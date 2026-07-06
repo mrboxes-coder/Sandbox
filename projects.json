@@ -1,0 +1,98 @@
+{
+  "projects": [
+    {
+      "id": 1,
+      "name": "Chromatic Mirror",
+      "tier": "1",
+      "categories": [
+        "Canvas"
+      ],
+      "date": "",
+      "desc": "Live colour mosaic and generative art sampled directly from your webcam. No tracking - pure pixel-level palette extraction.",
+      "link": "./chromatic-mirror/",
+      "tags": [
+        "WebCam",
+        "Canvas API"
+      ],
+      "thumb": "images/Screenshot 2026-07-06 093035.jpg"
+    },
+    {
+      "id": 2,
+      "name": "Motion Trail Painter",
+      "tier": "1",
+      "categories": [
+        "Canvas",
+        "MediaPipe Hands"
+      ],
+      "date": "",
+      "desc": "Move your hands and leave glowing colour trails on an infinite canvas. Adjust brush size, glow intensity and decay in real time.",
+      "link": "./motion-trail-painter/",
+      "tags": [
+        "WebCam",
+        "Hands",
+        "Canvas API"
+      ],
+      "thumb": ""
+    },
+    {
+      "id": 3,
+      "name": "Presence Theremin",
+      "tier": "1",
+      "categories": [
+        "MediaPipe Hands",
+        "Audio"
+      ],
+      "date": "",
+      "desc": "Hand position controls pitch and volume of a Web Audio synth. An invisible instrument you play with empty air.",
+      "link": "./presence-theremin/",
+      "tags": [
+        "WebCam",
+        "Hands",
+        "Web Audio"
+      ],
+      "thumb": ""
+    },
+    {
+      "id": 4,
+      "name": "Mirror Kaleidoscope",
+      "tier": "1",
+      "categories": [
+        "Canvas"
+      ],
+      "date": "",
+      "desc": "Your webcam feed reflected and rotated into a real-time symmetrical kaleidoscope. Adjust segments and mirror modes live.",
+      "link": "./mirror-kaleidoscope/",
+      "tags": [
+        "WebCam",
+        "Canvas API"
+      ],
+      "thumb": ""
+    },
+    {
+      "id": 5,
+      "name": "Face Particle Field",
+      "tier": "1",
+      "categories": [
+        "MediaPipe Face",
+        "Canvas"
+      ],
+      "date": "",
+      "desc": "468 face landmarks rendered as a floating 3D particle cloud. Tilt your head to orbit the field.",
+      "link": "./face-particle-field/",
+      "tags": [
+        "WebCam",
+        "Face Mesh",
+        "Canvas"
+      ],
+      "thumb": ""
+    }
+  ],
+  "nextId": 6,
+  "sortMode": "date",
+  "site": {
+    "eyebrow": "Browser-based creative tools : Chris Shaw",
+    "title": "Immersive Lab",
+    "accent": "Sandbox",
+    "subtitle": "The projects here exist at the intersection of exploration and imagination. A collection of real-time creative experiments using webcam, MediaPipe, and the Web Audio API, built through vibe coding: an intuitive, improvisational approach to making where curiosity leads and outcomes follow. They exist to probe, to test, to ask what if. Because imagination needs space before it needs purpose - and the most interesting discoveries tend to live just past the point where the plan ran out."
+  }
+}
