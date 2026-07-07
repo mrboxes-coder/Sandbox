@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Immersive Lab Sandbox</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23378ADD' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolygon points='13 2 3 14 12 14 11 22 21 10 12 10 13 2'/%3E%3C/svg%3E">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{--blue:#378ADD;}
@@ -11,7 +12,7 @@ body{background:#0d0d0d;color:#e8e3d8;font-family:-apple-system,BlinkMacSystemFo
 a{text-decoration:none;color:inherit;}
 .lp-hero{padding:72px 60px 48px;border-bottom:0.5px solid rgba(255,255,255,0.06);position:relative;overflow:hidden;}
 .lp-hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 70% 60% at 50% 0%,rgba(55,138,221,0.07) 0%,transparent 70%);pointer-events:none;}
-.lp-eyebrow{font-size:10px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--blue);margin-bottom:16px;}
+.lp-eyebrow{font-size:10px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--blue);margin-bottom:16px;line-height:1;}
 .lp-title{font-size:42px;font-weight:700;letter-spacing:-.03em;line-height:1.05;color:#f0ede6;margin-bottom:16px;}
 .lp-title span{color:var(--blue);}
 .lp-subtitle{font-size:14px;line-height:1.65;color:#999;max-width:680px;}
@@ -50,20 +51,76 @@ a{text-decoration:none;color:inherit;}
 .lp-card-arrow{color:var(--blue);opacity:0;transform:translate(-4px,4px);transition:opacity .2s,transform .2s;flex-shrink:0;}
 .lp-footer{padding:24px 60px;border-top:.5px solid rgba(255,255,255,.05);display:flex;align-items:center;justify-content:center;}
 .lp-footer-label{font-size:10px;color:#e8e3d8;letter-spacing:.08em;text-transform:uppercase;}
+.lp-hero-row{display:flex;gap:48px;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;position:relative;z-index:1;}
+.lp-hero-text{flex:1;min-width:280px;}
+.lp-carousel-frame{width:450px;flex-shrink:0;align-self:flex-start;}
+.lp-carousel{aspect-ratio:16/9;background:#111;position:relative;overflow:hidden;border-radius:4px;}
+.lp-carousel img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity 1.5s;}
+.lp-carousel img.active{opacity:1;}
+.lp-carousel-name{margin-top:10px;font-size:13px;font-weight:700;color:#fff;text-align:center;min-height:18px;opacity:0;transition:opacity .4s;}
+.lp-carousel-name.active{opacity:1;}
+.lp-carousel-dots{display:flex;justify-content:center;gap:6px;margin-top:8px;}
+.lp-carousel-dot{width:6px;height:6px;border-radius:50%;background:#555;border:none;padding:0;cursor:pointer;transition:background .2s,transform .2s;}
+.lp-carousel-dot:hover{background:#888;}
+.lp-carousel-dot.active{background:#378ADD;transform:scale(1.3);}
+.lp-carousel-empty{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#444;font-size:10px;text-transform:uppercase;letter-spacing:.08em;}
+@media(max-width:900px){.lp-carousel-frame{width:100%;max-width:450px;}}
+.lp-detail-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:300;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .15s;padding:24px;}
+.lp-detail-backdrop.open{opacity:1;pointer-events:all;}
+.lp-detail-modal{background:#2b2b2b;border:0.5px solid rgba(0,0,0,0.6);border-radius:8px;width:600px;max-width:100%;max-height:88vh;box-shadow:0 32px 100px rgba(0,0,0,.8);transform:scale(.97) translateY(8px);transition:transform .18s;overflow:hidden;display:flex;flex-direction:column;}
+.lp-detail-titlebar{display:flex;align-items:center;justify-content:space-between;padding:0 18px;height:42px;background:#333;border-bottom:1px solid #1a1a1a;flex-shrink:0;}
+.lp-detail-titlebar h2{font-size:13px;font-weight:600;color:#ccc;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.lp-detail-close{background:none;border:none;color:#888;cursor:pointer;font-size:18px;line-height:1;padding:4px 7px;border-radius:3px;}
+.lp-detail-close:hover{background:rgba(255,255,255,0.08);color:#eee;}
+.lp-detail-backdrop.open .lp-detail-modal{transform:scale(1) translateY(0);}
+.lp-detail-scroll{overflow-y:auto;}
+.lp-detail-hero-img{width:100%;aspect-ratio:16/9;object-fit:cover;display:block;background:#000;}
+.lp-detail-video{position:relative;width:100%;aspect-ratio:16/9;background:#000;}
+.lp-detail-video iframe{position:absolute;inset:0;width:100%;height:100%;border:0;display:block;}
+.lp-detail-body{padding:24px 28px 28px;}
+.lp-detail-meta{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-bottom:16px;}
+.lp-detail-tag{font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#888;padding:3px 8px;border:0.5px solid rgba(255,255,255,.12);border-radius:3px;}
+.lp-detail-meta-text{font-size:11px;color:#666;}
+.lp-detail-desc{font-size:14px;line-height:1.7;color:#bbb;margin-bottom:24px;white-space:pre-line;}
+.lp-detail-gallery{display:flex;flex-direction:column;gap:16px;margin-bottom:24px;}
+.lp-detail-gallery-item img{width:100%;border-radius:4px;display:block;background:#000;}
+.lp-detail-gallery-cap{font-size:12px;color:#fff;margin-top:6px;text-align:center;}
+.lp-detail-actions{display:flex;gap:8px;flex-wrap:wrap;border-top:0.5px solid rgba(255,255,255,.06);padding-top:20px;}
+.lp-detail-btn{flex:1;min-width:120px;text-align:center;padding:10px 14px;font-size:12px;font-weight:700;border-radius:6px;border:0.5px solid rgba(255,255,255,.15);background:rgba(255,255,255,.04);color:#e8e3d8;text-decoration:none;cursor:pointer;transition:background .15s;box-sizing:border-box;}
+.lp-detail-btn:hover{background:rgba(255,255,255,.09);}
+.lp-detail-btn.primary{background:#378ADD;border-color:#378ADD;color:#fff;}
+.lp-detail-btn.primary:hover{background:#4a9eff;}
+.lp-detail-btn.disabled{opacity:.35;pointer-events:none;}
+.lp-about-link{display:inline-block;margin-top:16px;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--blue);cursor:pointer;text-decoration:underline;text-underline-offset:3px;}
+.lp-about-link:hover{color:#4a9eff;}
+.lp-cat-filters{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:20px;}
+.lp-cat-chip{font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:4px 10px;border-radius:14px;border:0.5px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.04);color:#888;cursor:pointer;user-select:none;transition:background .15s,border-color .15s,color .15s;}
+.lp-cat-chip:hover{background:rgba(255,255,255,0.08);color:#e8e3d8;}
+.lp-cat-chip.active{border-color:var(--blue);background:#1a3d5c;color:var(--blue);}
 .lp-loading{padding:80px 60px;text-align:center;font-size:12px;color:#444;letter-spacing:.08em;text-transform:uppercase;}
 @media(max-width:640px){.lp-hero{padding:40px 24px 32px;}.lp-title{font-size:28px;}.lp-section{padding:24px 24px 48px;}.lp-footer{padding:20px 24px;}}
 </style>
 </head>
 <body>
 <div class="lp-hero">
-  <div class="lp-eyebrow">Browser-based creative tools : Chris Shaw</div>
-  <div class="lp-title">Immersive Lab <span>Sandbox</span></div>
-  <div class="lp-subtitle">The projects here exist at the intersection of exploration and imagination. A collection of real-time creative experiments using webcam, MediaPipe, and the Web Audio API, built through vibe coding: an intuitive, improvisational approach to making where curiosity leads and outcomes follow. They exist to probe, to test, to ask what if. Because imagination needs space before it needs purpose - and the most interesting discoveries tend to live just past the point where the plan ran out.</div>
-  <div class="lp-meta">
-    <div class="lp-tag">WebCam</div>
-    <div class="lp-tag">MediaPipe</div>
-    <div class="lp-tag">Web Audio</div>
-    <div class="lp-count" id="projectCount"></div>
+  <div class="lp-hero-row">
+    <div class="lp-hero-text">
+      <div class="lp-eyebrow">Browser-based creative exploration : Chris Shaw</div>
+      <div class="lp-title">Immersive Lab <span>Sandbox</span></div>
+      <div class="lp-subtitle">The projects here exist at the intersection of exploration and imagination. A collection of real-time creative experiments using webcam, MediaPipe, and the Web Audio API, built through vibe coding: an intuitive, improvisational approach to making where curiosity leads and outcomes follow. They exist to probe, to test, to ask what if. Because imagination needs space before it needs purpose - and the most interesting discoveries tend to live just past the point where the plan ran out.</div>
+      <div class="lp-about-link" onclick="openAbout()">About this sandbox &rarr;</div>
+      <div class="lp-meta">
+        <div class="lp-tag">WebCam</div>
+        <div class="lp-tag">MediaPipe</div>
+        <div class="lp-tag">Web Audio</div>
+        <div class="lp-count" id="projectCount"></div>
+      </div>
+    </div>
+    <div class="lp-carousel-frame">
+      <div class="lp-carousel" id="carousel"></div>
+      <div class="lp-carousel-name" id="carouselName"></div>
+      <div class="lp-carousel-dots" id="carouselDots"></div>
+    </div>
   </div>
 </div>
 <div class="lp-section">
@@ -72,18 +129,112 @@ a{text-decoration:none;color:inherit;}
     <div class="lp-sort-chips">
       <span class="sort-chip active" id="chipDate" onclick="setSort('date')">By Date</span>
       <span class="sort-chip" id="chipTier" onclick="setSort('tier')">By Tier</span>
+      <span class="sort-chip" id="chipName" onclick="setSort('name')">By Name</span>
     </div>
     <div class="lp-section-line"></div>
   </div>
+  <div class="lp-cat-filters" id="catFilters"></div>
   <div id="projectsContainer"><div class="lp-loading">Loading&hellip;</div></div>
 </div>
 <div class="lp-footer">
   <span class="lp-footer-label">Immersive Lab &middot; Sandbox &nbsp;&middot;&nbsp; &copy; Chris Shaw 2026</span>
 </div>
+<div class="lp-detail-backdrop" id="detailBackdrop">
+  <div class="lp-detail-modal">
+    <div class="lp-detail-titlebar"><h2 id="detailTitle"></h2><button class="lp-detail-close" onclick="closeDetail()">&#x00D7;</button></div>
+    <div class="lp-detail-scroll" id="detailScroll"></div>
+  </div>
+</div>
+<div class="lp-detail-backdrop" id="aboutBackdrop">
+  <div class="lp-detail-modal">
+    <div class="lp-detail-titlebar"><h2>About</h2><button class="lp-detail-close" onclick="closeAbout()">&#x00D7;</button></div>
+    <div class="lp-detail-scroll"><div class="lp-detail-body"><div class="lp-detail-desc">This sandbox is a controlled environment where interactive and immersive technologies can be tested, broken, and reassembled without consequence. Built through vibe coding: an intuitive, improvisational approach to making where curiosity leads and outcomes follow.
+
+Many of the projects here have no immediate purpose beyond the experience of discovering what happens when technology is given room to play. They exist to probe, to test, to ask what if. Because imagination needs space before it needs purpose - and the most interesting discoveries tend to live just past the point where the plan ran out.
+
+Potential rarely arrives fully formed. It surfaces through experimentation - through the willingness to begin without knowing the end.
+
+- Chris Shaw</div></div></div>
+  </div>
+</div>
 <script>
 var PROJECTS=[];var currentSort='date';
 function fmtDate(iso){if(!iso)return'';var p=iso.split('-');return p[2]+'/'+p[1]+'/'+p[0].slice(2);}
 function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function fmtGalleryItem(g){
+  if(!g.img)return'';
+  var cap=g.caption?'<div class="lp-detail-gallery-cap">'+esc(g.caption)+'</div>':'';
+  return'<div class="lp-detail-gallery-item"><img src="'+esc(g.img)+'" alt=""> '+cap+'</div>';
+}
+function ytVideoId(url){
+  if(!url)return'';
+  var s=url.trim();
+  var m;
+  m=s.match(/[?&]v=([A-Za-z0-9_-]{6,})/);if(m)return m[1];
+  m=s.match(/youtu\.be\/([A-Za-z0-9_-]{6,})/);if(m)return m[1];
+  m=s.match(/embed\/([A-Za-z0-9_-]{6,})/);if(m)return m[1];
+  m=s.match(/shorts\/([A-Za-z0-9_-]{6,})/);if(m)return m[1];
+  m=s.match(/\/v\/([A-Za-z0-9_-]{6,})/);if(m)return m[1];
+  m=s.match(/\/live\/([A-Za-z0-9_-]{6,})/);if(m)return m[1];
+  if(/^[A-Za-z0-9_-]{6,15}$/.test(s))return s;
+  return'';
+}
+function buildDetailHTML(p){
+  var metaParts=[];
+  if(p.tier)metaParts.push('<span class="lp-detail-tag">Tier '+esc(p.tier)+'</span>');
+  if(p.date)metaParts.push('<span class="lp-detail-meta-text">'+fmtDate(p.date)+'</span>');
+  (p.categories||[]).forEach(function(c){metaParts.push('<span class="lp-detail-tag">'+esc(c)+'</span>');});
+  var metaRow=metaParts.length?'<div class="lp-detail-meta">'+metaParts.join('')+'</div>':'';
+  var ytId=ytVideoId(p.youtube);
+  var thumb=ytId
+    ?'<div class="lp-detail-video"><iframe src="https://www.youtube-nocookie.com/embed/'+ytId+'" title="'+esc(p.name||'')+'" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></div>'
+    :(p.thumb?'<img class="lp-detail-hero-img" src="'+esc(p.thumb)+'" alt="'+esc(p.name||'')+'">':'');
+  var fullText=p.fullDesc||p.desc||'';
+  var fullDesc=fullText?'<div class="lp-detail-desc">'+esc(fullText)+'</div>':'';
+  var gallery=(p.gallery||[]).map(fmtGalleryItem).join('');
+  var gallerySection=gallery?'<div class="lp-detail-gallery">'+gallery+'</div>':'';
+  var openClass=p.link?'':' disabled';
+  var openHref=p.link?' href="'+esc(p.link)+'" target="_blank" rel="noopener"':'';
+  var resLabel=p.resourceLabel?esc(p.resourceLabel):'Project Resources';
+  var resClass=p.resourceLink?'':' disabled';
+  var resHref=p.resourceLink?' href="'+esc(p.resourceLink)+'" target="_blank" rel="noopener"':'';
+  return thumb
+    +'<div class="lp-detail-body">'
+    +metaRow+fullDesc+gallerySection
+    +'<div class="lp-detail-actions">'
+    +'<a class="lp-detail-btn primary'+openClass+'"'+openHref+'>Open Site</a>'
+    +'<a class="lp-detail-btn'+resClass+'"'+resHref+'>'+resLabel+'</a>'
+    +'<button type="button" class="lp-detail-btn" onclick="closeDetail()">Close</button>'
+    +'</div></div>';
+}
+function openDetail(id){
+  var p=null;for(var i=0;i<PROJECTS.length;i++){if(PROJECTS[i].id===id){p=PROJECTS[i];break;}}
+  if(!p)return;
+  document.getElementById('detailTitle').textContent=p.name||'Untitled';
+  document.getElementById('detailScroll').innerHTML=buildDetailHTML(p);
+  document.getElementById('detailBackdrop').classList.add('open');
+}
+function closeDetail(){
+  document.getElementById('detailBackdrop').classList.remove('open');
+}
+document.getElementById('detailBackdrop').addEventListener('click',function(e){
+  if(e.target===document.getElementById('detailBackdrop'))closeDetail();
+});
+document.addEventListener('keydown',function(e){
+  if(e.key==='Escape')closeDetail();
+});
+function openAbout(){
+  document.getElementById('aboutBackdrop').classList.add('open');
+}
+function closeAbout(){
+  document.getElementById('aboutBackdrop').classList.remove('open');
+}
+document.getElementById('aboutBackdrop').addEventListener('click',function(e){
+  if(e.target===document.getElementById('aboutBackdrop'))closeAbout();
+});
+document.addEventListener('keydown',function(e){
+  if(e.key==='Escape')closeAbout();
+});
 function thumbWrapHTML(p){
   if(!p.thumb)return'<div class="lp-card-thumb-empty"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/></svg></div>';
   return'<img src="'+esc(p.thumb)+'" alt="'+esc(p.name||'')+'" loading="lazy">';
@@ -92,8 +243,7 @@ function cardHTML(p,num){
   var cats=(p.categories||[]).map(function(t){return'<span class="lp-card-tech-tag">'+esc(t)+'</span>';}).join('');
   var badge=p.tier?'<div class="lp-card-tier-badge">Tier '+esc(p.tier)+'</div>':'';
   var dl=p.date?' &middot; '+fmtDate(p.date):'';
-  var href=p.link?'href="'+esc(p.link)+'"':'';
-  return'<a class="lp-card" '+href+'>'
+  return'<div class="lp-card" onclick="openDetail('+p.id+')">'
     +'<div class="lp-card-thumb">'+thumbWrapHTML(p)+badge+'</div>'
     +'<div class="lp-card-body">'
     +'<div class="lp-card-num">'+esc(num)+dl+'</div>'
@@ -101,37 +251,125 @@ function cardHTML(p,num){
     +'<div class="lp-card-desc">'+esc(p.desc||'')+'</div>'
     +'<div class="lp-card-footer"><div class="lp-card-tech">'+cats+'</div>'
     +'<svg class="lp-card-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m7 17 10-10M7 7h10v10"/></svg>'
-    +'</div></div></a>';
+    +'</div></div></div>';
 }
 function gridHTML(list){return'<div class="lp-grid">'+list.map(function(p,i){return cardHTML(p,String(i+1).padStart(2,'0'));}).join('')+'</div>';}
+var activeCatFilters=[];
+function allCategoriesUsed(){
+  var set={};
+  PROJECTS.forEach(function(p){(p.categories||[]).forEach(function(c){set[c]=true;});});
+  return Object.keys(set).sort();
+}
+function filteredProjects(list){
+  if(!activeCatFilters.length)return list;
+  return list.filter(function(p){
+    var cats=p.categories||[];
+    for(var i=0;i<activeCatFilters.length;i++){if(cats.indexOf(activeCatFilters[i])>=0)return true;}
+    return false;
+  });
+}
+function renderCatChips(){
+  var wrap=document.getElementById('catFilters');
+  var cats=allCategoriesUsed();
+  if(!cats.length){wrap.innerHTML='';return;}
+  wrap.innerHTML=cats.map(function(c){
+    var active=activeCatFilters.indexOf(c)>=0?' active':'';
+    return'<span class="lp-cat-chip'+active+'" onclick="toggleCatFilter(\''+c.replace(/'/g,"\\'")+'\')">'+c+'</span>';
+  }).join('');
+}
+function toggleCatFilter(cat){
+  var idx=activeCatFilters.indexOf(cat);
+  if(idx>=0)activeCatFilters.splice(idx,1);else activeCatFilters.push(cat);
+  render();
+}
 function render(){
   var c=document.getElementById('projectsContainer');
-  document.getElementById('projectCount').textContent=PROJECTS.length+' experiment'+(PROJECTS.length!==1?'s':'');
-  if(!PROJECTS.length){c.innerHTML='<div class="lp-loading">No projects found in projects.json</div>';return;}
+  renderCatChips();
+  if(!PROJECTS.length){c.innerHTML='<div class="lp-loading">No projects found in Sandbox_Projects.json</div>';document.getElementById('projectCount').textContent='0 experiments';return;}
+  var list=filteredProjects(PROJECTS);
+  document.getElementById('projectCount').textContent=list.length+' experiment'+(list.length!==1?'s':'');
+  if(!list.length){c.innerHTML='<div class="lp-loading">No projects match the selected filters</div>';return;}
   if(currentSort==='date'){
-    var sorted=PROJECTS.slice().sort(function(a,b){return !a.date&&!b.date?0:!a.date?1:!b.date?-1:b.date.localeCompare(a.date);});
+    var sorted=list.slice().sort(function(a,b){return !a.date&&!b.date?0:!a.date?1:!b.date?-1:b.date.localeCompare(a.date);});
     c.innerHTML=gridHTML(sorted);
+  } else if(currentSort==='name'){
+    var sortedName=list.slice().sort(function(a,b){return(a.name||'').localeCompare(b.name||'');});
+    c.innerHTML=gridHTML(sortedName);
   } else {
     var h='';
     ['1','2','3','4','5'].forEach(function(t){
-      var l=PROJECTS.filter(function(p){return p.tier===t;});
+      var l=list.filter(function(p){return p.tier===t;});
       if(l.length)h+='<div class="lp-tier-group"><div class="lp-tier-head"><span class="lp-tier-head-label">Tier '+t+'</span><div class="lp-tier-head-line"></div></div>'+gridHTML(l)+'</div>';
     });
-    var u=PROJECTS.filter(function(p){return!p.tier;});
+    var u=list.filter(function(p){return!p.tier;});
     if(u.length)h+='<div class="lp-tier-group"><div class="lp-tier-head"><span class="lp-tier-head-label">Untiered</span><div class="lp-tier-head-line"></div></div>'+gridHTML(u)+'</div>';
     c.innerHTML=h;
   }
+}
+var _carTimer=null;
+function goToCarouselSlide(box,nameEl,dotsEl,idx){
+  var imgs=box.querySelectorAll('img');
+  var dots=dotsEl.querySelectorAll('.lp-carousel-dot');
+  if(!imgs.length)return;
+  for(var i=0;i<imgs.length;i++)imgs[i].classList.toggle('active',i===idx);
+  for(var j=0;j<dots.length;j++)dots[j].classList.toggle('active',j===idx);
+  nameEl.classList.remove('active');
+  setTimeout(function(){nameEl.textContent=imgs[idx].alt;nameEl.classList.add('active');},200);
+}
+function startCarouselTimer(box,nameEl,dotsEl,getIdx,setIdx){
+  if(_carTimer){clearInterval(_carTimer);_carTimer=null;}
+  var imgs=box.querySelectorAll('img');
+  if(imgs.length<2)return;
+  _carTimer=setInterval(function(){
+    var next=(getIdx()+1)%imgs.length;
+    setIdx(next);
+    goToCarouselSlide(box,nameEl,dotsEl,next);
+  },5000);
+}
+function initCarousel(){
+  var box=document.getElementById('carousel');
+  var nameEl=document.getElementById('carouselName');
+  var dotsEl=document.getElementById('carouselDots');
+  var slides=PROJECTS.filter(function(p){return p.carousel&&p.thumb;});
+  if(!slides.length){box.innerHTML='<div class="lp-carousel-empty">No carousel images</div>';nameEl.textContent='';dotsEl.innerHTML='';return;}
+  box.innerHTML='';dotsEl.innerHTML='';
+  var current=0;
+  slides.forEach(function(p,i){
+    var img=document.createElement('img');
+    img.src=p.thumb;img.alt=p.name||'';
+    if(i===0)img.className='active';
+    box.appendChild(img);
+    var dot=document.createElement('button');
+    dot.className='lp-carousel-dot'+(i===0?' active':'');
+    dot.type='button';
+    dot.setAttribute('aria-label','Show '+(p.name||'project '+(i+1)));
+    dot.addEventListener('click',function(){
+      current=i;
+      goToCarouselSlide(box,nameEl,dotsEl,current);
+      startCarouselTimer(box,nameEl,dotsEl,function(){return current;},function(v){current=v;});
+    });
+    dotsEl.appendChild(dot);
+  });
+  nameEl.textContent=slides[0].name||'';
+  nameEl.classList.add('active');
+  startCarouselTimer(box,nameEl,dotsEl,function(){return current;},function(v){current=v;});
 }
 function setSort(mode){
   currentSort=mode;
   document.getElementById('chipDate').classList.toggle('active',mode==='date');
   document.getElementById('chipTier').classList.toggle('active',mode==='tier');
+  document.getElementById('chipName').classList.toggle('active',mode==='name');
   render();
 }
-fetch('projects.json')
+fetch('Sandbox_Projects.json')
   .then(function(r){if(!r.ok)throw 0;return r.json();})
-  .then(function(d){PROJECTS=d.projects||[];render();})
-  .catch(function(){document.getElementById('projectsContainer').innerHTML='<div class="lp-loading">Could not load projects.json - place it in the same folder as index.html</div>';});
+  .then(function(d){PROJECTS=d.projects||[];render();initCarousel();})
+  .catch(function(){
+    var msg=(location.protocol==='file:')
+      ?'This page must be opened through a local web server (e.g. VS Code Live Server), not by double-clicking the file. Browsers block file access when opened directly.'
+      :'Could not load Sandbox_Projects.json - place it in the same folder as index.html';
+    document.getElementById('projectsContainer').innerHTML='<div class="lp-loading">'+msg+'</div>';
+  });
 </script>
 </body>
 </html>

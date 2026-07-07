@@ -1,0 +1,962 @@
+{
+  "projects": [
+    {
+      "id": 1,
+      "name": "Chromatic Mirror v1",
+      "tier": "1",
+      "categories": [
+        "Canvas"
+      ],
+      "date": "2026-05-27",
+      "desc": "Live colour mosaic and generative art sampled directly from your webcam. No tracking - pure pixel-level palette extraction.",
+      "link": "./chromatic-mirror/",
+      "tags": [
+        "WebCam",
+        "Canvas API"
+      ],
+      "thumb": "",
+      "fullDesc": "",
+      "resourceLabel": "",
+      "resourceLink": "",
+      "gallery": [
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        }
+      ],
+      "carousel": true,
+      "youtube": ""
+    },
+    {
+      "id": 25,
+      "name": "Chromatic Mirror v2",
+      "tier": "1",
+      "categories": [
+        "Canvas"
+      ],
+      "date": "2026-05-27",
+      "desc": "Live colour mosaic and generative art sampled directly from your webcam. No tracking - pure pixel-level palette extraction.",
+      "link": "./chromatic-mirror/",
+      "tags": [
+        "WebCam",
+        "Canvas API"
+      ],
+      "thumb": "",
+      "fullDesc": "",
+      "resourceLabel": "",
+      "resourceLink": "",
+      "gallery": [
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        }
+      ],
+      "carousel": true,
+      "youtube": ""
+    },
+    {
+      "id": 3,
+      "name": "Presence Theremin",
+      "tier": "1",
+      "categories": [
+        "MediaPipe Hands",
+        "Audio"
+      ],
+      "date": "",
+      "desc": "Hand position controls pitch and volume of a Web Audio synth. An invisible instrument you play with empty air.",
+      "link": "./presence-theremin/",
+      "tags": [
+        "WebCam",
+        "Hands",
+        "Web Audio"
+      ],
+      "thumb": "",
+      "fullDesc": "",
+      "resourceLabel": "",
+      "resourceLink": "",
+      "gallery": [
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        }
+      ],
+      "carousel": true,
+      "youtube": ""
+    },
+    {
+      "id": 4,
+      "name": "Mirror Kaleidoscope",
+      "tier": "1",
+      "categories": [
+        "Canvas"
+      ],
+      "date": "",
+      "desc": "Your webcam feed reflected and rotated into a real-time symmetrical kaleidoscope. Adjust segments and mirror modes live.",
+      "link": "./mirror-kaleidoscope/",
+      "tags": [
+        "WebCam",
+        "Canvas API"
+      ],
+      "thumb": "",
+      "fullDesc": "",
+      "resourceLabel": "",
+      "resourceLink": "",
+      "gallery": [
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        }
+      ],
+      "carousel": true,
+      "youtube": ""
+    },
+    {
+      "id": 8,
+      "name": "Gaussian Splat Viewer",
+      "tier": "3",
+      "categories": [
+        "Animation Tool",
+        "Gaussian Splat",
+        "Fly-Thru"
+      ],
+      "date": "2026-07-07",
+      "desc": "Gaussian FlyThru is a browser-based Gaussian splat viewer for flying through 3D captures, adding bookmarks, hotspots, camera defaults, bounds, screenshots, recordings, and workspace exports.",
+      "fullDesc": "Gaussian FlyThru is a browser-based Gaussian splat / Luma .ply viewer designed for inspecting, navigating, annotating, and recording immersive 3D captures.\n\nIt loads LUMA-style Gaussian splat .ply files directly in the browser, so a user can explore a captured real-world scene without needing a heavy desktop 3D package. The viewer supports multiple navigation modes: Orbit for inspecting the scene from outside, Walk for grounded movement, Look for mouse-based first-person viewing, and Flight Sim for flying through the capture with velocity control, mouse steering, a central reticle, and optional bounding-box containment.\n\nThe project includes tools for setting a camera movement boundary, aligning the bounding box across X/Y/Z rotations, adjusting splat size, showing an axis gizmo, saving camera defaults, and reading precise camera position and rotation data. Users can create editable viewpoint bookmarks, add notes, generate flythrough tours from saved viewpoints, scrub a timeline, set tour duration, adjust look-ahead and aim smoothing, and record tours as MP4/WebM where supported.\n\nIt also supports hotspots: labeled markers placed inside the 3D scene with editable text, position, color, and short labels. These are useful for identifying scene features, research observations, design issues, or spatial points of interest.\n\nThe app exports and imports workspace JSON files. These save viewer state such as scene alignment, bounds, camera defaults, current camera, bookmarks, tour settings, hotspots, splat size, axis visibility, screenshot/recording settings, and navigation settings. The actual .ply capture remains separate and must be loaded again before importing the workspace.\n\nFor immersive practice and research, Gaussian FlyThru could be used to study spatial experience, document captured environments, rehearse movement paths, create guided walkthroughs, compare viewpoints, annotate field observations, and generate video material from 3D scans. It is especially relevant for architecture, exhibition design, virtual production, site analysis, heritage documentation, urban research, performance spaces, training simulations, and any workflow where moving through a captured environment matters as much as viewing it.",
+      "resourceLabel": "",
+      "resourceLink": "https://drive.google.com/drive/folders/1L55IaeJLnyPRVH0f---9dcbepje8xAxX?usp=sharing",
+      "gallery": [
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        }
+      ],
+      "carousel": false,
+      "link": "",
+      "tags": [],
+      "thumb": "",
+      "youtube": ""
+    },
+    {
+      "id": 9,
+      "name": "CaptureLab   Screenshot Record Paint",
+      "tier": "3",
+      "categories": [
+        "Canvas",
+        "Editing Tool",
+        "Image Editor"
+      ],
+      "date": "",
+      "desc": "CaptureLab is a browser tool for capturing screens, recording video, sketching, layering, annotating, cropping, selecting, and exporting visual research material for immersive practice and documentation.",
+      "fullDesc": "CaptureLab is a browser-based capture, recording, and visual annotation workspace designed for documenting screen-based activity and developing visual research material.\n   \nIt has three modes. Screenshot mode lets the user select a screen or window, capture still images, store them in a temporary gallery, and edit each capture with its own layer stack. Record mode records screen video, with options for audio, quality, resolution, format, and saved output. Paint mode provides a blank or imported-image canvas for sketching, diagramming, annotation, and visual development.\n   \nThe project includes drawing tools such as pen, eraser, fill, colour picker, text, crop, rectangular selection, lasso selection, and transform/select. Shape tools include rectangles, ellipses, lines, arrows, stars, speech bubbles, and thought bubbles, with editable line/fill styling, opacity, palettes, and layer controls. Layers can be named, hidden, reordered, merged, deleted, selected, moved, scaled, rotated, and edited after creation.\n  \nIt imports screen captures and image files, and exports still images as PNG or JPG at different scales. Recording exports video formats such as MP4 or WebM, depending on browser support.\n  \nFor immersive practice and research, CaptureLab can be used to document interaction flows, analyse software or virtual environments, annotate spatial/visual experiences, create research diaries, capture usability observations, sketch interface ideas, and produce visual evidence from screen-based practice. It is especially useful where screenshots, notes, mark-up, layered interpretation, and short recordings need to stay close together in one lightweight working space.",
+      "resourceLabel": "",
+      "resourceLink": "",
+      "gallery": [
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        }
+      ],
+      "carousel": false,
+      "link": "",
+      "tags": [],
+      "thumb": "",
+      "youtube": ""
+    },
+    {
+      "id": 10,
+      "name": "Stop Motion Studio",
+      "tier": "4",
+      "categories": [
+        "Animation Tool",
+        "Editing Tool"
+      ],
+      "date": "2026-07-07",
+      "desc": "A standalone browser-based stop-motion animation tool. Capture frames via webcam or import images, edit on a timeline, rotoscope, add an audio scratch track, and export as MP4, GIF, or image sequences.",
+      "fullDesc": "Stop Motion Studio is a fully self-contained, browser-based animation tool built as a single HTML file requiring no installation, server, or internet connection. It runs directly from a local file, making it immediately deployable in any classroom, studio, or research environment with a browser.\n    \nAt its core, the tool is a frame-by-frame animation system. A live webcam feed is displayed in one window while a preview window shows captured or imported frames. Frames can be captured directly from the camera or imported as image sequences, and are arranged on a zoomable, scrollable timeline with IN and OUT range markers for non-destructive editing. Frames can be duplicated, deleted, reordered, or extended in duration by dragging — and the playback rate is fully adjustable, supporting standard animation frame rates from 8 to 30fps.\n    \nThe rotoscoping system allows artists to draw frame-by-frame annotations directly over the captured footage using a pen, eraser, or line tool with a 25-colour editable palette. These drawings exist on a separate transparent layer that can be toggled, exported independently as a PNG sequence, and composited with the captured frames on export. An onion skin feature overlays up to three previous frames as semi-transparent ghosts on the live camera, providing spatial reference for animators during capture.\n     \nAn audio scratch track can be imported, scrubbed, and mixed into the final export. Output formats include MP4 with embedded audio, animated GIF, PNG and JPG sequences. Project settings — including all camera, timeline, guide, and rotoscope configurations — are saved and restored via a JSON project file.\n       \nThe tool has strong potential for immersive practice and research. Its rotoscoping and compositing capabilities support investigations into presence, embodiment, and the boundary between live capture and drawn mark-making. The frame-extend and onion skin features enable durational studies — tracing movement, gesture, and spatial relationships across time. As a portable, dependency-free tool, it is equally suited to field-based research, participatory workshops, and classroom-based experimental animation practice.",
+      "resourceLabel": "",
+      "resourceLink": "",
+      "gallery": [
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        }
+      ],
+      "carousel": false,
+      "link": "",
+      "tags": [],
+      "thumb": "",
+      "youtube": ""
+    },
+    {
+      "id": 11,
+      "name": "Panzerkrieg Editor",
+      "tier": "4",
+      "categories": [
+        "Game"
+      ],
+      "date": "2026-07-07",
+      "desc": "Panzer Editor is a browser-based 3D tool for designing, configuring and testing WWII tanks for the game Panzerkrieg. Build models, tune combat stats, and run target practice, all exported as a single GLB file.",
+      "fullDesc": "Panzer Editor is a self-contained browser tool built for designing and configuring WWII tank assets for the game Panzerkrieg. It requires no installation, runs from a single HTML file, and stores everything - geometry, combat data, explosion physics - inside a standard GLB file using the GLTF extras field.\n    \nThe editor is organised across three distinct modes. \n   \n1. The Model tab is a full 3D mesh editor with orthographic views, transform controls, material editing, and a role-tagging system that tells the engine which parts of the tank are hull, turret, or barrel. \n   \n2. The Armoury tab assembles the modelled tank into a live drive simulation where the user can physically operate the vehicle — steering, accelerating, firing shells — against a field of spawned enemy tanks on a 500×500 world-unit terrain. Three shell types (HE, AP, LR) are each independently configurable with their own ballistic properties, recoil behaviour, and fire rates. A terrain texture system with normal map support and a flight simulator-style Drone Camera round out the environmental tools. \n   \n3. The Enemy Tank tab provides a dedicated editor for configuring explosion and shrapnel physics, which are then embedded in the enemy GLB and triggered automatically when a shell connects in the Armoury.\n   \nBeyond game development, the tool has meaningful potential for immersive military education and research. The ability to model historical vehicle configurations, set accurate performance parameters such as turret traverse speed, armour rating, and ammunition characteristics, and then experience those parameters interactively through a live drive simulation creates a uniquely tangible learning environment. Researchers could use it to explore comparative tank performance, while educators could deploy it as an accessible, no-install simulation tool.",
+      "resourceLabel": "Download Tank Models (GLB)",
+      "resourceLink": "https://drive.google.com/drive/folders/1OeE3VdM9mxqJyPJHiV8nAGiSDqJSzm2y?usp=sharing",
+      "gallery": [
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        }
+      ],
+      "carousel": false,
+      "link": "",
+      "tags": [],
+      "thumb": "",
+      "youtube": ""
+    },
+    {
+      "id": 13,
+      "name": "Asteroids",
+      "tier": "4",
+      "categories": [
+        "Three.js",
+        "Game",
+        "Fly-Thru"
+      ],
+      "date": "2026-07-07",
+      "desc": "Asteroids is a browser-based 3D space combat simulatio. A single self-contained HTML file in which the player pilots a spacecraft to intercept and destroy an autonomous boid navigating a procedurally generated asteroid field.",
+      "fullDesc": "Asteroid is a browser-based interactive 3D simulation built entirely in a single self-contained HTML file. It runs in Chrome without a build process, importing Three.js r158 and OrbitControls as ES modules from a CDN, with no external dependencies, servers, or frameworks required.\n   \nThe simulation places the user inside a procedurally generated asteroid field — a field of rotating, tumbling cubes scattered across a defined volume — and tasks them with piloting a first-person spacecraft to intercept and destroy an autonomous target called the Boid. A second autonomous agent, Princess, chases the same target object independently, creating emergent triangular dynamics between the player, the quarry, and the observer. Both agents use quaternion-based steering with asteroid avoidance built from weighted repulsion vectors, giving them naturalistic flight behaviour without scripted paths.\n   \nThe environment supports two camera modes: a first-person flight camera with inertial mouse controls and a full six-degree flight model, and an orbital observer camera that allows detached viewing of the scene. Space mines of two types — orange (non-fatal) and red (fatal) — add tactical hazard, with full collision detection, camera shake, and escalating warning sequences. Missile combat uses alternating twin-gun emitters, a lock-on detection cone, and a proximity-based HUD reticle. Death events trigger one of two cinematic destruction scenarios driven by real-time quaternion interpolation, particle systems, and procedural audio.\n   \nThe project has direct application in immersive media research and education as a platform for exploring autonomous agent behaviour, spatial reasoning, multi-agent interaction, and real-time 3D interface design — all in a lightweight, portable format that runs in any modern browser without installation.",
+      "resourceLabel": "",
+      "resourceLink": "",
+      "gallery": [
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        }
+      ],
+      "carousel": false,
+      "link": "",
+      "tags": [],
+      "thumb": "",
+      "youtube": ""
+    },
+    {
+      "id": 14,
+      "name": "Space Invaders: A Prompt Engineering Case Study",
+      "tier": "1",
+      "categories": [
+        "Game"
+      ],
+      "date": "2026-07-07",
+      "desc": "Effective prompting is used to generate a complete arcade game. However, it is explicitly cautioned that without design thinking, iteration, or analytical engagement, the process collapses into retrieval, not learning.",
+      "fullDesc": "This project is a fully self-contained browser-based recreation of the 1978 Taito arcade classic Space Invaders, generated entirely from a single structured prompt without external dependencies, frameworks, or asset files. The game runs directly in any modern browser as a standalone HTML document, rendering all visuals programmatically through the Canvas 2D API using pixel-by-pixel bitmap drawing routines. It imports and exports nothing (no libraries, no network calls, no build pipeline) making it genuinely portable and archivable.\n\nThe game was created in less than 5 mins with 2 prompts.\n     \nPrompt 1 : \"Please describe to me the game \"SPACE INVADERS\". Outline in detail how the gameplay unfolds, how the controls are used, and how the graphics are created.\"\n   \nPrompt 2 : \"Now write an extensive prompt to create this game.\"\n      \nFunctionally, the game replicates the original with considerable fidelity: three alien types march in formation with accelerating speed as their numbers diminish, firing projectiles that physically erode destructible shields pixel by pixel. A mystery UFO traverses the screen periodically, awarding variable bonus scores. The player cannon responds to keyboard and touch input, with a single-shot constraint that demands timing and precision. All audio is synthesised in real-time through the Web Audio API, including the iconic four-tone march sequence, noise-burst kill effects, and frequency-sweep death sounds. A persistent high-score is stored locally between sessions.\n     \nIn the context of immersive media practice and research, this project carries specific pedagogical and methodological relevance. The technique of generating interactive, real-time browser environments through structured natural language prompting has direct applications in rapid prototyping for installation work, interactive narrative, and experiential design research. A researcher could deploy this methodology to produce testable interactive prototypes for audience studies, spatial computing experiments, or immersive environment pre-visualisation, collapsing weeks of development into hours. \n     \nThis project is offered as a demonstration of prompt engineering capability, not an advocated model of practice. Generating a functional application through a single prompt, while technically impressive, bypasses the iterative reasoning, critical problem-solving, and developmental thinking that constitute genuine learning, reducing the process to sophisticated retrieval rather than constructed understanding. What would begin to legitimise this work is the subsequent stage: the deliberate interrogation, adaptation, and modification of the generated output, where generated material becomes the starting point for critical authorship rather than the endpoint of a query. Students and practitioners are strongly cautioned against treating generative output as a substitute for technical and conceptual competency; its responsible use presupposes the very analytical capacity it is otherwise capable of circumventing.",
+      "resourceLabel": "",
+      "resourceLink": "",
+      "gallery": [
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        }
+      ],
+      "carousel": false,
+      "link": "",
+      "tags": [],
+      "thumb": "",
+      "youtube": ""
+    },
+    {
+      "id": 15,
+      "name": "GLB File Viewer / Slideshow",
+      "tier": "2",
+      "categories": [],
+      "date": "2026-07-07",
+      "desc": "",
+      "fullDesc": "",
+      "resourceLabel": "",
+      "resourceLink": "",
+      "gallery": [
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        }
+      ],
+      "carousel": false,
+      "link": "",
+      "tags": [],
+      "thumb": "",
+      "youtube": ""
+    },
+    {
+      "id": 16,
+      "name": "Flight Simulator",
+      "tier": "3",
+      "categories": [
+        "Three.js",
+        "Game",
+        "Fly-Thru"
+      ],
+      "date": "2026-07-07",
+      "desc": "Look for Update Flight Simulator",
+      "fullDesc": "",
+      "resourceLabel": "",
+      "resourceLink": "",
+      "gallery": [
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        }
+      ],
+      "carousel": false,
+      "link": "",
+      "tags": [],
+      "thumb": "",
+      "youtube": ""
+    },
+    {
+      "id": 17,
+      "name": "Boids  v1",
+      "tier": "2",
+      "categories": [
+        "Animation Tool"
+      ],
+      "date": "2026-07-07",
+      "desc": "Looks for Boids Version 01 - Claude Code",
+      "fullDesc": "",
+      "resourceLabel": "",
+      "resourceLink": "",
+      "gallery": [
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        }
+      ],
+      "carousel": false,
+      "link": "",
+      "tags": [],
+      "thumb": "",
+      "youtube": ""
+    },
+    {
+      "id": 18,
+      "name": "Boids  v2",
+      "tier": "3",
+      "categories": [
+        "Animation Tool",
+        "Three.js",
+        "Fly-Thru"
+      ],
+      "date": "2026-07-07",
+      "desc": "Looks for Boids Version 02 - Claude Code",
+      "fullDesc": "",
+      "resourceLabel": "",
+      "resourceLink": "",
+      "gallery": [
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        }
+      ],
+      "carousel": false,
+      "link": "",
+      "tags": [],
+      "thumb": "",
+      "youtube": ""
+    },
+    {
+      "id": 23,
+      "name": "Boids  v3 - X-Wing",
+      "tier": "3",
+      "categories": [
+        "Animation Tool",
+        "Three.js",
+        "Fly-Thru"
+      ],
+      "date": "2026-06-05",
+      "desc": "Looks for X-Wing Boids - Claude Code",
+      "fullDesc": "",
+      "resourceLabel": "",
+      "resourceLink": "",
+      "gallery": [
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        }
+      ],
+      "carousel": false,
+      "link": "",
+      "tags": [],
+      "thumb": "",
+      "youtube": ""
+    },
+    {
+      "id": 19,
+      "name": "Motion Trail Painter v1",
+      "tier": "2",
+      "categories": [
+        "MediaPipe Hands"
+      ],
+      "date": "",
+      "desc": "See Motion Trail Painter 01",
+      "fullDesc": "",
+      "resourceLabel": "",
+      "resourceLink": "",
+      "gallery": [
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        }
+      ],
+      "carousel": false,
+      "link": "",
+      "tags": [],
+      "thumb": "",
+      "youtube": ""
+    },
+    {
+      "id": 26,
+      "name": "Motion Trail Painter v2",
+      "tier": "2",
+      "categories": [
+        "MediaPipe Hands"
+      ],
+      "date": "",
+      "desc": "See Motion Trail Painter 02",
+      "fullDesc": "",
+      "resourceLabel": "",
+      "resourceLink": "",
+      "gallery": [
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        }
+      ],
+      "carousel": false,
+      "link": "",
+      "tags": [],
+      "thumb": "",
+      "youtube": ""
+    },
+    {
+      "id": 20,
+      "name": "Image Mesh Morph",
+      "tier": "3",
+      "categories": [
+        "Canvas",
+        "Editing Tool",
+        "Image Editor"
+      ],
+      "date": "",
+      "desc": "See Morph Mesh Claude Code",
+      "fullDesc": "",
+      "resourceLabel": "",
+      "resourceLink": "",
+      "gallery": [
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        }
+      ],
+      "carousel": false,
+      "link": "",
+      "tags": [],
+      "thumb": "",
+      "youtube": ""
+    },
+    {
+      "id": 21,
+      "name": "GLB Editor",
+      "tier": "3",
+      "categories": [
+        "Three.js"
+      ],
+      "date": "2026-06-05",
+      "desc": "Look for GLB Editor  - Claude Code",
+      "fullDesc": "",
+      "resourceLabel": "",
+      "resourceLink": "",
+      "gallery": [
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        }
+      ],
+      "carousel": false,
+      "link": "",
+      "tags": [],
+      "thumb": "",
+      "youtube": ""
+    },
+    {
+      "id": 24,
+      "name": "Generic 3D Environment Setup",
+      "tier": "2",
+      "categories": [],
+      "date": "2026-06-07",
+      "desc": "Look for Boids/3D Basic Environment Setup",
+      "fullDesc": "",
+      "resourceLabel": "",
+      "resourceLink": "",
+      "gallery": [
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        }
+      ],
+      "carousel": false,
+      "link": "",
+      "tags": [],
+      "thumb": "",
+      "youtube": ""
+    },
+    {
+      "id": 27,
+      "name": "Start & End Frame Extractor",
+      "tier": "1",
+      "categories": [
+        "Editing Tool"
+      ],
+      "date": "2026-06-05",
+      "desc": "Media Tools >  Video Frame Extraction Tool",
+      "fullDesc": "",
+      "resourceLabel": "",
+      "resourceLink": "",
+      "gallery": [
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        }
+      ],
+      "carousel": false,
+      "link": "",
+      "tags": [],
+      "thumb": "",
+      "youtube": ""
+    }
+  ],
+  "nextId": 28,
+  "sortMode": "date",
+  "site": {
+    "eyebrow": "Browser-based creative exploration : Chris Shaw",
+    "title": "Immersive Lab",
+    "accent": "Sandbox",
+    "subtitle": "The projects here exist at the intersection of exploration and imagination. A collection of real-time creative experiments using webcam, MediaPipe, and the Web Audio API, built through vibe coding: an intuitive, improvisational approach to making where curiosity leads and outcomes follow. They exist to probe, to test, to ask what if. Because imagination needs space before it needs purpose - and the most interesting discoveries tend to live just past the point where the plan ran out.",
+    "about": "This sandbox is a exploratory environment where interactive and immersive technologies can be tested, broken, and reassembled without consequence. Built through vibe coding: an intuitive, improvisational approach to making where curiosity leads and outcomes follow.\n\nMany of the projects here have no immediate purpose beyond the experience of discovering what happens when technology is given room to play. They exist to probe, to test, to ask what if. Because imagination needs space before it needs purpose - and the most interesting discoveries tend to live just past the point where the plan ran out.\n\nPotential rarely arrives fully formed. It surfaces through experimentation - through the willingness to begin without knowing the end.\n\n- Chris Shaw\nHead, Puttnam School of Film & Animation\nLASALLE College of the Arts\nUniversity of the Arts Singapore "
+  }
+}
