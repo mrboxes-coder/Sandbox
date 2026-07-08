@@ -30,6 +30,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-seri
 .section-header{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;cursor:pointer;user-select:none;}
 .section-header:hover{background:var(--surface2);}
 .section-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);}
+.tier-count{font-weight:400;text-transform:none;letter-spacing:normal;color:#555;}
 .section-chevron{transition:transform 0.2s;color:var(--text-muted);flex-shrink:0;}
 .section-header.collapsed .section-chevron{transform:rotate(-90deg);}
 .section-body{padding:0 14px 12px;}
@@ -262,22 +263,72 @@ Potential rarely arrives fully formed. It surfaces through experimentation - thr
             <span class="cat-chip"        id="sortBtnName" onclick="setSortMode('name')">By Name</span>
           </div>
         </div>
-      </div>
-    </div>
-
-    <div class="panel-section">
-      <div class="section-header" onclick="toggleSection(this)">
-        <div class="section-label">Projects</div>
-        <svg class="section-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
-      </div>
-      <div class="section-body" style="padding:0;">
-        <div class="project-list" id="projectList"></div>
-        <div style="padding:8px 14px 12px;">
+        <div class="field">
           <button class="big-btn ghost" onclick="addProject()">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
             Add Project
           </button>
         </div>
+      </div>
+    </div>
+
+    <div class="panel-section">
+      <div class="section-header" onclick="toggleSection(this)">
+        <div class="section-label">No Tier <span class="tier-count" id="countNone"></span></div>
+        <svg class="section-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+      <div class="section-body" style="padding:0;">
+        <div class="project-list" id="projectListNone"></div>
+      </div>
+    </div>
+
+    <div class="panel-section">
+      <div class="section-header" onclick="toggleSection(this)">
+        <div class="section-label">Tier 1 <span class="tier-count" id="count1"></span></div>
+        <svg class="section-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+      <div class="section-body" style="padding:0;">
+        <div class="project-list" id="projectList1"></div>
+      </div>
+    </div>
+
+    <div class="panel-section">
+      <div class="section-header" onclick="toggleSection(this)">
+        <div class="section-label">Tier 2 <span class="tier-count" id="count2"></span></div>
+        <svg class="section-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+      <div class="section-body" style="padding:0;">
+        <div class="project-list" id="projectList2"></div>
+      </div>
+    </div>
+
+    <div class="panel-section">
+      <div class="section-header" onclick="toggleSection(this)">
+        <div class="section-label">Tier 3 <span class="tier-count" id="count3"></span></div>
+        <svg class="section-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+      <div class="section-body" style="padding:0;">
+        <div class="project-list" id="projectList3"></div>
+      </div>
+    </div>
+
+    <div class="panel-section">
+      <div class="section-header" onclick="toggleSection(this)">
+        <div class="section-label">Tier 4 <span class="tier-count" id="count4"></span></div>
+        <svg class="section-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+      <div class="section-body" style="padding:0;">
+        <div class="project-list" id="projectList4"></div>
+      </div>
+    </div>
+
+    <div class="panel-section">
+      <div class="section-header" onclick="toggleSection(this)">
+        <div class="section-label">Tier 5 <span class="tier-count" id="count5"></span></div>
+        <svg class="section-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+      <div class="section-body" style="padding:0;">
+        <div class="project-list" id="projectList5"></div>
       </div>
     </div>
 
@@ -401,7 +452,7 @@ function b64DecodeUtf8(b64){
   return new TextDecoder('utf-8').decode(bytes);
 }
 
-var CATEGORIES=['Canvas','MediaPipe Hands','MediaPipe Face','MediaPipe Body','Animation Tool','Editing Tool','Audio','Three.js','Gaussian Splat','Game','Image Editor','Fly-Thru'];
+var CATEGORIES=['Canvas','MediaPipe Hands','MediaPipe Face','MediaPipe Body','Animation Tool','Editing Tool','Audio','Three.js','Gaussian Splat','Game','Image Editor','Fly-Thru','Simulation','Behaviour','Flock/Schools/Herds','Video Editing'];
 var IMAGES_FOLDER='images/';
 var sortMode='date';
 var projects=[
@@ -573,8 +624,20 @@ function fmtDate(iso){if(!iso)return'';var p=iso.split('-');return p[2]+'/'+p[1]
 
 /* Render sidebar list */
 function renderList(){
-  var list=document.getElementById('projectList');list.innerHTML='';
+  var buckets={
+    '':document.getElementById('projectListNone'),
+    '1':document.getElementById('projectList1'),
+    '2':document.getElementById('projectList2'),
+    '3':document.getElementById('projectList3'),
+    '4':document.getElementById('projectList4'),
+    '5':document.getElementById('projectList5')
+  };
+  var counts={'':0,'1':0,'2':0,'3':0,'4':0,'5':0};
+  Object.keys(buckets).forEach(function(k){buckets[k].innerHTML='';});
+
   projects.forEach(function(p,i){
+    var tierKey=(p.tier&&buckets[p.tier])?p.tier:'';
+    counts[tierKey]++;
     var item=document.createElement('div');item.className='project-card-item';
     item.addEventListener('click',function(){openEdit(p.id);});
     var thumbHTML=p.thumb
@@ -586,8 +649,16 @@ function renderList(){
       +'<div class="project-card-tier">'+(p.tier?'Tier '+p.tier:'No tier')
       +(p.categories&&p.categories.length?' - '+p.categories.slice(0,2).join(', '):'')
       +(p.date?' - '+fmtDate(p.date):'')+'</div></div>';
-    list.appendChild(item);
+    buckets[tierKey].appendChild(item);
   });
+
+  document.getElementById('countNone').textContent=counts['']?'('+counts['']+')':'';
+  document.getElementById('count1').textContent=counts['1']?'('+counts['1']+')':'';
+  document.getElementById('count2').textContent=counts['2']?'('+counts['2']+')':'';
+  document.getElementById('count3').textContent=counts['3']?'('+counts['3']+')':'';
+  document.getElementById('count4').textContent=counts['4']?'('+counts['4']+')':'';
+  document.getElementById('count5').textContent=counts['5']?'('+counts['5']+')':'';
+
   document.getElementById('statTotal').textContent=projects.length;
   document.getElementById('statThumbs').textContent=projects.filter(function(p){return p.thumb;}).length;
   document.getElementById('statLinks').textContent=projects.filter(function(p){return p.link;}).length;

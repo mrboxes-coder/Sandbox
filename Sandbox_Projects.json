@@ -431,15 +431,15 @@
       "resourceLink": "",
       "gallery": [
         {
-          "img": "",
+          "img": "images/space_invaders01.jpg",
           "caption": ""
         },
         {
-          "img": "",
+          "img": "images/space_invaders02.jpg",
           "caption": ""
         },
         {
-          "img": "",
+          "img": "images/space_invaders03.jpg",
           "caption": ""
         },
         {
@@ -455,11 +455,11 @@
           "caption": ""
         }
       ],
-      "carousel": false,
+      "carousel": true,
       "link": "",
       "tags": [],
-      "thumb": "",
-      "youtube": ""
+      "thumb": "images/space_invaders02.jpg",
+      "youtube": "https://youtu.be/NC-fQi74lTI?si=Do7l9-FPasNJidZJ"
     },
     {
       "id": 15,
@@ -467,8 +467,8 @@
       "tier": "2",
       "categories": [],
       "date": "2026-07-07",
-      "desc": "",
-      "fullDesc": "",
+      "desc": "GLB Slideshow is a self-contained browser-based 3D viewer built with Three.js. It supports loading, viewing and presenting GLB files with full lighting, camera, metadata and scene-state controls — all saved as a curated, reloadable slideshow playlist.",
+      "fullDesc": "GLB Slideshow is a self-contained, browser-based 3D presentation and research tool built entirely in a single HTML file using Three.js r160. It requires no installation, no server, and no build pipeline — opening it in any modern browser gives immediate access to a full-featured GLB viewing and curation environment.\n       \nThe tool operates in two complementary modes. In standard viewing mode it functions as a professional GLB viewer with granular control over lighting (exposure, ambient, key, fill and rim lights with studio/outdoor/dramatic presets), camera (FOV, orbit, auto-rotate with bidirectional speed control), background (greyscale and custom colour swatches, background image with brightness and opacity blending), grid, display and overlay settings. All of these scene attributes can be embedded directly into a GLB file as metadata alongside authoring information — name, author, contact, tags, description and notes — and recalled precisely on reload.\n   \nIn slideshow mode a horizontal filmstrip panel opens along the bottom of the viewport, accepting GLB files by drag and drop. Each card in the filmstrip stores its own complete scene state — camera position and orientation, lighting values, background colour, grid settings, rotation speed, and metadata overlay style — which is restored automatically when the card is selected. Slideshows are saved as lightweight JSON playlists and reloaded by pointing to a folder of GLB files, making the format portable and archival.\n   \nExport options include PNG screenshots, transparent-background PNG renders for compositing, and GLB files with embedded scene state and version history.\n     \nFor immersive practice and research the tool has significant potential as a presentation layer for 3D asset libraries, a comparative review environment for iterative model development, a lightweight alternative to game-engine previsualisaton pipelines, and a portable portfolio or exhibition format that travels as two files — a JSON playlist and a folder of GLBs — with no dependency on cloud infrastructure or proprietary software.",
       "resourceLabel": "",
       "resourceLink": "",
       "gallery": [
@@ -513,8 +513,8 @@
         "Fly-Thru"
       ],
       "date": "2026-07-07",
-      "desc": "Look for Update Flight Simulator",
-      "fullDesc": "",
+      "desc": "Flight Simulator — A browser-based 3D flight simulator built as a single HTML file using Three.js. Features a fully functional flight model, HUD overlays, cockpit skin, instrumentation panels, and realistic thrust/speed/pitch mechanics.",
+      "fullDesc": "This is a browser-based 3D flight simulator built as a single self-contained HTML file, requiring no installation or build tools. It runs entirely in Chrome using Three.js r128 for 3D rendering and HTML5 Canvas for HUD and instrument overlays.\n        \nThe simulator presents a first-person cockpit perspective over a procedurally populated 3D environment of coloured cubes and stars, with a fully functional flight model governing thrust, speed, pitch, roll, yaw, altitude, and landing gear. The aircraft starts on the ground with brakes applied, requiring the pilot to build thrust, release brakes, and manage a realistic runway roll before achieving takeoff speed. Once airborne, pitch controls climb and descent, roll and yaw respond proportionally to speed, and a graduated pitch ease system simulates the inertia of a real aircraft transitioning from ground to flight.\n      \nThe interface has two configurable side panels — a Setup Panel controlling environment, lighting, atmosphere, scene objects, and a cockpit skin overlay — and a Flight Control Panel showing live instrumentation including IAS, altitude, VSI, heading, and fuel. A heads-up display canvas renders a heading tape, speed and altitude ladders with thrust markers, a boresight reticle, and a pitch ladder that rotates with the aircraft's roll angle. A separate cockpit instrument panel canvas aligns precisely with a loadable PNG cockpit skin at 1920×1080.\n      \nThe simulator can import GLB/GLTF 3D models and custom cockpit skin PNGs, making it extensible for different vehicle configurations. Its potential applications include immersive UX research for cockpit interface design, spatial awareness training, HUD readability studies, and as a development platform for interactive aerial experiences and educational simulations.",
       "resourceLabel": "",
       "resourceLink": "",
       "gallery": [
@@ -554,24 +554,25 @@
       "name": "Boids  v1",
       "tier": "2",
       "categories": [
-        "Animation Tool"
+        "Animation Tool",
+        "Three.js"
       ],
       "date": "2026-07-07",
-      "desc": "Looks for Boids Version 01 - Claude Code",
-      "fullDesc": "",
+      "desc": "Boids 01 is a Three.js 3D simulation where a single agent (Boid) seeks and follows a bouncing target within a bounded space, using velocity and turn-rate limited steering to create realistic, gradual movement.",
+      "fullDesc": "Boids 01 is a real-time 3D steering and flocking simulation built as a self-contained browser application using Three.js. At its core, a single triangular agent navigates a bounded volumetric space by seeking a moving target object, using quaternion-based steering constrained to local X and Y rotation axes, producing smooth, lifelike turning behaviour governed by adjustable velocity and turn-rate parameters.\n   \nThe environment is fully interactive — the camera can be orbited, zoomed and panned freely, and all key simulation parameters are exposed through a structured control panel. The bounded space itself is a resizable wireframe box whose height can be adjusted at runtime, while the target object bounces dynamically off all six interior faces, creating an unpredictable flight path for the agent to pursue. Visual aids including local axis gizmos, directional light helpers, a shadow-casting ground plane and a world-space orientation gizmo help communicate spatial relationships clearly during observation.\n   \nThe application imports Three.js via CDN as an ES module alongside OrbitControls and GLTFLoader, and exports scenes as binary GLB files, making it straightforward to extract simulation geometry into external 3D tools for further development.\n   \nIn the context of immersive practice and research, Boids serves as a lightweight, accessible testbed for exploring emergent agent behaviour, spatial reasoning and non-linear choreography. It has strong potential as a tool for visualising autonomous movement systems in virtual and extended reality contexts, generative installation work, or as a pedagogical instrument for teaching steering algorithms and spatial computing. The architecture is intentionally modular, designed to scale toward full multi-agent Reynolds flocking with separation, alignment and cohesion forces.",
       "resourceLabel": "",
       "resourceLink": "",
       "gallery": [
         {
-          "img": "",
+          "img": "images/boids01_01.jpg",
           "caption": ""
         },
         {
-          "img": "",
+          "img": "images/boids01_03.jpg",
           "caption": ""
         },
         {
-          "img": "",
+          "img": "images/boids01_02.jpg",
           "caption": ""
         },
         {
@@ -587,11 +588,11 @@
           "caption": ""
         }
       ],
-      "carousel": false,
+      "carousel": true,
       "link": "",
       "tags": [],
-      "thumb": "",
-      "youtube": ""
+      "thumb": "images/boids01_04.jpg",
+      "youtube": "https://youtu.be/1zfOHXKfGtU"
     },
     {
       "id": 18,
@@ -603,8 +604,8 @@
         "Fly-Thru"
       ],
       "date": "2026-07-07",
-      "desc": "Looks for Boids Version 02 - Claude Code",
-      "fullDesc": "",
+      "desc": "A real-time 3D flocking simulation built with Three.js. Multiple agents fly together using Reynolds' three rules — separation, alignment, and cohesion — producing emergent flock behaviour controlled via an interactive panel.",
+      "fullDesc": "Boids is a real-time 3D flocking simulation built as a self-contained browser application using Three.js. It implements Craig Reynolds' classic emergent behaviour algorithm, spawning a flock of agents that fly together through a bounded 3D space without any central coordination — cohesion, separation, and alignment forces applied locally to each agent every frame produce the complex group dynamics observed in real bird murmurations and fish shoals.\n  \nThe simulation offers two broad operational modes: a contained mode where soft wall repulsion and hard boundary clamping keep the flock within a defined box, and an open mode where the flock drifts freely through unbounded space. A secondary attractor — a bouncing target sphere — can be introduced to draw the flock in a particular direction, overlaying goal-seeking behaviour on top of the emergent dynamics. An auto-rotating camera keeps the flock continuously in frame, and all flocking parameters — agent count, speed range, turn rate, perception radius, and the individual weights of each Reynolds force — are exposed as real-time sliders, allowing the behaviour to be sculpted live without reloading.\n  \nThe application imports Three.js via CDN ES module along with OrbitControls, GLTFLoader, and GLTFExporter, and can export the full scene as a GLB file for use in external 3D tools or game engines.\n  \nFor immersive practice and research, Boids serves as a versatile generative engine. It can drive ambient environmental behaviour in virtual reality installations, model crowd or swarm dynamics for spatial computing experiments, provide a visual thinking tool for studying emergence and complexity, and act as a real-time generative backdrop for audiovisual performance work.",
       "resourceLabel": "",
       "resourceLink": "",
       "gallery": [
@@ -621,11 +622,11 @@
           "caption": ""
         },
         {
-          "img": "",
+          "img": "images/boids02_01.jpg",
           "caption": ""
         },
         {
-          "img": "",
+          "img": "images/boids02_02.jpg",
           "caption": ""
         },
         {
@@ -649,8 +650,8 @@
         "Fly-Thru"
       ],
       "date": "2026-06-05",
-      "desc": "Looks for X-Wing Boids - Claude Code",
-      "fullDesc": "",
+      "desc": "A real-time 3D flocking simulation built with Three.js, implementing Craig Reynolds' Boids algorithm. A flock of tetrahedra exhibit emergent flocking behaviour — cohesion, separation, alignment — while navigating cylindrical obstacles and floor avoidance within a bounded space.",
+      "fullDesc": "X-Wing_Boids is a self-contained, browser-based 3D flocking simulation built entirely with Three.js (r158). It implements Craig Reynolds' classic Boids algorithm — cohesion, separation, and alignment — to produce emergent collective behaviour from a squadron of agents navigating a bounded 60×60 unit space in real time at 50fps.\n    \nThe simulation runs in two model modes: a custom flat-shaded tetrahedron mesh, or a loaded X-Wing GLB model embedded directly in the file. Agents respond to a bouncing target object, six positionable cylindrical obstacles with configurable detection radii and avoidance weighting, and a floor avoidance zone that pitches agents upward using local-axis rotation. Obstacle avoidance uses a predictive look-ahead system, projecting each agent's future position to trigger evasion before collision occurs. A full set of sliders governs every aspect of flock behaviour — speed range, turn rate, perception radius, and the relative weights of each steering force.\n    \nThe camera system supports orbital navigation, auto-rotation, and a Track Flock mode that dynamically centres the orbit target on the average position of the leading agents. The scene includes dynamic lighting with shadow mapping, a customisable grid with colour and intensity controls, and adjustable background tone.\n     \nThe file imports Three.js, OrbitControls, GLTFLoader, and TransformControls exclusively via CDN — no build tools, no server required. It exports nothing, running entirely in the browser as a single HTML file.\n     \nIn the context of immersive practice and research, the simulation serves as a real-time behavioural testbed for exploring emergence, swarm intelligence, and spatial dynamics — directly applicable to crowd simulation, generative installation design, interactive narrative environments, and the choreography of autonomous agents in virtual production and XR contexts.",
       "resourceLabel": "",
       "resourceLink": "",
       "gallery": [
@@ -783,8 +784,8 @@
         "Image Editor"
       ],
       "date": "",
-      "desc": "See Morph Mesh Claude Code",
-      "fullDesc": "",
+      "desc": "MeshMorph is a self-contained browser-based image morphing tool. Users place correspondence nodes on two images to guide a mesh warp, exporting a smooth H.264 MP4 transition video. Runs locally from file:// with zero dependencies.",
+      "fullDesc": "MeshMorph is a self-contained, browser-based image morphing tool that runs entirely from a local HTML file with no server, installation, or internet connection required. The user loads two images — a start frame and an end frame — then places numbered correspondence nodes across both images to define how specific points in one image relate to points in the other. These nodes guide a mesh-based warp algorithm that smoothly transitions the pixel content of one image into the other over a user-defined duration of one to ten seconds.\n     \nThe tool offers three warping methods — Delaunay triangulation, Thin Plate Spline, and Moving Least Squares — each producing subtly different deformation qualities ranging from sharp, localised warps to globally smooth, organic transitions. Five easing curves control the temporal feel of the morph, from linear to bounce. Users can prepend a customisable title card, freeze the first or last frame for dramatic effect, and optionally burn the animated mesh overlay directly into the exported video. Everything is exported as a standards-compliant H.264 MP4 file encoded entirely in the browser via the WebCodecs API.\n    \nSessions — including all node positions, method choices, easing, duration, and title settings — can be saved and reloaded as lightweight JSON files, making iterative refinement practical.\n    \nFor immersive practice and research, MeshMorph offers a precise, tactile way to explore transformation, identity, and perceptual continuity between images. It could be used to morph portraits, architectural spaces, anatomical forms, or environmental states — producing material for projection mapping, VR content pipelines, performance documentation, and live visual research where the act of morphing itself carries conceptual weight.",
       "resourceLabel": "",
       "resourceLink": "",
       "gallery": [
@@ -827,8 +828,8 @@
         "Three.js"
       ],
       "date": "2026-06-05",
-      "desc": "Look for GLB Editor  - Claude Code",
-      "fullDesc": "",
+      "desc": "A self-contained, single-file browser-based 3D editor built on Three.js. Supports loading, creating, transforming, grouping and exporting GLB scenes. Designed as a reusable template component for projects requiring interactive 3D object editing.",
+      "fullDesc": "GLB Editor is a fully self-contained, browser-based 3D scene editor built on Three.js r160, packaged as a single HTML file with no build tools or server requirements. It runs entirely in the browser, making it immediately deployable across platforms without installation.\n      \nThe editor loads GLB and GLTF files via drag-and-drop or file picker, normalises them into a navigable 3D viewport with orbit, zoom and pan controls. Once loaded, scenes can be decomposed — grouped objects can be exploded into individually selectable meshes, each inheriting their correct world-space transforms. Objects can then be selected individually or as multi-object selections, transformed (translate in world space, rotate and scale in local space) via on-screen gizmos or precise numeric inputs, duplicated, grouped, deleted, or have their normals reversed. All structural changes support five-level undo. New geometry can be created directly in the editor — boxes, spheres, cones and cylinders — with configurable parameters, choice of material type (Wireframe, Basic, Lambert, Phong, Standard), and editable colour. Transforms can be baked into geometry, aligning local axes to world axes. The scene exports as a single GLB file.\n      \nFor immersive practice and research, the editor functions as a lightweight spatial prototyping tool — enabling rapid construction, modification and export of 3D scenes without dependency on commercial software like Blender or Maya. It is particularly suited to preparing assets for WebXR experiences, AR/VR pipelines, and real-time rendering contexts where GLB is the standard delivery format. Its single-file architecture makes it embeddable as a template component within larger research platforms, curatorial tools, or interactive documentary and spatial storytelling projects.",
       "resourceLabel": "",
       "resourceLink": "",
       "gallery": [
@@ -869,8 +870,8 @@
       "tier": "2",
       "categories": [],
       "date": "2026-06-07",
-      "desc": "Look for Boids/3D Basic Environment Setup",
-      "fullDesc": "",
+      "desc": "A web-based 3D environment with camera and light controls. Built on Three.js r160, featuring orbit/zoom/pan, FOV, auto-rotate, custom grid, directional lighting with shadows, and an XYZ gizmo.",
+      "fullDesc": "3D Project is a web-based, self-contained 3D environment built on Three.js r160, delivered as a single HTML file with no build step or external dependencies beyond a CDN. It opens directly in any modern browser, making it immediately accessible for research, prototyping, and presentation contexts.\n          \nThe environment provides a fully interactive perspective viewport with orbit, zoom, and pan controls driven by mouse input, alongside a structured dark control panel. Camera behaviour is tunable in real time — field of view, damping, and auto-rotation speed can all be adjusted without reloading. A custom grid system built from a single LineSegments object provides spatial reference without the rendering artefacts associated with Three.js's native GridHelper.\n         \nLighting is composed of an ambient layer, a key directional light, and a fill directional light, each independently controlled for intensity and visibility. PCF soft shadow mapping is enabled on the key light, with a wide frustum configured to cover the full scene. Tone mapping and exposure are adjustable through the panel, giving broad control over the perceived look of any content loaded into the scene.\n     \nThe file imports Three.js and OrbitControls as ES modules via CDN, and exports nothing — it is entirely self-contained. The scene is intentionally left empty beyond the ground plane and grid, making it a clean drop-in foundation for any 3D content.\n        \nFor immersive practice and research, this template is well suited as a starting point for spatial composition tools, object placement studies, lighting investigations, virtual exhibition prototypes, real-time material and shader explorations, and browser-based 3D documentation of physical or speculative work.",
       "resourceLabel": "",
       "resourceLink": "",
       "gallery": [
@@ -913,8 +914,54 @@
         "Editing Tool"
       ],
       "date": "2026-06-05",
-      "desc": "Media Tools >  Video Frame Extraction Tool",
-      "fullDesc": "",
+      "desc": "A frame extraction tool for chaining AI-generated video scenes — save the first and last frames of any clip to use as start/end reference frames when generating adjacent scenes.",
+      "fullDesc": "Frame Extractor is a lightweight, self-contained browser tool designed to bridge the gaps between AI-generated video scenes. It operates entirely locally — no installation, no server, no cloud dependency — running as a single HTML file in any modern browser.\n       \nThe workflow is straightforward: load any MP4, MOV, or WebM video file via drag-and-drop or file browser, and the tool automatically seeks to and captures both the very first and very last frame of the clip at its native resolution. Both frames are previewed side by side with their exact pixel dimensions and timestamps displayed. Once captured, frames can be exported individually or together in PNG (lossless), JPG, WebP, or BMP format, with adjustable quality control for lossy formats.\n       \nThe core value lies in what those two frames enable. Contemporary AI video generation tools — Runway, Kling, Sora, and others — allow users to specify a starting or ending reference image to anchor a generated scene. By extracting the last frame of one clip and feeding it as the first-frame prompt of the next, and vice versa, practitioners can stitch together coherent, continuous AI-generated sequences without visual discontinuity between scenes. This makes Frame Extractor an essential utility for constructing longer-form immersive narratives, generative film work, virtual environment walkthroughs, and experiential installations where spatial or temporal continuity across scenes is critical to the viewer's sense of presence.\n    \nCrucially, it removes the need to open heavyweight production software like Adobe Premiere or After Effects simply to grab a single frame — a task that previously required importing footage, scrubbing to position, and manually exporting a still.",
+      "resourceLabel": "",
+      "resourceLink": "",
+      "gallery": [
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        }
+      ],
+      "carousel": false,
+      "link": "",
+      "tags": [],
+      "thumb": "",
+      "youtube": ""
+    },
+    {
+      "id": 28,
+      "name": "Pixel Dust",
+      "tier": "3",
+      "categories": [
+        "Animation Tool",
+        "Editing Tool",
+        "Image Editor"
+      ],
+      "date": "2026-05-30",
+      "desc": "A browser-based tool that selects, animates, and exports pixel-level image differences as H.264 MP4 video. A key proof-of-concept demonstrating direct pixel manipulation and pure-JS MP4 encoding via the WebCodecs API.",
+      "fullDesc": "Pixel Dust is a browser-based creative tool for animating the pixel-level differences between two images and exporting the result as a true H.264 MP4 video file — entirely without a server, plugins, or external libraries.\nThe tool begins by loading two images: a clean background plate and a version of the same scene containing an additional object. It performs a per-pixel colour difference analysis, which can be refined using a paintbrush directly on the diff mask canvas, allowing precise manual inclusion or exclusion of pixels. A resolution slider consolidates pixels into blocks of up to 5×5, giving the animation a mosaic or chunky particle quality.\n      \nTwo animation modes drive the export. In Dissolve Right, selected pixels drift horizontally with velocities derived from their individual brightness values — brighter pixels travel faster, darker ones slower. In Explode mode the system becomes substantially richer: each pixel is assigned a directional velocity vector drawn from four weighted axes, modified by gravity, dampening, mass (brightness-linked weight), and a per-pixel random factor. Pixels are given individual lifespans — again brightness-derived — and fade out through alpha compositing. A Fuse Wire system allows the user to place a Start and End handle on the canvas, creating a radial wave of staggered launch times that propagates outward from the start point. A brightness delay layer adds a further perceptual stagger within that wave. The entire animation can be rendered in reverse.\n        \nThe tool exports genuine H.264 MP4 via the WebCodecs API with a pure-JavaScript muxer — no FFmpeg, no server.\n   \nFor immersive practice and research, Pixel Dust opens direct investigation into how images decompose, how matter appears to dissolve or shatter, and how light-weight (brightness-as-physics) can be used as a compositional principle. It has clear application in real-time installation work, generative video performance, and research into perception of material transformation.",
       "resourceLabel": "",
       "resourceLink": "",
       "gallery": [
@@ -950,8 +997,8 @@
       "youtube": ""
     }
   ],
-  "nextId": 28,
-  "sortMode": "date",
+  "nextId": 29,
+  "sortMode": "tier",
   "site": {
     "eyebrow": "Browser-based creative exploration : Chris Shaw",
     "title": "Immersive Lab",
