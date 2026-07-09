@@ -592,7 +592,7 @@
       "link": "",
       "tags": [],
       "thumb": "images/boids01_04.jpg",
-      "youtube": "https://youtu.be/1zfOHXKfGtU"
+      "youtube": "https://youtu.be/IVdIODo90bQ"
     },
     {
       "id": 18,
@@ -868,7 +868,10 @@
       "id": 24,
       "name": "Generic 3D Environment Setup",
       "tier": "2",
-      "categories": [],
+      "categories": [
+        "Three.js",
+        "Game"
+      ],
       "date": "2026-06-07",
       "desc": "A web-based 3D environment with camera and light controls. Built on Three.js r160, featuring orbit/zoom/pan, FOV, auto-rotate, custom grid, directional lighting with shadows, and an XYZ gizmo.",
       "fullDesc": "3D Project is a web-based, self-contained 3D environment built on Three.js r160, delivered as a single HTML file with no build step or external dependencies beyond a CDN. It opens directly in any modern browser, making it immediately accessible for research, prototyping, and presentation contexts.\n          \nThe environment provides a fully interactive perspective viewport with orbit, zoom, and pan controls driven by mouse input, alongside a structured dark control panel. Camera behaviour is tunable in real time — field of view, damping, and auto-rotation speed can all be adjusted without reloading. A custom grid system built from a single LineSegments object provides spatial reference without the rendering artefacts associated with Three.js's native GridHelper.\n         \nLighting is composed of an ambient layer, a key directional light, and a fill directional light, each independently controlled for intensity and visibility. PCF soft shadow mapping is enabled on the key light, with a wide frustum configured to cover the full scene. Tone mapping and exposure are adjustable through the panel, giving broad control over the perceived look of any content loaded into the scene.\n     \nThe file imports Three.js and OrbitControls as ES modules via CDN, and exports nothing — it is entirely self-contained. The scene is intentionally left empty beyond the ground plane and grid, making it a clean drop-in foundation for any 3D content.\n        \nFor immersive practice and research, this template is well suited as a starting point for spatial composition tools, object placement studies, lighting investigations, virtual exhibition prototypes, real-time material and shader explorations, and browser-based 3D documentation of physical or speculative work.",
@@ -900,10 +903,10 @@
           "caption": ""
         }
       ],
-      "carousel": false,
+      "carousel": true,
       "link": "",
       "tags": [],
-      "thumb": "",
+      "thumb": "images/3D_environment_template01.jpg",
       "youtube": ""
     },
     {
@@ -920,15 +923,15 @@
       "resourceLink": "",
       "gallery": [
         {
-          "img": "",
+          "img": "images/frame_extractor01.jpg",
           "caption": ""
         },
         {
-          "img": "",
+          "img": "images/frame_extractor02.jpg",
           "caption": ""
         },
         {
-          "img": "",
+          "img": "images/frame_extractor04.jpg",
           "caption": ""
         },
         {
@@ -944,10 +947,10 @@
           "caption": ""
         }
       ],
-      "carousel": false,
+      "carousel": true,
       "link": "",
       "tags": [],
-      "thumb": "",
+      "thumb": "images/frame_extractor03.jpg",
       "youtube": ""
     },
     {
