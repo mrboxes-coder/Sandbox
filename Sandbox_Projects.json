@@ -601,7 +601,10 @@
       "categories": [
         "Animation Tool",
         "Three.js",
-        "Fly-Thru"
+        "Fly-Thru",
+        "Simulation",
+        "Behaviour",
+        "Flock/Schools/Herds"
       ],
       "date": "2026-07-07",
       "desc": "A real-time 3D flocking simulation built with Three.js. Multiple agents fly together using Reynolds' three rules — separation, alignment, and cohesion — producing emergent flock behaviour controlled via an interactive panel.",
@@ -610,19 +613,7 @@
       "resourceLink": "",
       "gallery": [
         {
-          "img": "",
-          "caption": ""
-        },
-        {
-          "img": "",
-          "caption": ""
-        },
-        {
-          "img": "",
-          "caption": ""
-        },
-        {
-          "img": "images/boids02_01.jpg",
+          "img": "images/boids02_03.jpg",
           "caption": ""
         },
         {
@@ -630,15 +621,27 @@
           "caption": ""
         },
         {
-          "img": "",
+          "img": "images/boids02_04.jpg",
+          "caption": ""
+        },
+        {
+          "img": "images/boids02_05.jpg",
+          "caption": ""
+        },
+        {
+          "img": "images/boids02_01.jpg",
+          "caption": ""
+        },
+        {
+          "img": "images/boids02_06.jpg",
           "caption": ""
         }
       ],
-      "carousel": false,
+      "carousel": true,
       "link": "",
       "tags": [],
-      "thumb": "",
-      "youtube": ""
+      "thumb": "images/boids02_03.jpg",
+      "youtube": "https://youtu.be/0Km7aSSMq84"
     },
     {
       "id": 23,
