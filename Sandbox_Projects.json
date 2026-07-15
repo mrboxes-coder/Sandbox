@@ -779,33 +779,33 @@
     },
     {
       "id": 20,
-      "name": "Image Mesh Morph",
+      "name": "Image MeshMorph",
       "tier": "3",
       "categories": [
         "Canvas",
         "Editing Tool",
         "Image Editor"
       ],
-      "date": "",
+      "date": "2026-04-18",
       "desc": "MeshMorph is a self-contained browser-based image morphing tool. Users place correspondence nodes on two images to guide a mesh warp, exporting a smooth H.264 MP4 transition video. Runs locally from file:// with zero dependencies.",
-      "fullDesc": "MeshMorph is a self-contained, browser-based image morphing tool that runs entirely from a local HTML file with no server, installation, or internet connection required. The user loads two images — a start frame and an end frame — then places numbered correspondence nodes across both images to define how specific points in one image relate to points in the other. These nodes guide a mesh-based warp algorithm that smoothly transitions the pixel content of one image into the other over a user-defined duration of one to ten seconds.\n     \nThe tool offers three warping methods — Delaunay triangulation, Thin Plate Spline, and Moving Least Squares — each producing subtly different deformation qualities ranging from sharp, localised warps to globally smooth, organic transitions. Five easing curves control the temporal feel of the morph, from linear to bounce. Users can prepend a customisable title card, freeze the first or last frame for dramatic effect, and optionally burn the animated mesh overlay directly into the exported video. Everything is exported as a standards-compliant H.264 MP4 file encoded entirely in the browser via the WebCodecs API.\n    \nSessions — including all node positions, method choices, easing, duration, and title settings — can be saved and reloaded as lightweight JSON files, making iterative refinement practical.\n    \nFor immersive practice and research, MeshMorph offers a precise, tactile way to explore transformation, identity, and perceptual continuity between images. It could be used to morph portraits, architectural spaces, anatomical forms, or environmental states — producing material for projection mapping, VR content pipelines, performance documentation, and live visual research where the act of morphing itself carries conceptual weight.",
+      "fullDesc": "Welcome to the Image Mesh Morph project, part of a series of exploratory projects into AI-assisted coding. This is a sandbox environment where curiosity leads, and outcomes follow.\n\nSo, what is this project about? MeshMorph is a browser-based image morphing tool, a single HTML file that runs locally, no server, no installation, no internet connection needed. The user imports two images, places a set of correspondence nodes on the images, and the tool smoothly warps one image into the other, exporting the result as an MP4 video.\n\nThis project started as a fairly simple question, can we load two images, manipulate their pixels, and produce a video transition entirely in the browser? What emerged was much richer than that.\n\nThe nodes you place act as anchors, telling the tool which point in the start image corresponds to which point in the end image. From there, a mesh warp algorithm handles the rest, interpolating every pixel from the start image to the end image. The project provides three warping methods to choose from, 'Delaunay triangulation', 'Thin Plate Spline', and 'Moving Least Squares', each producing a different quality of deformation. The user is provided with five 'easing' curves to control the timing of the transition.\n\nAs the project developed, features were added sequentially through exploration, a 'live preview with a scrubber', a 'customisable title screen', the ability to 'hold the first or last frame', and the option to 'burn the animated mesh overlay' directly into the exported video. There's also a 'save' and 'load function', so the user can export and import node positions, together with the project settings as a JSON file.\n\nThe entire MP4 export happens inside the browser using the WebCodecs API, no external libraries, no dependencies whatsoever. Just a file the user can open and run.\n\nFor immersive practice and research, this kind of tool opens up interesting territory, 'morphing portraits', 'spaces', 'anatomical forms', or 'environmental states' to produce material for projection, VR pipelines, or live performance contexts where transformation itself carries meaning.\n\nAll of this was developed collaboratively with Claude, not just the code, but the architecture, the debugging, the feature decisions, and the UI, which evolved organically as the project emerged and found its own shape.",
       "resourceLabel": "",
       "resourceLink": "",
       "gallery": [
         {
-          "img": "",
+          "img": "images/mesh_morph01.jpg",
           "caption": ""
         },
         {
-          "img": "",
+          "img": "images/mesh_morph02.jpg",
           "caption": ""
         },
         {
-          "img": "",
+          "img": "images/mesh_morph03.jpg",
           "caption": ""
         },
         {
-          "img": "",
+          "img": "images/mesh_morph04.jpg",
           "caption": ""
         },
         {
@@ -817,10 +817,10 @@
           "caption": ""
         }
       ],
-      "carousel": false,
+      "carousel": true,
       "link": "",
       "tags": [],
-      "thumb": "",
+      "thumb": "images/mesh_morph02.jpg",
       "youtube": ""
     },
     {
