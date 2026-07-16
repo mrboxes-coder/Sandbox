@@ -193,7 +193,7 @@
     {
       "id": 8,
       "name": "Gaussian Splat Viewer",
-      "tier": "3",
+      "tier": "4",
       "categories": [
         "Animation Tool",
         "Gaussian Splat",
@@ -202,27 +202,27 @@
       "date": "2026-07-07",
       "desc": "Gaussian FlyThru is a browser-based Gaussian splat viewer for flying through 3D captures, adding bookmarks, hotspots, camera defaults, bounds, screenshots, recordings, and workspace exports.",
       "fullDesc": "Gaussian FlyThru is a browser-based Gaussian splat / Luma .ply viewer designed for inspecting, navigating, annotating, and recording immersive 3D captures.\n\nIt loads LUMA-style Gaussian splat .ply files directly in the browser, so a user can explore a captured real-world scene without needing a heavy desktop 3D package. The viewer supports multiple navigation modes: Orbit for inspecting the scene from outside, Walk for grounded movement, Look for mouse-based first-person viewing, and Flight Sim for flying through the capture with velocity control, mouse steering, a central reticle, and optional bounding-box containment.\n\nThe project includes tools for setting a camera movement boundary, aligning the bounding box across X/Y/Z rotations, adjusting splat size, showing an axis gizmo, saving camera defaults, and reading precise camera position and rotation data. Users can create editable viewpoint bookmarks, add notes, generate flythrough tours from saved viewpoints, scrub a timeline, set tour duration, adjust look-ahead and aim smoothing, and record tours as MP4/WebM where supported.\n\nIt also supports hotspots: labeled markers placed inside the 3D scene with editable text, position, color, and short labels. These are useful for identifying scene features, research observations, design issues, or spatial points of interest.\n\nThe app exports and imports workspace JSON files. These save viewer state such as scene alignment, bounds, camera defaults, current camera, bookmarks, tour settings, hotspots, splat size, axis visibility, screenshot/recording settings, and navigation settings. The actual .ply capture remains separate and must be loaded again before importing the workspace.\n\nFor immersive practice and research, Gaussian FlyThru could be used to study spatial experience, document captured environments, rehearse movement paths, create guided walkthroughs, compare viewpoints, annotate field observations, and generate video material from 3D scans. It is especially relevant for architecture, exhibition design, virtual production, site analysis, heritage documentation, urban research, performance spaces, training simulations, and any workflow where moving through a captured environment matters as much as viewing it.",
-      "resourceLabel": "",
-      "resourceLink": "https://drive.google.com/drive/folders/1L55IaeJLnyPRVH0f---9dcbepje8xAxX?usp=sharing",
+      "resourceLabel": "Download .ply Files",
+      "resourceLink": "https://drive.google.com/drive/folders/1a5ASsxRHDinJqEJMK8g6htgLH3UfrCPG?usp=drive_link",
       "gallery": [
         {
-          "img": "",
+          "img": "images/gaussian05.jpg",
           "caption": ""
         },
         {
-          "img": "",
+          "img": "images/gaussian04.jpg",
           "caption": ""
         },
         {
-          "img": "",
+          "img": "images/gaussian01.jpg",
           "caption": ""
         },
         {
-          "img": "",
+          "img": "images/gaussian03.jpg",
           "caption": ""
         },
         {
-          "img": "",
+          "img": "images/gaussian02.jpg",
           "caption": ""
         },
         {
@@ -230,11 +230,11 @@
           "caption": ""
         }
       ],
-      "carousel": false,
-      "link": "",
+      "carousel": true,
+      "link": "/gaussian_splat/luma-ply-viewer.html",
       "tags": [],
-      "thumb": "",
-      "youtube": ""
+      "thumb": "images/gaussian05.jpg",
+      "youtube": "https://youtu.be/UhSvGwNIezs"
     },
     {
       "id": 9,

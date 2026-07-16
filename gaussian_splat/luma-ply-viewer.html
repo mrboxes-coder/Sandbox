@@ -1,0 +1,4473 @@
+﻿<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PLY Gaussian Splat Viewer</title>
+  <link rel="icon" type="image/png" href="gaussian-flythru-icon.png">
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #101014;
+      --panel: #1f2027;
+      --panel-2: #272832;
+      --line: #343642;
+      --text: #f2f3f7;
+      --muted: #a9aec5;
+      --accent: #3b97ee;
+      --accent-2: #71baff;
+      --danger: #ff3838;
+      --shadow: 0 18px 56px rgba(0, 0, 0, 0.38);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      overflow: hidden;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    body {
+      display: grid;
+      grid-template-rows: auto 1fr;
+    }
+
+    .topbar {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 16px;
+      align-items: center;
+      min-height: 76px;
+      padding: 14px 18px;
+      background: #1d1d22;
+      border-bottom: 1px solid var(--line);
+      box-shadow: var(--shadow);
+      z-index: 4;
+    }
+
+    .title {
+      display: grid;
+      gap: 3px;
+      min-width: 0;
+    }
+
+    .brand-line {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      min-width: 0;
+    }
+
+    .brand-icon {
+      width: 28px;
+      height: 28px;
+      object-fit: contain;
+      flex: 0 0 auto;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 18px;
+      font-weight: 720;
+      letter-spacing: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    h1 span {
+      color: var(--accent);
+    }
+
+    .subtitle {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.35;
+      overflow-wrap: anywhere;
+    }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    input[type="file"] {
+      position: absolute;
+      inline-size: 1px;
+      block-size: 1px;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .button {
+      appearance: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 32px;
+      padding: 0 14px;
+      border: 1px solid var(--line);
+      border-radius: 3px;
+      background: var(--panel-2);
+      color: var(--muted);
+      font-family: "IBM Plex Mono", "Cascadia Mono", Consolas, monospace;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: background 140ms ease, border-color 140ms ease, transform 140ms ease;
+    }
+
+    .button:hover {
+      background: #18314b;
+      border-color: var(--accent);
+      color: #fff;
+    }
+
+    .button:active {
+      transform: translateY(1px);
+    }
+
+    .button.primary {
+      background: #163452;
+      border-color: var(--accent);
+      color: var(--accent-2);
+    }
+
+    .button.primary:hover {
+      background: #1c4167;
+      border-color: var(--accent-2);
+    }
+
+    .button:disabled {
+      cursor: not-allowed;
+      opacity: 0.56;
+      transform: none;
+    }
+
+    main {
+      position: relative;
+      min-height: 0;
+      overflow: hidden;
+    }
+
+    #viewer {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 40% 35%, #20252c 0, #101317 48%, #090b0d 100%);
+    }
+
+    .drop-panel {
+      position: absolute;
+      inset: 18px;
+      display: grid;
+      place-items: center;
+      border: 1px dashed rgba(174, 184, 196, 0.45);
+      border-radius: 8px;
+      background: rgba(13, 15, 18, 0.68);
+      backdrop-filter: blur(8px);
+      z-index: 2;
+      transition: border-color 140ms ease, background 140ms ease;
+    }
+
+    .drop-panel.hidden {
+      display: none;
+    }
+
+    .drop-panel.dragging {
+      border-color: var(--accent);
+      background: rgba(25, 47, 40, 0.78);
+    }
+
+    .drop-inner {
+      width: min(560px, calc(100vw - 58px));
+      display: grid;
+      gap: 18px;
+      justify-items: center;
+      text-align: center;
+      padding: 28px;
+      background: rgba(23, 27, 32, 0.86);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+    }
+
+    .drop-icon {
+      display: grid;
+      place-items: center;
+      width: 56px;
+      aspect-ratio: 1;
+      border-radius: 8px;
+      background: rgba(59, 151, 238, 0.14);
+      color: var(--accent);
+    }
+
+    .drop-icon svg {
+      width: 30px;
+      height: 30px;
+      stroke: currentColor;
+    }
+
+    .drop-heading {
+      margin: 0;
+      font-size: 24px;
+      line-height: 1.15;
+      letter-spacing: 0;
+    }
+
+    .drop-copy {
+      margin: 0;
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.5;
+      max-width: 46ch;
+    }
+
+    .status {
+      position: absolute;
+      left: 16px;
+      bottom: 16px;
+      max-width: min(680px, calc(100vw - 32px));
+      padding: 10px 12px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: rgba(17, 20, 24, 0.9);
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.35;
+      z-index: 3;
+      box-shadow: var(--shadow);
+      overflow-wrap: anywhere;
+    }
+
+    .status.error {
+      color: var(--danger);
+      border-color: rgba(255, 138, 138, 0.38);
+    }
+
+    .status.ready {
+      color: var(--accent);
+      border-color: rgba(59, 151, 238, 0.44);
+    }
+
+    .control-panel {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      max-width: min(760px, calc(100vw - 32px));
+      padding: 10px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(17, 20, 24, 0.9);
+      box-shadow: var(--shadow);
+      z-index: 3;
+    }
+
+    .segmented {
+      display: inline-grid;
+      grid-template-columns: 1fr 1fr 1fr 1.35fr;
+      min-width: 310px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      overflow: hidden;
+      background: #12161b;
+    }
+
+    .segment {
+      appearance: none;
+      min-height: 36px;
+      padding: 0 12px;
+      border: 0;
+      border-right: 1px solid var(--line);
+      background: transparent;
+      color: var(--muted);
+      font: inherit;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .segment:last-child {
+      border-right: 0;
+    }
+
+    .segment.active {
+      background: var(--accent-2);
+      color: #06132d;
+    }
+
+    .segment:disabled {
+      cursor: not-allowed;
+      opacity: 0.55;
+    }
+
+    .speed-control {
+      display: inline-grid;
+      grid-template-columns: auto minmax(100px, 150px) 42px;
+      gap: 8px;
+      align-items: center;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 650;
+    }
+
+    .speed-control input {
+      accent-color: var(--accent);
+    }
+
+    .speed-control output {
+      color: var(--text);
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .flight-readout {
+      display: inline-grid;
+      grid-template-columns: auto 48px;
+      gap: 8px;
+      align-items: center;
+      min-height: 36px;
+      padding: 0 10px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: #12161b;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 650;
+    }
+
+    .flight-readout output {
+      color: var(--text);
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .camera-readout {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 2px 8px;
+      width: 100%;
+      padding: 7px 10px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: #12161b;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 650;
+      line-height: 1.25;
+    }
+
+    .camera-readout output {
+      color: var(--text);
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+    }
+
+    .icon-button {
+      appearance: none;
+      display: inline-grid;
+      place-items: center;
+      min-width: 38px;
+      height: 38px;
+      padding: 0 10px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: var(--panel-2);
+      color: var(--text);
+      font: inherit;
+      font-size: 13px;
+      font-weight: 750;
+      cursor: pointer;
+    }
+
+    .icon-button:hover {
+      background: #2a323c;
+    }
+
+    .icon-button:disabled,
+    .icon-button[aria-disabled="true"] {
+      cursor: not-allowed;
+      opacity: 0.55;
+    }
+
+    .icon-button[aria-disabled="true"] {
+      pointer-events: none;
+    }
+
+    .help-panel {
+      position: absolute;
+      right: 16px;
+      top: 76px;
+      width: min(360px, calc(100vw - 32px));
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(17, 20, 24, 0.96);
+      color: var(--muted);
+      box-shadow: var(--shadow);
+      z-index: 4;
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    .help-panel.hidden,
+    .annotation-panel.hidden,
+    .reticle.hidden,
+    .flight-reticle.hidden,
+    .recording-badge.hidden {
+      display: none;
+    }
+
+    .help-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 10px;
+      color: var(--text);
+      font-weight: 760;
+    }
+
+    .help-panel dl {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 6px 12px;
+      margin: 0;
+    }
+
+    .help-panel dt {
+      color: var(--text);
+      font-weight: 720;
+      white-space: nowrap;
+    }
+
+    .help-panel dd {
+      margin: 0;
+    }
+
+    .reticle {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 18px;
+      height: 18px;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      z-index: 3;
+    }
+
+    .reticle::before,
+    .reticle::after {
+      content: "";
+      position: absolute;
+      background: rgba(244, 247, 251, 0.78);
+      box-shadow: 0 0 12px rgba(0, 0, 0, 0.7);
+    }
+
+    .reticle::before {
+      left: 8px;
+      top: 0;
+      width: 2px;
+      height: 18px;
+    }
+
+    .reticle::after {
+      left: 0;
+      top: 8px;
+      width: 18px;
+      height: 2px;
+    }
+
+    .flight-reticle {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 96px;
+      height: 96px;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      z-index: 3;
+      color: rgba(244, 247, 251, 0.86);
+      filter: drop-shadow(0 1px 4px rgba(0, 0, 0, 0.8));
+    }
+
+    .flight-reticle .reticle-ring {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 30px;
+      height: 30px;
+      border: 3px solid currentColor;
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+    }
+
+    .flight-reticle .reticle-tick {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      background: currentColor;
+      border-radius: 999px;
+    }
+
+    .flight-reticle .reticle-tick.top,
+    .flight-reticle .reticle-tick.bottom {
+      width: 4px;
+      height: 20px;
+      transform: translateX(-50%);
+    }
+
+    .flight-reticle .reticle-tick.top {
+      top: 8px;
+    }
+
+    .flight-reticle .reticle-tick.bottom {
+      top: auto;
+      bottom: 8px;
+    }
+
+    .flight-reticle .reticle-tick.left,
+    .flight-reticle .reticle-tick.right {
+      width: 22px;
+      height: 4px;
+      transform: translateY(-50%);
+    }
+
+    .flight-reticle .reticle-tick.left {
+      left: 8px;
+    }
+
+    .flight-reticle .reticle-tick.right {
+      left: auto;
+      right: 8px;
+    }
+
+    .annotation-panel {
+      position: absolute;
+      right: 16px;
+      bottom: 64px;
+      width: min(360px, calc(100vw - 32px));
+      max-height: min(300px, calc(100vh - 160px));
+      display: grid;
+      gap: 10px;
+      padding: 12px;
+      border: 1px solid rgba(59, 151, 238, 0.34);
+      border-radius: 8px;
+      background: rgba(17, 20, 24, 0.94);
+      color: var(--text);
+      box-shadow: var(--shadow);
+      z-index: 4;
+      overflow: auto;
+    }
+
+    .annotation-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      font-size: 13px;
+      font-weight: 820;
+    }
+
+    .annotation-copy {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.45;
+      white-space: pre-wrap;
+    }
+
+    .recording-badge {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      display: inline-flex;
+      gap: 8px;
+      align-items: center;
+      min-height: 34px;
+      padding: 0 12px;
+      border: 1px solid rgba(255, 107, 107, 0.42);
+      border-radius: 7px;
+      background: rgba(54, 10, 13, 0.92);
+      color: #ffe8e8;
+      box-shadow: var(--shadow);
+      z-index: 5;
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: 0;
+      translate: -50% -50%;
+    }
+
+    .recording-badge::before {
+      content: "";
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: #ff4f4f;
+      box-shadow: 0 0 0 0 rgba(255, 79, 79, 0.7);
+      animation: recPulse 1.15s infinite;
+    }
+
+    @keyframes recPulse {
+      0% {
+        box-shadow: 0 0 0 0 rgba(255, 79, 79, 0.65);
+      }
+      70% {
+        box-shadow: 0 0 0 8px rgba(255, 79, 79, 0);
+      }
+      100% {
+        box-shadow: 0 0 0 0 rgba(255, 79, 79, 0);
+      }
+    }
+
+    .view-panel {
+      position: absolute;
+      left: 16px;
+      top: 16px;
+      width: min(390px, calc(100vw - 32px));
+      max-height: calc(100% - 104px);
+      display: grid;
+      gap: 12px;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(17, 20, 24, 0.9);
+      box-shadow: var(--shadow);
+      z-index: 3;
+      overflow: auto;
+    }
+
+    .view-panel.flight-hidden {
+      display: none;
+    }
+
+    .view-panel h2 {
+      margin: 0;
+      font-size: 14px;
+      letter-spacing: 0;
+    }
+
+    .panel-row {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .panel-row.space-between {
+      justify-content: space-between;
+    }
+
+    .range-control {
+      display: grid;
+      grid-template-columns: auto minmax(110px, 1fr) 48px;
+      gap: 8px;
+      align-items: center;
+      width: 100%;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 650;
+    }
+
+    .range-control input {
+      accent-color: var(--accent);
+    }
+
+    .range-control output {
+      color: var(--text);
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .number-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .number-control {
+      display: grid;
+      gap: 4px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .number-control input {
+      width: 100%;
+      height: 34px;
+      padding: 0 8px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: #12161b;
+      color: var(--text);
+      font: inherit;
+      font-size: 13px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .workspace-name {
+      flex: 1 1 170px;
+      min-width: 0;
+      height: 38px;
+      padding: 0 10px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: #12161b;
+      color: var(--text);
+      font: inherit;
+      font-size: 13px;
+    }
+
+    .toggle-control {
+      display: inline-flex;
+      gap: 8px;
+      align-items: center;
+      min-height: 36px;
+      color: var(--text);
+      font-size: 13px;
+      font-weight: 720;
+    }
+
+    .toggle-control input {
+      width: 16px;
+      height: 16px;
+      accent-color: var(--accent);
+    }
+
+    .bookmark-list {
+      display: grid;
+      gap: 6px;
+      min-height: 40px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .bookmark-item {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 54px auto;
+      gap: 8px;
+      align-items: center;
+      padding: 8px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: rgba(32, 38, 45, 0.8);
+    }
+
+    .bookmark-annotation {
+      grid-column: 1 / -1;
+      width: 100%;
+      min-height: 54px;
+      resize: vertical;
+      padding: 8px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: #12161b;
+      color: var(--text);
+      font: inherit;
+      font-size: 12px;
+      line-height: 1.35;
+    }
+
+    .bookmark-annotation::placeholder {
+      color: var(--muted);
+    }
+
+    .hotspot-list {
+      display: grid;
+      gap: 6px;
+      min-height: 32px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .hotspot-item {
+      display: grid;
+      gap: 8px;
+      padding: 8px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: rgba(32, 38, 45, 0.8);
+    }
+
+    .hotspot-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 52px auto auto;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .hotspot-position {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 6px;
+    }
+
+    .hotspot-text {
+      width: 100%;
+      min-height: 48px;
+      resize: vertical;
+      padding: 8px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: #12161b;
+      color: var(--text);
+      font: inherit;
+      font-size: 12px;
+      line-height: 1.35;
+    }
+
+    .hotspot-color {
+      width: 38px;
+      height: 32px;
+      padding: 2px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: #12161b;
+    }
+
+    .bookmark-name {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      color: var(--text);
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .bookmark-thumb {
+      width: 54px;
+      height: 30px;
+      border: 1px solid var(--line);
+      border-radius: 5px;
+      background: #0d0f12;
+      object-fit: cover;
+    }
+
+    .bookmark-actions {
+      display: flex;
+      gap: 4px;
+      align-items: center;
+    }
+
+    .mini-button {
+      appearance: none;
+      display: inline-grid;
+      place-items: center;
+      min-width: 28px;
+      height: 28px;
+      padding: 0;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: #151a20;
+      color: var(--text);
+      font: inherit;
+      font-size: 12px;
+      font-weight: 760;
+      cursor: pointer;
+    }
+
+    .mini-button svg {
+      width: 15px;
+      height: 15px;
+      stroke: currentColor;
+      stroke-width: 2;
+      fill: none;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      pointer-events: none;
+    }
+
+    .mini-button:hover {
+      background: #2a323c;
+    }
+
+    .mini-button:disabled {
+      cursor: not-allowed;
+      opacity: 0.45;
+    }
+
+    .empty-list {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.35;
+    }
+
+    select.compact-select {
+      height: 36px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: var(--panel-2);
+      color: var(--text);
+      font: inherit;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .view-panel,
+    .control-panel {
+      --tool-bg: #101014;
+      --tool-surface: #1a1a20;
+      --tool-surface2: #26272f;
+      --tool-surface3: #2c2d35;
+      --tool-border: #343642;
+      --tool-accent: #3b97ee;
+      --tool-accent-soft: #163452;
+      --tool-danger: #ff3838;
+      --tool-muted: #a5abc0;
+      --tool-text: #f2f3f7;
+      --tool-sub: #b4bad0;
+      --tool-mono: "IBM Plex Mono", "Cascadia Mono", Consolas, monospace;
+    }
+
+    .control-panel {
+      gap: 6px;
+      padding: 7px;
+      border-color: var(--tool-border);
+      border-radius: 3px;
+      background: rgba(31, 32, 39, 0.96);
+    }
+
+    .segmented {
+      grid-template-columns: repeat(4, minmax(58px, 1fr));
+      min-width: 310px;
+      gap: 4px;
+      border: 0;
+      border-radius: 0;
+      overflow: visible;
+      background: transparent;
+    }
+
+    .segment,
+    .control-panel .icon-button {
+      min-height: 34px;
+      border: 1px solid var(--tool-border);
+      border-radius: 3px;
+      background: var(--tool-surface2);
+      color: var(--tool-sub);
+      font-family: var(--tool-mono);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+    }
+
+    .segment {
+      border-right: 1px solid var(--tool-border);
+      padding: 0 7px;
+    }
+
+    .segment:hover,
+    .control-panel .icon-button:hover {
+      border-color: var(--tool-accent);
+      color: #fff;
+      background: var(--tool-surface2);
+    }
+
+    .segment.active {
+      border-color: var(--tool-accent);
+      background: var(--tool-accent-soft);
+      color: #71baff;
+    }
+
+    .view-panel {
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 260px;
+      max-height: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      padding: 0;
+      border-width: 0 1px 0 0;
+      border-color: var(--tool-border);
+      border-radius: 0;
+      background: var(--tool-surface);
+      color: var(--tool-text);
+      box-shadow: none;
+      scrollbar-width: thin;
+      scrollbar-color: #3b97ee #101014;
+    }
+
+    .view-panel::-webkit-scrollbar {
+      width: 10px;
+    }
+
+    .view-panel::-webkit-scrollbar-track {
+      background: #101014;
+      border-left: 1px solid var(--tool-border);
+    }
+
+    .view-panel::-webkit-scrollbar-thumb {
+      background: #2d303a;
+      border: 2px solid #101014;
+      border-radius: 6px;
+    }
+
+    .view-panel::-webkit-scrollbar-thumb:hover {
+      background: var(--tool-accent);
+    }
+
+    .panel-section {
+      padding: 10px;
+      border-bottom: 1px solid var(--tool-border);
+      background: var(--tool-surface);
+    }
+
+    .accordion-toggle {
+      appearance: none;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      min-height: 30px;
+      padding: 0 8px;
+      border: 1px solid transparent;
+      border-radius: 0;
+      background: var(--tool-surface3);
+      color: var(--tool-text);
+      cursor: pointer;
+      font-family: var(--tool-mono);
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.14em;
+      text-align: left;
+      text-transform: uppercase;
+    }
+
+    .accordion-toggle::after {
+      content: "+";
+      color: var(--tool-accent);
+      font-size: 14px;
+      line-height: 1;
+    }
+
+    .panel-section.open > .accordion-toggle::after {
+      content: "-";
+    }
+
+    .accordion-body {
+      display: none;
+      padding-top: 9px;
+    }
+
+    .panel-section.open > .accordion-body {
+      display: grid;
+      gap: 8px;
+    }
+
+    .view-panel .action-row,
+    .view-panel .panel-row {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 4px;
+      align-items: stretch;
+    }
+
+    .view-panel .bounds-actions .icon-button {
+      grid-column: 1 / -1;
+    }
+
+    .view-panel .bookmark-add-row .icon-button {
+      grid-column: 1 / -1;
+    }
+
+    .view-panel .camera-default-row .icon-button {
+      grid-column: 1 / -1;
+    }
+
+    .view-panel .align-reset-row .icon-button,
+    .view-panel #bakeAlignFrameXButton,
+    .view-panel #bakeAlignFrameYButton,
+    .view-panel #bakeAlignFrameZButton {
+      grid-column: 1 / -1;
+    }
+
+    .view-panel .workspace-import-row input[type="file"] {
+      display: none;
+    }
+
+    .view-panel .workspace-import-row .icon-button {
+      grid-column: 1 / -1;
+    }
+
+    .view-panel .range-control {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 42px;
+      gap: 4px;
+      color: var(--tool-text);
+      font-family: var(--tool-mono);
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .view-panel .range-control span {
+      grid-column: 1 / -1;
+    }
+
+    .view-panel .range-control input {
+      min-width: 0;
+      width: 100%;
+      height: 3px;
+      accent-color: var(--tool-accent);
+    }
+
+    .view-panel .range-control output {
+      justify-self: end;
+      color: var(--tool-sub);
+      font-family: var(--tool-mono);
+      font-size: 11px;
+      line-height: 1;
+    }
+
+    .view-panel .icon-button,
+    .view-panel .toggle-control,
+    .view-panel select.compact-select,
+    .view-panel .workspace-name {
+      min-height: 30px;
+      height: auto;
+      border: 1px solid var(--tool-border);
+      border-radius: 3px;
+      background: var(--tool-surface2);
+      color: var(--tool-sub);
+      font-family: var(--tool-mono);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+    }
+
+    .view-panel .icon-button,
+    .view-panel .toggle-control {
+      display: grid;
+      place-items: center;
+      padding: 6px 4px;
+      text-align: center;
+      text-transform: uppercase;
+    }
+
+    .view-panel .icon-button:hover,
+    .view-panel select.compact-select:hover {
+      border-color: var(--tool-accent);
+      color: #71baff;
+      background: var(--tool-accent-soft);
+    }
+
+    .view-panel .toggle-control {
+      grid-template-columns: auto 1fr;
+      place-items: center start;
+      gap: 6px;
+      text-transform: none;
+    }
+
+    .view-panel .toggle-control input {
+      width: 13px;
+      height: 13px;
+      accent-color: var(--tool-accent);
+    }
+
+    .view-panel .number-grid,
+    .hotspot-position {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 4px;
+    }
+
+    .view-panel .number-control {
+      gap: 3px;
+      color: var(--tool-muted);
+      font-family: var(--tool-mono);
+      font-size: 9px;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .view-panel .number-control input,
+    .view-panel input[type="text"],
+    .view-panel input[type="number"],
+    .view-panel textarea {
+      min-width: 0;
+      border: 1px solid var(--tool-border);
+      border-radius: 3px;
+      background: var(--tool-surface2);
+      color: var(--tool-sub);
+      font-family: var(--tool-mono);
+      font-size: 10px;
+    }
+
+    .view-panel .number-control input {
+      height: 28px;
+      padding: 0 5px;
+    }
+
+    .view-panel .camera-readout {
+      grid-template-columns: 1fr;
+      gap: 5px;
+      padding: 7px;
+      border-color: var(--tool-border);
+      border-radius: 3px;
+      background: var(--tool-bg);
+      color: var(--tool-muted);
+      font-family: var(--tool-mono);
+      font-size: 9px;
+      text-transform: uppercase;
+    }
+
+    .view-panel .camera-readout .readout-label {
+      color: var(--tool-muted);
+      line-height: 1;
+    }
+
+    .view-panel .camera-readout output {
+      color: var(--tool-sub);
+      font-size: 10px;
+      text-transform: none;
+    }
+
+    .view-panel .axis-readout {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 4px;
+      width: 100%;
+    }
+
+    .view-panel .axis-readout span {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr);
+      gap: 3px;
+      min-width: 0;
+      color: var(--tool-sub);
+      font-variant-numeric: tabular-nums;
+      line-height: 1.1;
+      white-space: nowrap;
+    }
+
+    .view-panel .axis-readout b {
+      color: var(--tool-text);
+      font-weight: 800;
+    }
+
+    .bookmark-list,
+    .hotspot-list {
+      gap: 4px;
+    }
+
+    .bookmark-item,
+    .hotspot-item {
+      gap: 5px;
+      padding: 6px;
+      border-color: var(--tool-border);
+      border-radius: 3px;
+      background: var(--tool-surface2);
+    }
+
+    .bookmark-item {
+      grid-template-columns: minmax(0, 1fr);
+      align-items: stretch;
+    }
+
+    .bookmark-name {
+      font-family: var(--tool-mono);
+      font-size: 10px;
+      color: var(--tool-text);
+    }
+
+    .bookmark-title-row {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr);
+      gap: 4px;
+      align-items: center;
+      min-width: 0;
+      padding: 5px;
+      border: 1px solid var(--tool-border);
+      border-radius: 3px;
+      background: var(--tool-surface3);
+    }
+
+    .bookmark-index {
+      color: var(--tool-text);
+      font-family: var(--tool-mono);
+      font-size: 10px;
+      font-weight: 800;
+      line-height: 1;
+    }
+
+    .view-panel .bookmark-name-input {
+      height: 24px;
+      min-width: 0;
+      padding: 0 5px;
+      border-color: transparent;
+      background: transparent;
+      color: var(--tool-text);
+      font-family: var(--tool-mono);
+      font-size: 10px;
+      font-weight: 800;
+    }
+
+    .view-panel .bookmark-name-input:hover,
+    .view-panel .bookmark-name-input:focus {
+      border-color: var(--tool-border);
+      background: var(--tool-bg);
+      color: var(--tool-text);
+      outline: none;
+    }
+
+    .bookmark-thumb {
+      display: block;
+      width: 100%;
+      max-width: 220px;
+      height: auto;
+      aspect-ratio: 16 / 9;
+      grid-column: 1;
+      grid-row: auto;
+      justify-self: center;
+      object-fit: cover;
+    }
+
+    .bookmark-actions {
+      grid-column: 1;
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 3px;
+    }
+
+    .mini-button {
+      min-width: 0;
+      height: 23px;
+      border-color: var(--tool-border);
+      border-radius: 3px;
+      background: var(--tool-surface);
+      color: var(--tool-sub);
+    }
+
+    .mini-button:hover {
+      border-color: var(--tool-accent);
+      color: #71baff;
+      background: var(--tool-accent-soft);
+    }
+
+    .bookmark-annotation,
+    .hotspot-text {
+      min-height: 42px;
+      padding: 6px;
+      font-size: 10px;
+    }
+
+    .hotspot-text {
+      min-height: 126px;
+    }
+
+    .hotspot-row {
+      grid-template-columns: minmax(0, 1fr) 38px 30px 24px;
+      gap: 4px;
+      padding: 5px;
+      border: 1px solid var(--tool-border);
+      border-radius: 3px;
+      background: var(--tool-surface3);
+    }
+
+    .hotspot-color {
+      width: 30px;
+      height: 28px;
+      border-radius: 3px;
+      background: var(--tool-surface2);
+    }
+
+    .empty-list {
+      color: var(--tool-muted);
+      font-size: 11px;
+    }
+
+    @media (max-width: 720px) {
+      body {
+        grid-template-rows: auto minmax(0, 1fr);
+      }
+
+      .topbar {
+        grid-template-columns: 1fr;
+        gap: 12px;
+        padding: 13px;
+      }
+
+      h1 {
+        white-space: normal;
+      }
+
+      .actions {
+        justify-content: stretch;
+      }
+
+      .button {
+        flex: 1 1 150px;
+      }
+
+      .drop-panel {
+        inset: 12px;
+      }
+
+      .drop-inner {
+        padding: 20px;
+      }
+
+      .drop-heading {
+        font-size: 20px;
+      }
+
+      .control-panel {
+        left: 12px;
+        right: 12px;
+        top: 12px;
+        justify-content: stretch;
+      }
+
+      .segmented,
+      .speed-control {
+        flex: 1 1 100%;
+      }
+
+      .help-panel {
+        left: 12px;
+        right: 12px;
+        top: 120px;
+        width: auto;
+      }
+
+      .view-panel {
+        left: 12px;
+        top: auto;
+        bottom: 60px;
+        max-height: 48%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="title">
+      <div class="brand-line">
+        <img class="brand-icon" src="gaussian-flythru-icon.png" alt="" aria-hidden="true">
+        <h1>Gaussian <span>FlyThru</span></h1>
+      </div>
+      <div class="subtitle" id="fileMeta">Choose a Luma-style Gaussian splat .ply file from this device.</div>
+    </div>
+    <div class="actions">
+      <input id="fileInput" type="file" accept=".ply,application/octet-stream">
+      <label class="button primary" for="fileInput">Choose PLY</label>
+      <button class="button" id="orientationButton" type="button" disabled>Flip Upright</button>
+      <button class="button" id="clearButton" type="button" disabled>Clear</button>
+    </div>
+  </header>
+
+  <main>
+    <section id="viewer" aria-label="3D viewer"></section>
+    <section class="drop-panel" id="dropPanel" aria-label="File drop area">
+      <div class="drop-inner">
+        <div class="drop-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 3v12"></path>
+            <path d="m7 8 5-5 5 5"></path>
+            <path d="M5 15v3a3 3 0 0 0 3 3h8a3 3 0 0 0 3-3v-3"></path>
+          </svg>
+        </div>
+        <div>
+          <h2 class="drop-heading">Drop a .ply file here</h2>
+          <p class="drop-copy">The file stays on this computer and is opened directly in the browser. Large captures can take a moment to process.</p>
+        </div>
+        <label class="button primary" for="fileInput">Select File</label>
+      </div>
+    </section>
+    <section class="control-panel" aria-label="Viewer controls">
+      <div class="segmented" aria-label="Navigation mode">
+        <button class="segment active" id="orbitModeButton" type="button" disabled>Orbit</button>
+        <button class="segment" id="walkModeButton" type="button" disabled>Walk</button>
+        <button class="segment" id="mouseLookButton" type="button" disabled>Look</button>
+        <button class="segment" id="flyModeButton" type="button" disabled>Flight Sim</button>
+      </div>
+      <button class="icon-button" id="resetViewButton" type="button" title="Reset view" disabled>Reset</button>
+      <button class="icon-button" id="fullscreenButton" type="button" title="Fullscreen viewer">Full</button>
+      <button class="icon-button" id="helpButton" type="button" title="Show controls">?</button>
+    </section>
+    <section class="view-panel" aria-label="Scene tools">
+      <section class="panel-section" data-accordion-section>
+        <button class="accordion-toggle" type="button" aria-expanded="false">Bounding Box</button>
+        <div class="accordion-body">
+          <div class="number-grid">
+            <label class="number-control">Center X<input id="boundsCenterX" type="number" step="0.1" value="0" disabled></label>
+            <label class="number-control">Center Y<input id="boundsCenterY" type="number" step="0.1" value="0" disabled></label>
+            <label class="number-control">Center Z<input id="boundsCenterZ" type="number" step="0.1" value="0" disabled></label>
+          </div>
+          <div class="number-grid">
+            <label class="number-control">Width<input id="boundsWidth" type="number" min="0.1" step="0.1" value="1" disabled></label>
+            <label class="number-control">Height<input id="boundsHeight" type="number" min="0.1" step="0.1" value="1" disabled></label>
+            <label class="number-control">Depth<input id="boundsDepth" type="number" min="0.1" step="0.1" value="1" disabled></label>
+          </div>
+          <label class="range-control">
+            <span>Fly Threshold</span>
+            <input id="flyBoundsThresholdControl" type="range" min="0.05" max="3" step="0.05" value="0.6" disabled>
+            <output id="flyBoundsThresholdValue">0.60</output>
+          </label>
+          <div class="action-row bounds-actions">
+            <button class="icon-button" id="setBoundsCenterButton" type="button" disabled>Set to Camera</button>
+            <label class="toggle-control"><input id="boundsToggle" type="checkbox" disabled><span>Enable</span></label>
+            <label class="toggle-control"><input id="boundsShowToggle" type="checkbox" checked disabled><span>Show</span></label>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel-section" data-accordion-section>
+        <button class="accordion-toggle" type="button" aria-expanded="false">Align Bounding Box</button>
+        <div class="accordion-body">
+          <label class="range-control">
+            <span>Bounding Box Rotation X</span>
+            <input id="alignFrameXControl" type="range" min="-90" max="90" step="1" value="0" disabled>
+            <output id="alignFrameXValue">0°</output>
+          </label>
+          <div class="action-row">
+            <button class="icon-button" id="bakeAlignFrameXButton" type="button" disabled>Bake X Rotation</button>
+          </div>
+          <label class="range-control">
+            <span>Bounding Box Rotation Y</span>
+            <input id="alignFrameYControl" type="range" min="-90" max="90" step="1" value="0" disabled>
+            <output id="alignFrameYValue">0°</output>
+          </label>
+          <div class="action-row">
+            <button class="icon-button" id="bakeAlignFrameYButton" type="button" disabled>Bake Y Rotation</button>
+          </div>
+          <label class="range-control">
+            <span>Bounding Box Rotation Z</span>
+            <input id="alignFrameZControl" type="range" min="-90" max="90" step="1" value="0" disabled>
+            <output id="alignFrameZValue">0°</output>
+          </label>
+          <div class="action-row">
+            <button class="icon-button" id="bakeAlignFrameZButton" type="button" disabled>Bake Z Rotation</button>
+          </div>
+          <div class="action-row align-reset-row">
+            <button class="icon-button" id="resetAlignFrameButton" type="button" disabled>Reset</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel-section" data-accordion-section>
+        <button class="accordion-toggle" type="button" aria-expanded="false">Camera Data</button>
+        <div class="accordion-body">
+          <div class="camera-readout" aria-label="Camera data">
+            <span class="readout-label">Position</span>
+            <output class="axis-readout" id="cameraPositionValue"><span><b>X</b> 0.00</span><span><b>Y</b> 0.00</span><span><b>Z</b> 0.00</span></output>
+            <span class="readout-label">Rotation</span>
+            <output class="axis-readout" id="cameraOrientationValue"><span><b>X</b> 0.0&deg;</span><span><b>Y</b> 0.0&deg;</span><span><b>Z</b> 0.0&deg;</span></output>
+          </div>
+          <div class="action-row camera-default-row">
+            <button class="icon-button" id="setCameraDefaultButton" type="button" disabled>SET CAMERA DEFAULT</button>
+          </div>
+          <label class="range-control">
+            <span>Walk Speed</span>
+            <input id="speedControl" type="range" min="0.05" max="2" step="0.05" value="0.22" disabled>
+            <output id="speedValue">0.22</output>
+          </label>
+          <label class="range-control">
+            <span>Splats Size</span>
+            <input id="pointScaleControl" type="range" min="0.35" max="2.5" step="0.05" value="1" disabled>
+            <output id="pointScaleValue">1.00</output>
+          </label>
+          <label class="toggle-control"><input id="axisGizmoToggle" type="checkbox" checked disabled><span>Show Axis Gizmo</span></label>
+          <div class="action-row">
+            <button class="icon-button" id="screenshotButton" type="button" title="Save screenshot" disabled>Screen Shot</button>
+            <select class="compact-select" id="screenshotResolutionSelect" disabled title="Image size">
+              <option value="viewer">Viewer size</option>
+              <option value="640x360">Thumbnail 360p</option>
+              <option value="1280x720">720p</option>
+              <option value="1920x1080">1080p</option>
+              <option value="3840x2160">4K</option>
+            </select>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel-section" data-accordion-section>
+        <button class="accordion-toggle" type="button" aria-expanded="false">Bookmark Viewpoints</button>
+        <div class="accordion-body">
+          <div class="action-row bookmark-add-row"><button class="icon-button" id="addBookmarkButton" type="button" disabled>ADD VIEWPOINT</button></div>
+          <ol class="bookmark-list" id="bookmarkList"><li class="empty-list">Add up to 10 camera positions for a flythrough.</li></ol>
+          <label class="range-control"><span>Duration</span><input id="tourDurationControl" type="range" min="5" max="120" step="1" value="30" disabled><output id="tourDurationValue">30s</output></label>
+          <label class="range-control"><span>Aim Smooth</span><input id="aimSmoothControl" type="range" min="0" max="100" step="1" value="0" disabled><output id="aimSmoothValue">0%</output></label>
+          <label class="range-control"><span>Look Ahead</span><input id="lookAheadControl" type="range" min="0" max="100" step="1" value="0" disabled><output id="lookAheadValue">0%</output></label>
+          <label class="range-control"><span>Timeline</span><input id="tourTimelineControl" type="range" min="0" max="1000" step="1" value="0" disabled><output id="tourTimelineValue">0%</output></label>
+          <div class="action-row">
+            <button class="icon-button" id="playTourButton" type="button" disabled>Play</button>
+            <button class="icon-button" id="stopTourButton" type="button" disabled>Stop</button>
+            <select class="compact-select" id="tourModeSelect" disabled><option value="loop">Loop</option><option value="pingpong">Ping-pong</option></select>
+          </div>
+          <div class="action-row">
+            <button class="icon-button" id="recordTourButton" type="button" disabled>Record MP4</button>
+            <select class="compact-select" id="recordResolutionSelect" disabled title="Recording resolution">
+              <option value="viewer">Viewer size</option>
+              <option value="640x360">Thumbnail 360p</option>
+              <option value="1280x720">720p</option>
+              <option value="1920x1080">1080p</option>
+              <option value="3840x2160">4K</option>
+            </select>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel-section" data-accordion-section>
+        <button class="accordion-toggle" type="button" aria-expanded="false">Hotspots</button>
+        <div class="accordion-body">
+          <div class="action-row">
+            <button class="icon-button" id="addHotspotButton" type="button" disabled>Add</button>
+            <label class="toggle-control"><input id="hotspotVisibleToggle" type="checkbox" checked disabled><span>Visible</span></label>
+          </div>
+          <ol class="hotspot-list" id="hotspotList"><li class="empty-list">Add hotspots for scene labels.</li></ol>
+        </div>
+      </section>
+
+      <section class="panel-section" data-accordion-section>
+        <button class="accordion-toggle" type="button" aria-expanded="false">Workspace</button>
+        <div class="accordion-body">
+          <div class="action-row">
+            <input class="workspace-name" id="workspaceNameInput" type="text" value="luma-workspace" aria-label="Workspace JSON filename" disabled>
+            <button class="icon-button" id="exportWorkspaceButton" type="button" disabled>Export JSON</button>
+          </div>
+          <div class="action-row workspace-import-row">
+            <input id="workspaceImportInput" type="file" accept=".json,application/json" disabled>
+            <label class="icon-button" id="importWorkspaceButton" for="workspaceImportInput" aria-disabled="true">Import JSON</label>
+          </div>
+        </div>
+      </section>
+    </section>    <aside class="help-panel hidden" id="helpPanel" aria-label="Controls help">
+      <div class="help-title">
+        <span>Controls</span>
+        <button class="icon-button" id="closeHelpButton" type="button" title="Close help">X</button>
+      </div>
+      <dl>
+        <dt>Orbit</dt>
+        <dd>Drag to inspect. Scroll to zoom.</dd>
+        <dt>Walk</dt>
+        <dd>Arrow keys or W/A/S/D move through the scene.</dd>
+        <dt>Look</dt>
+        <dd>Move the mouse to aim. Esc or Space exits.</dd>
+        <dt>Flight Sim</dt>
+        <dd>Mouse steers. W increases thrust, S decreases it, and Esc or Space exits.</dd>
+        <dt>Up / Down</dt>
+        <dd>Page Up / Page Down or E / Q.</dd>
+        <dt>Fast Move</dt>
+        <dd>Hold Shift while moving.</dd>
+        <dt>Axis Gizmo</dt>
+        <dd>Shows world X, Y, and Z axes at the scene origin.</dd>
+        <dt>Viewpoints</dt>
+        <dd>Add bookmarks for the current camera view.</dd>
+        <dt>Tour</dt>
+        <dd>Plays a tour of the bookmarked Viewpoints.</dd>
+        <dt>Smooth</dt>
+        <dd>Uses a curved camera path with orientation-based aiming.</dd>
+        <dt>Aim Smooth</dt>
+        <dd>Softens camera rotation between saved viewpoints.</dd>
+        <dt>Look Ahead</dt>
+        <dd>Blends aim toward the path ahead for a walking or flying feel.</dd>
+        <dt>Viewpoint Notes</dt>
+        <dd>Click a viewpoint eye button to show its note.</dd>
+        <dt>Hotspots</dt>
+        <dd>Add scene markers, edit their fields, then click visible markers to show their text.</dd>
+        <dt>Record</dt>
+        <dd>Captures one tour cycle as MP4 when supported.</dd>
+        <dt>Bounds</dt>
+        <dd>Shows and enforces a camera movement box.</dd>
+        <dt>Align Bounding Box</dt>
+          <dd>Rotate or move the bounds live, then bake the inverse transform to the scene.</dd>
+        <dt>Workspace</dt>
+        <dd>Saves bookmarks, bounds, and viewer settings as JSON.</dd>
+      </dl>
+    </aside>
+    <div class="reticle hidden" id="reticle" aria-hidden="true"></div>
+    <div class="flight-reticle hidden" id="flightReticle" aria-hidden="true">
+      <span class="reticle-ring"></span>
+      <span class="reticle-tick top"></span>
+      <span class="reticle-tick right"></span>
+      <span class="reticle-tick bottom"></span>
+      <span class="reticle-tick left"></span>
+    </div>
+    <div class="recording-badge hidden" id="recordingBadge" aria-live="polite">REC Tour</div>
+    <aside class="annotation-panel hidden" id="annotationPanel" aria-live="polite">
+      <div class="annotation-title">
+        <span id="annotationTitle">Annotation</span>
+        <button class="icon-button" id="closeAnnotationButton" type="button" title="Close annotation">X</button>
+      </div>
+      <p class="annotation-copy" id="annotationCopy"></p>
+    </aside>
+    <div class="status" id="status">Waiting for a .ply file.</div>
+  </main>
+
+  <script>
+    if (location.protocol === "file:") {
+      location.replace("http://127.0.0.1:8766/luma-ply-viewer.html");
+    }
+  </script>
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js"
+      }
+    }
+  </script>
+  <script type="module">
+    import * as THREE from "three";
+    import * as GaussianSplats3D from "https://cdn.jsdelivr.net/npm/@mkkellogg/gaussian-splats-3d@latest/build/gaussian-splats-3d.module.js";
+
+    const fileInput = document.querySelector("#fileInput");
+    const dropPanel = document.querySelector("#dropPanel");
+    const statusEl = document.querySelector("#status");
+    const fileMeta = document.querySelector("#fileMeta");
+    const clearButton = document.querySelector("#clearButton");
+    const orientationButton = document.querySelector("#orientationButton");
+    const viewerRoot = document.querySelector("#viewer");
+    const viewPanel = document.querySelector(".view-panel");
+    const orbitModeButton = document.querySelector("#orbitModeButton");
+    const walkModeButton = document.querySelector("#walkModeButton");
+    const flyModeButton = document.querySelector("#flyModeButton");
+    const speedControl = document.querySelector("#speedControl");
+    const speedValue = document.querySelector("#speedValue");
+    const flySpeedValue = document.querySelector("#flySpeedValue");
+    const cameraPositionValue = document.querySelector("#cameraPositionValue");
+    const cameraOrientationValue = document.querySelector("#cameraOrientationValue");
+    const mouseLookButton = document.querySelector("#mouseLookButton");
+    const resetViewButton = document.querySelector("#resetViewButton");
+    const screenshotButton = document.querySelector("#screenshotButton");
+    const screenshotResolutionSelect = document.querySelector("#screenshotResolutionSelect");
+    const fullscreenButton = document.querySelector("#fullscreenButton");
+    const helpButton = document.querySelector("#helpButton");
+    const closeHelpButton = document.querySelector("#closeHelpButton");
+    const helpPanel = document.querySelector("#helpPanel");
+    const reticle = document.querySelector("#reticle");
+    const flightReticle = document.querySelector("#flightReticle");
+    const recordingBadge = document.querySelector("#recordingBadge");
+    const annotationPanel = document.querySelector("#annotationPanel");
+    const annotationTitle = document.querySelector("#annotationTitle");
+    const annotationCopy = document.querySelector("#annotationCopy");
+    const closeAnnotationButton = document.querySelector("#closeAnnotationButton");
+    const axisGizmoToggle = document.querySelector("#axisGizmoToggle");
+    const setCameraDefaultButton = document.querySelector("#setCameraDefaultButton");
+    const addBookmarkButton = document.querySelector("#addBookmarkButton");
+    const bookmarkList = document.querySelector("#bookmarkList");
+    const addHotspotButton = document.querySelector("#addHotspotButton");
+    const hotspotVisibleToggle = document.querySelector("#hotspotVisibleToggle");
+    const hotspotList = document.querySelector("#hotspotList");
+    const pointScaleControl = document.querySelector("#pointScaleControl");
+    const pointScaleValue = document.querySelector("#pointScaleValue");
+    const playTourButton = document.querySelector("#playTourButton");
+    const stopTourButton = document.querySelector("#stopTourButton");
+    const recordTourButton = document.querySelector("#recordTourButton");
+    const tourModeSelect = document.querySelector("#tourModeSelect");
+    const recordResolutionSelect = document.querySelector("#recordResolutionSelect");
+    const tourDurationControl = document.querySelector("#tourDurationControl");
+    const tourDurationValue = document.querySelector("#tourDurationValue");
+    const tourTimelineControl = document.querySelector("#tourTimelineControl");
+    const tourTimelineValue = document.querySelector("#tourTimelineValue");
+    const aimSmoothControl = document.querySelector("#aimSmoothControl");
+    const aimSmoothValue = document.querySelector("#aimSmoothValue");
+    const lookAheadControl = document.querySelector("#lookAheadControl");
+    const lookAheadValue = document.querySelector("#lookAheadValue");
+    const boundsToggle = document.querySelector("#boundsToggle");
+    const boundsShowToggle = document.querySelector("#boundsShowToggle");
+    const setBoundsCenterButton = document.querySelector("#setBoundsCenterButton");
+    const boundsCenterX = document.querySelector("#boundsCenterX");
+    const boundsCenterY = document.querySelector("#boundsCenterY");
+    const boundsCenterZ = document.querySelector("#boundsCenterZ");
+    const boundsWidth = document.querySelector("#boundsWidth");
+    const boundsHeight = document.querySelector("#boundsHeight");
+    const boundsDepth = document.querySelector("#boundsDepth");
+    const flyBoundsThresholdControl = document.querySelector("#flyBoundsThresholdControl");
+    const flyBoundsThresholdValue = document.querySelector("#flyBoundsThresholdValue");
+    const bakeAlignFrameXButton = document.querySelector("#bakeAlignFrameXButton");
+    const bakeAlignFrameYButton = document.querySelector("#bakeAlignFrameYButton");
+    const bakeAlignFrameZButton = document.querySelector("#bakeAlignFrameZButton");
+    const resetAlignFrameButton = document.querySelector("#resetAlignFrameButton");
+    const alignFrameXControl = document.querySelector("#alignFrameXControl");
+    const alignFrameYControl = document.querySelector("#alignFrameYControl");
+    const alignFrameZControl = document.querySelector("#alignFrameZControl");
+    const alignFrameXValue = document.querySelector("#alignFrameXValue");
+    const alignFrameYValue = document.querySelector("#alignFrameYValue");
+    const alignFrameZValue = document.querySelector("#alignFrameZValue");
+    const workspaceNameInput = document.querySelector("#workspaceNameInput");
+    const workspaceImportInput = document.querySelector("#workspaceImportInput");
+    const importWorkspaceButton = document.querySelector("#importWorkspaceButton");
+    const exportWorkspaceButton = document.querySelector("#exportWorkspaceButton");
+    viewerRoot.tabIndex = -1;
+
+    let viewer = null;
+    let currentObjectUrl = null;
+    let currentFile = null;
+    let flipUpright = true;
+    let keyboardNavigationEnabled = false;
+    let navigationMode = "orbit";
+    let movementSpeed = Number(speedControl.value);
+    let flyVelocity = 0;
+    let flyThrust = 0;
+    let flyTargetSpeed = 0;
+    const flyMaxSpeed = 0.5;
+    let flyAirborneTime = 0;
+    let pitchTarget = 0;
+    let pitchEasedTarget = 0;
+    const flyMouse = { x: 0, y: 0 };
+    let flyBoundsThreshold = Number(flyBoundsThresholdControl.value);
+    let flyAnimationId = null;
+    let lastFlyFrameTime = 0;
+    let flightRoll = 0;
+    let flyRig = null;
+    let flyFrozen = false;
+    let flyInput = {
+      accelerate: false,
+      decelerate: false
+    };
+    let initialView = null;
+    let cameraDefaultView = null;
+    let yaw = 0;
+    let pitch = 0;
+    let pointScale = Number(pointScaleControl.value);
+    let axisGizmoVisible = true;
+    let sceneYawDegrees = 0;
+    let sceneBaseYawDegrees = 0;
+    let sceneBaseRotation = new THREE.Quaternion();
+    let sceneOffset = new THREE.Vector3(0, 0, 0);
+    let bookmarks = [];
+    let hotspots = [];
+    let tourAnimationId = null;
+    let tourPlaying = false;
+    let tourStartTime = 0;
+    let tourPath = [];
+    let tourTotalDuration = Number(tourDurationControl.value) * 1000;
+    let tourRecording = false;
+    let tourRecorder = null;
+    let tourRecordingTimeout = null;
+    let recordingFrameId = null;
+    let tourScrubProgress = 0;
+    let smoothTourEnabled = true;
+    let smoothTourPositionCurve = null;
+    let aimSmoothAmount = Number(aimSmoothControl.value) / 100;
+    let lookAheadAmount = Number(lookAheadControl.value) / 100;
+    let lastTourFrameTime = 0;
+    let boundsEnabled = false;
+    let boundsVisible = true;
+    let boundsHelper = null;
+    let axisGizmoHelper = null;
+    let hotspotMarkerGroup = null;
+    let hotspotsVisible = true;
+    let activeHotspotId = null;
+    let hotspotPointerDown = null;
+    const annotationRaycaster = new THREE.Raycaster();
+    const annotationPointer = new THREE.Vector2();
+    let boundsOverlayScene = null;
+    let boundsRenderWrapped = false;
+    const boundsEdgeRadius = 0.0175;
+    let bounds = {
+      center: new THREE.Vector3(0, 0, 0),
+      size: new THREE.Vector3(1, 1, 1)
+    };
+    let alignFrame = {
+      rotationDegrees: new THREE.Vector3(0, 0, 0),
+      offset: new THREE.Vector3(0, 0, 0)
+    };
+
+    const plyFormat = GaussianSplats3D.SceneFormat?.Ply ?? 2;
+
+    function setStatus(message, tone = "") {
+      statusEl.textContent = message;
+      statusEl.className = `status ${tone}`.trim();
+    }
+
+    function setRecordingIndicator(active, label = "REC Tour") {
+      recordingBadge.textContent = label;
+      recordingBadge.classList.toggle("hidden", !active);
+      recordTourButton.textContent = active ? "Recording..." : "Record MP4";
+    }
+
+    function prettyBytes(bytes) {
+      if (!bytes) return "0 B";
+      const units = ["B", "KB", "MB", "GB"];
+      const index = Math.min(Math.floor(Math.log(bytes) / Math.log(1024)), units.length - 1);
+      return `${(bytes / 1024 ** index).toFixed(index === 0 ? 0 : 1)} ${units[index]}`;
+    }
+
+    function formatSignedNumber(value, digits = 2) {
+      const fixed = Math.abs(value) < 0.0005 ? 0 : value;
+      return fixed.toFixed(digits);
+    }
+
+    function setAxisReadout(output, values, unit = "") {
+      output.innerHTML = ["X", "Y", "Z"].map((axis, index) => (
+        `<span><b>${axis}</b> ${values[index]}${unit}</span>`
+      )).join("");
+    }
+
+    function updateCameraReadout() {
+      if (!viewer?.camera) {
+        setAxisReadout(cameraPositionValue, ["--", "--", "--"]);
+        setAxisReadout(cameraOrientationValue, ["--", "--", "--"], "\u00B0");
+        return;
+      }
+      const { position, quaternion } = viewer.camera;
+      const rotation = new THREE.Euler().setFromQuaternion(quaternion, "YXZ");
+      setAxisReadout(cameraPositionValue, [
+        formatSignedNumber(position.x),
+        formatSignedNumber(position.y),
+        formatSignedNumber(position.z)
+      ]);
+      setAxisReadout(cameraOrientationValue, [
+        formatSignedNumber(THREE.MathUtils.radToDeg(rotation.x), 1),
+        formatSignedNumber(THREE.MathUtils.radToDeg(rotation.y), 1),
+        formatSignedNumber(THREE.MathUtils.radToDeg(rotation.z), 1)
+      ], "\u00B0");
+    }
+
+    function setViewPanelVisible(visible) {
+      viewPanel?.classList.toggle("flight-hidden", !visible);
+    }
+
+    function toggleViewPanelVisible() {
+      if (!viewPanel) return;
+      setViewPanelVisible(viewPanel.classList.contains("flight-hidden"));
+    }
+
+    function setKeyboardNavigationEnabled(enabled) {
+      if (keyboardNavigationEnabled === enabled) return;
+      keyboardNavigationEnabled = enabled;
+      const action = enabled ? "addEventListener" : "removeEventListener";
+      window[action]("keydown", handleSceneKeydown, true);
+      window[action]("keyup", handleSceneKeyup, true);
+    }
+
+    function setSceneControlsEnabled(enabled) {
+      orbitModeButton.disabled = !enabled;
+      walkModeButton.disabled = !enabled;
+      flyModeButton.disabled = !enabled;
+      mouseLookButton.disabled = !enabled;
+      speedControl.disabled = !enabled;
+      resetViewButton.disabled = !enabled;
+      setCameraDefaultButton.disabled = !enabled;
+      screenshotButton.disabled = !enabled;
+      screenshotResolutionSelect.disabled = !enabled;
+      addBookmarkButton.disabled = !enabled || bookmarks.length >= 10;
+      pointScaleControl.disabled = !enabled;
+      axisGizmoToggle.disabled = !enabled;
+      addHotspotButton.disabled = !enabled;
+      hotspotVisibleToggle.disabled = !enabled;
+      workspaceNameInput.disabled = !enabled;
+      workspaceImportInput.disabled = !enabled;
+      importWorkspaceButton.setAttribute("aria-disabled", `${!enabled}`);
+      exportWorkspaceButton.disabled = !enabled;
+      boundsToggle.disabled = !enabled;
+      boundsShowToggle.disabled = !enabled;
+      setBoundsCenterButton.disabled = !enabled;
+      bakeAlignFrameXButton.disabled = !enabled;
+      bakeAlignFrameYButton.disabled = !enabled;
+      bakeAlignFrameZButton.disabled = !enabled;
+      resetAlignFrameButton.disabled = !enabled;
+      alignFrameXControl.disabled = !enabled;
+      alignFrameYControl.disabled = !enabled;
+      alignFrameZControl.disabled = !enabled;
+      flyBoundsThresholdControl.disabled = !enabled;
+      [
+        boundsCenterX,
+        boundsCenterY,
+        boundsCenterZ,
+        boundsWidth,
+        boundsHeight,
+        boundsDepth
+      ].forEach((input) => {
+        input.disabled = !enabled;
+      });
+      updateTourControls();
+    }
+
+    function readNumber(input, fallback) {
+      const value = Number(input.value);
+      return Number.isFinite(value) ? value : fallback;
+    }
+
+    function readBoundsFromInputs() {
+      bounds.center.set(
+        readNumber(boundsCenterX, bounds.center.x),
+        readNumber(boundsCenterY, bounds.center.y),
+        readNumber(boundsCenterZ, bounds.center.z)
+      );
+      bounds.size.set(
+        Math.max(0.1, readNumber(boundsWidth, bounds.size.x)),
+        Math.max(0.1, readNumber(boundsHeight, bounds.size.y)),
+        Math.max(0.1, readNumber(boundsDepth, bounds.size.z))
+      );
+    }
+
+    function writeBoundsToInputs() {
+      boundsCenterX.value = bounds.center.x.toFixed(2);
+      boundsCenterY.value = bounds.center.y.toFixed(2);
+      boundsCenterZ.value = bounds.center.z.toFixed(2);
+      boundsWidth.value = bounds.size.x.toFixed(2);
+      boundsHeight.value = bounds.size.y.toFixed(2);
+      boundsDepth.value = bounds.size.z.toFixed(2);
+    }
+
+    function readAlignFrameFromInputs() {
+      alignFrame.rotationDegrees.set(
+        readNumber(alignFrameXControl, alignFrame.rotationDegrees.x),
+        readNumber(alignFrameYControl, alignFrame.rotationDegrees.y),
+        readNumber(alignFrameZControl, alignFrame.rotationDegrees.z)
+      );
+      alignFrame.offset.set(0, 0, 0);
+    }
+
+    function writeAlignFrameToInputs() {
+      alignFrameXControl.value = `${alignFrame.rotationDegrees.x}`;
+      alignFrameYControl.value = `${alignFrame.rotationDegrees.y}`;
+      alignFrameZControl.value = `${alignFrame.rotationDegrees.z}`;
+      alignFrameXValue.textContent = `${alignFrame.rotationDegrees.x}\u00B0`;
+      alignFrameYValue.textContent = `${alignFrame.rotationDegrees.y}\u00B0`;
+      alignFrameZValue.textContent = `${alignFrame.rotationDegrees.z}\u00B0`;
+    }
+
+    function alignFrameQuaternion() {
+      return new THREE.Quaternion().setFromEuler(new THREE.Euler(
+        THREE.MathUtils.degToRad(alignFrame.rotationDegrees.x),
+        THREE.MathUtils.degToRad(alignFrame.rotationDegrees.y),
+        THREE.MathUtils.degToRad(alignFrame.rotationDegrees.z),
+        "XYZ"
+      ));
+    }
+
+    function alignFrameInverseQuaternion() {
+      return alignFrameQuaternion().invert();
+    }
+
+    function alignFrameToWorld(position) {
+      return position.clone().applyQuaternion(alignFrameQuaternion()).add(alignFrame.offset);
+    }
+
+    function worldToAlignFrame(position) {
+      return position.clone().sub(alignFrame.offset).applyQuaternion(alignFrameInverseQuaternion());
+    }
+
+    function boundsMinMax() {
+      const half = bounds.size.clone().multiplyScalar(0.5);
+      return {
+        min: bounds.center.clone().sub(half),
+        max: bounds.center.clone().add(half)
+      };
+    }
+
+    function createAxisLabel(text, color) {
+      const canvas = document.createElement("canvas");
+      canvas.width = 96;
+      canvas.height = 96;
+      const context = canvas.getContext("2d");
+      context.clearRect(0, 0, canvas.width, canvas.height);
+      context.fillStyle = color;
+      context.beginPath();
+      context.arc(48, 48, 30, 0, Math.PI * 2);
+      context.fill();
+      context.fillStyle = "#101317";
+      context.font = "700 42px system-ui, sans-serif";
+      context.textAlign = "center";
+      context.textBaseline = "middle";
+      context.fillText(text, 48, 51);
+      const texture = new THREE.CanvasTexture(canvas);
+      texture.colorSpace = THREE.SRGBColorSpace;
+      const material = new THREE.SpriteMaterial({
+        map: texture,
+        transparent: true,
+        depthTest: false,
+        depthWrite: false
+      });
+      const sprite = new THREE.Sprite(material);
+      sprite.renderOrder = 1001;
+      sprite.userData.texture = texture;
+      sprite.scale.set(0.24, 0.24, 0.24);
+      return sprite;
+    }
+
+    function addAxisArrow(group, axis, color, label) {
+      const length = 1.15;
+      const shaftLength = 0.9;
+      const shaftRadius = 0.018;
+      const headLength = 0.18;
+      const direction = axis.clone().normalize();
+      const upAxis = new THREE.Vector3(0, 1, 0);
+      const shaftGeometry = group.userData.shaftGeometry;
+      const headGeometry = group.userData.headGeometry;
+      const material = new THREE.MeshBasicMaterial({
+        color,
+        transparent: true,
+        opacity: 0.95,
+        depthTest: false,
+        depthWrite: false
+      });
+
+      const shaft = new THREE.Mesh(shaftGeometry, material);
+      shaft.position.copy(direction.clone().multiplyScalar(shaftLength * 0.5));
+      shaft.quaternion.setFromUnitVectors(upAxis, direction);
+      shaft.scale.set(shaftRadius, shaftLength, shaftRadius);
+      shaft.renderOrder = 1000;
+      shaft.userData.axisMaterial = material;
+      group.add(shaft);
+
+      const head = new THREE.Mesh(headGeometry, material);
+      head.position.copy(direction.clone().multiplyScalar(shaftLength + headLength * 0.5));
+      head.quaternion.setFromUnitVectors(upAxis, direction);
+      head.renderOrder = 1000;
+      group.add(head);
+
+      const labelSprite = createAxisLabel(label, `#${color.toString(16).padStart(6, "0")}`);
+      labelSprite.position.copy(direction.clone().multiplyScalar(length + 0.2));
+      group.add(labelSprite);
+    }
+
+    function createWorldAxisGizmo() {
+      const group = new THREE.Group();
+      group.name = "WorldOriginAxisGizmo";
+      group.renderOrder = 1000;
+      group.userData.shaftGeometry = new THREE.CylinderGeometry(1, 1, 1, 12, 1, true);
+      group.userData.headGeometry = new THREE.ConeGeometry(0.06, 0.18, 16);
+      addAxisArrow(group, new THREE.Vector3(1, 0, 0), 0xff626d, "X");
+      addAxisArrow(group, new THREE.Vector3(0, 1, 0), 0x5fe08b, "Y");
+      addAxisArrow(group, new THREE.Vector3(0, 0, 1), 0x61a8ff, "Z");
+      return group;
+    }
+
+    function ensureAxisGizmoHelper() {
+      if (!viewer || axisGizmoHelper) return;
+      ensureBoundsOverlayRender();
+      boundsOverlayScene = boundsOverlayScene || new THREE.Scene();
+      axisGizmoHelper = createWorldAxisGizmo();
+      boundsOverlayScene.add(axisGizmoHelper);
+      updateAxisGizmo();
+    }
+
+    function updateAxisGizmo() {
+      if (!axisGizmoHelper) return;
+      axisGizmoHelper.visible = axisGizmoVisible;
+      viewer?.forceRenderNextFrame?.();
+    }
+
+    function removeAxisGizmoHelper() {
+      if (!axisGizmoHelper) return;
+      axisGizmoHelper.parent?.remove(axisGizmoHelper);
+      axisGizmoHelper.userData.shaftGeometry?.dispose();
+      axisGizmoHelper.userData.headGeometry?.dispose();
+      const materials = new Set();
+      const textures = new Set();
+      axisGizmoHelper.traverse((child) => {
+        if (child.userData.texture) {
+          textures.add(child.userData.texture);
+        }
+        if (child.material?.map) {
+          textures.add(child.material.map);
+        }
+        if (child.material) {
+          materials.add(child.material);
+        }
+      });
+      textures.forEach((texture) => texture.dispose());
+      materials.forEach((material) => material.dispose());
+      axisGizmoHelper = null;
+      if (!boundsHelper) boundsOverlayScene = null;
+    }
+
+    function createHotspotMarkerTexture(label, color = "#5ee6b5", active = false) {
+      const canvas = document.createElement("canvas");
+      canvas.width = 128;
+      canvas.height = 128;
+      const context = canvas.getContext("2d");
+      const fill = active ? "#f7c948" : color;
+      context.clearRect(0, 0, canvas.width, canvas.height);
+      context.fillStyle = "rgba(13, 15, 18, 0.34)";
+      context.beginPath();
+      context.arc(64, 68, 46, 0, Math.PI * 2);
+      context.fill();
+      context.fillStyle = fill;
+      context.beginPath();
+      context.arc(64, 58, 34, 0, Math.PI * 2);
+      context.fill();
+      context.beginPath();
+      context.moveTo(64, 116);
+      context.lineTo(48, 82);
+      context.lineTo(80, 82);
+      context.closePath();
+      context.fill();
+      context.strokeStyle = "rgba(255, 255, 255, 0.82)";
+      context.lineWidth = 5;
+      context.stroke();
+      context.fillStyle = "#101317";
+      const markerText = `${label || ""}`.slice(0, 5);
+      const fontSize = markerText.length > 4 ? 22 : markerText.length > 2 ? 28 : 38;
+      context.font = `800 ${fontSize}px system-ui, sans-serif`;
+      context.textAlign = "center";
+      context.textBaseline = "middle";
+      context.fillText(markerText, 64, 58);
+      const texture = new THREE.CanvasTexture(canvas);
+      texture.colorSpace = THREE.SRGBColorSpace;
+      return texture;
+    }
+
+    function disposeHotspotMarker(marker) {
+      marker.material?.map?.dispose();
+      marker.material?.dispose();
+    }
+
+    function ensureHotspotMarkerGroup() {
+      if (!viewer || hotspotMarkerGroup) return;
+      ensureBoundsOverlayRender();
+      boundsOverlayScene = boundsOverlayScene || new THREE.Scene();
+      hotspotMarkerGroup = new THREE.Group();
+      hotspotMarkerGroup.name = "HotspotMarkers";
+      hotspotMarkerGroup.renderOrder = 1002;
+      boundsOverlayScene.add(hotspotMarkerGroup);
+    }
+
+    function updateHotspotMarkers() {
+      if (!viewer) return;
+      ensureHotspotMarkerGroup();
+      hotspotMarkerGroup.children.forEach(disposeHotspotMarker);
+      hotspotMarkerGroup.clear();
+      if (activeHotspotId && !hotspots.some((hotspot) => hotspot.id === activeHotspotId)) {
+        activeHotspotId = null;
+        annotationPanel.classList.add("hidden");
+      }
+
+      hotspots.forEach((hotspot, index) => {
+        const texture = createHotspotMarkerTexture(hotspot.label || `${index + 1}`, hotspot.color, hotspot.id === activeHotspotId);
+        const material = new THREE.SpriteMaterial({
+          map: texture,
+          transparent: true,
+          depthTest: false,
+          depthWrite: false
+        });
+        const marker = new THREE.Sprite(material);
+        marker.name = `HotspotMarker${index + 1}`;
+        marker.position.copy(hotspot.position);
+        marker.scale.set(0.28, 0.28, 0.28);
+        marker.renderOrder = 1002;
+        marker.visible = hotspotsVisible;
+        marker.userData.hotspotId = hotspot.id;
+        hotspotMarkerGroup.add(marker);
+      });
+
+      viewer?.forceRenderNextFrame?.();
+    }
+
+    function removeHotspotMarkers() {
+      if (!hotspotMarkerGroup) return;
+      hotspotMarkerGroup.children.forEach(disposeHotspotMarker);
+      hotspotMarkerGroup.parent?.remove(hotspotMarkerGroup);
+      hotspotMarkerGroup = null;
+      activeHotspotId = null;
+      annotationPanel.classList.add("hidden");
+      if (!boundsHelper && !axisGizmoHelper) boundsOverlayScene = null;
+    }
+
+    function showTextPanel(title, text, hotspotId = null) {
+      activeHotspotId = hotspotId;
+      annotationTitle.textContent = title || "Annotation";
+      annotationCopy.textContent = text?.trim() || "No annotation text added.";
+      annotationPanel.classList.remove("hidden");
+      updateHotspotMarkers();
+    }
+
+    function hideAnnotation() {
+      activeHotspotId = null;
+      annotationPanel.classList.add("hidden");
+      updateHotspotMarkers();
+    }
+
+    function goToBookmark(bookmark) {
+      applyView(bookmark);
+      showTextPanel(bookmark.name, bookmark.annotationText);
+    }
+
+    function toggleHotspot(hotspot) {
+      if (!hotspot) return;
+      if (activeHotspotId === hotspot.id && !annotationPanel.classList.contains("hidden")) {
+        hideAnnotation();
+      } else {
+        showTextPanel(hotspot.name, hotspot.text, hotspot.id);
+      }
+    }
+
+    function isFormControlElement(element) {
+      return !!element?.matches?.("input, textarea, select, button") || !!element?.isContentEditable;
+    }
+
+    function handleHotspotPointerDown(event) {
+      hotspotPointerDown = { x: event.clientX, y: event.clientY };
+    }
+
+    function handleHotspotClick(event) {
+      if (!viewer?.camera || !hotspotsVisible || !hotspotMarkerGroup?.children.length || document.pointerLockElement === viewerRoot) return;
+      if (isFormControlElement(event.target)) return;
+      if (hotspotPointerDown) {
+        const distance = Math.hypot(event.clientX - hotspotPointerDown.x, event.clientY - hotspotPointerDown.y);
+        hotspotPointerDown = null;
+        if (distance > 5) return;
+      }
+      const rect = viewer.renderer?.domElement?.getBoundingClientRect() || viewerRoot.getBoundingClientRect();
+      annotationPointer.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+      annotationPointer.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+      annotationRaycaster.setFromCamera(annotationPointer, viewer.camera);
+      const intersections = annotationRaycaster.intersectObjects(hotspotMarkerGroup.children, false);
+      if (!intersections.length) return;
+      const hotspot = hotspots.find((item) => item.id === intersections[0].object.userData.hotspotId);
+      if (!hotspot) return;
+      event.preventDefault();
+      event.stopPropagation();
+      toggleHotspot(hotspot);
+    }
+
+    function ensureBoundsHelper() {
+      if (!viewer || boundsHelper) return;
+      ensureBoundsOverlayRender();
+      boundsOverlayScene = boundsOverlayScene || new THREE.Scene();
+      const geometry = new THREE.CylinderGeometry(1, 1, 1, 10, 1, true);
+      const material = new THREE.MeshBasicMaterial({
+        color: 0x5ee6b5,
+        transparent: true,
+        opacity: 0.9,
+        depthTest: false,
+        depthWrite: false
+      });
+      boundsHelper = new THREE.Group();
+      boundsHelper.name = "CameraBoundsHelper";
+      boundsHelper.renderOrder = 999;
+      boundsHelper.userData.edgeGeometry = geometry;
+      boundsHelper.userData.edgeMaterial = material;
+      for (let i = 0; i < 12; i += 1) {
+        const edge = new THREE.Mesh(geometry, material);
+        edge.renderOrder = 999;
+        boundsHelper.add(edge);
+      }
+      boundsOverlayScene.add(boundsHelper);
+      updateBoundsHelper();
+    }
+
+    function ensureBoundsOverlayRender() {
+      if (!viewer || boundsRenderWrapped) return;
+      const originalRender = viewer.render.bind(viewer);
+      viewer.render = () => {
+        originalRender();
+        const hasVisibleOverlay = boundsHelper?.visible
+          || axisGizmoHelper?.visible
+          || (hotspotsVisible && !!hotspotMarkerGroup?.children.length);
+        if (!hasVisibleOverlay || !boundsOverlayScene || !viewer.renderer || !viewer.camera) return;
+        const savedAutoClear = viewer.renderer.autoClear;
+        viewer.renderer.autoClear = false;
+        viewer.renderer.render(boundsOverlayScene, viewer.camera);
+        viewer.renderer.autoClear = savedAutoClear;
+      };
+      boundsRenderWrapped = true;
+    }
+
+    function updateBoundsHelper() {
+      if (!boundsHelper) return;
+      boundsHelper.position.copy(alignFrameToWorld(bounds.center));
+      boundsHelper.quaternion.copy(alignFrameQuaternion());
+      boundsHelper.scale.set(1, 1, 1);
+      boundsHelper.visible = boundsVisible;
+      const half = bounds.size.clone().multiplyScalar(0.5);
+      const min = new THREE.Vector3(-half.x, -half.y, -half.z);
+      const max = new THREE.Vector3(half.x, half.y, half.z);
+      const corners = [
+        new THREE.Vector3(min.x, min.y, min.z),
+        new THREE.Vector3(max.x, min.y, min.z),
+        new THREE.Vector3(max.x, min.y, max.z),
+        new THREE.Vector3(min.x, min.y, max.z),
+        new THREE.Vector3(min.x, max.y, min.z),
+        new THREE.Vector3(max.x, max.y, min.z),
+        new THREE.Vector3(max.x, max.y, max.z),
+        new THREE.Vector3(min.x, max.y, max.z)
+      ];
+      const edgePairs = [
+        [0, 1], [1, 2], [2, 3], [3, 0],
+        [4, 5], [5, 6], [6, 7], [7, 4],
+        [0, 4], [1, 5], [2, 6], [3, 7]
+      ];
+      const upAxis = new THREE.Vector3(0, 1, 0);
+      edgePairs.forEach(([startIndex, endIndex], edgeIndex) => {
+        const edge = boundsHelper.children[edgeIndex];
+        const start = corners[startIndex];
+        const end = corners[endIndex];
+        const midpoint = start.clone().add(end).multiplyScalar(0.5);
+        const direction = end.clone().sub(start);
+        const length = direction.length();
+        edge.position.copy(midpoint);
+        edge.quaternion.setFromUnitVectors(upAxis, direction.normalize());
+        edge.scale.set(boundsEdgeRadius, length, boundsEdgeRadius);
+      });
+      viewer?.forceRenderNextFrame?.();
+    }
+
+    function removeBoundsHelper() {
+      if (!boundsHelper) return;
+      boundsHelper.parent?.remove(boundsHelper);
+      boundsHelper.userData.edgeGeometry?.dispose();
+      boundsHelper.userData.edgeMaterial?.dispose();
+      boundsHelper = null;
+      if (!axisGizmoHelper && !hotspotMarkerGroup) boundsOverlayScene = null;
+      boundsRenderWrapped = false;
+    }
+
+    function clampPositionToBounds(position) {
+      if (!boundsEnabled) return position.clone();
+      const { min, max } = boundsMinMax();
+      const localPosition = worldToAlignFrame(position);
+      const clampedLocal = localPosition.clone().set(
+        THREE.MathUtils.clamp(localPosition.x, min.x, max.x),
+        THREE.MathUtils.clamp(localPosition.y, min.y, max.y),
+        THREE.MathUtils.clamp(localPosition.z, min.z, max.z)
+      );
+      return alignFrameToWorld(clampedLocal);
+    }
+
+    function enforceBoundsOnCamera() {
+      if (!viewer?.camera || !viewer?.controls || !boundsEnabled) return;
+      const before = viewer.camera.position.clone();
+      const after = clampPositionToBounds(before);
+      const delta = after.sub(before);
+      if (delta.lengthSq() === 0) return;
+      viewer.camera.position.add(delta);
+      viewer.controls.target.add(delta);
+      viewer.controls.update();
+      updateCameraReadout();
+      viewer.forceRenderNextFrame?.();
+    }
+
+    function captureInitialView() {
+      if (!viewer?.camera || !viewer?.controls) return;
+      initialView = {
+        position: viewer.camera.position.clone(),
+        up: viewer.camera.up.clone(),
+        quaternion: viewer.camera.quaternion.clone()
+      };
+    }
+
+    function captureCurrentView(name = "") {
+      if (!viewer?.camera || !viewer?.controls) return null;
+      return {
+        id: crypto.randomUUID(),
+        name,
+        position: viewer.camera.position.clone(),
+        up: viewer.camera.up.clone(),
+        quaternion: viewer.camera.quaternion.clone(),
+        annotationText: ""
+      };
+    }
+
+    function setCameraDefault() {
+      const view = captureCurrentView("Camera Default");
+      if (!view) return;
+      cameraDefaultView = view;
+      initialView = {
+        position: view.position.clone(),
+        up: view.up.clone(),
+        quaternion: view.quaternion.clone()
+      };
+      setStatus("Camera default saved.", "ready");
+    }
+
+    function captureViewThumbnail() {
+      if (!viewer?.renderer?.domElement) return "";
+      viewer.forceRenderNextFrame?.();
+      viewer.render?.();
+      const sourceCanvas = viewer.renderer.domElement;
+      const thumbnailCanvas = document.createElement("canvas");
+      thumbnailCanvas.width = 160;
+      thumbnailCanvas.height = 90;
+      const context = thumbnailCanvas.getContext("2d", { alpha: false });
+      if (!context) return "";
+      context.drawImage(sourceCanvas, 0, 0, thumbnailCanvas.width, thumbnailCanvas.height);
+      try {
+        return thumbnailCanvas.toDataURL("image/jpeg", 0.72);
+      } catch (error) {
+        console.warn("Bookmark thumbnail capture failed", error);
+        return "";
+      }
+    }
+
+    function forwardFromQuaternion(quaternion) {
+      return new THREE.Vector3(0, 0, -1).applyQuaternion(quaternion).normalize();
+    }
+
+    function setControlsTargetFromOrientation() {
+      if (!viewer?.camera || !viewer?.controls) return;
+      viewer.controls.target.copy(viewer.camera.position).add(forwardFromQuaternion(viewer.camera.quaternion));
+    }
+
+    function ensureFlyRig() {
+      if (flyRig) return flyRig;
+      const cameraRig = new THREE.Group();
+      cameraRig.rotation.order = "YXZ";
+      cameraRig.position.copy(viewer?.camera?.position || new THREE.Vector3(0, 50, 200));
+      flyRig = { cameraRig };
+      return flyRig;
+    }
+
+    function applyFlyRigOrientation() {
+      if (!viewer?.camera) return;
+      const rig = ensureFlyRig();
+      rig.cameraRig.position.copy(viewer.camera.position);
+      rig.cameraRig.rotation.set(pitch, yaw, -flightRoll, "YXZ");
+      rig.cameraRig.updateMatrixWorld(true);
+      rig.cameraRig.getWorldQuaternion(viewer.camera.quaternion).normalize();
+      viewer.camera.up.set(0, 1, 0).applyQuaternion(viewer.camera.quaternion).normalize();
+      setControlsTargetFromOrientation();
+    }
+
+    function resetFlySteering() {
+      flyFrozen = false;
+      flyMouse.x = 0;
+      flyMouse.y = 0;
+      pitchTarget = pitch;
+      pitchEasedTarget = pitch;
+      flightRoll = 0;
+      if (viewer?.camera) {
+        ensureFlyRig().cameraRig.position.copy(viewer.camera.position);
+        applyFlyRigOrientation();
+        viewer.controls?.update();
+        viewer.forceRenderNextFrame?.();
+      }
+    }
+
+    function freezeFlyCamera() {
+      flyFrozen = true;
+      flyInput.accelerate = false;
+      flyInput.decelerate = false;
+      flyMouse.x = 0;
+      flyMouse.y = 0;
+      pitchTarget = pitch;
+      pitchEasedTarget = pitch;
+      flyThrust = 0;
+      flyTargetSpeed = 0;
+      setFlyVelocity(0);
+      viewer?.forceRenderNextFrame?.();
+    }
+
+    function resumeFlyCamera() {
+      flyFrozen = false;
+    }
+
+    function updateFlySpeedReadout() {
+      if (flySpeedValue) flySpeedValue.textContent = flyVelocity.toFixed(2);
+    }
+
+    function flyVelocityStep() {
+      return 0.05;
+    }
+
+    function flyAccelerationRate() {
+      return Math.max(0.6, movementSpeed * 5);
+    }
+
+    function flyVelocityMax() {
+      return flyMaxSpeed;
+    }
+
+    function setFlyVelocity(value) {
+      flyVelocity = THREE.MathUtils.clamp(value, 0, flyVelocityMax());
+      flyThrust = THREE.MathUtils.clamp(flyVelocity / flyMaxSpeed, 0, 1);
+      flyTargetSpeed = flyThrust * flyMaxSpeed;
+      updateFlySpeedReadout();
+    }
+
+    function setFlyThrust(value) {
+      flyThrust = THREE.MathUtils.clamp(value, 0, 1);
+      flyTargetSpeed = flyThrust * flyMaxSpeed;
+    }
+
+    function setCameraForwardDirection(forward) {
+      if (!viewer?.camera || !viewer?.controls || forward.lengthSq() < 0.000001) return;
+      const up = viewer.camera.up.clone().normalize();
+      const matrix = new THREE.Matrix4().lookAt(
+        viewer.camera.position,
+        viewer.camera.position.clone().add(forward.clone().normalize()),
+        up
+      );
+      viewer.camera.quaternion.setFromRotationMatrix(matrix).normalize();
+      syncLookAngles();
+      flightRoll = 0;
+      pitchTarget = pitch;
+      pitchEasedTarget = pitch;
+      setControlsTargetFromOrientation();
+    }
+
+    function applyFlyBoundsResponse(position, deltaSeconds) {
+      if (!viewer?.camera || !boundsEnabled) return position;
+      const { min, max } = boundsMinMax();
+      const localPosition = worldToAlignFrame(position);
+      const clampedLocal = localPosition.clone().set(
+        THREE.MathUtils.clamp(localPosition.x, min.x, max.x),
+        THREE.MathUtils.clamp(localPosition.y, min.y, max.y),
+        THREE.MathUtils.clamp(localPosition.z, min.z, max.z)
+      );
+      const threshold = Math.max(0.05, flyBoundsThreshold);
+      const repel = new THREE.Vector3();
+      const axes = ["x", "y", "z"];
+      const easeRepel = (distance) => {
+        const normalized = distance < 0
+          ? 1 + Math.min(1, Math.abs(distance) / threshold) * 0.65
+          : THREE.MathUtils.clamp(1 - distance / threshold, 0, 1);
+        return normalized * normalized * (3 - 2 * normalized);
+      };
+
+      axes.forEach((axis) => {
+        const lowDistance = localPosition[axis] - min[axis];
+        const highDistance = max[axis] - localPosition[axis];
+        if (lowDistance < threshold) {
+          repel[axis] += easeRepel(lowDistance);
+        }
+        if (highDistance < threshold) {
+          repel[axis] -= easeRepel(highDistance);
+        }
+      });
+
+      if (repel.lengthSq() > 0.000001) {
+        const currentForwardLocal = forwardFromQuaternion(viewer.camera.quaternion)
+          .applyQuaternion(alignFrameInverseQuaternion())
+          .normalize();
+        const steeringLocal = repel.clone();
+        steeringLocal.y *= 0.18;
+        const steerStrength = THREE.MathUtils.clamp(repel.length() * deltaSeconds * 0.65, 0, 0.035);
+        const deflectedLocal = currentForwardLocal.add(steeringLocal.multiplyScalar(steerStrength)).normalize();
+        if (Math.abs(repel.y) > 0.0001) {
+          const levelBlend = THREE.MathUtils.clamp(Math.abs(repel.y) * deltaSeconds * 0.9, 0, 0.08);
+          deflectedLocal.y = THREE.MathUtils.lerp(deflectedLocal.y, 0, levelBlend);
+        }
+        deflectedLocal.y = THREE.MathUtils.clamp(deflectedLocal.y, -0.72, 0.72);
+        const deflectedForward = deflectedLocal
+          .normalize()
+          .applyQuaternion(alignFrameQuaternion())
+          .normalize();
+        setCameraForwardDirection(deflectedForward);
+      }
+
+      return alignFrameToWorld(clampedLocal);
+    }
+
+    function slerpShortest(fromQuaternion, toQuaternion, progress) {
+      const target = toQuaternion.clone();
+      if (fromQuaternion.dot(target) < 0) {
+        target.x *= -1;
+        target.y *= -1;
+        target.z *= -1;
+        target.w *= -1;
+      }
+      return fromQuaternion.clone().slerp(target, progress);
+    }
+
+    function positionAtTourProgress(progress) {
+      if (smoothTourEnabled && smoothTourPositionCurve) {
+        return smoothTourPositionCurve.getPointAt(Math.max(0, Math.min(1, progress)));
+      }
+      const segment = tourSegmentForProgress(progress);
+      if (!segment.from || !segment.to) return null;
+      return segment.from.position.clone().lerp(segment.to.position, segment.localProgress);
+    }
+
+    function lookAheadQuaternion(position, targetUp, tourProgress) {
+      if (lookAheadAmount <= 0 || !position) return null;
+      const lookAheadProgress = (tourProgress + THREE.MathUtils.lerp(0.015, 0.09, lookAheadAmount)) % 1;
+      const aheadPosition = positionAtTourProgress(lookAheadProgress);
+      if (!aheadPosition || aheadPosition.distanceToSquared(position) < 0.000001) return null;
+      const matrix = new THREE.Matrix4().lookAt(position, aheadPosition, targetUp);
+      return new THREE.Quaternion().setFromRotationMatrix(matrix).normalize();
+    }
+
+    function applyTourOrientation(targetQuaternion, targetUp, position, tourProgress, deltaMs = 16.67) {
+      const aheadQuaternion = lookAheadQuaternion(position, targetUp, tourProgress);
+      const mixedTarget = aheadQuaternion
+        ? slerpShortest(targetQuaternion, aheadQuaternion, lookAheadAmount)
+        : targetQuaternion;
+      const smoothing = Math.max(0, Math.min(1, aimSmoothAmount));
+      const immediate = smoothing <= 0;
+      const blend = immediate
+        ? 1
+        : 1 - Math.exp(-deltaMs / THREE.MathUtils.lerp(20, 850, smoothing));
+      viewer.camera.up.lerp(targetUp, blend).normalize();
+      viewer.camera.quaternion.copy(slerpShortest(viewer.camera.quaternion, mixedTarget, blend));
+    }
+
+    function applyView(view) {
+      if (!viewer?.camera || !viewer?.controls || !view) return;
+      viewer.camera.position.copy(clampPositionToBounds(view.position));
+      viewer.camera.up.copy(view.up);
+      viewer.camera.quaternion.copy(view.quaternion);
+      setControlsTargetFromOrientation();
+      viewer.controls.update();
+      syncLookAngles();
+      updateCameraReadout();
+      viewer.forceRenderNextFrame?.();
+    }
+
+    function applyInterpolatedView(from, to, progress, tourProgress, deltaMs = 16.67) {
+      if (!viewer?.camera || !viewer?.controls || !from || !to) return;
+      const t = Math.max(0, Math.min(1, progress));
+      const targetUp = from.up.clone().lerp(to.up, t).normalize();
+      const targetQuaternion = slerpShortest(from.quaternion, to.quaternion, t);
+      viewer.camera.position.copy(from.position).lerp(to.position, t);
+      applyTourOrientation(targetQuaternion, targetUp, viewer.camera.position, tourProgress, deltaMs);
+      setControlsTargetFromOrientation();
+      viewer.controls.update();
+      syncLookAngles();
+      updateCameraReadout();
+      viewer.forceRenderNextFrame?.();
+    }
+
+    function tourSegmentForProgress(progress) {
+      if (tourPath.length < 2) return { from: null, to: null, localProgress: 0 };
+      const legCount = tourPath.length - 1;
+      if (progress >= 1) {
+        return {
+          from: tourPath[legCount - 1],
+          to: tourPath[legCount],
+          localProgress: 1
+        };
+      }
+      const scaled = Math.max(0, progress) * legCount;
+      const index = Math.min(legCount - 1, Math.floor(scaled));
+      return {
+        from: tourPath[index],
+        to: tourPath[index + 1],
+        localProgress: scaled - index
+      };
+    }
+
+    function applySmoothTourView(progress, deltaMs = 16.67) {
+      if (!viewer?.camera || !viewer?.controls || !smoothTourPositionCurve) return;
+      const curveProgress = Math.max(0, Math.min(1, progress));
+      const curveT = smoothTourPositionCurve.getUtoTmapping(curveProgress);
+      const segment = tourSegmentForProgress(curveT);
+      if (!segment.from || !segment.to) return;
+      const position = smoothTourPositionCurve.getPointAt(curveProgress);
+      const targetUp = segment.from.up.clone().lerp(segment.to.up, segment.localProgress).normalize();
+      const targetQuaternion = slerpShortest(segment.from.quaternion, segment.to.quaternion, segment.localProgress);
+
+      viewer.camera.position.copy(position);
+      applyTourOrientation(targetQuaternion, targetUp, viewer.camera.position, curveProgress, deltaMs);
+      setControlsTargetFromOrientation();
+      viewer.controls.update();
+      syncLookAngles();
+      updateCameraReadout();
+      viewer.forceRenderNextFrame?.();
+    }
+
+    function setTourTimelineProgress(progress) {
+      tourScrubProgress = Math.max(0, Math.min(1, progress));
+      tourTimelineControl.value = `${Math.round(tourScrubProgress * 1000)}`;
+      tourTimelineValue.textContent = `${Math.round(tourScrubProgress * 100)}%`;
+    }
+
+    function applyTourAtProgress(progress, deltaMs = 16.67) {
+      if (!viewer || tourPath.length < 2) return;
+      const clampedProgress = Math.max(0, Math.min(1, progress));
+      if (smoothTourEnabled && smoothTourPositionCurve) {
+        applySmoothTourView(clampedProgress, deltaMs);
+        return;
+      }
+      const segment = tourSegmentForProgress(clampedProgress);
+      if (!segment.from || !segment.to) return;
+      applyInterpolatedView(segment.from, segment.to, segment.localProgress, clampedProgress, deltaMs);
+    }
+
+    function scrubTourToProgress(progress) {
+      if (!viewer || bookmarks.length < 2 || tourRecording) return;
+      stopTour(false);
+      prepareTour();
+      if (tourPath.length < 2) return;
+      setNavigationMode("walk");
+      const clampedProgress = Math.max(0, Math.min(1, progress));
+      setTourTimelineProgress(clampedProgress);
+      applyTourAtProgress(clampedProgress, 10000);
+      setStatus(`Tour preview: ${Math.round(clampedProgress * 100)}%.`, "ready");
+    }
+
+    function updateBookmarkList() {
+      bookmarkList.replaceChildren();
+
+      if (!bookmarks.length) {
+        const empty = document.createElement("li");
+        empty.className = "empty-list";
+        empty.textContent = "Add up to 10 camera positions for a flythrough.";
+        bookmarkList.append(empty);
+      }
+
+      bookmarks.forEach((bookmark, index) => {
+        const item = document.createElement("li");
+        item.className = "bookmark-item";
+
+        const titleRow = document.createElement("div");
+        titleRow.className = "bookmark-title-row";
+
+        const indexLabel = document.createElement("span");
+        indexLabel.className = "bookmark-index";
+        indexLabel.textContent = `${index + 1}.`;
+
+        const name = document.createElement("input");
+        name.className = "bookmark-name-input";
+        name.type = "text";
+        name.value = bookmark.name;
+        name.placeholder = `View ${index + 1}`;
+        name.addEventListener("input", () => {
+          bookmark.name = name.value.trim() || `View ${index + 1}`;
+          thumbnail.alt = `${bookmark.name} preview`;
+        });
+        name.addEventListener("blur", () => {
+          name.value = bookmark.name;
+        });
+        titleRow.append(indexLabel, name);
+
+        const thumbnail = document.createElement("img");
+        thumbnail.className = "bookmark-thumb";
+        thumbnail.alt = `${bookmark.name} preview`;
+        if (bookmark.thumbnail) {
+          thumbnail.src = bookmark.thumbnail;
+        }
+
+        const actions = document.createElement("div");
+        actions.className = "bookmark-actions";
+
+        const go = createBookmarkButton("eye", "Go to viewpoint", () => goToBookmark(bookmark));
+        const update = createBookmarkButton("refresh", "Update viewpoint", () => updateBookmark(index));
+        const up = createBookmarkButton("up", "Move viewpoint up", () => moveBookmark(index, -1));
+        const down = createBookmarkButton("down", "Move viewpoint down", () => moveBookmark(index, 1));
+        const remove = createBookmarkButton("trash", "Delete viewpoint", () => removeBookmark(index));
+        up.disabled = index === 0;
+        down.disabled = index === bookmarks.length - 1;
+
+        const annotation = document.createElement("textarea");
+        annotation.className = "bookmark-annotation";
+        annotation.rows = 2;
+        annotation.placeholder = "Viewpoint note shown when Go is clicked.";
+        annotation.value = bookmark.annotationText || "";
+        annotation.addEventListener("input", () => {
+          bookmark.annotationText = annotation.value;
+        });
+
+        actions.append(go, update, up, down, remove);
+        item.append(titleRow, thumbnail, actions, annotation);
+        bookmarkList.append(item);
+      });
+
+      addBookmarkButton.disabled = !viewer || bookmarks.length >= 10 || tourRecording;
+      updateTourControls();
+    }
+
+    function hotspotPositionInFrontOfCamera(distance = 1.5) {
+      if (!viewer?.camera) return new THREE.Vector3(0, 1.2, 0);
+      return viewer.camera.position.clone().add(forwardFromQuaternion(viewer.camera.quaternion).multiplyScalar(distance));
+    }
+
+    function createHotspot() {
+      if (!viewer) return;
+      const hotspot = {
+        id: crypto.randomUUID(),
+        name: `Hotspot ${hotspots.length + 1}`,
+        label: `${hotspots.length + 1}`,
+        position: hotspotPositionInFrontOfCamera(),
+        color: "#5ee6b5",
+        text: ""
+      };
+      hotspots.push(hotspot);
+      updateHotspotList();
+      showTextPanel(hotspot.name, hotspot.text, hotspot.id);
+      setStatus(`Added ${hotspot.name}.`, "ready");
+    }
+
+    function updateHotspotFromInputs(hotspot, fields) {
+      hotspot.name = fields.name.value.trim() || hotspot.name;
+      hotspot.label = fields.label.value.trim().slice(0, 5) || hotspot.label;
+      hotspot.position.set(
+        readNumber(fields.x, hotspot.position.x),
+        readNumber(fields.y, hotspot.position.y),
+        readNumber(fields.z, hotspot.position.z)
+      );
+      hotspot.color = fields.color.value || hotspot.color;
+      hotspot.text = fields.text.value;
+      if (activeHotspotId === hotspot.id) {
+        annotationTitle.textContent = hotspot.name;
+        annotationCopy.textContent = hotspot.text.trim() || "No annotation text added.";
+      }
+      updateHotspotMarkers();
+    }
+
+    function setHotspotToCamera(hotspot) {
+      hotspot.position.copy(hotspotPositionInFrontOfCamera());
+      updateHotspotList();
+      showTextPanel(hotspot.name, hotspot.text, hotspot.id);
+    }
+
+    function removeHotspot(index) {
+      if (hotspots[index]?.id === activeHotspotId) hideAnnotation();
+      hotspots.splice(index, 1);
+      updateHotspotList();
+    }
+
+    function updateHotspotList() {
+      hotspotList.replaceChildren();
+
+      if (!hotspots.length) {
+        const empty = document.createElement("li");
+        empty.className = "empty-list";
+        empty.textContent = "Add hotspots for scene labels.";
+        hotspotList.append(empty);
+      }
+
+      hotspots.forEach((hotspot, index) => {
+        const item = document.createElement("li");
+        item.className = "hotspot-item";
+
+        const topRow = document.createElement("div");
+        topRow.className = "hotspot-row";
+
+        const name = document.createElement("input");
+        name.className = "workspace-name";
+        name.type = "text";
+        name.value = hotspot.name;
+        name.disabled = !viewer;
+
+        const label = document.createElement("input");
+        label.className = "workspace-name";
+        label.type = "text";
+        label.maxLength = 5;
+        label.title = "Marker text";
+        label.value = hotspot.label || `${index + 1}`;
+        label.disabled = !viewer;
+
+        const color = document.createElement("input");
+        color.className = "hotspot-color";
+        color.type = "color";
+        color.value = hotspot.color || "#5ee6b5";
+        color.disabled = !viewer;
+
+        const remove = createBookmarkButton("trash", "Delete hotspot", () => removeHotspot(index));
+        remove.disabled = !viewer;
+        topRow.append(name, label, color, remove);
+
+        const positionRow = document.createElement("div");
+        positionRow.className = "hotspot-position";
+        const x = createHotspotNumberInput("X", hotspot.position.x);
+        const y = createHotspotNumberInput("Y", hotspot.position.y);
+        const z = createHotspotNumberInput("Z", hotspot.position.z);
+        [x, y, z].forEach((input) => {
+          input.disabled = !viewer;
+          positionRow.append(input.parentElement);
+        });
+
+        const text = document.createElement("textarea");
+        text.className = "hotspot-text";
+        text.rows = 2;
+        text.placeholder = "Hotspot text shown when marker is clicked.";
+        text.value = hotspot.text || "";
+        text.disabled = !viewer;
+
+        const setToCamera = document.createElement("button");
+        setToCamera.className = "icon-button";
+        setToCamera.type = "button";
+        setToCamera.textContent = "Set to Camera";
+        setToCamera.disabled = !viewer;
+        setToCamera.addEventListener("click", () => setHotspotToCamera(hotspot));
+
+        const fields = { name, label, x, y, z, color, text };
+        [name, label, x, y, z, color, text].forEach((input) => {
+          input.addEventListener("input", () => updateHotspotFromInputs(hotspot, fields));
+        });
+
+        item.append(topRow, positionRow, text, setToCamera);
+        hotspotList.append(item);
+      });
+
+      addHotspotButton.disabled = !viewer;
+      updateHotspotMarkers();
+    }
+
+    function createHotspotNumberInput(label, value) {
+      const wrapper = document.createElement("label");
+      wrapper.className = "number-control";
+      wrapper.textContent = label;
+      const input = document.createElement("input");
+      input.type = "number";
+      input.step = "0.1";
+      input.value = value.toFixed(2);
+      wrapper.append(input);
+      return input;
+    }
+
+    function createBookmarkButton(iconName, label, onClick) {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "mini-button";
+      button.title = label;
+      button.setAttribute("aria-label", label);
+      button.innerHTML = bookmarkIcon(iconName);
+      button.addEventListener("click", onClick);
+      return button;
+    }
+
+    function bookmarkIcon(name) {
+      const icons = {
+        eye: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Z"></path><circle cx="12" cy="12" r="3"></circle></svg>',
+        up: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m18 15-6-6-6 6"></path></svg>',
+        down: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg>',
+        trash: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18"></path><path d="M8 6V4h8v2"></path><path d="M19 6l-1 14H6L5 6"></path><path d="M10 11v5"></path><path d="M14 11v5"></path></svg>',
+        refresh: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 11a8.1 8.1 0 0 0-15.5-2M4 5v4h4"></path><path d="M4 13a8.1 8.1 0 0 0 15.5 2M20 19v-4h-4"></path></svg>'
+      };
+      return icons[name] || "";
+    }
+
+    function moveBookmark(index, direction) {
+      const nextIndex = index + direction;
+      if (nextIndex < 0 || nextIndex >= bookmarks.length) return;
+      const [bookmark] = bookmarks.splice(index, 1);
+      bookmarks.splice(nextIndex, 0, bookmark);
+      updateBookmarkList();
+    }
+
+    function removeBookmark(index) {
+      bookmarks.splice(index, 1);
+      stopTour();
+      updateBookmarkList();
+    }
+
+    function updateBookmark(index) {
+      if (!viewer || !bookmarks[index]) return;
+      const updated = captureCurrentView(bookmarks[index].name);
+      if (!updated) return;
+      updated.id = bookmarks[index].id;
+      updated.annotationText = bookmarks[index].annotationText || "";
+      updated.thumbnail = captureViewThumbnail();
+      bookmarks[index] = updated;
+      stopTour(false);
+      updateBookmarkList();
+      setStatus(`Updated ${updated.name}.`, "ready");
+    }
+
+    function addBookmark() {
+      if (!viewer || bookmarks.length >= 10) return;
+      const bookmark = captureCurrentView(`View ${bookmarks.length + 1}`);
+      if (!bookmark) return;
+      bookmark.annotationText = "";
+      bookmark.thumbnail = captureViewThumbnail();
+      bookmarks.push(bookmark);
+      updateBookmarkList();
+      setStatus(`Saved ${bookmark.name}.`, "ready");
+    }
+
+    function setPointScale(value) {
+      pointScale = Number(value);
+      pointScaleValue.textContent = pointScale.toFixed(2);
+      if (viewer?.splatMesh?.setSplatScale) {
+        viewer.splatMesh.setSplatScale(pointScale);
+        viewer.forceRenderNextFrame?.();
+      }
+    }
+
+    function sceneRotationQuaternion() {
+      const upright = flipUpright
+        ? new THREE.Quaternion(1, 0, 0, 0)
+        : new THREE.Quaternion(0, 0, 0, 1);
+      const yawRotation = new THREE.Quaternion().setFromAxisAngle(
+        new THREE.Vector3(0, 1, 0),
+        THREE.MathUtils.degToRad(sceneBaseYawDegrees + sceneYawDegrees)
+      );
+      return yawRotation.multiply(sceneBaseRotation).multiply(upright).toArray();
+    }
+
+    function scenePositionArray() {
+      return vectorToArray(sceneOffset);
+    }
+
+    function applyInverseAlignFrameToView(view) {
+      const inverseFrame = alignFrameInverseQuaternion();
+      view.position.copy(worldToAlignFrame(view.position));
+      view.up.applyQuaternion(inverseFrame).normalize();
+      view.quaternion.premultiply(inverseFrame).normalize();
+    }
+
+    function alignFrameAxisQuaternion(axis) {
+      const radians = THREE.MathUtils.degToRad(alignFrame.rotationDegrees[axis]);
+      const axisVector = axis === "x"
+        ? new THREE.Vector3(1, 0, 0)
+        : axis === "y"
+          ? new THREE.Vector3(0, 1, 0)
+          : new THREE.Vector3(0, 0, 1);
+      return new THREE.Quaternion().setFromAxisAngle(axisVector, radians);
+    }
+
+    async function bakeAlignFrameAxis(axis) {
+      if (!viewer || !currentFile) return;
+      readAlignFrameFromInputs();
+      if (Math.abs(alignFrame.rotationDegrees[axis]) < 0.001 && alignFrame.offset.lengthSq() < 0.000001) {
+        setStatus(`Align ${axis.toUpperCase()} rotation is already reset.`, "ready");
+        return;
+      }
+
+      const frame = alignFrameAxisQuaternion(axis);
+      const inverseFrame = frame.clone().invert();
+      sceneOffset.sub(alignFrame.offset).applyQuaternion(inverseFrame);
+      sceneBaseRotation.premultiply(inverseFrame).normalize();
+
+      if (viewer.camera && viewer.controls) {
+        viewer.camera.position.sub(alignFrame.offset).applyQuaternion(inverseFrame);
+        viewer.camera.up.applyQuaternion(inverseFrame).normalize();
+        viewer.camera.quaternion.premultiply(inverseFrame).normalize();
+        setControlsTargetFromOrientation();
+        syncLookAngles();
+      }
+      const applyInverseAxisToView = (view) => {
+        view.position.sub(alignFrame.offset).applyQuaternion(inverseFrame);
+        view.up.applyQuaternion(inverseFrame).normalize();
+        view.quaternion.premultiply(inverseFrame).normalize();
+      };
+      bookmarks.forEach(applyInverseAxisToView);
+      hotspots.forEach((hotspot) => {
+        hotspot.position.sub(alignFrame.offset).applyQuaternion(inverseFrame);
+      });
+      if (initialView) applyInverseAxisToView(initialView);
+      if (cameraDefaultView) applyInverseAxisToView(cameraDefaultView);
+
+      alignFrame.rotationDegrees[axis] = 0;
+      alignFrame.offset.set(0, 0, 0);
+      writeAlignFrameToInputs();
+      updateBoundsHelper();
+      updateHotspotMarkers();
+
+      const savedCurrentView = viewer.camera ? captureCurrentView("Current Camera") : null;
+      await loadPly(currentFile, { resetBounds: false, preserveBookmarks: true });
+      if (savedCurrentView) applyView(savedCurrentView);
+      updateBookmarkList();
+      setStatus(`Baked ${axis.toUpperCase()} rotation to scene transform.`, "ready");
+    }
+
+    function resetAlignFrame() {
+      alignFrame.rotationDegrees.set(0, 0, 0);
+      alignFrame.offset.set(0, 0, 0);
+      writeAlignFrameToInputs();
+      updateBoundsHelper();
+      enforceBoundsOnCamera();
+      setStatus("Align frame reset.", "ready");
+    }
+
+    function vectorToArray(vector) {
+      return [vector.x, vector.y, vector.z];
+    }
+
+    function quaternionToArray(quaternion) {
+      return [quaternion.x, quaternion.y, quaternion.z, quaternion.w];
+    }
+
+    function arrayToVector(value, fallback = new THREE.Vector3()) {
+      if (!Array.isArray(value) || value.length < 3) return fallback.clone();
+      const numbers = value.slice(0, 3).map(Number);
+      if (numbers.some((number) => !Number.isFinite(number))) return fallback.clone();
+      return new THREE.Vector3(numbers[0], numbers[1], numbers[2]);
+    }
+
+    function arrayToQuaternion(value, fallback = new THREE.Quaternion()) {
+      if (!Array.isArray(value) || value.length < 4) return fallback.clone();
+      const numbers = value.slice(0, 4).map(Number);
+      if (numbers.some((number) => !Number.isFinite(number))) return fallback.clone();
+      return new THREE.Quaternion(numbers[0], numbers[1], numbers[2], numbers[3]).normalize();
+    }
+
+    function clampNumber(value, min, max, fallback) {
+      const number = Number(value);
+      if (!Number.isFinite(number)) return fallback;
+      return Math.max(min, Math.min(max, number));
+    }
+
+    function sanitizeFileStem(value, fallback) {
+      const cleaned = value.trim()
+        .replace(/\.json$/i, "")
+        .replace(/[<>:"/\\|?*\x00-\x1F]/g, "-")
+        .replace(/\s+/g, "-")
+        .replace(/-+/g, "-")
+        .replace(/^-|-$/g, "");
+      return cleaned || fallback;
+    }
+
+    function defaultWorkspaceName(file) {
+      const stem = file?.name?.replace(/\.[^.]+$/, "") || "luma-workspace";
+      return `${sanitizeFileStem(stem, "luma-workspace")}-workspace`;
+    }
+
+    function serializeView(view) {
+      return {
+        id: view.id,
+        name: view.name,
+        position: vectorToArray(view.position),
+        up: vectorToArray(view.up),
+        quaternion: quaternionToArray(view.quaternion),
+        thumbnail: typeof view.thumbnail === "string" ? view.thumbnail : "",
+        annotationText: typeof view.annotationText === "string" ? view.annotationText : ""
+      };
+    }
+
+    function deserializeView(view, index) {
+      if (!view || typeof view !== "object") return null;
+      return {
+        id: typeof view.id === "string" ? view.id : crypto.randomUUID(),
+        name: typeof view.name === "string" && view.name.trim() ? view.name : `View ${index + 1}`,
+        position: arrayToVector(view.position),
+        up: arrayToVector(view.up, new THREE.Vector3(0, 1, 0)).normalize(),
+        quaternion: arrayToQuaternion(view.quaternion),
+        thumbnail: typeof view.thumbnail === "string" ? view.thumbnail : "",
+        annotationText: typeof view.annotationText === "string" ? view.annotationText : ""
+      };
+    }
+
+    function serializeHotspot(hotspot) {
+      return {
+        id: hotspot.id,
+        name: hotspot.name,
+        label: hotspot.label,
+        position: vectorToArray(hotspot.position),
+        color: hotspot.color,
+        text: hotspot.text
+      };
+    }
+
+    function deserializeHotspot(hotspot, index) {
+      if (!hotspot || typeof hotspot !== "object") return null;
+      return {
+        id: typeof hotspot.id === "string" ? hotspot.id : crypto.randomUUID(),
+        name: typeof hotspot.name === "string" && hotspot.name.trim() ? hotspot.name : `Hotspot ${index + 1}`,
+        label: typeof hotspot.label === "string" && hotspot.label.trim() ? hotspot.label.trim().slice(0, 5) : `${index + 1}`,
+        position: arrayToVector(hotspot.position),
+        color: typeof hotspot.color === "string" && /^#[0-9a-f]{6}$/i.test(hotspot.color) ? hotspot.color : "#5ee6b5",
+        text: typeof hotspot.text === "string" ? hotspot.text : ""
+      };
+    }
+
+    async function exportWorkspaceJson() {
+      if (!viewer || !currentFile) return;
+      readBoundsFromInputs();
+      const workspace = {
+        schema: "luma-ply-viewer-workspace",
+        version: 1,
+        exportedAt: new Date().toISOString(),
+        sourceFile: {
+          name: currentFile.name,
+          size: currentFile.size,
+          lastModified: currentFile.lastModified || null
+        },
+        scene: {
+          flipUpright,
+          sceneBaseYawDegrees,
+          sceneBaseRotation: quaternionToArray(sceneBaseRotation),
+          sceneYawDegrees,
+          sceneOffset: vectorToArray(sceneOffset),
+          pointScale,
+          axisGizmoVisible
+        },
+        alignFrame: {
+          yawDegrees: alignFrame.rotationDegrees.y,
+          rotationDegrees: vectorToArray(alignFrame.rotationDegrees),
+          offset: vectorToArray(alignFrame.offset)
+        },
+        navigation: {
+          mode: navigationMode,
+          speed: movementSpeed,
+          flyVelocity,
+          flyBoundsThreshold
+        },
+        settings: {
+          boundsEnable: boundsEnabled,
+          boundsShow: boundsVisible,
+          viewportsSmooth: true,
+          hotspotsVisible
+        },
+        currentCamera: viewer?.camera ? serializeView({
+          id: "current-camera",
+          name: "Current Camera",
+          position: viewer.camera.position,
+          up: viewer.camera.up,
+          quaternion: viewer.camera.quaternion
+        }) : null,
+        cameraDefault: cameraDefaultView ? serializeView(cameraDefaultView) : null,
+        viewpoints: bookmarks.map(serializeView),
+        hotspots: hotspots.map(serializeHotspot),
+        tour: {
+          mode: tourModeSelect.value,
+          smooth: true,
+          durationSeconds: Number(tourDurationControl.value),
+          aimSmooth: aimSmoothAmount,
+          lookAhead: lookAheadAmount,
+          recordingResolution: recordResolutionSelect.value
+        },
+        screenshot: {
+          resolution: screenshotResolutionSelect.value
+        },
+        bounds: {
+          enabled: boundsEnabled,
+          show: boundsVisible,
+          center: vectorToArray(bounds.center),
+          size: vectorToArray(bounds.size),
+          flyThreshold: flyBoundsThreshold
+        }
+      };
+      const json = JSON.stringify(workspace, null, 2);
+      const blob = new Blob([json], { type: "application/json" });
+      const fileStem = sanitizeFileStem(workspaceNameInput.value, defaultWorkspaceName(currentFile));
+      const suggestedName = `${fileStem}.json`;
+
+      if ("showSaveFilePicker" in window) {
+        try {
+          const handle = await window.showSaveFilePicker({
+            suggestedName,
+            types: [{
+              description: "Workspace JSON",
+              accept: { "application/json": [".json"] }
+            }]
+          });
+          const writable = await handle.createWritable();
+          const bytes = new TextEncoder().encode(json);
+          await writable.write(bytes);
+          await writable.truncate(bytes.byteLength);
+          await writable.close();
+          setStatus(`Workspace JSON saved: ${handle.name || suggestedName}`, "ready");
+          return;
+        } catch (error) {
+          if (error?.name === "AbortError") {
+            setStatus("Workspace JSON save cancelled.", "ready");
+            return;
+          }
+          console.warn("Save dialog failed; falling back to download.", error);
+        }
+      }
+
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = suggestedName;
+      link.click();
+      setTimeout(() => URL.revokeObjectURL(link.href), 1000);
+      setStatus(`Workspace JSON downloaded: ${suggestedName}`, "ready");
+    }
+
+    async function importWorkspaceJsonFile(file) {
+      if (!file) return;
+      if (!viewer || !currentFile) {
+        setStatus("Load the matching .ply file before importing a workspace JSON.", "error");
+        return;
+      }
+
+      try {
+        const text = await file.text();
+        if (!text.trim()) {
+          setStatus("Workspace JSON is empty. Please export the workspace again.", "error");
+          return;
+        }
+        const workspace = JSON.parse(text);
+        await applyWorkspace(workspace, file.name);
+      } catch (error) {
+        console.error(error);
+        setStatus("Workspace JSON could not be imported.", "error");
+      }
+    }
+
+    async function applyWorkspace(workspace, fileName) {
+      if (!workspace || typeof workspace !== "object") {
+        throw new Error("Invalid workspace JSON");
+      }
+
+      const scene = workspace.scene || {};
+      const importedYaw = clampNumber(scene.sceneYawDegrees, 0, 90, sceneYawDegrees);
+      const importedBaseYaw = clampNumber(scene.sceneBaseYawDegrees, -360, 360, sceneBaseYawDegrees);
+      const importedBaseRotation = arrayToQuaternion(scene.sceneBaseRotation, sceneBaseRotation);
+      const importedFlip = typeof scene.flipUpright === "boolean" ? scene.flipUpright : flipUpright;
+      const importedPointScale = clampNumber(scene.pointScale, 0.35, 2.5, pointScale);
+      const importedOffset = arrayToVector(scene.sceneOffset, sceneOffset);
+      const needsSceneReload = importedYaw !== sceneYawDegrees
+        || importedBaseYaw !== sceneBaseYawDegrees
+        || 1 - Math.abs(importedBaseRotation.dot(sceneBaseRotation)) > 0.000001
+        || importedFlip !== flipUpright
+        || importedOffset.distanceToSquared(sceneOffset) > 0.000001;
+
+      sceneYawDegrees = importedYaw;
+      sceneBaseYawDegrees = importedBaseYaw;
+      sceneBaseRotation.copy(importedBaseRotation);
+      sceneOffset.copy(importedOffset);
+      flipUpright = importedFlip;
+      orientationButton.textContent = flipUpright ? "Use Original" : "Flip Upright";
+      pointScale = importedPointScale;
+      pointScaleControl.value = `${pointScale}`;
+      axisGizmoVisible = scene.axisGizmoVisible !== false;
+      axisGizmoToggle.checked = axisGizmoVisible;
+      updateAxisGizmo();
+
+      if (needsSceneReload) {
+        await loadPly(currentFile, { resetBounds: false });
+      } else {
+        setPointScale(pointScale);
+      }
+
+      const importedBookmarks = Array.isArray(workspace.viewpoints)
+        ? workspace.viewpoints.map(deserializeView).filter(Boolean).slice(0, 10)
+        : [];
+      hideAnnotation();
+      bookmarks = importedBookmarks;
+      hotspots = Array.isArray(workspace.hotspots)
+        ? workspace.hotspots.map(deserializeHotspot).filter(Boolean).slice(0, 50)
+        : [];
+
+      const importedAlignFrame = workspace.alignFrame || {};
+      alignFrame.rotationDegrees.copy(arrayToVector(importedAlignFrame.rotationDegrees, new THREE.Vector3(0, clampNumber(importedAlignFrame.yawDegrees, -90, 90, 0), 0)));
+      alignFrame.rotationDegrees.set(
+        THREE.MathUtils.clamp(alignFrame.rotationDegrees.x, -90, 90),
+        THREE.MathUtils.clamp(alignFrame.rotationDegrees.y, -90, 90),
+        THREE.MathUtils.clamp(alignFrame.rotationDegrees.z, -90, 90)
+      );
+      alignFrame.offset.copy(arrayToVector(importedAlignFrame.offset, new THREE.Vector3(0, 0, 0)));
+      writeAlignFrameToInputs();
+
+      const importedBounds = workspace.bounds || {};
+      const importedSettings = workspace.settings || {};
+      boundsEnabled = typeof importedSettings.boundsEnable === "boolean"
+        ? importedSettings.boundsEnable
+        : !!importedBounds.enabled;
+      boundsVisible = typeof importedSettings.boundsShow === "boolean"
+        ? importedSettings.boundsShow
+        : importedBounds.show !== false;
+      hotspotsVisible = importedSettings.hotspotsVisible !== false;
+      hotspotVisibleToggle.checked = hotspotsVisible;
+      bounds.center.copy(arrayToVector(importedBounds.center, bounds.center));
+      bounds.size.copy(arrayToVector(importedBounds.size, bounds.size));
+      bounds.size.set(
+        Math.max(0.1, bounds.size.x),
+        Math.max(0.1, bounds.size.y),
+        Math.max(0.1, bounds.size.z)
+      );
+      flyBoundsThreshold = clampNumber(importedBounds.flyThreshold, 0.05, 3, flyBoundsThreshold);
+      flyBoundsThresholdControl.value = `${flyBoundsThreshold}`;
+      flyBoundsThresholdValue.textContent = flyBoundsThreshold.toFixed(2);
+      boundsToggle.checked = boundsEnabled;
+      boundsShowToggle.checked = boundsVisible;
+      writeBoundsToInputs();
+      ensureBoundsHelper();
+      updateBoundsHelper();
+      enforceBoundsOnCamera();
+
+      const tour = workspace.tour || {};
+      tourModeSelect.value = tour.mode === "pingpong" ? "pingpong" : "loop";
+      const resolutionValues = [...recordResolutionSelect.options].map((option) => option.value);
+      recordResolutionSelect.value = resolutionValues.includes(tour.recordingResolution)
+        ? tour.recordingResolution
+        : "viewer";
+      smoothTourEnabled = true;
+      const durationSeconds = clampNumber(tour.durationSeconds, 5, 120, Number(tourDurationControl.value));
+      tourDurationControl.value = `${durationSeconds}`;
+      tourDurationValue.textContent = `${durationSeconds}s`;
+      aimSmoothAmount = clampNumber(tour.aimSmooth, 0, 1, aimSmoothAmount);
+      aimSmoothControl.value = `${Math.round(aimSmoothAmount * 100)}`;
+      aimSmoothValue.textContent = `${Math.round(aimSmoothAmount * 100)}%`;
+      lookAheadAmount = clampNumber(tour.lookAhead, 0, 1, lookAheadAmount);
+      lookAheadControl.value = `${Math.round(lookAheadAmount * 100)}`;
+      lookAheadValue.textContent = `${Math.round(lookAheadAmount * 100)}%`;
+      const screenshot = workspace.screenshot || {};
+      const screenshotResolutionValues = [...screenshotResolutionSelect.options].map((option) => option.value);
+      screenshotResolutionSelect.value = screenshotResolutionValues.includes(screenshot.resolution)
+        ? screenshot.resolution
+        : "viewer";
+
+      const navigation = workspace.navigation || {};
+      movementSpeed = clampNumber(navigation.speed, 0.05, 2, movementSpeed);
+      speedControl.value = `${movementSpeed}`;
+      speedValue.textContent = movementSpeed.toFixed(2);
+      setFlyVelocity(clampNumber(navigation.flyVelocity, 0, flyVelocityMax(), 0));
+      const importedMode = ["orbit", "walk", "look", "fly"].includes(navigation.mode) ? navigation.mode : "orbit";
+      setNavigationMode(importedMode);
+
+      const currentCamera = deserializeView(workspace.currentCamera, 0);
+      cameraDefaultView = deserializeView(workspace.cameraDefault, 0);
+      if (cameraDefaultView) {
+        applyView(cameraDefaultView);
+      } else if (currentCamera) {
+        applyView(currentCamera);
+      }
+
+      workspaceNameInput.value = sanitizeFileStem(fileName || defaultWorkspaceName(currentFile), defaultWorkspaceName(currentFile));
+      updateBookmarkList();
+      updateHotspotList();
+      updateTourControls();
+      viewer?.forceRenderNextFrame?.();
+      setStatus(`Workspace imported: ${bookmarks.length} viewpoint${bookmarks.length === 1 ? "" : "s"} restored.`, "ready");
+    }
+
+    function updateTourControls() {
+      const canTour = !!viewer && bookmarks.length >= 2;
+      if (!canTour && tourScrubProgress !== 0) setTourTimelineProgress(0);
+      playTourButton.disabled = !canTour || tourPlaying || tourRecording;
+      stopTourButton.disabled = !tourPlaying || tourRecording;
+      recordTourButton.disabled = !canTour || tourPlaying || tourRecording;
+      tourModeSelect.disabled = !canTour || tourPlaying || tourRecording;
+      recordResolutionSelect.disabled = !canTour || tourPlaying || tourRecording;
+      tourDurationControl.disabled = !canTour || tourPlaying || tourRecording;
+      tourTimelineControl.disabled = !canTour || tourRecording;
+      aimSmoothControl.disabled = !canTour || tourPlaying || tourRecording;
+      lookAheadControl.disabled = !canTour || tourPlaying || tourRecording;
+    }
+
+    function buildTourPath() {
+      if (bookmarks.length < 2) return [];
+      if (tourModeSelect.value === "pingpong") {
+        return [...bookmarks, ...bookmarks.slice(1, -1).reverse(), bookmarks[0]];
+      }
+      return [...bookmarks, bookmarks[0]];
+    }
+
+    function prepareTour() {
+      tourPath = buildTourPath();
+      tourTotalDuration = Number(tourDurationControl.value) * 1000;
+      smoothTourPositionCurve = null;
+
+      if (smoothTourEnabled && tourPath.length >= 2) {
+        const positions = tourPath.map((view) => view.position.clone());
+        smoothTourPositionCurve = new THREE.CatmullRomCurve3(positions, false, "centripetal", 0.5);
+        smoothTourPositionCurve.arcLengthDivisions = Math.max(400, positions.length * 160);
+        smoothTourPositionCurve.updateArcLengths();
+      }
+    }
+
+    function playTour() {
+      if (!viewer || bookmarks.length < 2) return;
+      stopTour(false);
+      prepareTour();
+      if (tourPath.length < 2) return;
+      setNavigationMode("walk");
+      tourPlaying = true;
+      tourStartTime = performance.now();
+      lastTourFrameTime = tourStartTime;
+      updateTourControls();
+      setStatus("Tour playing.", "ready");
+      tourAnimationId = requestAnimationFrame(updateTour);
+    }
+
+    function stopTour(showStatus = true) {
+      if (tourAnimationId) {
+        cancelAnimationFrame(tourAnimationId);
+        tourAnimationId = null;
+      }
+      tourPlaying = false;
+      updateTourControls();
+      if (showStatus) setStatus("Tour stopped.", "ready");
+    }
+
+    function stopActiveRecording() {
+      if (recordingFrameId) {
+        cancelAnimationFrame(recordingFrameId);
+        recordingFrameId = null;
+      }
+      if (tourRecordingTimeout) {
+        clearTimeout(tourRecordingTimeout);
+        tourRecordingTimeout = null;
+      }
+      if (tourRecorder && tourRecorder.state !== "inactive") {
+        tourRecorder.stop();
+      } else if (tourRecording) {
+        tourRecording = false;
+        tourRecorder = null;
+        setRecordingIndicator(false);
+      }
+    }
+
+    function getRecordingMimeType() {
+      const preferredTypes = [
+        "video/mp4;codecs=h264",
+        "video/mp4;codecs=avc1.42E01E",
+        "video/mp4",
+        "video/webm;codecs=vp9",
+        "video/webm;codecs=vp8",
+        "video/webm"
+      ];
+      return preferredTypes.find((type) => MediaRecorder.isTypeSupported(type)) || "";
+    }
+
+    function recordingExtension(mimeType) {
+      return mimeType.includes("mp4") ? "mp4" : "webm";
+    }
+
+    function resolutionForCanvas(canvas, selected) {
+      if (selected === "viewer") {
+        return {
+          width: Math.max(1, canvas.width || canvas.clientWidth || 1280),
+          height: Math.max(1, canvas.height || canvas.clientHeight || 720),
+          label: "viewer size"
+        };
+      }
+      const [width, height] = selected.split("x").map(Number);
+      return {
+        width: Number.isFinite(width) ? width : 1280,
+        height: Number.isFinite(height) ? height : 720,
+        label: `${width}x${height}`
+      };
+    }
+
+    function recordingResolutionForCanvas(canvas) {
+      return resolutionForCanvas(canvas, recordResolutionSelect.value);
+    }
+
+    function recordingBitrate(width, height) {
+      const pixels = width * height;
+      if (pixels >= 3840 * 2160) return 36_000_000;
+      if (pixels >= 1920 * 1080) return 16_000_000;
+      if (pixels >= 1280 * 720) return 8_000_000;
+      return 5_000_000;
+    }
+
+    async function recordTour() {
+      if (!viewer?.renderer?.domElement || bookmarks.length < 2 || tourRecording) return;
+
+      const sourceCanvas = viewer.renderer.domElement;
+      if (typeof MediaRecorder === "undefined") {
+        setStatus("Video recording is not supported in this browser.", "error");
+        return;
+      }
+
+      const mimeType = getRecordingMimeType();
+      if (!mimeType) {
+        setStatus("No supported video recording format was found in this browser.", "error");
+        return;
+      }
+
+      const chunks = [];
+      const resolution = recordingResolutionForCanvas(sourceCanvas);
+      const recordingCanvas = document.createElement("canvas");
+      recordingCanvas.width = resolution.width;
+      recordingCanvas.height = resolution.height;
+      const recordingContext = recordingCanvas.getContext("2d", { alpha: false });
+      if (!recordingCanvas.captureStream || !recordingContext) {
+        setStatus("Video recording is not supported in this browser.", "error");
+        return;
+      }
+
+      const drawRecordingFrame = () => {
+        recordingContext.drawImage(sourceCanvas, 0, 0, recordingCanvas.width, recordingCanvas.height);
+        recordingFrameId = requestAnimationFrame(drawRecordingFrame);
+      };
+      drawRecordingFrame();
+
+      const stream = recordingCanvas.captureStream(30);
+      try {
+        tourRecorder = new MediaRecorder(stream, {
+          mimeType,
+          videoBitsPerSecond: recordingBitrate(resolution.width, resolution.height)
+        });
+      } catch (error) {
+        if (recordingFrameId) cancelAnimationFrame(recordingFrameId);
+        recordingFrameId = null;
+        stream.getTracks().forEach((track) => track.stop());
+        setStatus("Video recording could not start in this browser.", "error");
+        return;
+      }
+
+      tourRecorder.addEventListener("dataavailable", (event) => {
+        if (event.data?.size) chunks.push(event.data);
+      });
+
+      tourRecorder.addEventListener("stop", () => {
+        if (recordingFrameId) cancelAnimationFrame(recordingFrameId);
+        recordingFrameId = null;
+        stream.getTracks().forEach((track) => track.stop());
+        const blob = new Blob(chunks, { type: mimeType });
+        const extension = recordingExtension(mimeType);
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.download = `splat-tour-${new Date().toISOString().replace(/[:.]/g, "-")}.${extension}`;
+        link.click();
+        setTimeout(() => URL.revokeObjectURL(link.href), 1000);
+        tourRecording = false;
+        tourRecorder = null;
+        setRecordingIndicator(false);
+        updateTourControls();
+        setStatus(`Tour recording saved as ${extension.toUpperCase()}.`, extension === "mp4" ? "ready" : "");
+      });
+
+      tourRecorder.addEventListener("error", () => {
+        if (recordingFrameId) cancelAnimationFrame(recordingFrameId);
+        recordingFrameId = null;
+        stopTour(false);
+        tourRecording = false;
+        tourRecorder = null;
+        setRecordingIndicator(false);
+        updateTourControls();
+        setStatus("Recording failed before the tour finished.", "error");
+      });
+
+      tourRecording = true;
+      setRecordingIndicator(true, mimeType.includes("mp4") ? "REC MP4" : "REC WebM");
+      updateTourControls();
+      setStatus(mimeType.includes("mp4")
+        ? `Recording tour as MP4 at ${resolution.label}...`
+        : `MP4 recording is not supported here; recording WebM at ${resolution.label} instead.`);
+
+      playTour();
+      tourRecorder.start(250);
+      tourRecordingTimeout = window.setTimeout(() => {
+        stopTour(false);
+        tourRecorder?.stop();
+        tourRecordingTimeout = null;
+      }, tourTotalDuration + 250);
+    }
+
+    function updateTour(now) {
+      if (!tourPlaying || tourPath.length < 2) return;
+      const deltaMs = Math.max(1, Math.min(80, now - (lastTourFrameTime || now)));
+      lastTourFrameTime = now;
+
+      const elapsed = (now - tourStartTime) % tourTotalDuration;
+      const tourProgress = tourTotalDuration > 0 ? elapsed / tourTotalDuration : 0;
+      setTourTimelineProgress(tourProgress);
+      applyTourAtProgress(tourProgress, deltaMs);
+      tourAnimationId = requestAnimationFrame(updateTour);
+    }
+
+    function saveScreenshot() {
+      if (!viewer?.renderer?.domElement) return;
+      viewer.forceRenderNextFrame?.();
+      requestAnimationFrame(() => {
+        const sourceCanvas = viewer.renderer.domElement;
+        const resolution = resolutionForCanvas(sourceCanvas, screenshotResolutionSelect.value);
+        const outputCanvas = document.createElement("canvas");
+        outputCanvas.width = resolution.width;
+        outputCanvas.height = resolution.height;
+        const outputContext = outputCanvas.getContext("2d", { alpha: false });
+        if (!outputContext) {
+          setStatus("Screenshot could not be captured in this browser.", "error");
+          return;
+        }
+        outputContext.drawImage(sourceCanvas, 0, 0, outputCanvas.width, outputCanvas.height);
+        outputCanvas.toBlob((blob) => {
+          if (!blob) {
+            setStatus("Screenshot could not be captured in this browser.", "error");
+            return;
+          }
+          const link = document.createElement("a");
+          link.href = URL.createObjectURL(blob);
+          link.download = `splat-view-${new Date().toISOString().replace(/[:.]/g, "-")}.png`;
+          link.click();
+          setTimeout(() => URL.revokeObjectURL(link.href), 1000);
+          setStatus(`Screenshot saved at ${resolution.label}.`, "ready");
+        }, "image/png");
+      });
+    }
+
+    function syncLookAngles() {
+      if (!viewer?.camera) return;
+      const euler = new THREE.Euler().setFromQuaternion(viewer.camera.quaternion, "YXZ");
+      yaw = euler.y;
+      pitch = euler.x;
+    }
+
+    function setNavigationMode(mode) {
+      navigationMode = ["orbit", "walk", "look", "fly"].includes(mode) ? mode : "orbit";
+      orbitModeButton.classList.toggle("active", navigationMode === "orbit");
+      walkModeButton.classList.toggle("active", navigationMode === "walk");
+      mouseLookButton.classList.toggle("active", navigationMode === "look");
+      flyModeButton.classList.toggle("active", navigationMode === "fly");
+      setKeyboardNavigationEnabled(!!viewer && (navigationMode === "walk" || navigationMode === "look" || navigationMode === "fly"));
+
+      if (viewer?.controls) {
+        viewer.controls.enabled = navigationMode === "orbit";
+        viewer.controls.update();
+        updateCameraReadout();
+      }
+
+      if (navigationMode === "walk" || navigationMode === "look" || navigationMode === "fly") {
+        syncLookAngles();
+      } else if (document.pointerLockElement === viewerRoot) {
+        document.exitPointerLock();
+      }
+
+      if (navigationMode === "fly") {
+        setViewPanelVisible(false);
+        resetFlySteering();
+        startFlyLoop();
+      } else {
+        setViewPanelVisible(true);
+        stopFlyLoop();
+      }
+
+      reticle.classList.toggle("hidden", document.pointerLockElement !== viewerRoot);
+      flightReticle.classList.toggle("hidden", navigationMode !== "fly");
+      viewer?.forceRenderNextFrame?.();
+    }
+
+    async function enterLookMode() {
+      if (!viewer) return;
+      setNavigationMode("look");
+      viewerRoot.focus({ preventScroll: true });
+      try {
+        await viewerRoot.requestPointerLock();
+      } catch (error) {
+        setStatus("Look mode could not start in this browser context.", "error");
+      }
+    }
+
+    function exitImmersiveMode() {
+      if (document.pointerLockElement === viewerRoot) {
+        document.exitPointerLock();
+      }
+      if (navigationMode === "fly") {
+        freezeFlyCamera();
+      }
+      setNavigationMode("walk");
+      setStatus("Walk mode: use arrows or W/A/S/D. Look mode exited.", "ready");
+    }
+
+    function moveCamera(delta) {
+      if (!viewer?.camera || !viewer?.controls) return;
+
+      viewer.camera.position.add(delta);
+      viewer.controls.target.add(delta);
+      enforceBoundsOnCamera();
+      viewer.controls.update();
+      updateCameraReadout();
+      viewer.forceRenderNextFrame?.();
+    }
+
+    function isTypingInFormControl() {
+      const active = document.activeElement;
+      if (!active) return false;
+      return isFormControlElement(active);
+    }
+
+    function keyMatches(event, code, key) {
+      return event.code === code || event.key?.toLowerCase() === key;
+    }
+
+    function isExitModeKey(event) {
+      return keyMatches(event, "Escape", "escape") || keyMatches(event, "Space", " ");
+    }
+
+    function handleSceneKeydown(event) {
+      if (!viewer || !["walk", "look", "fly"].includes(navigationMode) || event.altKey || event.ctrlKey || event.metaKey) return;
+      if (isFormControlElement(event.target) || isTypingInFormControl()) return;
+
+      if (navigationMode === "look") {
+        if (!isExitModeKey(event)) return;
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        exitImmersiveMode();
+        return;
+      }
+
+      if (navigationMode === "fly") {
+        const isAccelerate = keyMatches(event, "KeyW", "w");
+        const isDecelerate = keyMatches(event, "KeyS", "s");
+        const isPause = keyMatches(event, "Space", " ");
+        const isExit = keyMatches(event, "Escape", "escape");
+        const handlesFlyKey = isAccelerate || isDecelerate || isPause;
+        if (!handlesFlyKey && !isExit) return;
+
+        event.preventDefault();
+        event.stopImmediatePropagation();
+
+        if (isAccelerate) {
+          resumeFlyCamera();
+          setFlyThrust(flyThrust + flyVelocityStep());
+        }
+        if (isDecelerate) {
+          resumeFlyCamera();
+          setFlyThrust(flyThrust - flyVelocityStep());
+        }
+        if (isPause) {
+          freezeFlyCamera();
+          toggleViewPanelVisible();
+          exitImmersiveMode();
+          return;
+        }
+        if (isExit) {
+          exitImmersiveMode();
+          return;
+        }
+        viewer.forceRenderNextFrame?.();
+        return;
+      }
+
+      const keyMap = {
+        ArrowUp: "forward",
+        KeyW: "forward",
+        ArrowDown: "backward",
+        KeyS: "backward",
+        ArrowLeft: "left",
+        KeyA: "left",
+        ArrowRight: "right",
+        KeyD: "right",
+        PageUp: "up",
+        KeyE: "up",
+        PageDown: "down",
+        KeyQ: "down"
+      };
+      const direction = keyMap[event.code];
+      if (!direction) return;
+
+      event.preventDefault();
+      event.stopImmediatePropagation();
+
+      const up = viewer.camera.up.clone().normalize();
+      const forward = viewer.controls.target.clone().sub(viewer.camera.position);
+      if (forward.lengthSq() === 0) return;
+      forward.normalize();
+
+      const right = forward.clone().cross(up);
+      if (right.lengthSq() === 0) return;
+      right.normalize();
+
+      const flatForward = up.clone().cross(right).normalize();
+      const step = event.shiftKey ? movementSpeed * 3 : movementSpeed;
+      const delta = viewer.camera.position.clone().set(0, 0, 0);
+
+      if (direction === "forward") delta.copy(flatForward).multiplyScalar(step);
+      if (direction === "backward") delta.copy(flatForward).multiplyScalar(-step);
+      if (direction === "left") delta.copy(right).multiplyScalar(-step);
+      if (direction === "right") delta.copy(right).multiplyScalar(step);
+      if (direction === "up") delta.copy(up).multiplyScalar(step);
+      if (direction === "down") delta.copy(up).multiplyScalar(-step);
+
+      moveCamera(delta);
+    }
+
+    function handleSceneKeyup(event) {
+      if (navigationMode !== "fly") return;
+      if (keyMatches(event, "KeyW", "w")) {
+        flyInput.accelerate = false;
+        event.preventDefault();
+      }
+      if (keyMatches(event, "KeyS", "s")) {
+        flyInput.decelerate = false;
+        event.preventDefault();
+      }
+    }
+
+    function updateWalkLook(movementX, movementY) {
+      if (!viewer?.camera || !viewer?.controls || !["walk", "look"].includes(navigationMode)) return;
+
+      const sensitivity = 0.0022;
+      yaw -= movementX * sensitivity;
+      pitch -= movementY * sensitivity;
+      pitch = Math.max(-Math.PI / 2 + 0.02, Math.min(Math.PI / 2 - 0.02, pitch));
+
+      viewer.camera.quaternion.setFromEuler(new THREE.Euler(pitch, yaw, 0, "YXZ"));
+      const forward = new THREE.Vector3(0, 0, -1).applyQuaternion(viewer.camera.quaternion);
+      viewer.controls.target.copy(viewer.camera.position).add(forward);
+      viewer.controls.update();
+      updateCameraReadout();
+      viewer.forceRenderNextFrame?.();
+    }
+
+    function updateFlyLook(event) {
+      if (!viewer?.camera || !viewer?.controls || navigationMode !== "fly") return;
+      if (flyFrozen) return;
+
+      const rect = viewerRoot.getBoundingClientRect();
+      if (!rect.width || !rect.height) return;
+      flyMouse.x = THREE.MathUtils.clamp(((event.clientX - rect.left) / rect.width) * 2 - 1, -1, 1);
+      flyMouse.y = THREE.MathUtils.clamp(-(((event.clientY - rect.top) / rect.height) * 2 - 1), -1, 1);
+    }
+
+    function startFlyLoop() {
+      if (flyAnimationId) return;
+      lastFlyFrameTime = performance.now();
+      flyAnimationId = requestAnimationFrame(updateFlyFrame);
+    }
+
+    function stopFlyLoop() {
+      if (flyAnimationId) {
+        cancelAnimationFrame(flyAnimationId);
+        flyAnimationId = null;
+      }
+      lastFlyFrameTime = 0;
+      resetFlySteering();
+      flyFrozen = false;
+      flyInput.accelerate = false;
+      flyInput.decelerate = false;
+    }
+
+    function updateFlyFrame(time) {
+      flyAnimationId = null;
+      if (!viewer?.camera || !viewer?.controls || navigationMode !== "fly") return;
+
+      const deltaSeconds = Math.min(0.05, Math.max(0, (time - lastFlyFrameTime) / 1000 || 0));
+      lastFlyFrameTime = time;
+
+      if (flyFrozen) {
+        flyAnimationId = requestAnimationFrame(updateFlyFrame);
+        return;
+      }
+
+      if (deltaSeconds > 0) {
+        flyVelocity += (flyTargetSpeed - flyVelocity) * 0.004;
+        if (flyVelocity < 0.0001) flyVelocity = 0;
+        updateFlySpeedReadout();
+
+        const speedPct = flyMaxSpeed > 0 ? flyVelocity / flyMaxSpeed : 0;
+        const speedFactor = 0.5 + speedPct * 0.5;
+        flyAirborneTime += deltaSeconds;
+
+        const yawRate = -flyMouse.x * 0.03 * speedFactor;
+        yaw += yawRate;
+
+        const pitchEase = 0.008 + (0.06 - 0.008) * Math.min(flyAirborneTime / 10, 1);
+        const pitchMax = Math.PI * 0.4;
+        pitchTarget = -flyMouse.y * Math.PI * 0.35;
+        pitchEasedTarget += (pitchTarget - pitchEasedTarget) * pitchEase;
+        pitch += (pitchEasedTarget - pitch) * 0.06;
+        pitch = THREE.MathUtils.clamp(pitch, -pitchMax, pitchMax);
+
+        const rollTarget = flyMouse.x * Math.PI * 0.25 * speedFactor;
+        flightRoll += (rollTarget - flightRoll) * 0.05;
+
+        applyFlyRigOrientation();
+        viewer.controls.update();
+        updateCameraReadout();
+        viewer.forceRenderNextFrame?.();
+      }
+
+      if (flyVelocity > 0 && deltaSeconds > 0) {
+        const rig = ensureFlyRig().cameraRig;
+        rig.position.copy(viewer.camera.position);
+        rig.updateMatrixWorld(true);
+        const forward = new THREE.Vector3();
+        rig.getWorldDirection(forward);
+        const movementScale = 5;
+        const nextPosition = viewer.camera.position.clone();
+        nextPosition.x -= forward.x * flyVelocity * movementScale * deltaSeconds;
+        nextPosition.z -= forward.z * flyVelocity * movementScale * deltaSeconds;
+        nextPosition.y += Math.sin(pitch) * flyVelocity * movementScale * deltaSeconds;
+        const boundedPosition = applyFlyBoundsResponse(nextPosition, deltaSeconds);
+        const delta = boundedPosition.sub(viewer.camera.position);
+        viewer.camera.position.add(delta);
+        viewer.controls.target.add(delta);
+        viewer.controls.update();
+        updateCameraReadout();
+        viewer.forceRenderNextFrame?.();
+      }
+
+      flyAnimationId = requestAnimationFrame(updateFlyFrame);
+    }
+
+    function resetView() {
+      applyView(cameraDefaultView || initialView);
+    }
+
+    function disposeViewer() {
+      stopActiveRecording();
+      stopTour(false);
+      stopFlyLoop();
+      setFlyVelocity(0);
+      setKeyboardNavigationEnabled(false);
+      if (document.pointerLockElement === viewerRoot) {
+        document.exitPointerLock();
+      }
+      removeHotspotMarkers();
+      removeAxisGizmoHelper();
+      removeBoundsHelper();
+
+      if (viewer) {
+        try {
+          viewer.dispose();
+        } catch (error) {
+          console.warn("Viewer disposal failed", error);
+        }
+        viewer = null;
+      }
+
+      if (currentObjectUrl) {
+        URL.revokeObjectURL(currentObjectUrl);
+        currentObjectUrl = null;
+      }
+
+      initialView = null;
+      setSceneControlsEnabled(false);
+      updateCameraReadout();
+      updateBookmarkList();
+    }
+
+    async function loadPly(file, options = {}) {
+      if (!file) return;
+      const resetBounds = options.resetBounds ?? true;
+      const preserveBookmarks = options.preserveBookmarks ?? false;
+
+      if (!file.name.toLowerCase().endsWith(".ply")) {
+        setStatus("Please choose a file with a .ply extension.", "error");
+        return;
+      }
+
+      disposeViewer();
+      if (!preserveBookmarks) {
+        bookmarks = [];
+        hotspots = [];
+        cameraDefaultView = null;
+        updateBookmarkList();
+        updateHotspotList();
+      }
+      currentFile = file;
+      dropPanel.classList.add("hidden");
+      clearButton.disabled = false;
+      orientationButton.disabled = false;
+      orientationButton.textContent = flipUpright ? "Use Original" : "Flip Upright";
+      fileMeta.textContent = `${file.name} - ${prettyBytes(file.size)}`;
+      if (!workspaceNameInput.value || workspaceNameInput.value === "luma-workspace") {
+        workspaceNameInput.value = defaultWorkspaceName(file);
+      }
+      setStatus(`Loading ${file.name}...`);
+
+      currentObjectUrl = URL.createObjectURL(file);
+
+      viewer = new GaussianSplats3D.Viewer({
+        rootElement: viewerRoot,
+        cameraUp: [0, 1, 0],
+        initialCameraPosition: [0, 0.75, 1.8],
+        initialCameraLookAt: [0, 0, 0],
+        sharedMemoryForWorkers: false,
+        gpuAcceleratedSort: false,
+        integerBasedSort: false,
+        sphericalHarmonicsDegree: 0,
+        ignoreDevicePixelRatio: true
+      });
+
+      try {
+        await viewer.addSplatScene(currentObjectUrl, {
+          format: plyFormat,
+          showLoadingUI: true,
+          progressiveLoad: false,
+          splatAlphaRemovalThreshold: 1,
+          rotation: sceneRotationQuaternion(),
+          position: scenePositionArray(),
+          onProgress: (percent, label) => {
+            const shown = label || `${Math.round(percent)}%`;
+            setStatus(`Loading ${file.name}: ${shown}`);
+          }
+        });
+
+        viewer.start();
+        captureInitialView();
+        updateCameraReadout();
+        if (initialView && resetBounds) {
+          bounds.center.set(0, 0, 0);
+          writeBoundsToInputs();
+        }
+        ensureBoundsHelper();
+        updateBoundsHelper();
+        ensureAxisGizmoHelper();
+        updateAxisGizmo();
+        updateHotspotList();
+        setPointScale(pointScale);
+        setSceneControlsEnabled(true);
+        setNavigationMode(navigationMode);
+        setStatus(`Ready: ${file.name}`, "ready");
+      } catch (error) {
+        console.error(error);
+        disposeViewer();
+        dropPanel.classList.remove("hidden");
+        clearButton.disabled = true;
+        orientationButton.disabled = true;
+        setSceneControlsEnabled(false);
+        fileMeta.textContent = "Choose a Luma-style Gaussian splat .ply file from this device.";
+        setStatus("This .ply file could not be loaded. Make sure it is a Gaussian splat PLY export, not a mesh-only PLY.", "error");
+      }
+    }
+
+    fileInput.addEventListener("change", () => {
+      loadPly(fileInput.files?.[0]);
+      fileInput.value = "";
+    });
+
+    clearButton.addEventListener("click", () => {
+      disposeViewer();
+      currentFile = null;
+      bookmarks = [];
+      hotspots = [];
+      updateBookmarkList();
+      updateHotspotList();
+      dropPanel.classList.remove("hidden");
+      clearButton.disabled = true;
+      orientationButton.disabled = true;
+      orientationButton.textContent = "Flip Upright";
+      sceneBaseYawDegrees = 0;
+      sceneBaseRotation.identity();
+      sceneOffset.set(0, 0, 0);
+      sceneYawDegrees = 0;
+      alignFrame.rotationDegrees.set(0, 0, 0);
+      alignFrame.offset.set(0, 0, 0);
+      writeAlignFrameToInputs();
+      setNavigationMode("orbit");
+      setSceneControlsEnabled(false);
+      fileMeta.textContent = "Choose a Luma-style Gaussian splat .ply file from this device.";
+      workspaceNameInput.value = "luma-workspace";
+      setStatus("Waiting for a .ply file.");
+    });
+
+    orientationButton.addEventListener("click", () => {
+      if (!currentFile) return;
+      flipUpright = !flipUpright;
+      loadPly(currentFile);
+    });
+
+    orbitModeButton.addEventListener("click", () => {
+      setNavigationMode("orbit");
+      setStatus(currentFile ? `Orbit mode: ${currentFile.name}` : "Orbit mode.", "ready");
+    });
+
+    walkModeButton.addEventListener("click", () => {
+      setNavigationMode("walk");
+      setStatus("Walk mode: use arrows or W/A/S/D.", "ready");
+    });
+
+    mouseLookButton.addEventListener("click", () => {
+      enterLookMode();
+      setStatus("Look mode: move the mouse to aim. Esc or Space exits.", "ready");
+    });
+
+    flyModeButton.addEventListener("click", () => {
+      setNavigationMode("fly");
+      setFlyVelocity(0);
+      viewerRoot.focus({ preventScroll: true });
+      setStatus("Flight Sim: mouse steers, W/S adjust thrust. Esc or Space exits.", "ready");
+    });
+
+    speedControl.addEventListener("input", () => {
+      movementSpeed = Number(speedControl.value);
+      speedValue.textContent = movementSpeed.toFixed(2);
+      setFlyVelocity(flyVelocity);
+    });
+
+    setCameraDefaultButton.addEventListener("click", setCameraDefault);
+
+    pointScaleControl.addEventListener("input", () => {
+      setPointScale(pointScaleControl.value);
+    });
+
+    axisGizmoToggle.addEventListener("change", () => {
+      axisGizmoVisible = axisGizmoToggle.checked;
+      ensureAxisGizmoHelper();
+      updateAxisGizmo();
+      viewer?.forceRenderNextFrame?.();
+      setStatus(axisGizmoVisible ? "Axis gizmo shown." : "Axis gizmo hidden.", "ready");
+    });
+
+    hotspotVisibleToggle.addEventListener("change", () => {
+      hotspotsVisible = hotspotVisibleToggle.checked;
+      if (!hotspotsVisible && activeHotspotId) hideAnnotation();
+      updateHotspotMarkers();
+      setStatus(hotspotsVisible ? "Hotspots shown." : "Hotspots hidden.", "ready");
+    });
+
+    workspaceImportInput.addEventListener("change", () => {
+      importWorkspaceJsonFile(workspaceImportInput.files?.[0]);
+      workspaceImportInput.value = "";
+    });
+
+    exportWorkspaceButton.addEventListener("click", exportWorkspaceJson);
+
+    tourDurationControl.addEventListener("input", () => {
+      tourDurationValue.textContent = `${tourDurationControl.value}s`;
+      if (bookmarks.length >= 2 && tourScrubProgress > 0) scrubTourToProgress(tourScrubProgress);
+    });
+
+    tourTimelineControl.addEventListener("input", () => {
+      scrubTourToProgress(Number(tourTimelineControl.value) / 1000);
+    });
+
+    aimSmoothControl.addEventListener("input", () => {
+      aimSmoothAmount = Number(aimSmoothControl.value) / 100;
+      aimSmoothValue.textContent = `${aimSmoothControl.value}%`;
+      if (bookmarks.length >= 2 && tourScrubProgress > 0) scrubTourToProgress(tourScrubProgress);
+    });
+
+    lookAheadControl.addEventListener("input", () => {
+      lookAheadAmount = Number(lookAheadControl.value) / 100;
+      lookAheadValue.textContent = `${lookAheadControl.value}%`;
+      if (bookmarks.length >= 2 && tourScrubProgress > 0) scrubTourToProgress(tourScrubProgress);
+    });
+
+    boundsToggle.addEventListener("change", () => {
+      boundsEnabled = boundsToggle.checked;
+      readBoundsFromInputs();
+      ensureBoundsHelper();
+      updateBoundsHelper();
+      enforceBoundsOnCamera();
+      setStatus(boundsEnabled ? "Camera bounds enforcement enabled." : "Camera bounds enforcement disabled.", "ready");
+    });
+
+    boundsShowToggle.addEventListener("change", () => {
+      boundsVisible = boundsShowToggle.checked;
+      ensureBoundsHelper();
+      updateBoundsHelper();
+      setStatus(boundsVisible ? "Camera bounds box shown." : "Camera bounds box hidden.", "ready");
+    });
+
+    flyBoundsThresholdControl.addEventListener("input", () => {
+      flyBoundsThreshold = Number(flyBoundsThresholdControl.value);
+      flyBoundsThresholdValue.textContent = flyBoundsThreshold.toFixed(2);
+    });
+
+    setBoundsCenterButton.addEventListener("click", () => {
+      if (!viewer?.camera) return;
+      bounds.center.copy(worldToAlignFrame(viewer.camera.position));
+      writeBoundsToInputs();
+      updateBoundsHelper();
+      setStatus("Bounds center set to current camera.", "ready");
+    });
+
+    [
+      boundsCenterX,
+      boundsCenterY,
+      boundsCenterZ,
+      boundsWidth,
+      boundsHeight,
+      boundsDepth
+    ].forEach((input) => {
+      input.addEventListener("input", () => {
+        readBoundsFromInputs();
+        updateBoundsHelper();
+        enforceBoundsOnCamera();
+      });
+    });
+
+    [
+      { axis: "x", control: alignFrameXControl, output: alignFrameXValue },
+      { axis: "y", control: alignFrameYControl, output: alignFrameYValue },
+      { axis: "z", control: alignFrameZControl, output: alignFrameZValue }
+    ].forEach(({ axis, control, output }) => {
+      control.addEventListener("input", () => {
+        alignFrame.rotationDegrees[axis] = readNumber(control, alignFrame.rotationDegrees[axis]);
+        output.textContent = `${alignFrame.rotationDegrees[axis]}\u00B0`;
+        updateBoundsHelper();
+        enforceBoundsOnCamera();
+      });
+    });
+
+    bakeAlignFrameXButton.addEventListener("click", () => bakeAlignFrameAxis("x"));
+    bakeAlignFrameYButton.addEventListener("click", () => bakeAlignFrameAxis("y"));
+    bakeAlignFrameZButton.addEventListener("click", () => bakeAlignFrameAxis("z"));
+    resetAlignFrameButton.addEventListener("click", resetAlignFrame);
+
+    addBookmarkButton.addEventListener("click", addBookmark);
+    addHotspotButton.addEventListener("click", createHotspot);
+    playTourButton.addEventListener("click", playTour);
+    stopTourButton.addEventListener("click", () => stopTour());
+    recordTourButton.addEventListener("click", recordTour);
+    screenshotButton.addEventListener("click", saveScreenshot);
+
+    resetViewButton.addEventListener("click", () => {
+      resetView();
+      setStatus(currentFile ? `View reset: ${currentFile.name}` : "View reset.", "ready");
+    });
+
+    fullscreenButton.addEventListener("click", async () => {
+      if (document.fullscreenElement) {
+        await document.exitFullscreen();
+      } else {
+        await document.querySelector("main").requestFullscreen();
+      }
+    });
+
+    helpButton.addEventListener("click", () => {
+      helpPanel.classList.toggle("hidden");
+    });
+
+    closeHelpButton.addEventListener("click", () => {
+      helpPanel.classList.add("hidden");
+    });
+
+    closeAnnotationButton.addEventListener("click", hideAnnotation);
+
+    document.querySelectorAll(".accordion-toggle").forEach((toggle) => {
+      toggle.addEventListener("click", () => {
+        const section = toggle.closest("[data-accordion-section]");
+        const open = !section?.classList.contains("open");
+        section?.classList.toggle("open", open);
+        toggle.setAttribute("aria-expanded", `${open}`);
+      });
+    });
+
+    document.addEventListener("keydown", (event) => {
+      if ((navigationMode === "look" || navigationMode === "fly") && isExitModeKey(event)) {
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        if (navigationMode === "fly" && keyMatches(event, "Space", " ")) {
+          freezeFlyCamera();
+          toggleViewPanelVisible();
+        }
+        exitImmersiveMode();
+        return;
+      }
+      if (isFormControlElement(event.target)) {
+        event.stopPropagation();
+      }
+    }, true);
+
+    viewerRoot.addEventListener("pointerdown", handleHotspotPointerDown);
+    viewerRoot.addEventListener("click", handleHotspotClick);
+
+    document.addEventListener("pointerlockchange", () => {
+      const locked = document.pointerLockElement === viewerRoot;
+      reticle.classList.toggle("hidden", !locked);
+      if (locked) {
+        setStatus("Look mode active. Esc or Space exits.", "ready");
+      } else if (navigationMode === "look") {
+        setNavigationMode("walk");
+        setStatus("Walk mode: Look mode exited.", "ready");
+      }
+    });
+
+    document.addEventListener("fullscreenchange", () => {
+      fullscreenButton.textContent = document.fullscreenElement ? "Exit" : "Full";
+    });
+
+    document.addEventListener("mousemove", (event) => {
+      if (document.pointerLockElement === viewerRoot) {
+        if (navigationMode === "fly") {
+          updateFlyLook(event);
+        } else if (navigationMode === "look") {
+          updateWalkLook(event.movementX, event.movementY);
+        }
+      } else if (navigationMode === "fly" && viewerRoot.contains(event.target)) {
+        updateFlyLook(event);
+      }
+    });
+
+    ["dragenter", "dragover"].forEach((eventName) => {
+      dropPanel.addEventListener(eventName, (event) => {
+        event.preventDefault();
+        dropPanel.classList.add("dragging");
+      });
+    });
+
+    ["dragleave", "drop"].forEach((eventName) => {
+      dropPanel.addEventListener(eventName, (event) => {
+        event.preventDefault();
+        dropPanel.classList.remove("dragging");
+      });
+    });
+
+    dropPanel.addEventListener("drop", (event) => {
+      const file = event.dataTransfer?.files?.[0];
+      loadPly(file);
+    });
+  </script>
+</body>
+</html>
