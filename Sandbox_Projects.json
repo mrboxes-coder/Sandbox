@@ -456,7 +456,7 @@
         }
       ],
       "carousel": true,
-      "link": "",
+      "link": "./space_invaders/space_invaders.html",
       "tags": [],
       "thumb": "images/space_invaders02.jpg",
       "youtube": "https://youtu.be/NC-fQi74lTI?si=Do7l9-FPasNJidZJ"
@@ -555,7 +555,10 @@
       "tier": "2",
       "categories": [
         "Animation Tool",
-        "Three.js"
+        "Three.js",
+        "Simulation",
+        "Behaviour",
+        "Flock/Schools/Herds"
       ],
       "date": "2026-07-07",
       "desc": "Boids 01 is a Three.js 3D simulation where a single agent (Boid) seeks and follows a bouncing target within a bounded space, using velocity and turn-rate limited steering to create realistic, gradual movement.",
@@ -576,11 +579,11 @@
           "caption": ""
         },
         {
-          "img": "",
+          "img": "images/boids01_05.jpg",
           "caption": ""
         },
         {
-          "img": "",
+          "img": "images/boids01_04.jpg",
           "caption": ""
         },
         {
@@ -589,19 +592,18 @@
         }
       ],
       "carousel": true,
-      "link": "",
+      "link": "./boid_projects/boids01.html",
       "tags": [],
       "thumb": "images/boids01_04.jpg",
       "youtube": "https://youtu.be/IVdIODo90bQ"
     },
     {
       "id": 18,
-      "name": "Boids  v2",
+      "name": "Boids  v2 - Flocking Behaviour",
       "tier": "3",
       "categories": [
         "Animation Tool",
         "Three.js",
-        "Fly-Thru",
         "Simulation",
         "Behaviour",
         "Flock/Schools/Herds"
@@ -638,55 +640,57 @@
         }
       ],
       "carousel": true,
-      "link": "",
+      "link": "./boid_projects/boids02.html",
       "tags": [],
       "thumb": "images/boids02_03.jpg",
       "youtube": "https://youtu.be/0Km7aSSMq84"
     },
     {
       "id": 23,
-      "name": "Boids  v3 - X-Wing",
+      "name": "Boids  v3 - Flocking Behaviour",
       "tier": "3",
       "categories": [
         "Animation Tool",
         "Three.js",
-        "Fly-Thru"
+        "Simulation",
+        "Behaviour",
+        "Flock/Schools/Herds"
       ],
       "date": "2026-06-05",
       "desc": "A real-time 3D flocking simulation built with Three.js, implementing Craig Reynolds' Boids algorithm. A flock of tetrahedra exhibit emergent flocking behaviour — cohesion, separation, alignment — while navigating cylindrical obstacles and floor avoidance within a bounded space.",
-      "fullDesc": "X-Wing_Boids is a self-contained, browser-based 3D flocking simulation built entirely with Three.js (r158). It implements Craig Reynolds' classic Boids algorithm — cohesion, separation, and alignment — to produce emergent collective behaviour from a squadron of agents navigating a bounded 60×60 unit space in real time at 50fps.\n    \nThe simulation runs in two model modes: a custom flat-shaded tetrahedron mesh, or a loaded X-Wing GLB model embedded directly in the file. Agents respond to a bouncing target object, six positionable cylindrical obstacles with configurable detection radii and avoidance weighting, and a floor avoidance zone that pitches agents upward using local-axis rotation. Obstacle avoidance uses a predictive look-ahead system, projecting each agent's future position to trigger evasion before collision occurs. A full set of sliders governs every aspect of flock behaviour — speed range, turn rate, perception radius, and the relative weights of each steering force.\n    \nThe camera system supports orbital navigation, auto-rotation, and a Track Flock mode that dynamically centres the orbit target on the average position of the leading agents. The scene includes dynamic lighting with shadow mapping, a customisable grid with colour and intensity controls, and adjustable background tone.\n     \nThe file imports Three.js, OrbitControls, GLTFLoader, and TransformControls exclusively via CDN — no build tools, no server required. It exports nothing, running entirely in the browser as a single HTML file.\n     \nIn the context of immersive practice and research, the simulation serves as a real-time behavioural testbed for exploring emergence, swarm intelligence, and spatial dynamics — directly applicable to crowd simulation, generative installation design, interactive narrative environments, and the choreography of autonomous agents in virtual production and XR contexts.",
+      "fullDesc": "Boids v3 is a self-contained, browser-based 3D flocking simulation built entirely with Three.js (r158). It implements Craig Reynolds' classic Boids algorithm — cohesion, separation, and alignment — to produce emergent collective behaviour from a squadron of agents navigating a bounded 60×60 unit space in real time at 50fps.\n    \nThe simulation runs in two model modes: a custom flat-shaded tetrahedron mesh, or a loaded X-Wing GLB model embedded directly in the file. Agents respond to a bouncing target object, six positionable cylindrical obstacles with configurable detection radii and avoidance weighting, and a floor avoidance zone that pitches agents upward using local-axis rotation. Obstacle avoidance uses a predictive look-ahead system, projecting each agent's future position to trigger evasion before collision occurs. A full set of sliders governs every aspect of flock behaviour — speed range, turn rate, perception radius, and the relative weights of each steering force.\n    \nThe camera system supports orbital navigation, auto-rotation, and a Track Flock mode that dynamically centres the orbit target on the average position of the leading agents. The scene includes dynamic lighting with shadow mapping, a customisable grid with colour and intensity controls, and adjustable background tone.\n     \nThe file imports Three.js, OrbitControls, GLTFLoader, and TransformControls exclusively via CDN — no build tools, no server required. It exports nothing, running entirely in the browser as a single HTML file.\n     \nIn the context of immersive practice and research, the simulation serves as a real-time behavioural testbed for exploring emergence, swarm intelligence, and spatial dynamics — directly applicable to crowd simulation, generative installation design, interactive narrative environments, and the choreography of autonomous agents in virtual production and XR contexts.",
       "resourceLabel": "",
       "resourceLink": "",
       "gallery": [
         {
-          "img": "",
+          "img": "images/boids03_06.jpg",
           "caption": ""
         },
         {
-          "img": "",
+          "img": "images/boids03_01.jpg",
           "caption": ""
         },
         {
-          "img": "",
+          "img": "images/boids03_02.jpg",
           "caption": ""
         },
         {
-          "img": "",
+          "img": "images/boids03_03.jpg",
           "caption": ""
         },
         {
-          "img": "",
+          "img": "images/boids03_04.jpg",
           "caption": ""
         },
         {
-          "img": "",
+          "img": "images/boids03_07.jpg",
           "caption": ""
         }
       ],
-      "carousel": false,
-      "link": "",
+      "carousel": true,
+      "link": "./boid_projects/boids03.html",
       "tags": [],
-      "thumb": "",
+      "thumb": "images/boids03_06.jpg",
       "youtube": ""
     },
     {
@@ -872,6 +876,7 @@
       "name": "Generic 3D Environment Setup",
       "tier": "2",
       "categories": [
+        "Animation Tool",
         "Three.js",
         "Game"
       ],
@@ -907,7 +912,7 @@
         }
       ],
       "carousel": true,
-      "link": "",
+      "link": "./templates/3d_environment.html",
       "tags": [],
       "thumb": "images/3D_environment_template01.jpg",
       "youtube": ""
@@ -951,7 +956,7 @@
         }
       ],
       "carousel": true,
-      "link": "",
+      "link": "./utilities/start_end_frame_extractor.html",
       "tags": [],
       "thumb": "images/frame_extractor03.jpg",
       "youtube": ""
@@ -1001,9 +1006,51 @@
       "tags": [],
       "thumb": "",
       "youtube": ""
+    },
+    {
+      "id": 29,
+      "name": "Sandbox Style Guide",
+      "tier": "",
+      "categories": [],
+      "date": "2026-07-17",
+      "desc": "The Sandbox compact technical UI style guide for web tools, with panels, accordions, blue accents, buttons, sliders, inputs, lists, and readouts.",
+      "fullDesc": "This style guide defines a compact, technical interface system for building professional web-based tools, viewers, editors, and research applications. It is designed for interfaces where users need clear controls, dense information, and repeatable workflows rather than decorative presentation or marketing-style layouts.\n       \nThe visual language is built around a dark charcoal workspace, fixed menu panels, low-contrast borders, compact spacing, and a bright blue accent colour for active, selected, hover, and focus states. Typography is precise and functional, using small uppercase monospace labels for headings, controls, readouts, and technical values, with off-white primary text and muted grey secondary text.\n      \nThe guide includes reusable patterns for top headers, branded icons, sidebar panels, accordion menus, buttons, sliders, checkboxes, text inputs, dropdowns, numeric fields, data readouts, list items, thumbnails, notes, and destructive actions. Accordion menus organise controls into clear sections while keeping the interface compact. Buttons use restrained dark styling by default, with white rollover text and stronger blue or red states for active and delete actions.\n    \nThis style is especially suited to creative technical software such as 3D viewers, image tools, simulation controls, annotation interfaces, media tools, spatial research platforms, and experimental prototypes. The overall feel should be clean, precise, focused, and professional, like a tool palette or control surface. The attached HTML/CSS example acts as a reusable reference for applying the same interface language consistently across future projects.",
+      "resourceLabel": "Download Style Guide",
+      "resourceLink": "./style_guide/Sandbox_Style_Guide.7z",
+      "gallery": [
+        {
+          "img": "images/sandbox_style_guide02.jpg",
+          "caption": ""
+        },
+        {
+          "img": "images/sandbox_style_guide01.jpg",
+          "caption": ""
+        },
+        {
+          "img": "images/sandbox_style_guide03.jpg",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        }
+      ],
+      "carousel": false,
+      "link": "./style_guide/style-guide.html",
+      "tags": [],
+      "thumb": "images/sandbox_style_guide03.jpg",
+      "youtube": ""
     }
   ],
-  "nextId": 29,
+  "nextId": 30,
   "sortMode": "tier",
   "site": {
     "eyebrow": "Browser-based creative exploration : Chris Shaw",

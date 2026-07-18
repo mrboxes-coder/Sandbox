@@ -1,0 +1,970 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>3D Project</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:         #0e0e0f;
+    --panel:      #161618;
+    --border:     rgba(255,255,255,0.07);
+    --text:       #e8e8e6;
+    --muted:      #9b9b97;
+    --accent:     #378ADD;
+    --accent-dim: rgba(55,138,221,0.12);
+    --panel-w:    280px;
+  }
+
+  html, body {
+    width: 100%; height: 100%;
+    overflow: hidden;
+    background: var(--bg);
+    font-family: 'DM Sans', sans-serif;
+    color: var(--text);
+  }
+
+  /* ── TITLE BAR ── */
+  #titleBar {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    height: 68px;
+    background: var(--panel);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    z-index: 200;
+    flex-shrink: 0;
+  }
+  #titleBar img.logo {
+    width: 36px;
+    height: 36px;
+    display: block;
+    flex-shrink: 0;
+  }
+  #titleBar h1 {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    font-weight: 700;
+    font-size: 42px;
+    letter-spacing: -0.03em;
+    line-height: 1.05;
+    color: #f0ede6;
+    display: flex;
+    align-items: baseline;
+    gap: 0.22em;
+  }
+  #titleBar h1 span {
+    color: #378ADD;
+  }
+
+  /* ── APP SHELL ── */
+  #app {
+    position: fixed;
+    top: 68px; left: 0; right: 0; bottom: 0;
+    display: flex;
+  }
+
+  /* ── VIEWPORT ── */
+  #viewport {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+  }
+  #threeCanvas {
+    display: block;
+    width: 100%; height: 100%;
+  }
+  #instructions {
+    position: absolute;
+    bottom: 14px; left: 16px;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    font-weight: 300;
+    color: #000000;
+    letter-spacing: 0.06em;
+    pointer-events: none;
+    user-select: none;
+  }
+  #fpsCounter {
+    position: absolute;
+    bottom: 14px; right: 16px;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    font-weight: 300;
+    color: rgba(255,255,255,0.22);
+    letter-spacing: 0.06em;
+    pointer-events: none;
+    user-select: none;
+  }
+
+  /* ── PANEL ── */
+  #panel {
+    width: var(--panel-w);
+    height: 100%;
+    background: var(--panel);
+    border-left: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+  #panelScroll {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 18px 0 32px;
+  }
+  #panelScroll::-webkit-scrollbar { width: 3px; }
+  #panelScroll::-webkit-scrollbar-track { background: transparent; }
+  #panelScroll::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+  /* ── SECTION / ACCORDION ── */
+  .section {
+    margin: 0 14px 6px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    overflow: hidden;
+  }
+  .section-header {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    font-weight: 400;
+    letter-spacing: 0.12em;
+    color: #ffffff;
+    text-transform: uppercase;
+    padding: 11px 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    user-select: none;
+    background: rgba(255,255,255,0.03);
+    transition: background 0.15s;
+  }
+  .section-header:hover { background: rgba(255,255,255,0.06); }
+  .section-chevron {
+    width: 14px; height: 14px;
+    flex-shrink: 0;
+    opacity: 0.4;
+    transition: transform 0.22s ease;
+  }
+  .section.open .section-chevron { transform: rotate(180deg); }
+  .section-body {
+    overflow: hidden;
+    max-height: 0;
+    transition: max-height 0.28s ease;
+  }
+  .section.open .section-body { max-height: 800px; }
+  .section-inner {
+    padding: 4px 14px 10px;
+  }
+
+  /* ── ROW ── */
+  .row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+    gap: 10px;
+    min-height: 38px;
+  }
+  .row:last-child { border-bottom: none; }
+  .row-label {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    font-weight: 400;
+    color: var(--muted);
+    white-space: nowrap;
+    flex-shrink: 0;
+    min-width: 78px;
+  }
+
+  /* ── CTA / RESET BUTTON ── */
+  .btn-reset {
+    display: block;
+    width: 100%;
+    margin: 10px 0 4px;
+    padding: 9px 0;
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.18);
+    border-radius: 6px;
+    color: #ffffff;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    font-weight: 400;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s;
+  }
+  .btn-reset:hover {
+    background: rgba(255,255,255,0.08);
+    border-color: rgba(255,255,255,0.32);
+  }
+  .btn-reset:active {
+    background: rgba(255,255,255,0.12);
+  }
+
+  /* ── SLIDER ── */
+  .slider-wrap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 1;
+    min-width: 0;
+  }
+  input[type=range] {
+    -webkit-appearance: none;
+    appearance: none;
+    flex: 1;
+    min-width: 0;
+    height: 2px;
+    background: #9b9b97;
+    border-radius: 2px;
+    outline: none;
+    cursor: pointer;
+  }
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--accent);
+    cursor: pointer;
+    transition: transform 0.12s;
+  }
+  input[type=range]::-webkit-slider-thumb:hover {
+    transform: scale(1.3);
+  }
+  input[type=range]::-moz-range-thumb {
+    width: 12px; height: 12px;
+    border-radius: 50%;
+    background: var(--accent);
+    border: none;
+    cursor: pointer;
+  }
+  .val {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    font-weight: 300;
+    color: var(--muted);
+    min-width: 36px;
+    text-align: right;
+    flex-shrink: 0;
+  }
+
+  /* ── TOGGLE SWITCH ── */
+  .switch-wrap {
+    display: inline-flex;
+    align-items: center;
+    cursor: pointer;
+    flex-shrink: 0;
+    position: relative;
+  }
+  .switch-wrap input[type=checkbox] {
+    position: absolute;
+    opacity: 0;
+    width: 0; height: 0;
+    pointer-events: none;
+  }
+  .switch-track {
+    width: 34px;
+    height: 18px;
+    border-radius: 18px;
+    background: var(--border);
+    border: 1px solid rgba(255,255,255,0.08);
+    position: relative;
+    transition: background 0.2s, border-color 0.2s;
+    flex-shrink: 0;
+  }
+  .switch-thumb {
+    position: absolute;
+    top: 3px; left: 3px;
+    width: 12px; height: 12px;
+    border-radius: 50%;
+    background: var(--muted);
+    transition: transform 0.2s, background 0.2s;
+    pointer-events: none;
+  }
+  .switch-wrap input:checked ~ .switch-track {
+    background: rgba(55,138,221,0.35);
+    border-color: rgba(55,138,221,0.2);
+  }
+  .switch-wrap input:checked ~ .switch-track .switch-thumb {
+    background: var(--accent);
+    transform: translateX(16px);
+  }
+</style>
+</head>
+<body>
+
+<!-- TITLE -->
+<div id="titleBar">
+  <img class="logo" src="data:image/png;base64,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" alt="logo">
+  <h1>3D <span>Environment</span></h1>
+</div>
+
+<div id="app">
+
+  <!-- VIEWPORT -->
+  <div id="viewport">
+    <canvas id="threeCanvas"></canvas>
+    <div id="instructions">Drag to orbit &nbsp;·&nbsp; Scroll to zoom &nbsp;·&nbsp; Right-drag to pan</div>
+    <div id="fpsCounter">-- fps</div>
+  </div>
+
+  <!-- CONTROL PANEL -->
+  <div id="panel">
+    <div id="panelScroll">
+
+      <!-- CAMERA -->
+      <div class="section open" id="sectionCamera">
+        <div class="section-header" data-target="sectionCamera">
+          Camera
+          <svg class="section-chevron" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M2 4.5L7 9.5L12 4.5" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="section-body">
+          <div class="section-inner">
+
+        <button class="btn-reset" id="btnReset">↺ &nbsp; Reset to Default</button>
+
+        <div class="row">
+          <span class="row-label">FOV</span>
+          <div class="slider-wrap">
+            <input type="range" id="sliderFOV" min="20" max="100" step="1" value="45">
+            <span class="val" id="valFOV">45°</span>
+          </div>
+        </div>
+
+        <div class="row">
+          <span class="row-label">Auto-Rotate</span>
+          <label class="switch-wrap">
+            <input type="checkbox" id="chkAutoRotate">
+            <div class="switch-track"><div class="switch-thumb"></div></div>
+          </label>
+        </div>
+
+        <div class="row">
+          <span class="row-label">Speed</span>
+          <div class="slider-wrap">
+            <input type="range" id="sliderSpeed" min="0.1" max="10" step="0.1" value="1.0">
+            <span class="val" id="valSpeed">1.0</span>
+          </div>
+        </div>
+
+        <div class="row">
+          <span class="row-label">Grid</span>
+          <label class="switch-wrap">
+            <input type="checkbox" id="chkGrid" checked>
+            <div class="switch-track"><div class="switch-thumb"></div></div>
+          </label>
+        </div>
+
+        <div class="row">
+          <span class="row-label">Axis Gizmo</span>
+          <label class="switch-wrap">
+            <input type="checkbox" id="chkGizmo" checked>
+            <div class="switch-track"><div class="switch-thumb"></div></div>
+          </label>
+        </div>
+
+        <div class="row">
+          <span class="row-label">Damping</span>
+          <label class="switch-wrap">
+            <input type="checkbox" id="chkDamping" checked>
+            <div class="switch-track"><div class="switch-thumb"></div></div>
+          </label>
+        </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- LIGHTS -->
+      <div class="section open" id="sectionLights">
+        <div class="section-header" data-target="sectionLights">
+          Lights
+          <svg class="section-chevron" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M2 4.5L7 9.5L12 4.5" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="section-body">
+          <div class="section-inner">
+
+        <div class="row">
+          <span class="row-label">Exposure</span>
+          <div class="slider-wrap">
+            <input type="range" id="sliderExposure" min="0.1" max="3.0" step="0.05" value="1.0">
+            <span class="val" id="valExposure">1.00</span>
+          </div>
+        </div>
+
+        <div class="row">
+          <span class="row-label">Ambient</span>
+          <div class="slider-wrap">
+            <input type="range" id="sliderAmbient" min="0" max="2" step="0.05" value="0.4">
+            <span class="val" id="valAmbient">0.40</span>
+          </div>
+          <label class="switch-wrap">
+            <input type="checkbox" id="chkAmbient" checked>
+            <div class="switch-track"><div class="switch-thumb"></div></div>
+          </label>
+        </div>
+
+        <div class="row">
+          <span class="row-label">Key Light</span>
+          <div class="slider-wrap">
+            <input type="range" id="sliderKey" min="0" max="5" step="0.1" value="1.5">
+            <span class="val" id="valKey">1.50</span>
+          </div>
+          <label class="switch-wrap">
+            <input type="checkbox" id="chkKey" checked>
+            <div class="switch-track"><div class="switch-thumb"></div></div>
+          </label>
+        </div>
+
+        <div class="row">
+          <span class="row-label">Fill Light</span>
+          <div class="slider-wrap">
+            <input type="range" id="sliderFill" min="0" max="3" step="0.05" value="0.6">
+            <span class="val" id="valFill">0.60</span>
+          </div>
+          <label class="switch-wrap">
+            <input type="checkbox" id="chkFill" checked>
+            <div class="switch-track"><div class="switch-thumb"></div></div>
+          </label>
+        </div>
+
+        <div class="row">
+          <span class="row-label">Light Display</span>
+          <label class="switch-wrap">
+            <input type="checkbox" id="chkLightDisplay">
+            <div class="switch-track"><div class="switch-thumb"></div></div>
+          </label>
+        </div>
+
+        <div class="row">
+          <span class="row-label">Shadows</span>
+          <label class="switch-wrap">
+            <input type="checkbox" id="chkShadows" checked>
+            <div class="switch-track"><div class="switch-thumb"></div></div>
+          </label>
+        </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- SYSTEM SETTINGS -->
+      <div class="section open" id="sectionSystem">
+        <div class="section-header" data-target="sectionSystem">
+          System Settings
+          <svg class="section-chevron" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M2 4.5L7 9.5L12 4.5" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="section-body">
+          <div class="section-inner">
+            <button class="btn-reset" id="btnExport">↓ &nbsp; Export Prompt</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+  }
+}
+</script>
+
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+// ── CUSTOM GRID ───────────────────────────────────────────
+function makeGrid(size, divisions, colorMain, colorDiv) {
+  const step = size / divisions;
+  const half = size / 2;
+  const positions = [];
+  const colors    = [];
+
+  const cMain = new THREE.Color(colorMain);
+  const cDiv  = new THREE.Color(colorDiv);
+
+  for (let i = 0, k = -half; i <= divisions; i++, k += step) {
+    const isCenter = (i === divisions / 2);
+    const col = isCenter ? cMain : cDiv;
+    positions.push(-half, 0, k,  half, 0, k);
+    positions.push(k, 0, -half,  k, 0,  half);
+    for (let j = 0; j < 4; j++) { colors.push(col.r, col.g, col.b); }
+  }
+
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+  geo.setAttribute('color',    new THREE.Float32BufferAttribute(colors,    3));
+  const mat = new THREE.LineBasicMaterial({ vertexColors: true });
+  return new THREE.LineSegments(geo, mat);
+}
+
+// ── RENDERER ─────────────────────────────────────────────
+const canvas   = document.getElementById('threeCanvas');
+const viewport = document.getElementById('viewport');
+
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.shadowMap.enabled   = true;
+renderer.shadowMap.type      = THREE.PCFSoftShadowMap;
+renderer.toneMapping         = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.0;
+renderer.autoClear           = false;
+
+// ── MAIN SCENE ───────────────────────────────────────────
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x808080);
+
+// ── CAMERA ───────────────────────────────────────────────
+const DEFAULT_FOV    = 45;
+const DEFAULT_POS    = new THREE.Vector3(6, 4, 8);
+const DEFAULT_TARGET = new THREE.Vector3(0, 0, 0);
+
+const camera = new THREE.PerspectiveCamera(DEFAULT_FOV, 1, 0.01, 1000);
+camera.position.copy(DEFAULT_POS);
+
+// ── ORBIT CONTROLS ───────────────────────────────────────
+const controls = new OrbitControls(camera, canvas);
+controls.enableDamping   = true;
+controls.dampingFactor   = 0.08;
+controls.autoRotate      = false;
+controls.autoRotateSpeed = 1.0;
+controls.mouseButtons    = {
+  LEFT:   THREE.MOUSE.ROTATE,
+  MIDDLE: THREE.MOUSE.DOLLY,
+  RIGHT:  THREE.MOUSE.PAN,
+};
+controls.target.copy(DEFAULT_TARGET);
+controls.update();
+
+// ── GRID ─────────────────────────────────────────────────
+const grid = makeGrid(20, 40, 0x555555, 0x383838);
+scene.add(grid);
+
+// ── GROUND ───────────────────────────────────────────────
+const ground = new THREE.Mesh(
+  new THREE.PlaneGeometry(40, 40),
+  new THREE.ShadowMaterial({ opacity: 0.35 })
+);
+ground.rotation.x    = -Math.PI / 2;
+ground.receiveShadow = true;
+scene.add(ground);
+
+// ── LIGHTS ───────────────────────────────────────────────
+const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
+scene.add(ambientLight);
+
+// Key Light — (15, 24, 1)
+const keyLight = new THREE.DirectionalLight(0xfff5e0, 1.5);
+keyLight.position.set(15, 24, 1);
+keyLight.castShadow = true;
+keyLight.shadow.mapSize.set(2048, 2048);
+keyLight.shadow.camera.near   = 0.1;
+keyLight.shadow.camera.far    = 80;
+keyLight.shadow.camera.left   = -20;
+keyLight.shadow.camera.right  =  20;
+keyLight.shadow.camera.top    =  20;
+keyLight.shadow.camera.bottom = -20;
+keyLight.shadow.bias          = -0.001;
+scene.add(keyLight);
+
+// Fill Light — (-15, 7, -15)
+const fillLight = new THREE.DirectionalLight(0xd0e8ff, 0.6);
+fillLight.position.set(-15, 7, -15);
+scene.add(fillLight);
+
+// Light helpers — hidden by default
+const keyHelper  = new THREE.DirectionalLightHelper(keyLight,  1.2, 0xffff00);
+const fillHelper = new THREE.DirectionalLightHelper(fillLight, 1.2, 0x88aaff);
+keyHelper.visible  = false;
+fillHelper.visible = false;
+scene.add(keyHelper);
+scene.add(fillHelper);
+
+// ── GIZMO SCENE ──────────────────────────────────────────
+const gizmoScene  = new THREE.Scene();
+const GIZMO_SIZE  = 88;
+const gizmoCamera = new THREE.PerspectiveCamera(50, 1, 0.1, 100);
+gizmoCamera.position.set(0, 0, 3);
+
+const AXES = [
+  { dir: new THREE.Vector3(1, 0, 0), color: 0xff3333, label: 'X', lc: '#000000' },
+  { dir: new THREE.Vector3(0, 1, 0), color: 0x33dd55, label: 'Y', lc: '#000000' },
+  { dir: new THREE.Vector3(0, 0, 1), color: 0x3366ff, label: 'Z', lc: '#000000' },
+];
+
+AXES.forEach(({ dir, color, label, lc }) => {
+  const mat = new THREE.MeshBasicMaterial({ color, depthTest: false });
+  const up  = new THREE.Vector3(0, 1, 0);
+
+  const shaft = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, 0.72, 8), mat);
+  shaft.position.copy(dir.clone().multiplyScalar(0.40));
+  shaft.quaternion.setFromUnitVectors(up, dir);
+  shaft.renderOrder = 999;
+  gizmoScene.add(shaft);
+
+  const cone = new THREE.Mesh(new THREE.ConeGeometry(0.10, 0.22, 12), mat);
+  cone.position.copy(dir.clone().multiplyScalar(0.84));
+  cone.quaternion.setFromUnitVectors(up, dir);
+  cone.renderOrder = 999;
+  gizmoScene.add(cone);
+
+  const cv  = document.createElement('canvas');
+  cv.width  = 128; cv.height = 128;
+  const ctx = cv.getContext('2d');
+  ctx.font         = 'bold 72px DM Mono, monospace';
+  ctx.fillStyle    = lc;
+  ctx.textAlign    = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(label, 64, 64);
+  const sprite = new THREE.Sprite(
+    new THREE.SpriteMaterial({
+      map: new THREE.CanvasTexture(cv),
+      depthTest: false,
+      transparent: true
+    })
+  );
+  sprite.scale.set(0.36, 0.36, 0.36);
+  sprite.position.copy(dir.clone().multiplyScalar(1.18));
+  sprite.renderOrder = 1000;
+  gizmoScene.add(sprite);
+});
+
+// ── RESIZE ───────────────────────────────────────────────
+function onResize() {
+  const w = viewport.clientWidth;
+  const h = viewport.clientHeight;
+  renderer.setSize(w, h);
+  camera.aspect = w / h;
+  camera.updateProjectionMatrix();
+}
+window.addEventListener('resize', onResize);
+onResize();
+
+// ── FPS ──────────────────────────────────────────────────
+const fpsEl   = document.getElementById('fpsCounter');
+let fpsFrames = 0;
+let fpsLast   = performance.now();
+let showGizmo = true;
+
+// ── RENDER LOOP ──────────────────────────────────────────
+function animate() {
+  requestAnimationFrame(animate);
+  controls.update();
+
+  // Sync gizmo camera to main camera orientation
+  gizmoCamera.position
+    .copy(camera.position)
+    .sub(controls.target)
+    .normalize()
+    .multiplyScalar(3);
+  gizmoCamera.lookAt(0, 0, 0);
+  gizmoCamera.up.copy(camera.up);
+
+  keyHelper.update();
+  fillHelper.update();
+
+  const vw = viewport.clientWidth;
+  const vh = viewport.clientHeight;
+
+  // Main scene
+  renderer.setViewport(0, 0, vw, vh);
+  renderer.setScissor(0, 0, vw, vh);
+  renderer.setScissorTest(true);
+  renderer.clear();
+  renderer.render(scene, camera);
+
+  // Gizmo — top-right corner
+  // WebGL origin is bottom-left, so top-right = (vw - size - m, vh - size - m)
+  if (showGizmo) {
+    const m  = 14;
+    const gx = vw - GIZMO_SIZE - m;
+    const gy = vh - GIZMO_SIZE - m;
+    renderer.setViewport(gx, gy, GIZMO_SIZE, GIZMO_SIZE);
+    renderer.setScissor(gx, gy, GIZMO_SIZE, GIZMO_SIZE);
+    renderer.clearDepth();
+    renderer.render(gizmoScene, gizmoCamera);
+  }
+
+  // FPS
+  fpsFrames++;
+  const now = performance.now();
+  if (now - fpsLast >= 500) {
+    fpsEl.textContent = Math.round(fpsFrames * 1000 / (now - fpsLast)) + ' fps';
+    fpsFrames = 0;
+    fpsLast   = now;
+  }
+}
+animate();
+
+// ── UI HELPERS ───────────────────────────────────────────
+function bindSlider(id, valId, decimals, suffix, cb) {
+  const sl = document.getElementById(id);
+  const vl = document.getElementById(valId);
+  sl.addEventListener('input', () => {
+    const v = parseFloat(sl.value);
+    vl.textContent = v.toFixed(decimals) + (suffix || '');
+    cb(v);
+  });
+}
+
+function bindToggle(id, cb) {
+  const el = document.getElementById(id);
+  el.addEventListener('change', () => cb(el.checked));
+}
+
+// ── CAMERA UI ────────────────────────────────────────────
+document.getElementById('btnReset').addEventListener('click', () => {
+  camera.fov = DEFAULT_FOV;
+  camera.updateProjectionMatrix();
+  document.getElementById('sliderFOV').value    = DEFAULT_FOV;
+  document.getElementById('valFOV').textContent = DEFAULT_FOV + '°';
+  camera.position.copy(DEFAULT_POS);
+  controls.target.copy(DEFAULT_TARGET);
+  controls.update();
+});
+
+bindSlider('sliderFOV', 'valFOV', 0, '°', v => {
+  camera.fov = v;
+  camera.updateProjectionMatrix();
+});
+
+bindToggle('chkAutoRotate', v => { controls.autoRotate = v; });
+
+bindSlider('sliderSpeed', 'valSpeed', 1, '', v => { controls.autoRotateSpeed = v; });
+
+bindToggle('chkGrid', v => { grid.visible = v; });
+bindToggle('chkGizmo', v => { showGizmo = v; });
+
+bindToggle('chkDamping', v => {
+  controls.enableDamping = v;
+  controls.dampingFactor = v ? 0.08 : 1.0;
+});
+
+// ── LIGHTS UI ────────────────────────────────────────────
+bindSlider('sliderExposure', 'valExposure', 2, '', v => {
+  renderer.toneMappingExposure = v;
+});
+
+bindSlider('sliderAmbient', 'valAmbient', 2, '', v => { ambientLight.intensity = v; });
+bindToggle('chkAmbient', v => { ambientLight.visible = v; });
+
+bindSlider('sliderKey', 'valKey', 2, '', v => { keyLight.intensity = v; });
+bindToggle('chkKey',    v => { keyLight.visible = v; });
+
+bindSlider('sliderFill', 'valFill', 2, '', v => { fillLight.intensity = v; });
+bindToggle('chkFill',   v => { fillLight.visible = v; });
+
+bindToggle('chkLightDisplay', v => {
+  keyHelper.visible  = v;
+  fillHelper.visible = v;
+});
+
+bindToggle('chkShadows', v => {
+  renderer.shadowMap.enabled  = v;
+  ground.receiveShadow        = v;
+  ground.material.needsUpdate = true;
+});
+
+// ── EXPORT PROMPT ────────────────────────────────────────
+document.getElementById('btnExport').addEventListener('click', () => {
+  const prompt = `# 3D Environment — Reconstruction Prompt
+
+Create a single self-contained HTML file with a 3D viewport using Three.js (r160 from CDN). The layout has a left 3D viewport and a right control panel. Please feel free to ask any questions or make suggestions.
+
+---
+
+## PAGE STRUCTURE
+
+- Title "3D Environment" at the top of the page in a fixed title bar, styled as a system UI font stack (-apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui), 42px, font-weight 700, letter-spacing -0.03em, line-height 1.05. "3D" in warm off-white (#f0ede6), "Environment" in blue (#378ADD) via a <span>.
+- A small logo image (lightning bolt icon) sits to the left of the heading in the title bar.
+- Bottom-left of viewport: static instruction text — "Drag to orbit · Scroll to zoom · Right-drag to pan" — in black.
+- Bottom-right of viewport: live FPS counter.
+- Left: 3D viewport fills the remaining screen space.
+- Right: fixed-width control panel (~280px), dark-styled, scrollable.
+
+---
+
+## DESIGN TOKENS
+
+Use the following CSS custom properties throughout:
+
+\`\`\`css
+--bg:         #0e0e0f;
+--panel:      #161618;
+--border:     rgba(255,255,255,0.07);
+--text:       #e8e8e6;
+--muted:      #9b9b97;
+--accent:     #378ADD;
+--accent-dim: rgba(55,138,221,0.12);
+\`\`\`
+
+---
+
+## TYPOGRAPHY
+
+- Import from Google Fonts: DM Mono (weights 300, 400, 700) and DM Sans (weights 300, 400, 500).
+- UI labels, values, monospace text: DM Mono.
+- Body and control text: DM Sans.
+- Section headings: 10px, DM Mono, uppercase, letter-spacing 0.12em, colour #ffffff.
+- Control labels: 12px, DM Sans, colour var(--muted) #9b9b97.
+- Value readouts: 11px, DM Mono, colour var(--muted) #9b9b97.
+
+---
+
+## 3D VIEWPORT
+
+- Three.js r160 via CDN ES module importmap.
+- Background colour: mid-grey 0x808080.
+- Grid: 20 units, 40 divisions, built using the custom makeGrid function below — do NOT use THREE.GridHelper.
+- XYZ axis gizmo rendered in the top-right corner of the viewport using a secondary scene + setViewport. X=red, Y=green, Z=blue. Axis labels X/Y/Z in black text. Use autoClear = false and a dedicated gizmo camera.
+- Camera: PerspectiveCamera, FOV 45° default.
+- Mouse controls via OrbitControls: left-drag to orbit, scroll to zoom, right-drag to pan.
+- Damping enabled by default (dampingFactor 0.08).
+- A ground plane (PlaneGeometry 40x40) using ShadowMaterial, receiveShadow = true.
+
+---
+
+## CUSTOM GRID FUNCTION
+
+Use this exact function — do not use THREE.GridHelper:
+
+\`\`\`javascript
+function makeGrid(size, divisions, colorMain, colorDiv) {
+  const step = size / divisions;
+  const half = size / 2;
+  const positions = [];
+  const colors = [];
+  const cMain = new THREE.Color(colorMain);
+  const cDiv  = new THREE.Color(colorDiv);
+  for (let i = 0, k = -half; i <= divisions; i++, k += step) {
+    const isCenter = (i === divisions / 2);
+    const col = isCenter ? cMain : cDiv;
+    positions.push(-half, 0, k,  half, 0, k);
+    positions.push(k, 0, -half,  k, 0,  half);
+    for (let j = 0; j < 4; j++) { colors.push(col.r, col.g, col.b); }
+  }
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+  geo.setAttribute('color',    new THREE.Float32BufferAttribute(colors, 3));
+  const mat = new THREE.LineBasicMaterial({ vertexColors: true });
+  return new THREE.LineSegments(geo, mat);
+}
+\`\`\`
+
+Instantiate as: const grid = makeGrid(20, 40, 0x555555, 0x383838);
+
+---
+
+## LIGHTS
+
+- AmbientLight: 0xffffff, intensity 0.4.
+- Key Light (DirectionalLight): 0xfff5e0, intensity 1.5, position (15, 24, 1). castShadow = true, shadow.mapSize 2048x2048, shadow.camera.near 0.1, shadow.camera.far 80, shadow frustum left/right/top/bottom ±20, shadow.bias -0.001.
+- Fill Light (DirectionalLight): 0xd0e8ff, intensity 0.6, position (-15, 7, -15).
+- DirectionalLightHelper for each light, hidden by default.
+- Renderer: ACESFilmicToneMapping, toneMappingExposure 1.0, PCFSoftShadowMap.
+
+---
+
+## CONTROL PANEL — ACCORDION SECTIONS
+
+The control panel has two sections — Camera and Lights — both implemented as accordion menus. Each section has:
+- A clickable header bar (10px DM Mono, uppercase, white, letter-spacing 0.12em) with a chevron SVG arrow that rotates 180° when collapsed.
+- A section-body that animates open/closed using max-height transition (0.28s ease).
+- Both sections open by default.
+- Section body rows use a thin border-bottom: 1px solid var(--border) between each row.
+
+### CAMERA SECTION
+
+1. Reset button — restores camera to default position (6, 4, 8), target (0,0,0), and FOV 45°.
+2. Export Prompt button — downloads a .txt file containing the full reconstruction prompt for this project.
+3. FOV slider (range 20–100, default 45°) — updates camera.fov and calls camera.updateProjectionMatrix() on input.
+4. Auto-Rotate toggle (default OFF) — controls controls.autoRotate.
+5. Speed slider (0.1–10, step 0.1, default 1.0) — controls controls.autoRotateSpeed.
+6. Grid toggle (default ON) — sets grid.visible.
+7. Axis Gizmo toggle (default ON) — shows/hides the XYZ gizmo render pass.
+8. Damping toggle (default ON) — controls controls.enableDamping.
+
+### LIGHTS SECTION
+
+1. Exposure slider (0.1–3.0, default 1.0) — controls renderer.toneMappingExposure.
+2. Ambient — intensity slider (0–2, default 0.4) + ON/OFF toggle.
+3. Key Light — intensity slider (0–5, default 1.5) + ON/OFF toggle.
+4. Fill Light — intensity slider (0–3, default 0.6) + ON/OFF toggle.
+5. Light Display toggle (default OFF) — shows/hides DirectionalLightHelper objects.
+6. Shadows toggle (default ON) — enables/disables renderer.shadowMap.enabled and ground.receiveShadow.
+
+---
+
+## UI COMPONENT SPECS
+
+### Sliders
+- Track: 2px height, background #9b9b97, border-radius 2px, -webkit-appearance: none.
+- Thumb: 12px circle, background var(--accent) #378ADD, scales to 1.3x on hover.
+- Value readout to the right, 11px DM Mono, colour var(--muted), fixed width, right-aligned.
+
+### Toggle switches
+- Hidden checkbox input with a styled track div and thumb div as siblings.
+- Track: 34x18px, border-radius 18px, background var(--border) when OFF, rgba(55,138,221,0.35) when ON.
+- Thumb: 12px circle, top/left 3px, background var(--muted) when OFF, var(--accent) when ON, transitions with transform: translateX(16px).
+
+### Buttons (Reset, Export Prompt)
+- Background: transparent. Border: 1px solid rgba(255,255,255,0.18). Border-radius: 6px.
+- Colour: #ffffff. Font: DM Mono 10px, uppercase, letter-spacing 0.08em.
+- Hover: background rgba(255,255,255,0.08), border-color rgba(255,255,255,0.32).
+
+---
+
+## GENERAL NOTES
+
+- Single self-contained HTML file, no build step.
+- Three.js and OrbitControls loaded as ES modules via importmap from cdn.jsdelivr.net.
+- renderer.autoClear = false to allow the gizmo secondary render pass.
+- FPS counter updates every 500ms.
+- On window resize, update renderer size and camera aspect ratio.
+`;
+
+  const blob = new Blob([prompt], { type: 'text/plain' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href     = url;
+  a.download = '3d-environment-prompt.txt';
+  a.click();
+  URL.revokeObjectURL(url);
+});
+
+// ── ACCORDION ────────────────────────────────────────────
+document.querySelectorAll('.section-header').forEach(header => {
+  header.addEventListener('click', () => {
+    const section = document.getElementById(header.dataset.target);
+    section.classList.toggle('open');
+  });
+});
+
+</script>
+</body>
+</html>

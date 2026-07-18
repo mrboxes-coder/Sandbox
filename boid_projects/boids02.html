@@ -1,0 +1,1645 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" type="image/png" href="data:image/png;base64,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">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Boid 02 Flocking Behaviour</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;700&family=Inter:wght@400;500;700&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    color-scheme: dark;
+    --bg:           #101014;
+    --topbar:       #1d1d22;
+    --panel:        #1a1a20;
+    --surface:      #26272f;
+    --surface-mid:  #2c2d35;
+    --border:       #343642;
+    --text:         #f2f3f7;
+    --muted:        #a5abc0;
+    --sub:          #8f96a8;
+    --accent:       #3b97ee;
+    --accent-light: #71baff;
+    --accent-fill:  #163452;
+    --danger:       #ff3838;
+    --mono: 'IBM Plex Mono', 'Cascadia Mono', Consolas, monospace;
+    --sans: Inter, ui-sans-serif, system-ui, -apple-system, sans-serif;
+    --label-size: 11px;
+  }
+
+  body { background: var(--bg); color: var(--text); font-family: var(--sans); font-size: 13px; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+
+  /* ── Topbar ── */
+  header { display: flex; align-items: center; justify-content: space-between; min-height: 56px; padding: 10px 16px; background: var(--topbar); border-bottom: 1px solid var(--border); flex-shrink: 0; z-index: 10; gap: 12px; }
+  .brand { display: flex; align-items: center; gap: 10px; }
+  .brand-icon { width: 32px; height: 32px; object-fit: contain; flex: 0 0 auto; border-radius: 4px; }
+  .brand h1 { font-family: var(--sans); font-size: 20px; font-weight: 700; color: var(--text); letter-spacing: 0; white-space: nowrap; }
+  .brand h1 span { color: var(--accent); }
+  .brand-sub { font-family: var(--sans); font-size: 13px; font-weight: 400; color: var(--muted); margin-top: 2px; }
+  .file-info { font-family: var(--mono); font-size: 11px; color: var(--muted); }
+
+  /* ── Layout ── */
+  .main { display: flex; flex: 1; overflow: hidden; min-height: 0; }
+  #canvas-wrap { flex: 1; position: relative; overflow: hidden; }
+  #canvas-wrap canvas { display: block; width: 100% !important; height: 100% !important; }
+  .loading-bar { position: absolute; top: 0; left: 0; right: 0; height: 2px; background: var(--accent); transform: scaleX(0); transform-origin: left; transition: transform 0.3s; z-index: 10; }
+
+  /* ── Panel ── */
+  .panel { width: 272px; flex-shrink: 0; background: var(--panel); border-left: 1px solid var(--border); display: flex; flex-direction: column; overflow-y: auto; scrollbar-width: thin; scrollbar-color: var(--accent) var(--bg); }
+  .panel::-webkit-scrollbar { width: 4px; }
+  .panel::-webkit-scrollbar-track { background: transparent; }
+  .panel::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+  /* ── Accordion ── */
+  .accordion { border-bottom: 1px solid var(--border); }
+  .accordion-heading { width: 100%; min-height: 34px; display: flex; align-items: center; justify-content: space-between; padding: 0 10px; background: var(--surface-mid); border: none; color: var(--text); font-family: var(--mono); font-size: var(--label-size); font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; cursor: pointer; transition: color 0.15s; }
+  .accordion-heading:hover { color: var(--accent-light); }
+  .accordion-heading::after { content: '+'; color: var(--accent); font-size: 16px; font-weight: 400; line-height: 1; }
+  .accordion.open .accordion-heading::after { content: '−'; }
+  .accordion-body { display: none; padding: 12px 10px; }
+  .accordion.open .accordion-body { display: block; }
+
+  /* ── Controls ── */
+  .ctrl-label { font-family: var(--mono); font-size: 11px; font-weight: 700; color: var(--text); flex-shrink: 0; letter-spacing: 0.04em; }
+  .ctrl-value { font-family: var(--mono); font-size: 11px; color: var(--text); min-width: 40px; text-align: right; flex-shrink: 0; font-variant-numeric: tabular-nums; }
+  .control-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; gap: 8px; }
+  .control-row:last-child { margin-bottom: 0; }
+
+  /* ── Sliders ── */
+  input[type=range] { -webkit-appearance: none; flex: 1; height: 2px; background: var(--border); border-radius: 2px; outline: none; min-width: 0; }
+  input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 11px; height: 11px; border-radius: 50%; background: var(--accent); cursor: pointer; transition: transform 0.15s; }
+  input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.3); }
+
+  /* ── Toggle switches ── */
+  .toggle-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+  .toggle { position: relative; width: 34px; height: 18px; flex-shrink: 0; }
+  .toggle input { opacity: 0; width: 0; height: 0; }
+  .toggle-track { position: absolute; inset: 0; background: var(--surface); border: 1px solid var(--border); border-radius: 18px; cursor: pointer; transition: background 0.2s, border-color 0.2s; }
+  .toggle input:checked + .toggle-track { background: var(--accent-fill); border-color: var(--accent); }
+  .toggle-thumb { position: absolute; width: 12px; height: 12px; border-radius: 50%; background: var(--muted); top: 2px; left: 2px; transition: transform 0.2s, background 0.2s; pointer-events: none; }
+  .toggle input:checked ~ .toggle-thumb { transform: translateX(16px); background: var(--accent); }
+
+  /* ── Buttons ── */
+  .btn { flex: 1; padding: 7px 0; background: var(--surface); border: 1px solid var(--border); border-radius: 4px; color: var(--muted); font-family: var(--mono); font-size: var(--label-size); letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer; transition: border-color 0.15s, color 0.15s, background 0.15s; }
+  .btn:hover { border-color: var(--accent); color: var(--accent-light); background: var(--accent-fill); }
+  .btn.active { border-color: var(--accent); color: var(--accent-light); background: var(--accent-fill); }
+  .btn.primary { background: var(--accent-fill); color: var(--accent-light); border-color: var(--accent); }
+  .btn.primary:hover { background: rgba(59,151,238,0.25); }
+  .btn-row { display: flex; gap: 8px; margin-bottom: 10px; }
+
+  /* ── Colour swatches ── */
+  .color-swatches { display: flex; gap: 8px; flex-wrap: wrap; }
+  .swatch { width: 22px; height: 22px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; transition: border-color 0.15s, transform 0.15s; }
+  .swatch:hover { transform: scale(1.15); }
+  .swatch.active { border-color: var(--accent); }
+
+  /* ── Stats ── */
+  .stats { font-family: var(--mono); font-size: 11px; color: var(--muted); line-height: 1.9; }
+  .stats span { color: var(--accent-light); }
+
+  /* ── Footer ── */
+  footer { padding: 8px 16px; border-top: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; background: var(--topbar); }
+  .hint { font-family: var(--mono); font-size: 10px; color: var(--sub); letter-spacing: 0.06em; }
+  .fps-counter { font-family: var(--mono); font-size: 10px; color: var(--muted); }
+  .fps-counter span { color: var(--accent); }
+
+  /* ── Misc ── */
+  #sel-hud { position: absolute; bottom: 48px; left: 16px; z-index: 10; display: none; background: rgba(22,22,24,0.9); border: 1px solid rgba(59,151,238,0.3); border-radius: 6px; padding: 10px 14px; backdrop-filter: blur(8px); font-family: var(--mono); font-size: 11px; color: var(--accent); min-width: 180px; }
+  #sel-hud .sel-name { font-size: 12px; color: var(--text); margin-bottom: 6px; }
+  #mesh-list { display: flex; flex-direction: column; gap: 4px; max-height: 200px; overflow-y: auto; }
+  .mesh-item { padding: 6px 9px; border: 1px solid var(--border); font-family: var(--mono); font-size: 10px; color: var(--muted); cursor: pointer; transition: all 0.15s; }
+  .mesh-item:hover, .mesh-item.selected { border-color: var(--accent); color: var(--accent-light); background: var(--accent-fill); }
+  #status { font-size: 11px; color: var(--accent); min-height: 16px; font-family: var(--mono); }
+  #status.err { color: var(--danger); }
+  body.presentation .panel, body.presentation header, body.presentation footer { display: none; }
+  .meta-field { margin-bottom: 10px; }
+  .meta-label { display: block; font-size: 11px; color: var(--muted); margin-bottom: 4px; font-family: var(--mono); letter-spacing: 0.04em; }
+  .meta-input { width: 100%; background: var(--surface); border: 1px solid var(--border); border-radius: 3px; color: var(--text); font-family: var(--mono); font-size: 11px; padding: 5px 8px; outline: none; transition: border-color 0.15s; }
+  .meta-input:focus { border-color: var(--accent); }
+  .num-input { width: 100%; background: var(--surface); border: 1px solid var(--border); border-radius: 3px; color: var(--text); font-family: var(--mono); font-size: 11px; padding: 5px 4px; outline: none; text-align: center; -moz-appearance: textfield; }
+  .num-input::-webkit-inner-spin-button, .num-input::-webkit-outer-spin-button { -webkit-appearance: none; }
+  .num-input:focus { border-color: var(--accent); }
+  .drop-overlay { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; z-index: 5; pointer-events: none; transition: opacity 0.4s; }
+  .drop-overlay.hidden { opacity: 0; }
+  .version-list { margin-top: 8px; max-height: 100px; overflow-y: auto; font-family: var(--mono); font-size: 10px; color: var(--muted); line-height: 1.8; }
+  .version-list::-webkit-scrollbar { width: 3px; }
+  .version-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+  .version-entry { border-bottom: 1px solid var(--border); padding: 3px 0; }
+  .version-entry:last-child { border-bottom: none; }
+  .version-entry .v-ts { color: var(--accent); }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">
+    <img class="brand-icon" src="data:image/png;base64,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" alt="Boid 02">
+    <div>
+      <h1>Boid 02 <span>Flocking Behaviour</span></h1>
+      <div class="brand-sub">Real-time 3D flocking simulation</div>
+    </div>
+  </div>
+  <div class="file-info" id="file-info"></div>
+</header>
+
+<div class="main">
+  <div id="canvas-wrap">
+    <div class="loading-bar" id="loading-bar"></div>
+
+
+
+    <!-- Selection HUD -->
+    <div id="sel-hud">
+      <div class="sel-name" id="sel-name">—</div>
+      <div id="sel-info">click an object</div>
+    </div>
+
+    <!-- Camera position HUD -->
+    <div id="boid-hud" style="position:absolute;top:12px;left:12px;z-index:5;pointer-events:none;
+      font-family:'DM Mono',monospace;font-size:11px;color:#fff;
+      background:rgba(0,0,0,0.45);border-radius:6px;padding:8px 12px;line-height:2;">
+      <div><span style="color:#ff4444;">X</span> <span id="hud-rx">0.00</span></div>
+      <div><span style="color:#44ff44;">Y</span> <span id="hud-ry">0.00</span></div>
+      <div><span style="color:#4488ff;">Z</span> <span id="hud-rz">0.00</span></div>
+    </div>
+
+    <div class="drop-overlay" id="drop-overlay" style="display:none;"></div>
+    <input type="file" id="file-input" accept=".glb,.gltf" style="display:none;">
+    <canvas id="axis-canvas" style="position:absolute;bottom:48px;right:16px;width:90px;height:90px;pointer-events:none;z-index:4;"></canvas>
+  </div>
+
+  <div class="panel">
+
+    <!-- Bounding Box -->
+    <section class="accordion">
+      <button class="accordion-heading" type="button">Bounding Box</button>
+      <div class="accordion-body">
+        <div class="toggle-row">
+          <span class="ctrl-label">Visible</span>
+          <label class="toggle"><input type="checkbox" id="bbox-visible"><div class="toggle-track"></div><div class="toggle-thumb"></div></label>
+        </div>
+        <div class="control-row" style="margin-bottom:0;">
+          <span class="ctrl-label">Height</span>
+          <input type="range" id="bbox-height" min="5" max="20" step="0.5" value="15">
+          <span class="ctrl-value" id="bbox-height-val">15</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Camera -->
+    <section class="accordion open">
+      <button class="accordion-heading" type="button">Camera</button>
+      <div class="accordion-body">
+        <div class="btn-row">
+          <button class="btn" onclick="resetCamera()">Reset</button>
+          <button class="btn" onclick="frameFit()">Fit</button>
+        </div>
+        <div class="control-row">
+          <span class="ctrl-label">FOV</span>
+          <input type="range" id="fov" min="20" max="100" step="1" value="45">
+          <span class="ctrl-value" id="fov-val">45°</span>
+        </div>
+        <div class="toggle-row">
+          <span class="ctrl-label">Auto-rotate</span>
+          <label class="toggle"><input type="checkbox" id="auto-rotate" checked><div class="toggle-track"></div><div class="toggle-thumb"></div></label>
+        </div>
+        <div class="control-row" style="margin-bottom:0;">
+          <span class="ctrl-label">Speed</span>
+          <input type="range" id="rot-speed" min="0" max="10" step="0.1" value="3">
+          <span class="ctrl-value" id="rot-speed-val">3.0</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Target Object -->
+    <section class="accordion">
+      <button class="accordion-heading" type="button">Target Object</button>
+      <div class="accordion-body">
+        <div class="toggle-row">
+          <span class="ctrl-label">Visible</span>
+          <label class="toggle"><input type="checkbox" id="target-visible"><div class="toggle-track"></div><div class="toggle-thumb"></div></label>
+        </div>
+        <div class="control-row" style="margin-bottom:0;">
+          <span class="ctrl-label">Velocity</span>
+          <input type="range" id="target-velocity" min="0" max="10" step="0.01" value="5">
+          <span class="ctrl-value" id="target-velocity-val">5.00</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Flock -->
+    <section class="accordion open">
+      <button class="accordion-heading" type="button">Flock</button>
+      <div class="accordion-body">
+        <div class="control-row">
+          <span class="ctrl-label">Count</span>
+          <input type="range" id="boid-count" min="1" max="80" step="1" value="20">
+          <span class="ctrl-value" id="boid-count-val">20</span>
+        </div>
+        <div class="control-row">
+          <span class="ctrl-label">Min Speed</span>
+          <input type="range" id="boid-speed-min" min="0.5" max="12" step="0.1" value="2">
+          <span class="ctrl-value" id="boid-speed-min-val">2.0</span>
+        </div>
+        <div class="control-row">
+          <span class="ctrl-label">Max Speed</span>
+          <input type="range" id="boid-speed-max" min="0.5" max="12" step="0.1" value="4.5">
+          <span class="ctrl-value" id="boid-speed-max-val">4.5</span>
+        </div>
+        <div class="control-row">
+          <span class="ctrl-label">Turn Rate</span>
+          <input type="range" id="boid-turnrate" min="0.5" max="8" step="0.1" value="2.5">
+          <span class="ctrl-value" id="boid-turnrate-val">2.5</span>
+        </div>
+        <div class="control-row">
+          <span class="ctrl-label">Perception</span>
+          <input type="range" id="boid-perception" min="1" max="12" step="0.5" value="4">
+          <span class="ctrl-value" id="boid-perception-val">4.0</span>
+        </div>
+        <div class="control-row">
+          <span class="ctrl-label">Separation</span>
+          <input type="range" id="boid-sep" min="0" max="3" step="0.05" value="1.7">
+          <span class="ctrl-value" id="boid-sep-val">1.70</span>
+        </div>
+        <div class="control-row">
+          <span class="ctrl-label">Alignment</span>
+          <input type="range" id="boid-ali" min="0" max="3" step="0.05" value="1.0">
+          <span class="ctrl-value" id="boid-ali-val">1.00</span>
+        </div>
+        <div class="control-row">
+          <span class="ctrl-label">Cohesion</span>
+          <input type="range" id="boid-coh" min="0" max="3" step="0.05" value="0.8">
+          <span class="ctrl-value" id="boid-coh-val">0.80</span>
+        </div>
+        <div class="control-row">
+          <span class="ctrl-label">Target Seek</span>
+          <input type="range" id="boid-seek" min="0" max="3" step="0.05" value="0.4">
+          <span class="ctrl-value" id="boid-seek-val">0.40</span>
+        </div>
+        <div class="toggle-row" style="margin-bottom:0;">
+          <span class="ctrl-label">Constrain to Boundary</span>
+          <label class="toggle"><input type="checkbox" id="boid-contain"><div class="toggle-track"></div><div class="toggle-thumb"></div></label>
+        </div>
+      </div>
+    </section>
+
+    <!-- Lighting -->
+    <section class="accordion">
+      <button class="accordion-heading" type="button">Lighting</button>
+      <div class="accordion-body">
+        <div class="control-row">
+          <span class="ctrl-label">Exposure</span>
+          <input type="range" id="exposure" min="0.2" max="3" step="0.05" value="1">
+          <span class="ctrl-value" id="exposure-val">1.0</span>
+        </div>
+        <div class="control-row">
+          <span class="ctrl-label">Ambient</span>
+          <input type="range" id="ambient" min="0" max="2" step="0.05" value="0.4">
+          <span class="ctrl-value" id="ambient-val">0.4</span>
+        </div>
+        <div class="control-row">
+          <span class="ctrl-label">Key Light</span>
+          <input type="range" id="keylight" min="0" max="5" step="0.1" value="1.5">
+          <span class="ctrl-value" id="keylight-val">1.5</span>
+        </div>
+        <div class="control-row">
+          <span class="ctrl-label">Fill Light</span>
+          <input type="range" id="filllight" min="0" max="3" step="0.1" value="0.6">
+          <span class="ctrl-value" id="filllight-val">0.6</span>
+        </div>
+        <div class="toggle-row" style="margin-bottom:0;">
+          <span class="ctrl-label">Light Gizmos</span>
+          <label class="toggle"><input type="checkbox" id="light-gizmos"><div class="toggle-track"></div><div class="toggle-thumb"></div></label>
+        </div>
+      </div>
+    </section>
+
+    <!-- Background -->
+    <section class="accordion">
+      <button class="accordion-heading" type="button">Background</button>
+      <div class="accordion-body">
+        <div class="color-swatches" id="bg-swatches">
+          <div class="swatch" data-color="#0e0e0f" style="background:#0e0e0f;outline:1px solid rgba(255,255,255,0.15);outline-offset:1px;"></div>
+          <div class="swatch active" data-color="#bbbbbb" style="background:#bbbbbb"></div>
+          <div class="swatch" data-color="#777777" style="background:#777777"></div>
+          <div class="swatch" data-color="#aaaaaa" style="background:#aaaaaa"></div>
+          <div class="swatch" data-color="#dddddd" style="background:#dddddd"></div>
+          <div class="swatch" data-color="#ffffff" style="background:#ffffff;outline:1px solid rgba(0,0,0,0.15);outline-offset:1px;"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Display -->
+    <section class="accordion">
+      <button class="accordion-heading" type="button">Display</button>
+      <div class="accordion-body">
+        <div class="btn-row">
+          <button class="btn active" id="mode-solid" onclick="setWireframe(false)">Solid</button>
+          <button class="btn" id="mode-wire" onclick="setWireframe(true)">Wire</button>
+        </div>
+        <div class="toggle-row">
+          <span class="ctrl-label">Shadows</span>
+          <label class="toggle"><input type="checkbox" id="shadows" checked><div class="toggle-track"></div><div class="toggle-thumb"></div></label>
+        </div>
+        <div class="toggle-row">
+          <span class="ctrl-label">Show Grid</span>
+          <label class="toggle"><input type="checkbox" id="show-grid" checked><div class="toggle-track"></div><div class="toggle-thumb"></div></label>
+        </div>
+        <div class="toggle-row" style="margin-bottom:0;">
+          <span class="ctrl-label">Axis Gizmos</span>
+          <label class="toggle"><input type="checkbox" id="axis-gizmos"><div class="toggle-track"></div><div class="toggle-thumb"></div></label>
+        </div>
+      </div>
+    </section>
+
+    <!-- Scene Info -->
+    <section class="accordion">
+      <button class="accordion-heading" type="button">Scene Info</button>
+      <div class="accordion-body">
+        <div style="font-family:var(--mono);font-size:10px;color:var(--accent-light);margin-bottom:6px;min-height:14px;" id="stats-object-name"></div>
+        <div class="stats" id="stats">
+          Vertices <span>—</span><br>
+          Triangles <span>—</span><br>
+          Materials <span>—</span><br>
+          Meshes <span>—</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Hidden elements required by JS -->
+    <div style="display:none;">
+      <div id="mesh-list"></div>
+      <div id="stats-label"></div>
+      <div id="mat-edit-panel">
+        <button id="medit-wireframe"></button>
+        <button id="medit-basic"></button>
+        <button id="medit-lambert"></button>
+        <button id="medit-phong"></button>
+        <button id="medit-standard"></button>
+        <input type="color" id="mat-color-picker" value="#888888">
+        <span id="mat-color-hex"></span>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<footer>
+  <div class="hint" id="footer-hint">Drag to orbit &nbsp;·&nbsp; Scroll to zoom &nbsp;·&nbsp; Right-drag to pan</div>
+  <div class="fps-counter">FPS <span id="fps">—</span></div>
+</footer>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+  }
+}
+</script>
+
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls }    from 'three/addons/controls/OrbitControls.js';
+import { GLTFLoader }       from 'three/addons/loaders/GLTFLoader.js';
+import { DRACOLoader }      from 'three/addons/loaders/DRACOLoader.js';
+import { GLTFExporter }      from 'three/addons/exporters/GLTFExporter.js';
+
+// ─── Renderer ────────────────────────────────────────────────────────────────
+const wrap = document.getElementById('canvas-wrap');
+const renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1;
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+wrap.appendChild(renderer.domElement);
+
+// ─── Scene ───────────────────────────────────────────────────────────────────
+const scene  = new THREE.Scene();
+scene.background = new THREE.Color('#bbbbbb');
+
+const camera = new THREE.PerspectiveCamera(45, 1, 0.001, 1000);
+camera.position.set(15, 21, 33);
+
+// ─── Orbit controls ──────────────────────────────────────────────────────────
+const orbitControls = new OrbitControls(camera, renderer.domElement);
+orbitControls.enableDamping = true;
+orbitControls.dampingFactor = 0.05;
+orbitControls.autoRotate = true;
+orbitControls.autoRotateSpeed = 3;
+orbitControls.target.set(0, 5, 0);
+
+// ─── Lights ──────────────────────────────────────────────────────────────────
+const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
+scene.add(ambientLight);
+
+const keyLight = new THREE.DirectionalLight(0xffffff, 1.5);
+keyLight.position.set(50, 80, 50);
+keyLight.castShadow = true;
+keyLight.shadow.mapSize.set(2048, 2048);
+keyLight.shadow.camera.near = 1;
+keyLight.shadow.camera.far = 300;
+keyLight.shadow.camera.left   = -30;
+keyLight.shadow.camera.right  =  30;
+keyLight.shadow.camera.top    =  30;
+keyLight.shadow.camera.bottom = -30;
+keyLight.shadow.bias = -0.001;
+scene.add(keyLight);
+
+const fillLight = new THREE.DirectionalLight(0x8ab4f8, 0.6);
+fillLight.position.set(-50, 30, -50);
+scene.add(fillLight);
+
+const rimLight = new THREE.DirectionalLight(0xffffff, 0.3);
+rimLight.position.set(0, 50, -80);
+scene.add(rimLight);
+
+// ─── Light gizmos (initially hidden) ─────────────────────────────────────────
+const keyLightHelper  = new THREE.DirectionalLightHelper(keyLight,  3, 0xffff00);
+const fillLightHelper = new THREE.DirectionalLightHelper(fillLight, 3, 0x8ab4f8);
+const rimLightHelper  = new THREE.DirectionalLightHelper(rimLight,  3, 0xffffff);
+[keyLightHelper, fillLightHelper, rimLightHelper].forEach(h => {
+  h.visible = false;
+  scene.add(h);
+});
+
+// ─── Grid & shadow plane ─────────────────────────────────────────────────────
+function makeGrid(size, divisions) {
+  const step = size / divisions, half = size / 2;
+  const positions = [], colors = [];
+  const cMain = new THREE.Color(0.2, 0.2, 0.2);
+  const cDiv  = new THREE.Color(0.11, 0.11, 0.11);
+  for (let i = 0, k = -half; i <= divisions; i++, k += step) {
+    const col = (i === divisions / 2) ? cMain : cDiv;
+    positions.push(-half,0,k, half,0,k, k,0,-half, k,0,half);
+    for (let j = 0; j < 4; j++) colors.push(col.r, col.g, col.b);
+  }
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+  geo.setAttribute('color',    new THREE.Float32BufferAttribute(colors, 3));
+  return new THREE.LineSegments(geo, new THREE.LineBasicMaterial({ vertexColors: true }));
+}
+const gridHelper = makeGrid(20, 40);
+scene.add(gridHelper);
+
+const shadowPlane = new THREE.Mesh(
+  new THREE.PlaneGeometry(40, 40),
+  new THREE.ShadowMaterial({ opacity: 0.25 })
+);
+shadowPlane.rotation.x = -Math.PI / 2;
+shadowPlane.receiveShadow = true;
+scene.add(shadowPlane);
+
+// ─── State ───────────────────────────────────────────────────────────────────
+let model          = null;
+let rawGlbBuffer   = null;
+let currentFileName = 'model.glb';
+let wireframeMode  = false;
+let selectedObject = null;     // the Three.js Object3D currently selected
+let meshList       = [];       // flat list of all mesh/group nodes
+let selectionBox   = null;     // bounding-box helper
+let versionHistory = [];
+const createdObjects = new Set();
+
+// ─── target_Obj ──────────────────────────────────────────────────────────────
+const targetObj = new THREE.Mesh(
+  new THREE.SphereGeometry(0.25, 6, 6),
+  new THREE.MeshLambertMaterial({ color: 0xff0000 })
+);
+targetObj.name = 'target_Obj';
+targetObj.position.set(0, 2, 0);
+targetObj.castShadow = true;
+targetObj.visible = false;
+scene.add(targetObj);
+createdObjects.add(targetObj.uuid);
+
+// Local axis helper for target_Obj (size = 0.6 so it's visible but not overwhelming)
+const targetAxesHelper = new THREE.AxesHelper(0.6);
+targetAxesHelper.visible = false;
+targetObj.add(targetAxesHelper);
+
+// Random initial rotation — X: -45 to +45°, Y: 0 to 360° (world axis order)
+const randX = THREE.MathUtils.degToRad((Math.random() * 90) - 45);
+const randY = THREE.MathUtils.degToRad(Math.random() * 360);
+targetObj.rotation.order = 'YXZ'; // apply Y (world) first, then X
+targetObj.rotation.set(randX, randY, 0);
+
+// (Individual boid meshes are created dynamically by spawnFlock — see flock section below)
+let bboxHeight = 15;
+const boundingBox = new THREE.Mesh(
+  new THREE.BoxGeometry(20, bboxHeight, 20),
+  new THREE.MeshBasicMaterial({ color: 0x4488ff, wireframe: true })
+);
+boundingBox.name = 'Bounding_Box';
+boundingBox.position.set(0, bboxHeight / 2, 0);
+boundingBox.visible = false;
+scene.add(boundingBox);
+
+// Highlight material for selection outline (emissive)
+let originalEmissive = null;
+
+// ─── Raycaster ───────────────────────────────────────────────────────────────
+const raycaster = new THREE.Raycaster();
+const mouse     = new THREE.Vector2();
+
+// ─── Axis gizmo ──────────────────────────────────────────────────────────────
+const axisScene  = new THREE.Scene();
+const axisCamera = new THREE.PerspectiveCamera(50, 1, 0.1, 100);
+axisCamera.position.set(0, 0, 3);
+axisCamera.lookAt(0, 0, 0);
+
+function makeAxisArrow(dir, color, label) {
+  const g = new THREE.Group();
+  const norm = dir.clone().normalize();
+  const shaft = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.035, 0.035, 0.65, 8),
+    new THREE.MeshBasicMaterial({ color, depthTest: false })
+  );
+  shaft.position.copy(norm.clone().multiplyScalar(0.325));
+  shaft.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0), norm);
+  shaft.renderOrder = 999;
+  g.add(shaft);
+  const head = new THREE.Mesh(
+    new THREE.ConeGeometry(0.09, 0.22, 8),
+    new THREE.MeshBasicMaterial({ color, depthTest: false })
+  );
+  head.position.copy(norm.clone().multiplyScalar(0.8));
+  head.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0), norm);
+  head.renderOrder = 999;
+  g.add(head);
+  const c2d = document.createElement('canvas'); c2d.width = c2d.height = 64;
+  const ctx = c2d.getContext('2d');
+  ctx.font = 'bold 38px sans-serif'; ctx.fillStyle = '#000000';
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(label, 32, 34);
+  const sprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: new THREE.CanvasTexture(c2d), depthTest: false, transparent: true }));
+  sprite.scale.set(0.32, 0.32, 1); sprite.position.copy(norm.clone().multiplyScalar(1.08)); sprite.renderOrder = 1000;
+  g.add(sprite);
+  return g;
+}
+const axisRoot = new THREE.Group();
+axisRoot.add(makeAxisArrow(new THREE.Vector3(1,0,0), 0xe05050, 'X'));
+axisRoot.add(makeAxisArrow(new THREE.Vector3(0,1,0), 0x60c060, 'Y'));
+axisRoot.add(makeAxisArrow(new THREE.Vector3(0,0,1), 0x5080e0, 'Z'));
+axisScene.add(axisRoot);
+
+const GIZMO_SIZE = 90;
+
+// ─── Selection helpers ────────────────────────────────────────────────────────
+function setSelectedObject(obj) {
+  // Clear previous selection highlight
+  if (selectedObject) {
+    selectedObject.traverse(n => {
+      if (n.isMesh && n.material) {
+        const ms = Array.isArray(n.material) ? n.material : [n.material];
+        ms.forEach(m => {
+          if (m._origEmissive !== undefined) {
+            m.emissive.copy(m._origEmissive);
+            delete m._origEmissive;
+          }
+        });
+      }
+    });
+    if (selectionBox) { scene.remove(selectionBox); selectionBox = null; }
+  }
+
+  selectedObject = obj;
+
+  if (!obj) {
+    updateMatEditor(null);
+    updateStats();
+    document.getElementById('sel-hud').style.display = 'none';
+    // refresh mesh list highlighting
+    document.querySelectorAll('.mesh-item').forEach(el => el.classList.remove('selected'));
+    return;
+  }
+
+  // Highlight: add emissive tint
+  obj.traverse(n => {
+    if (n.isMesh && n.material) {
+      const ms = Array.isArray(n.material) ? n.material : [n.material];
+      ms.forEach(m => {
+        if (m._origEmissive === undefined) m._origEmissive = m.emissive.clone();
+        m.emissive.set(0x004488);
+      });
+    }
+  });
+
+  // Bounding box helper
+  selectionBox = new THREE.BoxHelper(obj, 0x60c8f0);
+  selectionBox.material.linewidth = 2;
+  scene.add(selectionBox);
+
+  updateMatEditor(obj);
+  updateStats(obj);
+
+  const name = obj.name || '(unnamed)';
+  document.getElementById('sel-name').textContent = name;
+
+  // Count meshes in selection
+  let meshCount = 0;
+  obj.traverse(n => { if (n.isMesh) meshCount++; });
+  document.getElementById('sel-info').textContent = meshCount + ' mesh' + (meshCount !== 1 ? 'es' : '');
+  document.getElementById('sel-hud').style.display = 'block';
+
+  // Highlight mesh list item
+  document.querySelectorAll('.mesh-item').forEach(el => {
+    el.classList.toggle('selected', el.dataset.uuid === obj.uuid);
+  });
+}
+
+window.deselectAll = function() { setSelectedObject(null); };
+
+// ─── Click-to-select raycasting ───────────────────────────────────────────────
+renderer.domElement.addEventListener('pointerdown', e => {
+  if (e.button !== 0) return;
+  _pointerDown = { x: e.clientX, y: e.clientY };
+});
+
+let _pointerDown = null;
+
+renderer.domElement.addEventListener('pointerup', e => {
+  if (e.button !== 0 || !_pointerDown) return;
+  const dx = e.clientX - _pointerDown.x;
+  const dy = e.clientY - _pointerDown.y;
+  _pointerDown = null;
+  if (Math.abs(dx) > 4 || Math.abs(dy) > 4) return; // was a drag
+
+  const rect = renderer.domElement.getBoundingClientRect();
+  mouse.x =  ((e.clientX - rect.left)  / rect.width)  * 2 - 1;
+  mouse.y = -((e.clientY - rect.top)   / rect.height) * 2 + 1;
+
+  raycaster.setFromCamera(mouse, camera);
+
+  // Collect all pickable meshes: from model + created primitives
+  const targets = [];
+  if (model) model.traverse(n => { if (n.isMesh) targets.push(n); });
+  scene.children.forEach(child => {
+    if (createdObjects.has(child.uuid) && child.isMesh) targets.push(child);
+  });
+
+  const hits = raycaster.intersectObjects(targets, false);
+
+  if (hits.length === 0) { deselectAll(); return; }
+
+  // Walk up to find the best selectable ancestor
+  let obj = hits[0].object;
+  while (obj.parent && obj.parent !== model && obj.parent !== scene) {
+    obj = obj.parent;
+  }
+  setSelectedObject(obj);
+});
+
+// ─── Material colour editor ───────────────────────────────────────────────────
+function updateMatEditor(obj) {
+  const panel = document.getElementById('mat-edit-panel');
+  if (!obj || !createdObjects.has(obj.uuid)) { panel.style.display = 'none'; return; }
+  panel.style.display = '';
+  const mat = obj.material;
+  if (mat && mat.color) {
+    const hex = '#' + mat.color.getHexString();
+    document.getElementById('mat-color-picker').value = hex;
+    document.getElementById('mat-color-hex').textContent = hex;
+  }
+  // Highlight the active material type button
+  const type = mat?._matType || 'phong';
+  ['wireframe','basic','lambert','phong','standard'].forEach(t => {
+    document.getElementById('medit-' + t).classList.toggle('active', t === type);
+  });
+}
+
+window.changeSelectedMat = function(type) {
+  if (!selectedObject || !createdObjects.has(selectedObject.uuid)) return;
+  const oldMat = selectedObject.material;
+  const color  = oldMat?.color ? oldMat.color.clone() : new THREE.Color(0x888888);
+  // Restore true emissive if highlighted
+  const emissive = oldMat?._origEmissive ? oldMat._origEmissive.clone() : new THREE.Color(0x004488);
+
+  let newMat;
+  switch (type) {
+    case 'wireframe': newMat = new THREE.MeshBasicMaterial({ color, wireframe: true }); break;
+    case 'basic':     newMat = new THREE.MeshBasicMaterial({ color }); break;
+    case 'lambert':   newMat = new THREE.MeshLambertMaterial({ color }); break;
+    case 'phong':     newMat = new THREE.MeshPhongMaterial({ color }); break;
+    case 'standard':  newMat = new THREE.MeshStandardMaterial({ color }); break;
+  }
+  newMat._matType = type;
+  // Re-apply selection highlight emissive
+  if (newMat.emissive) {
+    newMat._origEmissive = new THREE.Color(0x000000);
+    newMat.emissive.set(0x004488);
+  }
+  oldMat?.dispose();
+  selectedObject.material = newMat;
+
+  // Highlight buttons
+  ['wireframe','basic','lambert','phong','standard'].forEach(t => {
+    document.getElementById('medit-' + t).classList.toggle('active', t === type);
+  });
+};
+
+document.getElementById('mat-color-picker').addEventListener('input', e => {
+  if (!selectedObject || !createdObjects.has(selectedObject.uuid)) return;
+  const hex = e.target.value;
+  document.getElementById('mat-color-hex').textContent = hex;
+  const mat = selectedObject.material;
+  if (mat && mat.color) mat.color.set(hex);
+});
+
+// ─── Mesh list builder ────────────────────────────────────────────────────────
+function buildMeshList() {
+  meshList = [];
+
+  // Collect from loaded model
+  if (model) {
+    model.children.forEach(child => meshList.push(child));
+    if (meshList.length === 0) {
+      model.traverse(n => { if (n.isMesh) meshList.push(n); });
+    }
+  }
+
+  // Also collect scene-level created primitives
+  scene.children.forEach(child => {
+    if (createdObjects.has(child.uuid)) meshList.push(child);
+  });
+
+  const container = document.getElementById('mesh-list');
+  container.innerHTML = '';
+  if (meshList.length === 0) {
+    container.innerHTML = '<span style="font-family:\'DM Mono\',monospace;font-size:10px;color:var(--muted);">No objects in scene</span>';
+    return;
+  }
+
+  meshList.forEach(obj => {
+    const item = document.createElement('div');
+    item.className = 'mesh-item';
+    item.dataset.uuid = obj.uuid;
+    const name = obj.name || '(unnamed)';
+    const isPrim = createdObjects.has(obj.uuid);
+    let meshCount = 0;
+    obj.traverse(n => { if (n.isMesh) meshCount++; });
+    item.textContent = (isPrim ? '◆ ' : '') + name + (meshCount > 1 ? ` [${meshCount}]` : '');
+    item.title = name;
+    item.addEventListener('click', () => {
+      setSelectedObject(obj);
+    });
+    container.appendChild(item);
+  });
+}
+
+// ─── Loader ──────────────────────────────────────────────────────────────────
+const loader = new GLTFLoader();
+const draco  = new DRACOLoader();
+draco.setDecoderPath('https://unpkg.com/three@0.160.0/examples/jsm/libs/draco/');
+loader.setDRACOLoader(draco);
+
+function loadFile(file) {
+  currentFileName = file.name.replace(/\.(glb|gltf)$/i, '') + '.glb';
+  document.getElementById('save-filename').value = file.name.replace(/\.(glb|gltf)$/i, '') + '_edited';
+  rawGlbBuffer = null;
+  deselectAll();
+
+  const reader = new FileReader();
+  reader.onload = ev => {
+    rawGlbBuffer = ev.target.result;
+    const url = URL.createObjectURL(file);
+    const bar = document.getElementById('loading-bar');
+    bar.style.transform = 'scaleX(0.1)';
+    bar.style.transition = 'transform 0.3s';
+
+    if (model) { scene.remove(model); model = null; }
+
+    loader.load(url, gltf => {
+      bar.style.transform = 'scaleX(1)';
+      setTimeout(() => { bar.style.transform = 'scaleX(0)'; bar.style.transition = 'transform 0.5s'; }, 400);
+
+      model = gltf.scene;
+
+      const box = new THREE.Box3().setFromObject(model);
+      const size   = box.getSize(new THREE.Vector3());
+      const center = box.getCenter(new THREE.Vector3());
+      const maxDim = Math.max(size.x, size.y, size.z);
+      const scale  = 2 / maxDim;
+      model.scale.setScalar(scale);
+      model.position.set(-center.x * scale, -box.min.y * scale, -center.z * scale);
+
+      model.traverse(node => {
+        if (node.isMesh) {
+          node.castShadow = true;
+          node.receiveShadow = true;
+        }
+      });
+
+      scene.add(model);
+      buildMeshList();
+      updateStats();
+
+      document.getElementById('file-info').textContent = file.name;
+      document.getElementById('drop-overlay').classList.add('hidden');
+      frameFit();
+      URL.revokeObjectURL(url);
+      setStatus('Loaded: ' + file.name);
+    }, xhr => {
+      if (xhr.total) bar.style.transform = `scaleX(${xhr.loaded / xhr.total})`;
+    });
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+function updateStats(target) {
+  // target = specific Object3D to inspect, or null/undefined = whole scene
+  let verts = 0, tris = 0, mats = new Set(), meshes = 0;
+
+  const label    = document.getElementById('stats-label');
+  const nameEl   = document.getElementById('stats-object-name');
+
+  if (target) {
+    label.textContent  = 'Object info';
+    nameEl.textContent = target.name || '(unnamed)';
+    target.traverse(n => {
+      if (n.isMesh) {
+        meshes++;
+        const pos = n.geometry?.attributes?.position;
+        if (pos) verts += pos.count;
+        if (n.geometry?.index) tris += n.geometry.index.count / 3;
+        else if (pos) tris += pos.count / 3;
+        const ms = Array.isArray(n.material) ? n.material : [n.material];
+        ms.forEach(m => mats.add(m.uuid));
+      }
+    });
+  } else {
+    label.textContent  = 'Scene info';
+    nameEl.textContent = '';
+    scene.traverse(n => {
+      if (n.isMesh) {
+        meshes++;
+        const pos = n.geometry?.attributes?.position;
+        if (pos) verts += pos.count;
+        if (n.geometry?.index) tris += n.geometry.index.count / 3;
+        else if (pos) tris += pos.count / 3;
+        const ms = Array.isArray(n.material) ? n.material : [n.material];
+        ms.forEach(m => mats.add(m.uuid));
+      }
+    });
+  }
+  const empty = meshes === 0 && !target;
+  document.getElementById('stats').innerHTML =
+    `Vertices <span>${empty ? '—' : verts.toLocaleString()}</span><br>` +
+    `Triangles <span>${empty ? '—' : Math.round(tris).toLocaleString()}</span><br>` +
+    `Materials <span>${empty ? '—' : mats.size}</span><br>` +
+    `Meshes <span>${empty ? '—' : meshes}</span>`;
+}
+
+// ─── Camera helpers ───────────────────────────────────────────────────────────
+function frameObject(obj) {
+  if (!obj) return;
+  const box = new THREE.Box3().setFromObject(obj);
+  const size   = box.getSize(new THREE.Vector3());
+  const center = box.getCenter(new THREE.Vector3());
+  const maxDim = Math.max(size.x, size.y, size.z) || 1;
+  const fov    = camera.fov * (Math.PI / 180);
+  const dist   = (maxDim / (2 * Math.tan(fov / 2))) * 1.6;
+  camera.position.set(center.x + dist * 0.6, center.y + dist * 0.4, center.z + dist);
+  orbitControls.target.copy(center);
+  orbitControls.update();
+}
+
+window.frameFit = function() {
+  // Frame selected object if one exists, otherwise frame the Bounding Box
+  if (selectedObject) { frameObject(selectedObject); return; }
+  frameObject(boundingBox);
+};
+
+window.resetCamera = function() {
+  camera.position.set(15, 21, 33);
+  orbitControls.target.set(0, 5, 0);
+  camera.fov = 45;
+  camera.updateProjectionMatrix();
+  orbitControls.update();
+  document.getElementById('fov').value = 45;
+  document.getElementById('fov-val').textContent = '45°';
+};
+
+// ─── Wireframe ────────────────────────────────────────────────────────────────
+window.setWireframe = function(val) {
+  wireframeMode = val;
+  scene.traverse(n => {
+    if (n.isMesh && n.material) {
+      const ms = Array.isArray(n.material) ? n.material : [n.material];
+      ms.forEach(m => m.wireframe = val);
+    }
+  });
+  document.getElementById('mode-solid').classList.toggle('active', !val);
+  document.getElementById('mode-wire').classList.toggle('active', val);
+};
+
+// ─── Status helper ────────────────────────────────────────────────────────────
+function setStatus(msg, isErr) {
+  const el = document.getElementById('status');
+  el.textContent = msg;
+  el.className = isErr ? 'err' : '';
+  if (msg) setTimeout(() => { if (el.textContent === msg) el.textContent = ''; }, 3000);
+}
+
+// ─── GLB Save ─────────────────────────────────────────────────────────────────
+// Two strategies:
+//   A) Scene has created primitives → use GLTFExporter for the full scene
+//   B) Loaded GLB only (no created primitives) → surgical JSON-chunk patch
+
+window.saveGLB = function() {
+  const hasPrimitives = createdObjects.size > 0;
+  const hasModel = !!model;
+
+  if (!hasPrimitives && !hasModel) {
+    setStatus('Nothing in scene to save', true);
+    return;
+  }
+
+  const filenameBase = document.getElementById('save-filename').value.trim() || 'scene';
+  const filename = filenameBase.endsWith('.glb') ? filenameBase : filenameBase + '.glb';
+
+  if (hasPrimitives || !rawGlbBuffer) {
+    // ── Strategy A: GLTFExporter (full scene) ──
+    // Build an export group containing model + all primitives
+    const exportGroup = new THREE.Group();
+    exportGroup.name = 'Scene';
+
+    if (model) {
+      // Clone so we don't disturb the live scene
+      const modelClone = model.clone(true);
+      exportGroup.add(modelClone);
+    }
+
+    scene.children.forEach(child => {
+      if (createdObjects.has(child.uuid)) {
+        exportGroup.add(child.clone(true));
+      }
+    });
+
+    const exporter = new GLTFExporter();
+    exporter.parse(
+      exportGroup,
+      glb => {
+        const blob = new Blob([glb], { type: 'model/gltf-binary' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = filename;
+        a.click();
+        URL.revokeObjectURL(a.href);
+        setStatus('Saved: ' + filename);
+        addVersionEntry(filename);
+      },
+      err => {
+        setStatus('Export failed: ' + err, true);
+        console.error(err);
+      },
+      { binary: true }
+    );
+
+  } else {
+    // ── Strategy B: surgical JSON-chunk patch (loaded GLB only) ──
+    try {
+      const dv = new DataView(rawGlbBuffer);
+      const magic   = dv.getUint32(0, true);
+      const version = dv.getUint32(4, true);
+      if (magic !== 0x46546C67) throw new Error('Not a valid GLB file');
+
+      const jsonChunkLen  = dv.getUint32(12, true);
+      const jsonChunkType = dv.getUint32(16, true);
+      if (jsonChunkType !== 0x4E4F534A) throw new Error('Expected JSON chunk');
+
+      const jsonBytes = new Uint8Array(rawGlbBuffer, 20, jsonChunkLen);
+      const json = JSON.parse(new TextDecoder().decode(jsonBytes));
+
+      // Apply transforms from Three.js back to glTF nodes
+      if (json.nodes && Array.isArray(json.nodes)) {
+        const threeByName = {};
+        model.traverse(obj => { if (obj.name) threeByName[obj.name] = obj; });
+
+        json.nodes.forEach(gltfNode => {
+          const obj = gltfNode.name ? threeByName[gltfNode.name] : null;
+          if (!obj) return;
+          delete gltfNode.matrix;
+          const p = obj.position, q = obj.quaternion, s = obj.scale;
+          if (Math.abs(p.x) > 1e-7 || Math.abs(p.y) > 1e-7 || Math.abs(p.z) > 1e-7)
+            gltfNode.translation = [p.x, p.y, p.z];
+          else delete gltfNode.translation;
+          if (Math.abs(q.x) > 1e-7 || Math.abs(q.y) > 1e-7 || Math.abs(q.z) > 1e-7 || Math.abs(q.w - 1) > 1e-7)
+            gltfNode.rotation = [q.x, q.y, q.z, q.w];
+          else delete gltfNode.rotation;
+          if (Math.abs(s.x - 1) > 1e-7 || Math.abs(s.y - 1) > 1e-7 || Math.abs(s.z - 1) > 1e-7)
+            gltfNode.scale = [s.x, s.y, s.z];
+          else delete gltfNode.scale;
+        });
+      }
+
+      // Patch geometry (normals/indices)
+      const jsonChunkStart = 20 + jsonChunkLen;
+      const hasSecondChunk = rawGlbBuffer.byteLength > jsonChunkStart + 8;
+      let binBuffer = null, binChunkStart = 0;
+
+      if (hasSecondChunk) {
+        const binChunkLen = dv.getUint32(jsonChunkStart, true);
+        const binType     = dv.getUint32(jsonChunkStart + 4, true);
+        binChunkStart     = jsonChunkStart + 8;
+        if (binType === 0x004E4942) binBuffer = new Uint8Array(rawGlbBuffer, binChunkStart, binChunkLen);
+      }
+
+      if (binBuffer && json.meshes && json.accessors && json.bufferViews) {
+        model.traverse(threeObj => {
+          if (!threeObj.isMesh || !threeObj.geometry) return;
+          const threeGeo = threeObj.geometry;
+          const meshDef  = json.meshes.find(m => m.name === threeObj.name);
+          if (!meshDef?.primitives) return;
+
+          meshDef.primitives.forEach(prim => {
+            if (prim.indices !== undefined && threeGeo.index) {
+              const acc = json.accessors[prim.indices];
+              if (acc) {
+                const bv  = json.bufferViews[acc.bufferView];
+                const off = (bv.byteOffset || 0) + (acc.byteOffset || 0);
+                const src = threeGeo.index.array;
+                const cs  = src.BYTES_PER_ELEMENT;
+                for (let i = 0; i < src.length; i++) {
+                  const bo = off + i * cs;
+                  if (cs === 4) {
+                    binBuffer[bo]   = src[i] & 0xff;
+                    binBuffer[bo+1] = (src[i] >> 8)  & 0xff;
+                    binBuffer[bo+2] = (src[i] >> 16) & 0xff;
+                    binBuffer[bo+3] = (src[i] >> 24) & 0xff;
+                  } else if (cs === 2) {
+                    binBuffer[bo]   = src[i] & 0xff;
+                    binBuffer[bo+1] = (src[i] >> 8) & 0xff;
+                  } else {
+                    binBuffer[bo] = src[i] & 0xff;
+                  }
+                }
+              }
+            }
+            if (prim.attributes?.NORMAL !== undefined && threeGeo.attributes.normal) {
+              const acc = json.accessors[prim.attributes.NORMAL];
+              if (acc) {
+                const bv  = json.bufferViews[acc.bufferView];
+                const off = (bv.byteOffset || 0) + (acc.byteOffset || 0);
+                const src = threeGeo.attributes.normal.array;
+                const dv2 = new DataView(rawGlbBuffer, binChunkStart + off, src.length * 4);
+                for (let i = 0; i < src.length; i++) dv2.setFloat32(i * 4, src[i], true);
+              }
+            }
+          });
+        });
+      }
+
+      // Re-assemble GLB
+      const newJsonStr   = JSON.stringify(json);
+      const newJsonBytes = new TextEncoder().encode(newJsonStr);
+      const padLen       = (4 - (newJsonBytes.length % 4)) % 4;
+      const paddedLen    = newJsonBytes.length + padLen;
+      const remainderLen = rawGlbBuffer.byteLength - jsonChunkStart;
+      const newTotalLen  = 12 + 8 + paddedLen + remainderLen;
+
+      const out = new ArrayBuffer(newTotalLen);
+      const outView  = new DataView(out);
+      const outBytes = new Uint8Array(out);
+      outView.setUint32(0,  0x46546C67, true);
+      outView.setUint32(4,  version,    true);
+      outView.setUint32(8,  newTotalLen, true);
+      outView.setUint32(12, paddedLen,   true);
+      outView.setUint32(16, 0x4E4F534A, true);
+      outBytes.set(newJsonBytes, 20);
+      for (let i = 0; i < padLen; i++) outBytes[20 + newJsonBytes.length + i] = 0x20;
+      outBytes.set(new Uint8Array(rawGlbBuffer, jsonChunkStart, remainderLen), 20 + paddedLen);
+
+      rawGlbBuffer = out;
+      const blob = new Blob([out], { type: 'model/gltf-binary' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = filename;
+      a.click();
+      URL.revokeObjectURL(a.href);
+      setStatus('Saved: ' + filename);
+      addVersionEntry(filename);
+    } catch(e) {
+      setStatus('Save failed: ' + e.message, true);
+      console.error(e);
+    }
+  }
+};
+
+function addVersionEntry(filename) {
+  const now = new Date();
+  const ts  = now.toLocaleDateString('en-GB', { day:'2-digit', month:'short' })
+            + ' ' + now.toLocaleTimeString('en-GB', { hour:'2-digit', minute:'2-digit' });
+  versionHistory.unshift({ ts, filename });
+  const el = document.getElementById('version-list');
+  el.innerHTML = versionHistory.slice(0, 10).map(v =>
+    `<div class="version-entry"><span class="v-ts">${v.ts}</span> ${v.filename}</div>`
+  ).join('');
+}
+
+// ─── UI bindings ──────────────────────────────────────────────────────────────
+function bindSlider(id, valId, decimals, suffix, cb) {
+  const el = document.getElementById(id);
+  const vEl = document.getElementById(valId);
+  el.addEventListener('input', () => {
+    const v = parseFloat(el.value);
+    vEl.textContent = decimals === 0 ? v + (suffix || '') : v.toFixed(decimals) + (suffix || '');
+    cb(v);
+  });
+}
+
+bindSlider('fov',       'fov-val',      0, '°', v => { camera.fov = v; camera.updateProjectionMatrix(); });
+bindSlider('rot-speed', 'rot-speed-val',1, '',  v => orbitControls.autoRotateSpeed = v);
+bindSlider('exposure',  'exposure-val', 1, '',  v => renderer.toneMappingExposure = v);
+bindSlider('ambient',   'ambient-val',  1, '',  v => ambientLight.intensity = v);
+bindSlider('keylight',  'keylight-val', 1, '',  v => keyLight.intensity = v);
+bindSlider('filllight', 'filllight-val',1, '',  v => fillLight.intensity = v);
+
+document.getElementById('auto-rotate').addEventListener('change', e => orbitControls.autoRotate = e.target.checked);
+document.getElementById('show-grid').addEventListener('change',   e => gridHelper.visible = e.target.checked);
+document.getElementById('light-gizmos').addEventListener('change', e => {
+  const on = e.target.checked;
+  [keyLightHelper, fillLightHelper, rimLightHelper].forEach(h => { h.visible = on; h.update(); });
+});
+document.getElementById('target-visible').addEventListener('change', e => {
+  targetObj.visible = e.target.checked;
+});
+document.getElementById('axis-gizmos').addEventListener('change', e => {
+  const on = e.target.checked;
+  targetAxesHelper.visible = on;
+  flock.forEach(b => { if (b.mesh.axesHelper) b.mesh.axesHelper.visible = on; });
+});
+document.getElementById('bbox-visible').addEventListener('change', e => { boundingBox.visible = e.target.checked; });
+document.getElementById('bbox-height').addEventListener('input', e => {
+  bboxHeight = parseFloat(e.target.value);
+  document.getElementById('bbox-height-val').textContent = bboxHeight;
+  boundingBox.geometry.dispose();
+  boundingBox.geometry = new THREE.BoxGeometry(20, bboxHeight, 20);
+  boundingBox.position.y = bboxHeight / 2;
+});
+document.getElementById('shadows').addEventListener('change', e => {
+  const on = e.target.checked;
+  keyLight.castShadow = on;
+  shadowPlane.material.opacity = on ? 0.25 : 0;
+});
+
+document.querySelectorAll('#bg-swatches .swatch').forEach(s => {
+  s.addEventListener('click', () => {
+    document.querySelectorAll('.swatch').forEach(x => x.classList.remove('active'));
+    s.classList.add('active');
+    scene.background = new THREE.Color(s.dataset.color);
+  });
+});
+
+// ─── File loading ─────────────────────────────────────────────────────────────
+const fileInput = document.getElementById('file-input');
+fileInput.addEventListener('change', e => { if (e.target.files[0]) loadFile(e.target.files[0]); });
+
+wrap.addEventListener('dragover', e => e.preventDefault());
+wrap.addEventListener('drop', e => {
+  e.preventDefault();
+  const file = e.dataTransfer.files[0];
+  if (file && (file.name.endsWith('.glb') || file.name.endsWith('.gltf'))) loadFile(file);
+});
+document.body.addEventListener('dragover', e => e.preventDefault());
+document.body.addEventListener('drop', e => {
+  e.preventDefault();
+  const file = e.dataTransfer.files[0];
+  if (file && (file.name.endsWith('.glb') || file.name.endsWith('.gltf'))) loadFile(file);
+});
+
+// ─── Resize ───────────────────────────────────────────────────────────────────
+function resize() {
+  const w = wrap.clientWidth, h = wrap.clientHeight;
+  renderer.setSize(w, h, false);
+  camera.aspect = w / h;
+  camera.updateProjectionMatrix();
+}
+window.addEventListener('resize', resize);
+resize();
+
+// ─── Flock parameters ────────────────────────────────────────────────────────
+const flockParams = {
+  count:       20,
+  minSpeed:    2.0,
+  maxSpeed:    4.5,
+  turnRate:    2.5,
+  perception:  4.0,
+  separation:  1.7,
+  alignment:   1.0,
+  cohesion:    0.8,
+  seek:        0.4,
+  contain:     false,
+};
+
+// ─── Boid geometry factory (shared geometry + material) ──────────────────────
+// Build the tetrahedron once with X=90° baked in, then clone meshes
+const _boidBaseGeo = (() => {
+  const geo = new THREE.BufferGeometry();
+  const verts = new Float32Array([
+    // front face
+     0,    1,    0,
+    -0.5,  0,    0,
+     0.5,  0,    0,
+    // right face
+     0,    1,    0,
+     0.5,  0,    0,
+     0,    0, -0.5,
+    // left face
+     0,    1,    0,
+     0,    0, -0.5,
+    -0.5,  0,    0,
+    // bottom face
+    -0.5,  0,    0,
+     0,    0, -0.5,
+     0.5,  0,    0,
+  ]);
+  geo.setAttribute('position', new THREE.BufferAttribute(verts, 3));
+  geo.computeVertexNormals();
+  // Bake X=90 rotation so local +Z is forward
+  const tmp = new THREE.Mesh(geo);
+  tmp.rotation.x = Math.PI / 2;
+  tmp.updateMatrix();
+  geo.applyMatrix4(tmp.matrix);
+  return geo;
+})();
+
+const _boidMat = null; // unused — each boid gets its own randomised material (see createBoidMesh)
+
+// ─── Flock state ─────────────────────────────────────────────────────────────
+// Each entry: { mesh, velocity: THREE.Vector3 }
+let flock = [];
+
+function createBoidMesh() {
+  // Random colour between (70,180,235) bright cyan-blue and (40,100,200) deeper blue
+  const t = Math.random();
+  const ri = Math.round(70  + t * (40  - 70));
+  const gi = Math.round(180 + t * (100 - 180));
+  const bi = Math.round(235 + t * (200 - 235));
+  const hex = (ri << 16) | (gi << 8) | bi;
+  const mat = new THREE.MeshLambertMaterial({ color: hex });
+  const mesh = new THREE.Mesh(_boidBaseGeo, mat);
+  mesh.name = 'Boid';
+  mesh.castShadow = true;
+  const ax = new THREE.AxesHelper(1.5);
+  mesh.add(ax);
+  mesh.axesHelper = ax;
+  // Toggle visibility to match current axis-gizmos state
+  ax.visible = document.getElementById('axis-gizmos').checked;
+  return mesh;
+}
+
+function spawnFlock(n) {
+  // Remove existing boids
+  flock.forEach(b => scene.remove(b.mesh));
+  flock = [];
+
+  const hw = 9, hh = bboxHeight * 0.5, hd = 9; // half-extents with margin
+  for (let i = 0; i < n; i++) {
+    const mesh = createBoidMesh();
+    // Random position inside bounding box
+    mesh.position.set(
+      (Math.random() * 2 - 1) * hw,
+      Math.random() * bboxHeight * 0.8 + 0.5,
+      (Math.random() * 2 - 1) * hd
+    );
+    // Random initial forward direction → random velocity
+    const dir = new THREE.Vector3(
+      Math.random() * 2 - 1,
+      (Math.random() * 2 - 1) * 0.3,
+      Math.random() * 2 - 1
+    ).normalize();
+    mesh.quaternion.setFromUnitVectors(new THREE.Vector3(0, 0, 1), dir);
+
+    const vel = dir.clone().multiplyScalar(flockParams.minSpeed);
+    const boidSpeed = flockParams.minSpeed + Math.random() * (flockParams.maxSpeed - flockParams.minSpeed);
+    flock.push({ mesh, velocity: vel, speed: boidSpeed });
+    scene.add(mesh);
+  }
+}
+
+// Initial spawn
+spawnFlock(flockParams.count);
+updateStats();
+
+// ─── Flock steering (Reynolds rules) ─────────────────────────────────────────
+const _sep   = new THREE.Vector3();
+const _ali   = new THREE.Vector3();
+const _coh   = new THREE.Vector3();
+const _seek  = new THREE.Vector3();
+const _steer = new THREE.Vector3();
+const _diff  = new THREE.Vector3();
+const _fwd   = new THREE.Vector3();
+const _tquat = new THREE.Quaternion();
+const _euler = new THREE.Euler();
+
+function steerFlock() {
+  const dt         = 1 / TARGET_FPS;
+  const perception = flockParams.perception;
+  const percSq     = perception * perception;
+  const sepRadius  = perception * 0.45;
+  const sepRadSq   = sepRadius * sepRadius;
+  const turnRad    = THREE.MathUtils.degToRad(flockParams.turnRate);
+
+  const half  = 10;
+  const floor = 0;
+  const ceil  = bboxHeight;
+  const r     = 0.3; // boid collision radius for walls
+
+  for (let i = 0; i < flock.length; i++) {
+    const bi = flock[i];
+    _sep.set(0, 0, 0);
+    _ali.set(0, 0, 0);
+    _coh.set(0, 0, 0);
+    let sepCount = 0, aliCount = 0, cohCount = 0;
+
+    for (let j = 0; j < flock.length; j++) {
+      if (i === j) continue;
+      const bj = flock[j];
+      _diff.subVectors(bi.mesh.position, bj.mesh.position);
+      const dSq = _diff.lengthSq();
+      if (dSq > percSq) continue;
+
+      // Cohesion: steer toward average neighbour position
+      _coh.add(bj.mesh.position);
+      cohCount++;
+
+      // Alignment: steer toward average neighbour velocity
+      _ali.add(bj.velocity);
+      aliCount++;
+
+      // Separation: steer away from too-close neighbours
+      if (dSq < sepRadSq && dSq > 0.0001) {
+        _diff.divideScalar(Math.sqrt(dSq)); // normalise by distance (closer = stronger)
+        _sep.add(_diff);
+        sepCount++;
+      }
+    }
+
+    // Average and scale each force
+    _steer.set(0, 0, 0);
+
+    if (cohCount > 0) {
+      _coh.divideScalar(cohCount).sub(bi.mesh.position).normalize();
+      _steer.addScaledVector(_coh, flockParams.cohesion);
+    }
+    if (aliCount > 0) {
+      _ali.divideScalar(aliCount).normalize();
+      _steer.addScaledVector(_ali, flockParams.alignment);
+    }
+    if (sepCount > 0) {
+      _sep.divideScalar(sepCount).normalize();
+      _steer.addScaledVector(_sep, flockParams.separation);
+    }
+
+    // Target seek: weak attraction toward the bouncing target
+    if (flockParams.seek > 0) {
+      _seek.subVectors(targetObj.position, bi.mesh.position).normalize();
+      _steer.addScaledVector(_seek, flockParams.seek);
+    }
+
+    // Wall avoidance — soft push away from all 6 faces (only when containment is ON)
+    const pos = bi.mesh.position;
+    const wa = 2.0;
+    const near = 3.0;
+    if (flockParams.contain) {
+      if (pos.x >  half - near) _steer.x -= wa * ((pos.x - (half - near)) / near);
+      if (pos.x < -half + near) _steer.x += wa * (((-half + near) - pos.x) / near);
+      if (pos.z >  half - near) _steer.z -= wa * ((pos.z - (half - near)) / near);
+      if (pos.z < -half + near) _steer.z += wa * (((-half + near) - pos.z) / near);
+      if (pos.y <  floor + near) _steer.y += wa * (((floor + near) - pos.y) / near);
+      if (pos.y >  ceil  - near) _steer.y -= wa * ((pos.y - (ceil  - near)) / near);
+    }
+
+    // Derive desired direction from steer vector (if non-zero)
+    if (_steer.lengthSq() > 0.0001) {
+      _steer.normalize();
+
+      // Current forward
+      _fwd.set(0, 0, 1).applyQuaternion(bi.mesh.quaternion);
+
+      // Target quaternion: rotate current forward to desired
+      // Guard against anti-parallel vectors
+      const dot = _fwd.dot(_steer);
+      if (dot < -0.9999) {
+        // 180° flip — rotate around Y
+        _tquat.setFromAxisAngle(new THREE.Vector3(0, 1, 0), Math.PI);
+        _tquat.multiply(bi.mesh.quaternion);
+      } else {
+        const dq = new THREE.Quaternion().setFromUnitVectors(_fwd, _steer);
+        _tquat.copy(dq).multiply(bi.mesh.quaternion);
+      }
+
+      // Slerp toward target at capped turn rate
+      const angle = bi.mesh.quaternion.angleTo(_tquat);
+      const t = angle < 0.0001 ? 1 : Math.min(turnRad / angle, 1);
+      bi.mesh.quaternion.slerp(_tquat, t);
+
+      // Lock roll (Z Euler)
+      _euler.setFromQuaternion(bi.mesh.quaternion, 'YXZ');
+      _euler.z = 0;
+      bi.mesh.quaternion.setFromEuler(_euler);
+    }
+
+    // Update velocity using this boid's personal speed (clamped to current slider range)
+    const speed = Math.max(flockParams.minSpeed, Math.min(flockParams.maxSpeed, bi.speed));
+    _fwd.set(0, 0, 1).applyQuaternion(bi.mesh.quaternion);
+    bi.velocity.copy(_fwd).multiplyScalar(speed);
+
+    // Translate
+    bi.mesh.position.addScaledVector(bi.velocity, dt);
+
+    // Hard clamp to bounds (safety net — only when containment is ON)
+    if (flockParams.contain) {
+      bi.mesh.position.x = Math.max(-half + r, Math.min(half - r, bi.mesh.position.x));
+      bi.mesh.position.y = Math.max(floor + r, Math.min(ceil  - r, bi.mesh.position.y));
+      bi.mesh.position.z = Math.max(-half + r, Math.min(half - r, bi.mesh.position.z));
+    }
+  }
+}
+
+// ─── Panel bindings ───────────────────────────────────────────────────────────
+function bindFlockSlider(id, valId, decimals, key) {
+  const el = document.getElementById(id);
+  const vEl = document.getElementById(valId);
+  el.addEventListener('input', () => {
+    const v = parseFloat(el.value);
+    flockParams[key] = v;
+    vEl.textContent = v.toFixed(decimals);
+    if (key === 'count') { spawnFlock(v); updateStats(); }
+  });
+}
+
+bindFlockSlider('boid-count',     'boid-count-val',     0, 'count');
+bindFlockSlider('boid-speed-min', 'boid-speed-min-val', 1, 'minSpeed');
+bindFlockSlider('boid-speed-max', 'boid-speed-max-val', 1, 'maxSpeed');
+
+// Keep min ≤ max and vice versa
+document.getElementById('boid-speed-min').addEventListener('change', () => {
+  if (flockParams.minSpeed > flockParams.maxSpeed) {
+    flockParams.maxSpeed = flockParams.minSpeed;
+    document.getElementById('boid-speed-max').value = flockParams.minSpeed;
+    document.getElementById('boid-speed-max-val').textContent = flockParams.minSpeed.toFixed(1);
+  }
+});
+document.getElementById('boid-speed-max').addEventListener('change', () => {
+  if (flockParams.maxSpeed < flockParams.minSpeed) {
+    flockParams.minSpeed = flockParams.maxSpeed;
+    document.getElementById('boid-speed-min').value = flockParams.maxSpeed;
+    document.getElementById('boid-speed-min-val').textContent = flockParams.maxSpeed.toFixed(1);
+  }
+});
+bindFlockSlider('boid-turnrate',  'boid-turnrate-val',  1, 'turnRate');
+bindFlockSlider('boid-perception','boid-perception-val',1, 'perception');
+bindFlockSlider('boid-sep',       'boid-sep-val',       2, 'separation');
+bindFlockSlider('boid-ali',       'boid-ali-val',       2, 'alignment');
+bindFlockSlider('boid-coh',       'boid-coh-val',       2, 'cohesion');
+bindFlockSlider('boid-seek',      'boid-seek-val',      2, 'seek');
+document.getElementById('boid-contain').addEventListener('change', e => {
+  flockParams.contain = e.target.checked;
+});
+const TARGET_FPS = 50;
+const FRAME_INTERVAL = 1000 / TARGET_FPS;
+
+let _last = performance.now(), _fpsLast = performance.now(), _frames = 0;
+let targetVelocity = 5.0; // units per second
+
+document.getElementById('target-velocity').addEventListener('input', e => {
+  targetVelocity = parseFloat(e.target.value);
+  document.getElementById('target-velocity-val').textContent = targetVelocity.toFixed(2);
+});
+
+const _localZ = new THREE.Vector3();
+const _normal = new THREE.Vector3();
+
+function bounceTargetObj() {
+  const half  = 10;                  // box half-width/depth (20/2)
+  const floor = 0;                   // box floor Y
+  const ceil  = bboxHeight;          // box ceiling Y
+  const r     = 0.25;                // sphere radius
+
+  const pos = targetObj.position;
+  _localZ.set(0, 0, 1).applyQuaternion(targetObj.quaternion); // current forward
+
+  let bounced = false;
+
+  // ── X walls ──────────────────────────────────────────────────────────────────
+  if (pos.x + r > half) {
+    pos.x = half - r;
+    _normal.set(-1, 0, 0);
+    _localZ.reflect(_normal).normalize();
+    bounced = true;
+  } else if (pos.x - r < -half) {
+    pos.x = -half + r;
+    _normal.set(1, 0, 0);
+    _localZ.reflect(_normal).normalize();
+    bounced = true;
+  }
+
+  // ── Z walls ──────────────────────────────────────────────────────────────────
+  if (pos.z + r > half) {
+    pos.z = half - r;
+    _normal.set(0, 0, -1);
+    _localZ.reflect(_normal).normalize();
+    bounced = true;
+  } else if (pos.z - r < -half) {
+    pos.z = -half + r;
+    _normal.set(0, 0, 1);
+    _localZ.reflect(_normal).normalize();
+    bounced = true;
+  }
+
+  // ── Floor ─────────────────────────────────────────────────────────────────────
+  if (pos.y - r < floor) {
+    pos.y = floor + r;
+    _normal.set(0, 1, 0);
+    _localZ.reflect(_normal).normalize();
+    bounced = true;
+  }
+
+  // ── Ceiling ───────────────────────────────────────────────────────────────────
+  if (pos.y + r > ceil) {
+    pos.y = ceil - r;
+    _normal.set(0, -1, 0);
+    _localZ.reflect(_normal).normalize();
+    bounced = true;
+  }
+
+  // Apply reflected direction as new rotation
+  if (bounced) {
+    const up = new THREE.Vector3(0, 1, 0);
+    const right = new THREE.Vector3().crossVectors(up, _localZ).normalize();
+    if (right.lengthSq() < 0.001) {
+      up.set(1, 0, 0);
+      right.crossVectors(up, _localZ).normalize();
+    }
+    const newUp = new THREE.Vector3().crossVectors(_localZ, right).normalize();
+    const m = new THREE.Matrix4().makeBasis(right, newUp, _localZ);
+    targetObj.quaternion.setFromRotationMatrix(m);
+  }
+}
+
+function animate() {
+  requestAnimationFrame(animate);
+
+  const now = performance.now();
+  if (now - _last < FRAME_INTERVAL) return;
+  _last = now;
+
+  // Move target_Obj along its local Z axis then bounce off Bounding_Box
+  _localZ.set(0, 0, 1).applyQuaternion(targetObj.quaternion);
+  targetObj.position.addScaledVector(_localZ, targetVelocity / TARGET_FPS);
+  bounceTargetObj();
+
+  // Steer flock toward each other and target_Obj
+  steerFlock();
+
+  // Update camera position HUD
+  document.getElementById('hud-rx').textContent = camera.position.x.toFixed(2);
+  document.getElementById('hud-ry').textContent = camera.position.y.toFixed(2);
+  document.getElementById('hud-rz').textContent = camera.position.z.toFixed(2);
+
+  orbitControls.update();
+
+  // Update bounding box helper if selection exists
+  if (selectionBox && selectedObject) selectionBox.update();
+
+  const w = wrap.clientWidth, h = wrap.clientHeight;
+  renderer.setScissorTest(false);
+  renderer.setViewport(0, 0, w, h);
+  renderer.render(scene, camera);
+
+  // Axis gizmo overlay
+  renderer.autoClear = false;
+  renderer.setScissorTest(true);
+  renderer.setScissor(w - GIZMO_SIZE, h - GIZMO_SIZE, GIZMO_SIZE, GIZMO_SIZE);
+  renderer.setViewport(w - GIZMO_SIZE, h - GIZMO_SIZE, GIZMO_SIZE, GIZMO_SIZE);
+  renderer.clearDepth();
+  axisRoot.quaternion.copy(camera.quaternion).invert();
+  renderer.render(axisScene, axisCamera);
+  renderer.setScissorTest(false);
+  renderer.autoClear = true;
+
+  _frames++;
+  if (now - _fpsLast >= 1000) {
+    document.getElementById('fps').textContent = _frames;
+    _frames = 0; _fpsLast = now;
+  }
+}
+animate();
+
+</script>
+
+<script>
+document.querySelectorAll('.accordion-heading').forEach(btn => {
+  btn.addEventListener('click', () => {
+    btn.closest('.accordion').classList.toggle('open');
+  });
+});
+</script>
+</body>
+</html>

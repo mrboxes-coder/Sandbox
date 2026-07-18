@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Frame Extractor</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Barlow:wght@700;800;900&family=Inter:wght@400;500&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0a0a0e;
+    --surface: #13131a;
+    --surface2: #1c1c25;
+    --border: rgba(255,255,255,0.08);
+    --border2: rgba(255,255,255,0.14);
+    --text: #eeedf0;
+    --muted: #7a7a90;
+    --accent: #378ADD;
+    --accent-dim: rgba(55,138,221,0.12);
+    --accent-border: rgba(55,138,221,0.4);
+    --red: #ff5c5c;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 3rem 1.5rem;
+  }
+
+  header {
+    text-align: center;
+    margin-bottom: 3rem;
+  }
+
+  .header-label {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.68rem;
+    font-weight: 500;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 0.75rem;
+  }
+
+  header h1 {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    font-size: 42px;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    line-height: 1.05;
+    color: #f0ede6;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.3em;
+  }
+  header h1 img {
+    height: 0.75em;
+    width: auto;
+  }
+
+  header h1 span {
+    color: #378ADD;
+  }
+
+  header p {
+    margin-top: 0.85rem;
+    font-size: 0.75rem;
+    color: var(--muted);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    font-family: 'Inter', sans-serif;
+  }
+
+  .main {
+    width: 100%;
+    max-width: 860px;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  /* Drop zone */
+  .drop-zone {
+    border: 1px dashed var(--border2);
+    border-radius: 12px;
+    padding: 3.5rem 2rem;
+    text-align: center;
+    cursor: pointer;
+    transition: background 0.2s, border-color 0.2s;
+    position: relative;
+  }
+
+  .drop-zone:hover, .drop-zone.drag-over {
+    background: var(--accent-dim);
+    border-color: var(--accent-border);
+  }
+
+  .drop-zone input[type="file"] {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+    width: 100%;
+    height: 100%;
+  }
+
+  .drop-icon {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    display: block;
+  }
+
+  .drop-zone h2 {
+    font-family: 'Barlow', sans-serif;
+    font-weight: 700;
+    font-size: 1.4rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .drop-zone p {
+    font-size: 0.75rem;
+    color: var(--muted);
+    letter-spacing: 0.05em;
+  }
+
+  /* Video info bar */
+  .video-info {
+    display: none;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1rem 1.25rem;
+    gap: 2rem;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .video-info.visible { display: flex; }
+
+  .info-item { display: flex; flex-direction: column; gap: 3px; }
+  .info-label { font-size: 0.65rem; color: var(--muted); letter-spacing: 0.1em; text-transform: uppercase; }
+  .info-value { font-size: 0.88rem; color: var(--text); }
+
+  .filename {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .filename .info-value {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: var(--accent);
+  }
+
+  /* Video player */
+  video {
+    display: none;
+    width: 100%;
+    border-radius: 10px;
+    background: #000;
+    max-height: 320px;
+    object-fit: contain;
+  }
+
+  video.visible { display: block; }
+
+  /* Frames grid */
+  .frames-section {
+    display: none;
+  }
+
+  .frames-section.visible { display: block; }
+
+  .frames-section h3 {
+    font-family: 'Inter', sans-serif;
+    font-weight: 500;
+    font-size: 0.72rem;
+    color: var(--muted);
+    margin-bottom: 1rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+
+  .frames-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.25rem;
+  }
+
+  @media (max-width: 540px) {
+    .frames-grid { grid-template-columns: 1fr; }
+  }
+
+  .frame-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  .frame-label {
+    padding: 0.6rem 1rem;
+    font-size: 0.7rem;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .frame-label span.badge {
+    background: var(--accent-dim);
+    color: var(--accent);
+    border: 1px solid var(--accent-border);
+    border-radius: 4px;
+    padding: 2px 6px;
+    font-size: 0.62rem;
+    letter-spacing: 0.08em;
+  }
+
+  .frame-preview {
+    position: relative;
+    background: #000;
+    min-height: 160px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .frame-preview canvas {
+    max-width: 100%;
+    max-height: 260px;
+    display: block;
+    object-fit: contain;
+  }
+
+  .frame-dims {
+    position: absolute;
+    bottom: 6px;
+    right: 8px;
+    font-size: 0.62rem;
+    color: rgba(255,255,255,0.5);
+    background: rgba(0,0,0,0.5);
+    padding: 2px 6px;
+    border-radius: 4px;
+    letter-spacing: 0.04em;
+  }
+
+  /* Download controls */
+  .download-section {
+    display: none;
+  }
+
+  .download-section.visible { display: block; }
+
+  .section-header {
+    font-size: 0.7rem;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+  }
+
+  .format-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .fmt-btn {
+    background: var(--surface);
+    border: 1px solid var(--border2);
+    border-radius: 6px;
+    color: var(--muted);
+    font-family: 'Inter', sans-serif;
+    font-size: 0.72rem;
+    padding: 0.45rem 0.9rem;
+    cursor: pointer;
+    letter-spacing: 0.1em;
+    transition: all 0.15s;
+    text-transform: uppercase;
+  }
+
+  .fmt-btn:hover {
+    border-color: var(--accent-border);
+    color: var(--accent);
+    background: var(--accent-dim);
+  }
+
+  .fmt-btn.active {
+    background: var(--accent-dim);
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .quality-row {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+  }
+
+  .quality-row label {
+    font-size: 0.72rem;
+    color: var(--muted);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .quality-row input[type="range"] {
+    flex: 1;
+    min-width: 120px;
+    accent-color: var(--accent);
+    cursor: pointer;
+  }
+
+  .quality-row .q-val {
+    font-size: 0.8rem;
+    color: var(--accent);
+    min-width: 32px;
+    text-align: right;
+  }
+
+  .quality-note {
+    font-size: 0.68rem;
+    color: var(--muted);
+    opacity: 0.6;
+    letter-spacing: 0.04em;
+  }
+
+  .download-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+  }
+
+  @media (max-width: 480px) {
+    .download-actions { grid-template-columns: 1fr; }
+  }
+
+  .dl-btn {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    font-size: 0.72rem;
+    padding: 0.8rem 1rem;
+    cursor: pointer;
+    letter-spacing: 0.05em;
+    transition: all 0.15s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .dl-btn:hover {
+    background: var(--accent-dim);
+    border-color: var(--accent-border);
+    color: var(--accent);
+  }
+
+  .dl-btn .dl-icon { font-size: 1.1rem; }
+  .dl-btn .dl-label { text-transform: uppercase; font-size: 0.65rem; color: var(--muted); letter-spacing: 0.08em; }
+
+  .dl-btn.all {
+    background: var(--accent-dim);
+    border-color: var(--accent);
+    color: var(--accent);
+    grid-column: 1 / -1;
+    flex-direction: row;
+    justify-content: center;
+    gap: 8px;
+    padding: 1rem;
+  }
+
+  .dl-btn.all:hover {
+    background: rgba(200,245,66,0.2);
+  }
+
+  .dl-btn.all .dl-label { color: var(--accent); }
+
+  /* Status */
+  .status-bar {
+    display: none;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    font-size: 0.72rem;
+    color: var(--muted);
+    letter-spacing: 0.04em;
+  }
+
+  .status-bar.visible { display: block; }
+  .status-bar.ok { border-color: var(--accent-border); color: var(--accent); background: var(--accent-dim); }
+  .status-bar.err { border-color: rgba(255,92,92,0.4); color: var(--red); background: rgba(255,92,92,0.08); }
+
+  /* Spinner */
+  .spinner {
+    display: none;
+    width: 16px; height: 16px;
+    border: 2px solid rgba(200,245,66,0.2);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    margin: auto;
+  }
+
+  .spinner.visible { display: block; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .processing-overlay {
+    position: relative;
+    min-height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  hr.divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 0.5rem 0;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <p class="header-label">Browser-Based Video Tool &nbsp;:&nbsp; Chris Shaw</p>
+  <h1><img src="data:image/png;base64,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" alt="logo">Frame <span>Extractor</span></h1>
+  <p>First &amp; Last Frame &nbsp;·&nbsp; Original Dimensions &nbsp;·&nbsp; Multi-Format Export</p>
+</header>
+
+<div class="main">
+
+  <!-- Drop zone -->
+  <div class="drop-zone" id="dropZone">
+    <input type="file" id="fileInput" accept="video/mp4,video/*" />
+    <span class="drop-icon">▶</span>
+    <h2>Drop your video here</h2>
+    <p>MP4, MOV, WebM · or click to browse</p>
+  </div>
+
+  <!-- Video info -->
+  <div class="video-info" id="videoInfo">
+    <div class="info-item filename">
+      <span class="info-label">File</span>
+      <span class="info-value" id="infoName">—</span>
+    </div>
+    <div class="info-item">
+      <span class="info-label">Duration</span>
+      <span class="info-value" id="infoDuration">—</span>
+    </div>
+    <div class="info-item">
+      <span class="info-label">Dimensions</span>
+      <span class="info-value" id="infoDims">—</span>
+    </div>
+    <div class="info-item">
+      <span class="info-label">FPS (est.)</span>
+      <span class="info-value" id="infoFps">—</span>
+    </div>
+  </div>
+
+  <!-- Video preview -->
+  <video id="videoEl" controls playsinline></video>
+
+  <!-- Extracted frames -->
+  <div class="frames-section" id="framesSection">
+    <h3>Extracted Frames</h3>
+    <div class="frames-grid">
+      <div class="frame-card">
+        <div class="frame-label">
+          <span>First Frame</span>
+          <span class="badge" id="badgeFirst">00:00:00</span>
+        </div>
+        <div class="frame-preview processing-overlay" id="previewFirst">
+          <div class="spinner visible" id="spinFirst"></div>
+          <canvas id="canvasFirst" style="display:none;"></canvas>
+          <span class="frame-dims" id="dimsFirst"></span>
+        </div>
+      </div>
+      <div class="frame-card">
+        <div class="frame-label">
+          <span>Last Frame</span>
+          <span class="badge" id="badgeLast">—</span>
+        </div>
+        <div class="frame-preview processing-overlay" id="previewLast">
+          <div class="spinner visible" id="spinLast"></div>
+          <canvas id="canvasLast" style="display:none;"></canvas>
+          <span class="frame-dims" id="dimsLast"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <hr class="divider" id="divider" style="display:none;">
+
+  <!-- Download controls -->
+  <div class="download-section" id="downloadSection">
+    <div class="section-header">Export Format</div>
+    <div class="format-grid" id="formatGrid">
+      <button class="fmt-btn active" data-fmt="image/png" data-ext="png">PNG</button>
+      <button class="fmt-btn" data-fmt="image/jpeg" data-ext="jpg">JPG</button>
+      <button class="fmt-btn" data-fmt="image/webp" data-ext="webp">WebP</button>
+      <button class="fmt-btn" data-fmt="image/bmp" data-ext="bmp">BMP</button>
+    </div>
+
+    <div class="quality-row" id="qualityRow" style="display:none;">
+      <label>Quality</label>
+      <input type="range" id="qualitySlider" min="0.5" max="1.0" step="0.05" value="0.92">
+      <span class="q-val" id="qualityVal">92%</span>
+      <span class="quality-note">(JPG / WebP only)</span>
+    </div>
+
+    <div class="download-actions">
+      <button class="dl-btn" style="flex-direction:row;justify-content:center;gap:8px;" onclick="downloadFrame('first')">
+        <span class="dl-icon">↓</span><span>Download First Frame</span>
+      </button>
+      <button class="dl-btn" style="flex-direction:row;justify-content:center;gap:8px;" onclick="downloadFrame('last')">
+        <span class="dl-icon">↓</span><span>Download Last Frame</span>
+      </button>
+      <button class="dl-btn all" onclick="downloadBoth()">
+        <span class="dl-icon">↓</span>
+        <span>Download Both</span>
+        <span class="dl-label">first + last</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="status-bar" id="statusBar"></div>
+
+</div>
+
+<script>
+const fileInput = document.getElementById('fileInput');
+const dropZone = document.getElementById('dropZone');
+const videoEl = document.getElementById('videoEl');
+const videoInfo = document.getElementById('videoInfo');
+const framesSection = document.getElementById('framesSection');
+const downloadSection = document.getElementById('downloadSection');
+const divider = document.getElementById('divider');
+const statusBar = document.getElementById('statusBar');
+const qualityRow = document.getElementById('qualityRow');
+const qualitySlider = document.getElementById('qualitySlider');
+const qualityVal = document.getElementById('qualityVal');
+
+const firstCanvas = document.getElementById('canvasFirst');
+const lastCanvas = document.getElementById('canvasLast');
+let activeFormat = { mime: 'image/png', ext: 'png' };
+let videoFilename = 'video';
+let framesReady = false;
+let currentObjectURL = null;
+
+// Drag & drop
+dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+dropZone.addEventListener('drop', e => {
+  e.preventDefault();
+  dropZone.classList.remove('drag-over');
+  const file = e.dataTransfer.files[0];
+  if (file && file.type.startsWith('video/')) loadVideo(file);
+  else showStatus('Please drop a valid video file.', 'err');
+});
+
+fileInput.addEventListener('change', () => {
+  if (fileInput.files[0]) loadVideo(fileInput.files[0]);
+});
+
+document.getElementById('formatGrid').addEventListener('click', e => {
+  const btn = e.target.closest('.fmt-btn');
+  if (!btn) return;
+  document.querySelectorAll('.fmt-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  activeFormat = { mime: btn.dataset.fmt, ext: btn.dataset.ext };
+  qualityRow.style.display = ['image/jpeg','image/webp'].includes(activeFormat.mime) ? 'flex' : 'none';
+});
+
+qualitySlider.addEventListener('input', () => {
+  qualityVal.textContent = Math.round(qualitySlider.value * 100) + '%';
+});
+
+function showStatus(msg, type = '') {
+  statusBar.textContent = msg;
+  statusBar.className = 'status-bar visible' + (type ? ' ' + type : '');
+}
+function hideStatus() { statusBar.className = 'status-bar'; }
+
+function formatTimestamp(s) {
+  const h = Math.floor(s / 3600);
+  const m = Math.floor((s % 3600) / 60);
+  const sec = Math.floor(s % 60);
+  const ms = Math.round((s - Math.floor(s)) * 1000);
+  return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}.${String(ms).padStart(3,'0')}`;
+}
+
+function loadVideo(file) {
+  videoFilename = file.name.replace(/\.[^/.]+$/, '');
+
+  if (currentObjectURL) URL.revokeObjectURL(currentObjectURL);
+  currentObjectURL = URL.createObjectURL(file);
+
+  videoInfo.classList.add('visible');
+  videoEl.classList.add('visible');
+  framesSection.classList.add('visible');
+  downloadSection.classList.remove('visible');
+  divider.style.display = 'none';
+  framesReady = false;
+  hideStatus();
+
+  firstCanvas.style.display = 'none';
+  lastCanvas.style.display = 'none';
+  document.getElementById('spinFirst').classList.add('visible');
+  document.getElementById('spinLast').classList.add('visible');
+  document.getElementById('badgeFirst').textContent = '—';
+  document.getElementById('badgeLast').textContent = '—';
+
+  document.getElementById('infoName').textContent = file.name;
+  document.getElementById('infoDuration').textContent = '—';
+  document.getElementById('infoDims').textContent = '—';
+  document.getElementById('infoFps').textContent = '—';
+
+  videoEl.src = currentObjectURL;
+
+  // Step 1: capture first frame using a dedicated video element
+  captureFrame(currentObjectURL, 0, firstCanvas, 'first', (dur, w, h) => {
+    document.getElementById('infoDuration').textContent = formatTimestamp(dur);
+    document.getElementById('infoDims').textContent = `${w} × ${h}`;
+    document.getElementById('infoFps').textContent = '~30';
+
+    // Step 2: only after first frame is done, capture last frame with a fresh element
+    const lastTs = Math.max(0, dur - 0.001);
+    captureFrame(currentObjectURL, lastTs, lastCanvas, 'last', () => {
+      framesReady = true;
+      downloadSection.classList.add('visible');
+      divider.style.display = 'block';
+    });
+  });
+}
+
+// Creates a fresh hidden video element, seeks to `time`, captures to `canvas`, then cleans up
+function captureFrame(src, time, canvas, which, onDone) {
+  const spinId = which === 'first' ? 'spinFirst' : 'spinLast';
+  const badgeId = which === 'first' ? 'badgeFirst' : 'badgeLast';
+  const dimsId = which === 'first' ? 'dimsFirst' : 'dimsLast';
+
+  const vid = document.createElement('video');
+  vid.muted = true;
+  vid.playsInline = true;
+  vid.preload = 'auto';
+  vid.style.display = 'none';
+  document.body.appendChild(vid);
+
+  vid.addEventListener('loadedmetadata', () => {
+    const dur = vid.duration;
+    const w = vid.videoWidth;
+    const h = vid.videoHeight;
+
+    vid.addEventListener('seeked', () => {
+      try {
+        canvas.width = w;
+        canvas.height = h;
+        canvas.getContext('2d').drawImage(vid, 0, 0, w, h);
+        canvas.style.display = 'block';
+        document.getElementById(spinId).classList.remove('visible');
+        document.getElementById(badgeId).textContent = formatTimestamp(vid.currentTime);
+        document.getElementById(dimsId).textContent = `${w} × ${h}`;
+      } catch(e) {
+        document.getElementById(spinId).classList.remove('visible');
+        showStatus('Could not capture frame — try another file.', 'err');
+      }
+      document.body.removeChild(vid);
+      if (onDone) onDone(dur, w, h);
+    }, { once: true });
+
+    vid.currentTime = time;
+  }, { once: true });
+
+  vid.src = src;
+  vid.load();
+}
+
+function getQuality() { return parseFloat(qualitySlider.value); }
+
+function downloadFrame(which) {
+  if (!framesReady) { showStatus('Frames not ready yet.', 'err'); return; }
+  const canvas = which === 'first' ? firstCanvas : lastCanvas;
+  const label = which === 'first' ? 'first-frame' : 'last-frame';
+  triggerDownload(canvas, `${videoFilename}_${label}.${activeFormat.ext}`);
+  showStatus(`Saved ${label}.${activeFormat.ext}`, 'ok');
+  setTimeout(hideStatus, 3000);
+}
+
+function downloadBoth() {
+  if (!framesReady) { showStatus('Frames not ready yet.', 'err'); return; }
+  triggerDownload(firstCanvas, `${videoFilename}_first-frame.${activeFormat.ext}`);
+  setTimeout(() => {
+    triggerDownload(lastCanvas, `${videoFilename}_last-frame.${activeFormat.ext}`);
+    showStatus(`Saved first & last frames as ${activeFormat.ext.toUpperCase()}`, 'ok');
+    setTimeout(hideStatus, 3000);
+  }, 300);
+}
+
+function triggerDownload(canvas, filename) {
+  const quality = getQuality();
+  const useQuality = ['image/jpeg','image/webp'].includes(activeFormat.mime);
+  const dataUrl = canvas.toDataURL(activeFormat.mime, useQuality ? quality : undefined);
+  const a = document.createElement('a');
+  a.href = dataUrl;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+}
+</script>
+</body>
+</html>
