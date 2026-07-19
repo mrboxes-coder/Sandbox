@@ -1,0 +1,582 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Technical Tool UI Style Guide</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #101014;
+      --topbar: #1d1d22;
+      --panel: #1a1a20;
+      --surface: #26272f;
+      --surface-mid: #2c2d35;
+      --border: #343642;
+      --text: #f2f3f7;
+      --muted: #a5abc0;
+      --sub: #b4bad0;
+      --accent: #c4e85c;
+      --accent-light: #dbf295;
+      --accent-fill: #313d11;
+      --danger: #ff3838;
+      --mono: "IBM Plex Mono", "Cascadia Mono", Consolas, monospace;
+      --sans: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      --label-size: 11px;
+      --list-text: #8f96a8;
+      --list-text-size: 13px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      width: 100%;
+      min-height: 100%;
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--sans);
+    }
+
+    body {
+      display: grid;
+      grid-template-rows: auto 1fr;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      min-height: 64px;
+      padding: 12px 18px;
+      border-bottom: 1px solid var(--border);
+      background: var(--topbar);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+    }
+
+    .brand-icon {
+      width: 34px;
+      height: 34px;
+      object-fit: contain;
+      flex: 0 0 auto;
+    }
+
+    h1 {
+      margin: 0;
+      color: var(--text);
+      font-size: 26px;
+      font-weight: 760;
+      letter-spacing: 0;
+      white-space: nowrap;
+    }
+
+    h1 span {
+      color: var(--accent);
+    }
+
+    .subtitle {
+      margin-top: 2px;
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.25;
+    }
+
+    .top-actions,
+    .mode-bar,
+    .button-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    main {
+      display: grid;
+      grid-template-columns: 270px minmax(0, 1fr);
+      min-height: 0;
+    }
+
+    .tool-panel {
+      height: calc(100vh - 64px);
+      overflow: auto;
+      border-right: 1px solid var(--border);
+      background: var(--panel);
+      scrollbar-width: thin;
+      scrollbar-color: var(--accent) var(--bg);
+    }
+
+    .workspace {
+      min-height: calc(100vh - 64px);
+      padding: 18px;
+      background:
+        linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px),
+        #121216;
+      background-size: 28px 28px;
+    }
+
+    .demo-area {
+      display: grid;
+      gap: 18px;
+      max-width: 980px;
+    }
+
+    .section-title {
+      margin: 0 0 8px;
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: var(--label-size);
+      font-weight: 800;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    .demo-card {
+      padding: 14px;
+      border: 1px solid var(--border);
+      background: rgba(26, 26, 32, 0.92);
+    }
+
+    .button,
+    .icon-button,
+    .select,
+    .text-input,
+    .textarea {
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      background: var(--surface);
+      color: var(--sub);
+      font-family: var(--mono);
+      font-size: var(--label-size);
+      font-weight: 700;
+      letter-spacing: 0.08em;
+    }
+
+    .button,
+    .icon-button,
+    .select {
+      min-height: 32px;
+      padding: 0 12px;
+      text-transform: uppercase;
+    }
+
+    .list-item .icon-button {
+      min-height: 36px;
+      min-width: 36px;
+      font-size: 15px;
+      line-height: 1;
+    }
+
+    .button,
+    .icon-button {
+      display: inline-grid;
+      place-items: center;
+      cursor: pointer;
+    }
+
+    .button:hover,
+    .icon-button:hover,
+    .select:hover {
+      border-color: var(--accent);
+      background: var(--accent-fill);
+      color: #fff;
+    }
+
+    .button.active:hover,
+    .mode.active:hover {
+      color: #fff;
+    }
+
+    .button.active,
+    .mode.active {
+      border-color: var(--accent);
+      background: var(--accent-fill);
+      color: var(--accent-light);
+    }
+
+    .button.danger {
+      border-color: var(--danger);
+      color: var(--danger);
+    }
+
+    .button.danger:hover {
+      border-color: var(--danger);
+      background: var(--danger);
+      color: #fff;
+    }
+
+    .button:disabled,
+    .icon-button:disabled {
+      cursor: not-allowed;
+      opacity: 0.45;
+    }
+
+    .mode-bar {
+      gap: 4px;
+    }
+
+    .mode {
+      min-width: 70px;
+      min-height: 32px;
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      background: var(--surface);
+      color: var(--sub);
+      font-family: var(--mono);
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      cursor: pointer;
+    }
+
+    .mode:hover {
+      border-color: var(--accent);
+      color: #fff;
+    }
+
+    .accordion {
+      border-bottom: 1px solid var(--border);
+      padding: 10px;
+    }
+
+    .accordion-heading {
+      width: 100%;
+      min-height: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border: 1px solid transparent;
+      border-radius: 0;
+      background: var(--surface-mid);
+      color: var(--text);
+      font-family: var(--mono);
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      padding: 0 8px;
+    }
+
+    .accordion-heading::after {
+      content: "+";
+      color: var(--accent);
+      font-size: 14px;
+    }
+
+    .accordion.open .accordion-heading::after {
+      content: "-";
+    }
+
+    .accordion-body {
+      display: none;
+      gap: 8px;
+      padding-top: 9px;
+    }
+
+    .accordion.open .accordion-body {
+      display: grid;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 6px;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 5px;
+    }
+
+    .field,
+    .range-field,
+    .check-row {
+      display: grid;
+      gap: 4px;
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .text-input,
+    .textarea,
+    .select {
+      width: 100%;
+      min-width: 0;
+    }
+
+    .text-input {
+      height: 28px;
+      padding: 0 7px;
+    }
+
+    .textarea {
+      min-height: 96px;
+      padding: 7px;
+      resize: vertical;
+      color: var(--list-text);
+      font-family: var(--mono);
+      font-size: var(--list-text-size);
+      line-height: 1.35;
+      text-transform: none;
+      letter-spacing: 0;
+    }
+
+    .range-field {
+      grid-template-columns: minmax(0, 1fr) 42px;
+      align-items: center;
+    }
+
+    .range-field span {
+      grid-column: 1 / -1;
+    }
+
+    .range-field input {
+      min-width: 0;
+      width: 100%;
+      height: 3px;
+      accent-color: var(--accent);
+    }
+
+    .range-field output {
+      justify-self: end;
+      color: var(--sub);
+      font-size: var(--label-size);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .check-row {
+      grid-template-columns: auto 1fr;
+      align-items: center;
+      min-height: 30px;
+      padding: 6px;
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      background: var(--surface);
+      color: var(--sub);
+      font-size: var(--label-size);
+      text-transform: none;
+      letter-spacing: 0.02em;
+    }
+
+    .check-row input {
+      width: 13px;
+      height: 13px;
+      accent-color: var(--accent);
+    }
+
+    .readout {
+      display: grid;
+      gap: 6px;
+      padding: 8px;
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      background: var(--bg);
+      font-family: var(--mono);
+      font-size: var(--label-size);
+    }
+
+    .axis-row {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 6px;
+      color: var(--sub);
+      font-size: var(--label-size);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .axis-row b {
+      color: var(--text);
+    }
+
+    .list-item {
+      display: grid;
+      gap: 9px;
+      padding: 9px;
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      background: var(--surface);
+    }
+
+    .item-heading {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 8px;
+      padding: 7px;
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      background: var(--surface-mid);
+      font-family: var(--mono);
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .item-heading input {
+      min-width: 0;
+      height: 30px;
+      border: 1px solid transparent;
+      background: transparent;
+      color: var(--list-text);
+      font-family: var(--mono);
+      font-size: var(--list-text-size);
+      font-weight: 800;
+    }
+
+    .item-heading input:focus {
+      border-color: var(--accent);
+      outline: none;
+      background: var(--bg);
+    }
+
+    .thumb {
+      height: 110px;
+      display: grid;
+      place-items: center;
+      border: 1px solid var(--border);
+      background: #08090b;
+      color: var(--list-text);
+      font-family: var(--mono);
+      font-size: var(--list-text-size);
+      letter-spacing: 0.08em;
+      text-transform: none;
+    }
+
+    @media (max-width: 760px) {
+      main {
+        grid-template-columns: 1fr;
+      }
+
+      .tool-panel {
+        height: auto;
+        max-height: 52vh;
+        border-right: 0;
+        border-bottom: 1px solid var(--border);
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <img class="brand-icon" src="style-guide-icon.png" alt="" aria-hidden="true">
+      <div>
+        <h1>Project <span>Interface</span></h1>
+        <div class="subtitle">Compact technical UI pattern library</div>
+      </div>
+    </div>
+    <div class="top-actions">
+      <button class="button active">Choose File</button>
+      <button class="button">Preview</button>
+      <button class="button" disabled>Export</button>
+    </div>
+  </header>
+
+  <main>
+    <aside class="tool-panel">
+      <section class="accordion open">
+        <button class="accordion-heading">Bounding Box</button>
+        <div class="accordion-body">
+          <div class="grid-3">
+            <label class="field">X<input class="text-input" value="0.00"></label>
+            <label class="field">Y<input class="text-input" value="0.00"></label>
+            <label class="field">Z<input class="text-input" value="0.00"></label>
+          </div>
+          <label class="range-field">
+            <span>Threshold</span>
+            <input type="range" value="45">
+            <output>0.45</output>
+          </label>
+          <button class="button">Set To Camera</button>
+          <div class="grid-2">
+            <label class="check-row"><input type="checkbox" checked> Enable</label>
+            <label class="check-row"><input type="checkbox"> Show</label>
+          </div>
+        </div>
+      </section>
+
+      <section class="accordion open">
+        <button class="accordion-heading">Camera Data</button>
+        <div class="accordion-body">
+          <div class="readout">
+            <div class="section-title">Position</div>
+            <div class="axis-row"><span><b>X</b> 1.24</span><span><b>Y</b> 0.80</span><span><b>Z</b> -2.10</span></div>
+            <div class="section-title">Rotation</div>
+            <div class="axis-row"><span><b>X</b> 0.0°</span><span><b>Y</b> 42.0°</span><span><b>Z</b> 0.0°</span></div>
+          </div>
+          <button class="button">Set Camera Default</button>
+        </div>
+      </section>
+
+      <section class="accordion">
+        <button class="accordion-heading">Workspace</button>
+      </section>
+    </aside>
+
+    <section class="workspace">
+      <div class="demo-area">
+        <div class="demo-card">
+          <h2 class="section-title">Mode Buttons</h2>
+          <div class="mode-bar">
+            <button class="mode active">Orbit</button>
+            <button class="mode">Walk</button>
+            <button class="mode">Look</button>
+            <button class="mode">Flight</button>
+          </div>
+        </div>
+
+        <div class="demo-card">
+          <h2 class="section-title">Buttons</h2>
+          <div class="button-row">
+            <button class="button active">Primary</button>
+            <button class="button">Secondary</button>
+            <button class="button danger">Delete</button>
+            <button class="icon-button">?</button>
+          </div>
+        </div>
+
+        <div class="demo-card">
+          <h2 class="section-title">List Item</h2>
+          <div class="list-item">
+            <div class="item-heading">
+              <span>1.</span>
+              <input value="Editable Item Title">
+              <button class="icon-button">×</button>
+            </div>
+            <div class="thumb">Thumbnail / Preview Area</div>
+            <div class="button-row">
+              <button class="icon-button">◎</button>
+              <button class="icon-button">↻</button>
+              <button class="icon-button">↑</button>
+              <button class="icon-button">↓</button>
+            </div>
+            <textarea class="textarea">Annotation or note text goes here.</textarea>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+  <script>
+    document.querySelectorAll(".accordion-heading").forEach((heading) => {
+      heading.addEventListener("click", () => {
+        heading.closest(".accordion")?.classList.toggle("open");
+      });
+    });
+  </script>
+</body>
+</html>

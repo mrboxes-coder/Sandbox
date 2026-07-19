@@ -1,0 +1,1710 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mesh Morpher</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&family=DM+Mono:ital,wght@0,300;0,400;1,300;1,400&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #141416;
+    --panel: #1e1e22;
+    --panel2: #28282e;
+    --border: #32323c;
+    --accent: #378ADD;
+    --accent2: #64B5F6;
+    --accent-glow: rgba(55,138,221,0.15);
+    --text: #e8e8ec;
+    --dim: #8888a0;
+    --danger: #ff4444;
+    --mono: 'DM Mono', monospace;
+    --ui: 'DM Sans', sans-serif;
+  }
+
+  body { background:var(--bg); color:var(--text); font-family:var(--ui); font-size:14px; font-weight:400; height:100vh; display:flex; flex-direction:column; overflow:hidden; }
+
+  /* ── Header ── */
+  header { display:flex; align-items:center; justify-content:space-between; padding:10px 20px; border-bottom:1px solid var(--border); background:var(--panel); flex-shrink:0; height:52px; }
+  .logo { display:flex; align-items:center; gap:10px; }
+  .logo-icon { width:28px; height:28px; flex-shrink:0; }
+  .logo-text { font-family:var(--ui); font-weight:700; font-size:24px; letter-spacing:0.04em; }
+  .logo-text .l1 { color:var(--text); }
+  .logo-text .l2 { color:var(--accent); font-weight:700; }
+  .hctrl { display:flex; gap:8px; }
+
+  /* ── Buttons ── */
+  button {
+    font-family:var(--mono); font-size:12px; font-weight:400;
+    letter-spacing:0.08em; padding:5px 16px;
+    border:1px solid var(--border); background:var(--panel2);
+    color:var(--dim); cursor:pointer; text-transform:uppercase;
+    border-radius:2px; transition:all 0.15s;
+  }
+  button:hover:not(:disabled) { border-color:var(--accent); color:var(--text); background:var(--accent-glow); }
+  button.primary { background:var(--accent); color:#fff; border-color:var(--accent); }
+  button.primary:hover { background:#4a9ae8; border-color:#4a9ae8; color:#fff; }
+  button.primary:disabled { background:var(--panel2); color:var(--dim); border-color:var(--border); }
+  button.danger { border-color:var(--danger); color:var(--danger); background:transparent; }
+  button.danger:hover { background:var(--danger); color:#fff; }
+  button:disabled { opacity:0.35; cursor:default; }
+
+  /* ── Mode / method buttons ── */
+  .mode-btn { text-align:left; padding:7px 10px; font-size:13px; font-family:var(--ui); font-weight:500; letter-spacing:0.01em; width:100%; background:var(--panel2); color:var(--dim); border-color:var(--border); }
+  .mode-btn:hover:not(:disabled) { border-color:var(--accent); color:var(--text); background:var(--accent-glow); }
+  .mode-btn.active { background:var(--accent-glow); border-color:var(--accent); color:var(--accent); }
+
+  /* ── Workspace ── */
+  .workspace { display:flex; flex:1; overflow:hidden; }
+
+  /* ── Sidebar ── */
+  .sidebar { width:250px; background:var(--panel); border-left:1px solid var(--border); display:flex; flex-direction:column; flex-shrink:0; gap:0; overflow-y:auto; order:2; }
+  .sidebar::-webkit-scrollbar { width:5px; }
+  .sidebar::-webkit-scrollbar-track { background:var(--bg); }
+  .sidebar::-webkit-scrollbar-thumb { background:var(--border); border-radius:3px; }
+  .sidebar::-webkit-scrollbar-thumb:hover { background:var(--accent); }
+
+  /* ── Collapsible sections ── */
+  details.sb-section { border-bottom:1px solid var(--border); }
+  details.sb-section > summary {
+    list-style:none; cursor:pointer;
+    display:flex; align-items:center; justify-content:space-between;
+    padding:10px 14px;
+    font-family:var(--mono); font-size:11px; font-weight:700;
+    letter-spacing:0.2em; text-transform:uppercase;
+    color:var(--text); background:var(--panel2);
+    user-select:none;
+  }
+  details.sb-section > summary::-webkit-details-marker { display:none; }
+  details.sb-section > summary::after { content:'∧'; font-size:10px; color:var(--dim); transition:transform 0.2s; display:inline-block; }
+  details.sb-section:not([open]) > summary::after { transform:rotate(180deg); }
+  .sb-body { padding:10px 14px; display:flex; flex-direction:column; gap:7px; }
+
+  /* ── Toggle switches ── */
+  .toggle-row { display:flex; align-items:center; justify-content:space-between; gap:8px; font-family:var(--ui); font-size:13px; font-weight:400; color:var(--text); padding:2px 0; }
+  .toggle-label { flex:1; }
+  .toggle { position:relative; display:inline-block; width:38px; height:20px; flex-shrink:0; }
+  .toggle input { opacity:0; width:0; height:0; position:absolute; }
+  .toggle-track {
+    position:absolute; inset:0;
+    background:#333;
+    border-radius:10px;
+    cursor:pointer;
+    transition:background 0.2s;
+    border:1px solid var(--border);
+  }
+  .toggle input:checked + .toggle-track { background:var(--accent); border-color:var(--accent); }
+  .toggle-track::after {
+    content:'';
+    position:absolute;
+    left:2px; top:2px;
+    width:14px; height:14px;
+    background:#fff;
+    border-radius:50%;
+    transition:transform 0.2s;
+    box-shadow:0 1px 3px rgba(0,0,0,0.4);
+  }
+  .toggle input:checked + .toggle-track::after { transform:translateX(18px); }
+
+  /* ── Sliders ── */
+  input[type=range] { accent-color:var(--accent); cursor:pointer; }
+
+  /* ── Misc sidebar elements ── */
+  .infobox { background:rgba(255,255,255,0.03); border:1px solid var(--border); padding:9px; font-size:12px; font-family:var(--ui); line-height:1.7; color:var(--dim); border-radius:2px; }
+  .opt-sub { display:flex; flex-direction:column; gap:5px; padding:4px 0 0; }
+  .opt-sub input[type=text]:focus { outline:none; border-color:var(--accent); }
+  .color-row { display:flex; align-items:center; gap:8px; font-family:var(--ui); font-size:12px; font-weight:300; color:var(--dim); }
+  .color-row input[type=color] { width:28px; height:20px; border:1px solid var(--border); background:none; cursor:pointer; padding:0; border-radius:2px; }
+  .bignum { font-family:var(--mono); font-size:30px; font-weight:400; color:var(--accent); line-height:1; }
+
+  /* ── Canvas area ── */
+  .canvases { flex:1; display:flex; overflow:hidden; padding:16px; gap:14px; align-items:center; justify-content:center; background:var(--bg); }
+  .cpanel { display:flex; flex-direction:column; align-items:center; gap:8px; flex:1; height:100%; min-width:0; }
+  .clabel { font-family:var(--mono); font-size:11px; font-weight:400; letter-spacing:0.12em; text-transform:uppercase; color:var(--text); display:flex; align-items:center; gap:7px; }
+  .dot { width:6px; height:6px; border-radius:50%; }
+  .ds { background:var(--accent); } .de { background:var(--accent2); }
+  .cwrap { position:relative; flex:1; width:100%; display:flex; align-items:center; justify-content:center; border:1px solid var(--border); background:#0a0a0c; overflow:hidden; border-radius:2px; }
+  .cwrap.drag-over { border-color:var(--accent); background:var(--accent-glow); }
+  .cwrap canvas { display:block; }
+  .overlay { position:absolute; top:0; left:0; pointer-events:none; }
+  .hint { position:absolute; display:flex; flex-direction:column; align-items:center; gap:8px; color:var(--dim); pointer-events:none; user-select:none; }
+  .hint .icon { font-size:30px; opacity:0.2; }
+  .hint p { font-family:var(--ui); font-size:12px; font-weight:300; letter-spacing:0.08em; text-transform:uppercase; }
+  .hint.hidden { display:none; }
+  .divider { width:1px; background:var(--border); align-self:stretch; flex-shrink:0; }
+
+  /* ── Status bar ── */
+  .statusbar { height:28px; background:var(--panel); border-top:1px solid var(--border); display:flex; align-items:center; padding:0 16px; gap:20px; flex-shrink:0; font-family:var(--mono); font-size:12px; font-weight:400; color:var(--text); }
+  .si { display:flex; align-items:center; gap:6px; }
+  .sdot { width:5px; height:5px; border-radius:50%; background:var(--dim); }
+  .sdot.ok { background:var(--accent); }
+
+  /* ── Preview modal ── */
+  #prevModal { display:none; position:fixed; inset:0; z-index:200; background:rgba(0,0,0,0.93); flex-direction:column; align-items:center; justify-content:center; gap:12px; }
+  #prevModal.show { display:flex; }
+  .modal-bar { display:flex; align-items:center; gap:12px; font-family:var(--ui); font-size:13px; color:var(--dim); }
+  .modal-bar input[type=range] { width:280px; accent-color:var(--accent); }
+  #prevBox { max-width:88vw; max-height:80vh; border:1px solid var(--border); background:#000; display:flex; align-items:center; justify-content:center; position:relative; overflow:hidden; }
+  #prevCanvas { display:block; max-width:88vw; max-height:80vh; }
+  #prevSpin { position:absolute; font-family:var(--mono); font-size:15px; font-weight:600; color:var(--accent); display:none; }
+  #prevSpin.show { display:block; }
+
+  /* ── Progress modal ── */
+  #progModal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.8); z-index:300; align-items:center; justify-content:center; }
+  #progModal.show { display:flex; }
+  .progbox { background:var(--panel); border:1px solid var(--border); padding:30px 38px; width:370px; display:flex; flex-direction:column; gap:14px; border-radius:2px; }
+  .progtitle { font-family:var(--mono); font-size:13px; font-weight:400; letter-spacing:0.14em; text-transform:uppercase; color:var(--accent); }
+  .progtrack { height:3px; background:var(--border); border-radius:2px; }
+  .progfill { height:100%; background:var(--accent); width:0%; transition:width 0.1s; border-radius:2px; }
+  .proglabel { font-family:var(--ui); font-size:13px; color:var(--dim); }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <svg class="logo-icon" viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M220 40 L90 220 H190 L180 360 L310 180 H210 L220 40Z" stroke="#378ADD" stroke-width="36" stroke-linejoin="round" stroke-linecap="round" fill="none"/>
+    </svg>
+    <div class="logo-text"><span class="l1">Mesh</span><span class="l2">Morph</span></div>
+  </div>
+  <div class="hctrl">
+    <button id="btnRes" onclick="toggleRes()">Half Res</button>
+    <button id="btnPreview">Preview</button>
+    <button class="primary" id="btnExport" disabled>Export MP4</button>
+  </div>
+</header>
+
+<div class="workspace">
+  <div class="canvases">
+    <div class="cpanel">
+      <div class="clabel"><span class="dot ds"></span>Start Image</div>
+      <div class="cwrap" id="wrapStart"
+           ondragover="onDragOver(event,'start')" ondragleave="onDragLeave(event,'start')" ondrop="onDrop(event,'start')">
+        <canvas id="csStart"></canvas>
+        <canvas id="ovStart" class="overlay"></canvas>
+        <div class="hint" id="hintStart"><div class="icon">&#x2B21;</div><p>Drop start image</p></div>
+      </div>
+    </div>
+    <div class="divider"></div>
+    <div class="cpanel">
+      <div class="clabel"><span class="dot de"></span>End Image</div>
+      <div class="cwrap" id="wrapEnd"
+           ondragover="onDragOver(event,'end')" ondragleave="onDragLeave(event,'end')" ondrop="onDrop(event,'end')">
+        <canvas id="csEnd"></canvas>
+        <canvas id="ovEnd" class="overlay"></canvas>
+        <div class="hint" id="hintEnd"><div class="icon">&#x2B21;</div><p>Drop end image</p></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sidebar">
+
+    <details class="sb-section" open>
+      <summary>Mode</summary>
+      <div class="sb-body">
+        <button class="mode-btn active" id="modeAdd"  onclick="setMode('add')">+ Add Nodes</button>
+        <button class="mode-btn"        id="modeMove" onclick="setMode('move')">&#8598; Move Nodes</button>
+        <button class="mode-btn"        id="modeDel"  onclick="setMode('delete')">&#10005; Delete Node</button>
+        <button class="mode-btn danger" onclick="clearAllNodes()" style="margin-top:2px;">&#10005; Clear All Nodes</button>
+      </div>
+    </details>
+
+    <details class="sb-section" open>
+      <summary>Nodes</summary>
+      <div class="sb-body">
+        <div class="bignum" id="nodeCount">0</div>
+      </div>
+    </details>
+
+    <details class="sb-section" open>
+      <summary>Copy Nodes</summary>
+      <div class="sb-body">
+        <button class="mode-btn" onclick="copyStartToEnd()">Start Frame &gt; End Frame</button>
+        <button class="mode-btn" onclick="copyEndToStart()">Start Frame &lt; End Frame</button>
+      </div>
+    </details>
+
+    <details class="sb-section" open>
+      <summary>Morph Method</summary>
+      <div class="sb-body">
+        <button class="mode-btn active" id="methodDelaunay" onclick="setMethod('delaunay')">&#9651; Delaunay</button>
+        <button class="mode-btn"        id="methodTPS"      onclick="setMethod('tps')">&#9675; Thin Plate Spline</button>
+        <button class="mode-btn"        id="methodMLS"      onclick="setMethod('mls')">&#9670; Moving Least Squares</button>
+        <div id="mlsControls" style="display:none;margin-top:4px;">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <input type="range" id="mlsAlpha" min="0.1" max="2.0" step="0.05" value="1.0"
+                   style="flex:1;"
+                   oninput="document.getElementById('mlsAlphaLabel').textContent=parseFloat(this.value).toFixed(2)">
+            <span id="mlsAlphaLabel" style="font-family:var(--mono);font-size:13px;font-weight:400;color:var(--accent);min-width:34px;">1.00</span>
+          </div>
+          <div style="font-family:var(--ui);font-size:11px;color:var(--dim);margin-top:3px;">&#8592; smoother · sharper &#8594;</div>
+        </div>
+      </div>
+    </details>
+
+    <details class="sb-section" open>
+      <summary>Display</summary>
+      <div class="sb-body">
+        <div class="toggle-row">
+          <span class="toggle-label">Show morph overlay</span>
+          <label class="toggle"><input type="checkbox" id="chkShowMorph" checked><span class="toggle-track"></span></label>
+        </div>
+        <div class="toggle-row">
+          <span class="toggle-label">Show morph in export</span>
+          <label class="toggle"><input type="checkbox" id="chkExportMorph"><span class="toggle-track"></span></label>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;margin-top:2px;">
+          <span style="font-family:var(--ui);font-size:13px;font-weight:400;color:var(--text);flex-shrink:0;">Brightness</span>
+          <input type="range" id="overlayBrightness" min="1" max="10" step="0.5" value="3" style="flex:1;"
+                 oninput="document.getElementById('brightnessLabel').textContent=parseFloat(this.value).toFixed(1);drawOverlays()">
+          <span id="brightnessLabel" style="font-family:var(--mono);font-size:13px;font-weight:400;color:var(--accent);min-width:26px;">3.0</span>
+        </div>
+      </div>
+    </details>
+
+    <details class="sb-section" open>
+      <summary>Easing</summary>
+      <div class="sb-body">
+        <button class="mode-btn active" id="easeLinear" onclick="setEase('linear')">&#9135; Linear</button>
+        <button class="mode-btn"        id="easeInOut"  onclick="setEase('inout')">&#9096; Ease In / Out</button>
+        <button class="mode-btn"        id="easeIn"     onclick="setEase('in')">&#8599; Ease In</button>
+        <button class="mode-btn"        id="easeOut"    onclick="setEase('out')">&#8600; Ease Out</button>
+        <button class="mode-btn"        id="easeBounce" onclick="setEase('bounce')">&#8645; Bounce</button>
+      </div>
+    </details>
+
+    <details class="sb-section" open>
+      <summary>Session</summary>
+      <div class="sb-body">
+        <button class="mode-btn" onclick="saveSession()">&#8681; Save Session</button>
+        <button class="mode-btn" onclick="document.getElementById('sessionLoader').click()">&#8679; Load Session</button>
+        <input type="file" id="sessionLoader" accept=".json" style="display:none" onchange="loadSession(this)">
+        <div class="infobox" id="sessionInfo">No session loaded</div>
+      </div>
+    </details>
+
+    <details class="sb-section" open>
+      <summary>Export Duration</summary>
+      <div class="sb-body">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <input type="range" id="durSlider" min="1" max="10" value="5" step="1" style="flex:1;"
+                 oninput="updateDuration(this.value)">
+          <span id="durLabel" style="font-family:var(--mono);font-size:13px;font-weight:400;color:var(--accent);min-width:28px;">5s</span>
+        </div>
+        <div class="infobox" id="exportInfo">60 frames · 12fps · 5sec</div>
+      </div>
+    </details>
+
+    <details class="sb-section" open>
+      <summary>Title Screen</summary>
+      <div class="sb-body">
+        <input type="text" id="titleText" value="MESHMORPH" placeholder="Title text…" maxlength="12"
+               style="font-family:var(--mono);font-size:13px;font-weight:400;background:var(--bg);border:1px solid var(--border);color:var(--text);padding:5px 8px;width:100%;border-radius:2px;">
+        <div class="toggle-row">
+          <span class="toggle-label">2-second title screen</span>
+          <label class="toggle"><input type="checkbox" id="chkTitle"><span class="toggle-track"></span></label>
+        </div>
+        <div class="opt-sub" id="titleOpts" style="display:none;">
+          <div class="color-row">
+            <span>Background</span>
+            <input type="color" id="titleBg" value="#000000">
+          </div>
+          <div class="color-row">
+            <span>Text colour</span>
+            <input type="color" id="titleFg" value="#ffffff">
+          </div>
+        </div>
+      </div>
+    </details>
+
+    <details class="sb-section" open>
+      <summary>Hold Frames</summary>
+      <div class="sb-body">
+        <div class="toggle-row">
+          <span class="toggle-label">Start : 1 - second</span>
+          <label class="toggle"><input type="checkbox" id="chkHoldStart"><span class="toggle-track"></span></label>
+        </div>
+        <div class="toggle-row">
+          <span class="toggle-label">End : 1 - second</span>
+          <label class="toggle"><input type="checkbox" id="chkHoldEnd"><span class="toggle-track"></span></label>
+        </div>
+      </div>
+    </details>
+
+  </div>
+</div>
+
+<div class="statusbar">
+  <div class="si"><div class="sdot" id="sdStart"></div><span id="slStart"></span></div>
+  <div class="si"><div class="sdot" id="sdEnd"></div><span id="slEnd"></span></div>
+  <div class="si"><div class="sdot" id="sdReady"></div><span id="slReady"></span></div>
+</div>
+
+<div id="prevModal">
+  <div class="modal-bar">
+    <span id="prevLabel">t = 0.50 (2.5s)</span>
+    <input type="range" id="prevSlider" min="0" max="100" value="50">
+    <button onclick="closePrev()">&#10005; Close</button>
+  </div>
+  <div id="prevBox">
+    <canvas id="prevCanvas"></canvas>
+    <span id="prevSpin">Rendering&#8230;</span>
+  </div>
+</div>
+
+<div id="progModal">
+  <div class="progbox">
+    <div class="progtitle">Exporting</div>
+    <div class="progtrack"><div class="progfill" id="progFill"></div></div>
+    <div class="proglabel" id="progLabel">Starting&#8230;</div>
+  </div>
+</div>
+
+<script>
+'use strict';
+const FPS=12;
+let DURATION=5;
+let NFRAMES=FPS*DURATION;
+
+function updateDuration(val) {
+  DURATION = parseInt(val);
+  NFRAMES  = FPS * DURATION;
+  document.getElementById('durLabel').textContent = val + 's';
+  document.getElementById('exportInfo').textContent =
+    `${NFRAMES} frames · ${FPS}fps · ${DURATION}sec`;
+}
+
+// ── Title / hold toggles ──────────────────────────────────────────────────────
+document.getElementById('chkTitle').addEventListener('change', e => {
+  document.getElementById('titleOpts').style.display = e.target.checked ? 'block' : 'none';
+});
+document.getElementById('chkShowMorph').addEventListener('change', () => drawOverlays());
+
+// Render a title card canvas at W×H
+function renderTitleFrame(W, H) {
+  const c = document.createElement('canvas');
+  c.width = W; c.height = H;
+  const ctx = c.getContext('2d');
+  ctx.fillStyle = document.getElementById('titleBg').value;
+  ctx.fillRect(0, 0, W, H);
+  ctx.fillStyle = document.getElementById('titleFg').value;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  // Scale font to ~8% of height
+  const fontSize = Math.round(H * 0.08);
+  ctx.font = `bold ${fontSize}px Arial, sans-serif`;
+  ctx.fillText(document.getElementById('titleText').value || 'MESHMORPH', W/2, H/2);
+  return c;
+}
+
+// ── Session save / load ───────────────────────────────────────────────────────
+function saveSession() {
+  if (!S.nodes.length) { alert('No nodes to save.'); return; }
+  const session = {
+    version:    1,
+    ease:       S.ease,
+    method:     S.method,
+    mlsAlpha:   parseFloat(document.getElementById('mlsAlpha').value),
+    duration:   DURATION,
+    holdStart:  document.getElementById('chkHoldStart').checked,
+    holdEnd:    document.getElementById('chkHoldEnd').checked,
+    title: {
+      enabled: document.getElementById('chkTitle').checked,
+      text:    document.getElementById('titleText').value,
+      bg:      document.getElementById('titleBg').value,
+      fg:      document.getElementById('titleFg').value,
+    },
+    startImage: S.startImageName || '(unknown)',
+    endImage:   S.endImageName   || '(unknown)',
+    nodes:      S.nodes.map(n=>({
+      sx: +n.sx.toFixed(6), sy: +n.sy.toFixed(6),
+      ex: +n.ex.toFixed(6), ey: +n.ey.toFixed(6),
+    })),
+  };
+  const json = JSON.stringify(session, null, 2);
+  const blob = new Blob([json], {type:'application/json'});
+  const url  = URL.createObjectURL(blob);
+  Object.assign(document.createElement('a'), {href:url, download:'morph_session.json'}).click();
+  URL.revokeObjectURL(url);
+  document.getElementById('sessionInfo').textContent =
+    `Saved: ${session.nodes.length} nodes`;
+}
+
+function loadSession(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    try {
+      const session = JSON.parse(ev.target.result);
+      if (!session.nodes || !Array.isArray(session.nodes))
+        throw new Error('Invalid session file');
+
+      // Restore nodes
+      S.nodes = session.nodes.map(n=>({sx:n.sx,sy:n.sy,ex:n.ex,ey:n.ey}));
+
+      // Restore ease
+      if (session.ease)   { S.ease = session.ease; setEase(session.ease); }
+      if (session.method) { S.method = session.method; setMethod(session.method); }
+      if (session.mlsAlpha !== undefined) {
+        document.getElementById('mlsAlpha').value = session.mlsAlpha;
+        document.getElementById('mlsAlphaLabel').textContent = parseFloat(session.mlsAlpha).toFixed(2);
+      }
+
+      // Restore duration
+      if (session.duration) {
+        DURATION = session.duration;
+        NFRAMES  = FPS * DURATION;
+        document.getElementById('durSlider').value = DURATION;
+        document.getElementById('durLabel').textContent = DURATION + 's';
+        document.getElementById('exportInfo').textContent =
+          `${NFRAMES} frames · ${FPS}fps · ${DURATION}sec`;
+      }
+
+      // Restore hold settings
+      document.getElementById('chkHoldStart').checked = !!session.holdStart;
+      document.getElementById('chkHoldEnd').checked   = !!session.holdEnd;
+
+      // Restore title settings
+      if (session.title) {
+        const t = session.title;
+        document.getElementById('chkTitle').checked = !!t.enabled;
+        const opts = document.getElementById('titleOpts');
+        opts.style.display = t.enabled ? 'block' : 'none';
+        opts.style.flexDirection = '';
+        if (t.text !== undefined) document.getElementById('titleText').value = t.text;
+        if (t.bg)   document.getElementById('titleBg').value = t.bg;
+        if (t.fg)   document.getElementById('titleFg').value = t.fg;
+      }
+
+      // Update UI
+      updCount();
+      drawOverlays();
+
+      const info = `Loaded: ${S.nodes.length} nodes\nStart: ${session.startImage}\nEnd: ${session.endImage}`;
+      document.getElementById('sessionInfo').textContent = info;
+
+      // Remind user to reload images if not already loaded
+      if (!S.startBaked || !S.endBaked) {
+        alert(`Session loaded — ${S.nodes.length} nodes restored.\n\nPlease re-drop your images:\nStart: ${session.startImage}\nEnd:   ${session.endImage}`);
+      }
+
+    } catch(e) {
+      alert('Failed to load session: ' + e.message);
+    }
+    // Reset file input so same file can be reloaded
+    input.value = '';
+  };
+  reader.readAsText(file);
+}
+
+const S = { startBaked:null, endBaked:null, nodes:[], mode:'add', drag:null, previewFull:false, ease:'linear', method:'delaunay', highlightedNode:-1, zoom:{scale:1, focusX:0.5, focusY:0.5}, panning:false, panStart:null };
+
+const csStart=document.getElementById('csStart');
+const csEnd=document.getElementById('csEnd');
+const ovStart=document.getElementById('ovStart');
+const ovEnd=document.getElementById('ovEnd');
+const ctxS=csStart.getContext('2d');
+const ctxE=csEnd.getContext('2d');
+const ctxOS=ovStart.getContext('2d');
+const ctxOE=ovEnd.getContext('2d');
+const prevModal=document.getElementById('prevModal');
+const prevCanvas=document.getElementById('prevCanvas');
+const prevCtx=prevCanvas.getContext('2d');
+const prevSlider=document.getElementById('prevSlider');
+const prevLabel=document.getElementById('prevLabel');
+const prevSpin=document.getElementById('prevSpin');
+
+// ── Load ──────────────────────────────────────────────────────────────────────
+function loadFile(which, file) {
+  if (!file||!file.type.startsWith('image/')) return;
+  // Store filename for session saving
+  if (which==='start') S.startImageName = file.name;
+  else                 S.endImageName   = file.name;
+  const reader=new FileReader();
+  reader.onload=ev=>{
+    const img=new Image();
+    img.onload=()=>{
+      // Bake into offscreen canvas at natural resolution.
+      // All subsequent rendering uses canvas→canvas drawImage (no CORS taint).
+      const baked=document.createElement('canvas');
+      baked.width=img.naturalWidth; baked.height=img.naturalHeight;
+      baked.getContext('2d').drawImage(img,0,0);
+      if (which==='start') {
+        S.startBaked=baked;
+        fitDraw(csStart,ctxS,baked);
+        document.getElementById('hintStart').classList.add('hidden');
+        document.getElementById('sdStart').classList.add('ok');
+        document.getElementById('slStart').textContent=`Start: ${baked.width}×${baked.height}`;
+      } else {
+        S.endBaked=baked;
+        fitDraw(csEnd,ctxE,baked);
+        document.getElementById('hintEnd').classList.add('hidden');
+        document.getElementById('sdEnd').classList.add('ok');
+        document.getElementById('slEnd').textContent=`End: ${baked.width}×${baked.height}`;
+      }
+      updateReady(); syncOverlays();
+      // Update session info panel
+      const si = document.getElementById('sessionInfo');
+      if (S.startImageName && S.endImageName)
+        si.textContent = `Start: ${S.startImageName}\nEnd: ${S.endImageName}`;
+      else if (S.startImageName)
+        si.textContent = `Start: ${S.startImageName}`;
+    };
+    img.src=ev.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+function fitDraw(canvas,ctx,src) {
+  const wrap=canvas.parentElement;
+  const r=Math.min((wrap.clientWidth-2)/src.width,(wrap.clientHeight-2)/src.height);
+  canvas.width=Math.round(src.width*r); canvas.height=Math.round(src.height*r);
+  canvas.style.width=canvas.width+'px'; canvas.style.height=canvas.height+'px';
+  // Actual drawing handled by redrawBase (zoom-aware)
+}
+
+// ── Zoom helpers ──────────────────────────────────────────────────────────────
+function getZT(canvas) {
+  const tx = canvas.width/2  - S.zoom.focusX * canvas.width  * S.zoom.scale;
+  const ty = canvas.height/2 - S.zoom.focusY * canvas.height * S.zoom.scale;
+  return {tx, ty};
+}
+
+function redrawBase() {
+  for (const [canvas, ctx, baked] of [
+    [csStart, ctxS, S.startBaked],
+    [csEnd,   ctxE, S.endBaked  ],
+  ]) {
+    if (!baked || !canvas.width) continue;
+    const {tx, ty} = getZT(canvas);
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.setTransform(S.zoom.scale, 0, 0, S.zoom.scale, tx, ty);
+    ctx.drawImage(baked, 0, 0, canvas.width, canvas.height);
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+  }
+}
+
+function syncOverlays() {
+  for (const [ov,base] of [[ovStart,csStart],[ovEnd,csEnd]]) {
+    ov.width=base.width; ov.height=base.height;
+    ov.style.width=base.style.width; ov.style.height=base.style.height;
+    ov.style.left=base.offsetLeft+'px'; ov.style.top=base.offsetTop+'px';
+  }
+  redrawBase();
+  drawOverlays();
+}
+
+function updateReady() {
+  const ok=!!(S.startBaked&&S.endBaked);
+  document.getElementById('sdReady').className='sdot'+(ok?' ok':'');
+  document.getElementById('slReady').textContent=ok?'Ready — click start image to add nodes':'Load both images to begin';
+  document.getElementById('btnExport').disabled=!ok;
+}
+
+// ── Drag-drop ─────────────────────────────────────────────────────────────────
+const cap=s=>s[0].toUpperCase()+s.slice(1);
+function onDragOver(e,w){e.preventDefault();document.getElementById('wrap'+cap(w)).classList.add('drag-over');}
+function onDragLeave(e,w){document.getElementById('wrap'+cap(w)).classList.remove('drag-over');}
+function onDrop(e,w){e.preventDefault();onDragLeave(e,w);loadFile(w,e.dataTransfer.files[0]);}
+
+// ── Mode ──────────────────────────────────────────────────────────────────────
+function setMode(m) {
+  S.mode=m;
+  ['Add','Move','Del'].forEach(x=>
+    document.getElementById('mode'+x).classList.toggle('active',x.toLowerCase()===(m==='delete'?'del':m)));
+}
+
+// ── Preview resolution toggle ─────────────────────────────────────────────────
+function toggleRes() {
+  S.previewFull = !S.previewFull;
+  const btn = document.getElementById('btnRes');
+  btn.textContent = S.previewFull ? 'Full Res' : 'Half Res';
+  btn.classList.toggle('primary', S.previewFull);
+}
+
+// ── Easing ────────────────────────────────────────────────────────────────────
+function setEase(e) {
+  S.ease = e;
+  ['Linear','InOut','In','Out','Bounce'].forEach(x =>
+    document.getElementById('ease'+x).classList.toggle('active', x.toLowerCase().replace('/','') === e.replace('-',''))
+  );
+}
+
+// ── Morph method ──────────────────────────────────────────────────────────────
+function setMethod(m) {
+  S.method = m;
+  ['Delaunay','TPS','MLS'].forEach(x =>
+    document.getElementById('method'+x).classList.toggle('active', x.toLowerCase() === m)
+  );
+  document.getElementById('mlsControls').style.display = m === 'mls' ? 'block' : 'none';
+  drawOverlays();
+}
+
+function applyEase(t) {
+  switch(S.ease) {
+    case 'inout':
+      return t < 0.5 ? 4*t*t*t : 1 - Math.pow(-2*t+2, 3)/2;
+    case 'in':
+      return t*t*t;
+    case 'out':
+      return 1 - Math.pow(1-t, 3);
+    case 'bounce': {
+      // Ease out bounce
+      const n1=7.5625, d1=2.75;
+      let bt = 1-t; // apply bounce on the way out
+      if(bt<1/d1)       return 1-(n1*bt*bt);
+      else if(bt<2/d1)  return 1-(n1*(bt-=1.5/d1)*bt+0.75);
+      else if(bt<2.5/d1)return 1-(n1*(bt-=2.25/d1)*bt+0.9375);
+      else              return 1-(n1*(bt-=2.625/d1)*bt+0.984375);
+    }
+    default: return t; // linear
+  }
+}
+
+// ── Coords ────────────────────────────────────────────────────────────────────
+const evXY=(el,e)=>{const r=el.getBoundingClientRect();return{x:e.clientX-r.left,y:e.clientY-r.top};};
+
+// Zoom-aware coordinate helpers
+const toNorm=(cv,x,y)=>{
+  const{tx,ty}=getZT(cv);
+  return{nx:(x-tx)/(cv.width*S.zoom.scale), ny:(y-ty)/(cv.height*S.zoom.scale)};
+};
+const toPx=(cv,nx,ny)=>{
+  const{tx,ty}=getZT(cv);
+  return{x:nx*cv.width*S.zoom.scale+tx, y:ny*cv.height*S.zoom.scale+ty};
+};
+
+// ── Hit test ──────────────────────────────────────────────────────────────────
+function hitNode(canvas,which,x,y) {
+  for(let i=S.nodes.length-1;i>=0;i--){
+    const n=S.nodes[i];
+    const p=toPx(canvas,which==='start'?n.sx:n.ex,which==='start'?n.sy:n.ey);
+    if(Math.hypot(x-p.x,y-p.y)<10) return i;
+  }
+  return -1;
+}
+
+// ── Mouse events ──────────────────────────────────────────────────────────────
+function setupEvents(overlay,canvas,which) {
+  overlay.style.pointerEvents='auto'; overlay.style.cursor='crosshair';
+
+  overlay.addEventListener('mousedown',e=>{
+    // Shift+click = pan mode
+    if(e.shiftKey){
+      S.panning=true;
+      S.panStart={x:e.clientX, y:e.clientY, focusX:S.zoom.focusX, focusY:S.zoom.focusY};
+      overlay.style.cursor='grabbing';
+      e.preventDefault(); return;
+    }
+    if(!S.startBaked||!S.endBaked) return;
+    const{x,y}=evXY(overlay,e);
+    if(S.mode==='add'&&which==='start'){
+      const{nx,ny}=toNorm(canvas,x,y);
+      S.nodes.push({sx:nx,sy:ny,ex:nx,ey:ny});
+      drawOverlays();updCount();
+    } else if(S.mode==='move'){
+      const idx=hitNode(canvas,which,x,y);
+      if(idx>=0){
+        S.drag={idx,which};
+        S.highlightedNode=(which==='start')?idx:-1;
+        drawOverlays();
+      }
+    } else if(S.mode==='delete'){
+      const idx=hitNode(canvas,which,x,y);
+      if(idx>=0){S.nodes.splice(idx,1);drawOverlays();updCount();}
+    }
+  });
+
+  overlay.addEventListener('mousemove',e=>{
+    // Pan
+    if(S.panning){
+      const dx=e.clientX-S.panStart.x;
+      const dy=e.clientY-S.panStart.y;
+      S.zoom.focusX=S.panStart.focusX - dx/(canvas.width *S.zoom.scale);
+      S.zoom.focusY=S.panStart.focusY - dy/(canvas.height*S.zoom.scale);
+      redrawBase(); drawOverlays(); return;
+    }
+    // Node drag
+    if(!S.drag||S.drag.which!==which) return;
+    const{x,y}=evXY(overlay,e);
+    const{nx,ny}=toNorm(canvas,x,y);
+    const n=S.nodes[S.drag.idx];
+    if(which==='start'){n.sx=nx;n.sy=ny;}else{n.ex=nx;n.ey=ny;}
+    drawOverlays();
+  });
+
+  overlay.addEventListener('mouseup',()=>{
+    if(S.panning){S.panning=false; overlay.style.cursor='crosshair'; return;}
+    S.drag=null; S.highlightedNode=-1; drawOverlays();
+  });
+  overlay.addEventListener('mouseleave',()=>{
+    if(S.panning){S.panning=false; overlay.style.cursor='crosshair'; return;}
+    S.drag=null; S.highlightedNode=-1; drawOverlays();
+  });
+
+  // Shift key: show grab cursor
+  overlay.addEventListener('keydown',e=>{ if(e.shiftKey) overlay.style.cursor='grab'; });
+  overlay.addEventListener('keyup',  e=>{ if(!e.shiftKey&&!S.panning) overlay.style.cursor='crosshair'; });
+
+  // Wheel zoom (zoom centred on cursor, both panels linked)
+  overlay.addEventListener('wheel', e=>{
+    e.preventDefault();
+    const{x,y}=evXY(overlay,e);
+    const{tx,ty}=getZT(canvas);
+    // Normalised coords under cursor
+    const curNX=(x-tx)/(canvas.width *S.zoom.scale);
+    const curNY=(y-ty)/(canvas.height*S.zoom.scale);
+    // New scale
+    const factor=e.deltaY<0?1.15:1/1.15;
+    const newScale=Math.max(0.5,Math.min(20,S.zoom.scale*factor));
+    // Adjust focus so the point under the cursor stays fixed
+    S.zoom.focusX=curNX+(canvas.width/2 -x)/(canvas.width *newScale);
+    S.zoom.focusY=curNY+(canvas.height/2-y)/(canvas.height*newScale);
+    S.zoom.scale =newScale;
+    redrawBase(); drawOverlays();
+  },{passive:false});
+}
+setupEvents(ovStart,csStart,'start');
+setupEvents(ovEnd,csEnd,'end');
+
+// ── Overlay drawing ──────────────────────────────────────────────────────────
+function drawOverlays() {
+  drawOv(ctxOS, ovStart, 'start', '#378ADD');
+  drawOv(ctxOE, ovEnd,   'end',   '#64B5F6');
+}
+
+function drawOv(ctx, canvas, which, col) {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  if (!S.nodes.length) return;
+
+  const showMorph = document.getElementById('chkShowMorph').checked;
+  const brightness = parseFloat(document.getElementById('overlayBrightness').value) || 3;
+  // Scale alpha by brightness (capped at ff)
+  const alpha = Math.min(255, Math.round(brightness * 25)).toString(16).padStart(2,'0');
+  const brightCol = col + alpha;
+
+  // Always draw node dots (skip if outside visible area)
+  S.nodes.forEach((n, i) => {
+    const p = toPx(canvas, which==='start'?n.sx:n.ex, which==='start'?n.sy:n.ey);
+    if(p.x<-12||p.x>canvas.width+12||p.y<-12||p.y>canvas.height+12) return;
+    const isHighlighted = (which === 'end' && i === S.highlightedNode);
+    const dotCol = isHighlighted ? '#ffffff' : col;
+    const dotR   = isHighlighted ? 7 : 5;
+    ctx.beginPath(); ctx.arc(p.x, p.y, dotR, 0, Math.PI*2);
+    ctx.fillStyle = dotCol; ctx.fill();
+    if (isHighlighted) {
+      ctx.strokeStyle = '#ffffff88'; ctx.lineWidth = 1.5;
+      ctx.stroke();
+    }
+    ctx.fillStyle = '#000'; ctx.font = `bold ${isHighlighted?9:8}px monospace`;
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText(i+1, p.x, p.y);
+  });
+
+  if (!showMorph) return;
+
+  if (S.method === 'delaunay') {
+    // Draw Delaunay mesh lines
+    const pts  = mkPts(canvas, which);
+    const tris = delaunay(pts);
+    ctx.strokeStyle = brightCol; ctx.lineWidth = 0.5;
+    tris.forEach(([a,b,c]) => {
+      ctx.beginPath();
+      ctx.moveTo(pts[a].x, pts[a].y);
+      ctx.lineTo(pts[b].x, pts[b].y);
+      ctx.lineTo(pts[c].x, pts[c].y);
+      ctx.closePath(); ctx.stroke();
+    });
+  } else {
+    // Draw displacement arrows
+    const ARROW_COL = '#64B5F6' + alpha;
+    S.nodes.forEach(n => {
+      const ps = toPx(canvas, n.sx, n.sy);
+      const pe = toPx(canvas, n.ex, n.ey);
+      const dx = pe.x - ps.x, dy = pe.y - ps.y;
+      const len = Math.hypot(dx, dy);
+      if (len < 2) return;
+      const from = toPx(canvas, which==='start' ? n.sx : n.ex, which==='start' ? n.sy : n.ey);
+      const toLocal = toPx(canvas, which==='start' ? n.ex : n.sx, which==='start' ? n.ey : n.sy);
+      drawArrow(ctx, from, toLocal, ARROW_COL);
+    });
+  }
+}
+
+function drawArrow(ctx, from, to, col) {
+  const dx = to.x - from.x, dy = to.y - from.y;
+  const len = Math.hypot(dx, dy);
+  if (len < 2) return;
+  const ux = dx/len, uy = dy/len;
+  const headLen = Math.min(10, len * 0.4);
+
+  ctx.strokeStyle = col; ctx.fillStyle = col;
+  ctx.lineWidth = 1.5;
+
+  // Line
+  ctx.beginPath();
+  ctx.moveTo(from.x, from.y);
+  ctx.lineTo(to.x, to.y);
+  ctx.stroke();
+
+  // Arrowhead
+  ctx.beginPath();
+  ctx.moveTo(to.x, to.y);
+  ctx.lineTo(to.x - ux*headLen + uy*headLen*0.4, to.y - uy*headLen - ux*headLen*0.4);
+  ctx.lineTo(to.x - ux*headLen - uy*headLen*0.4, to.y - uy*headLen + ux*headLen*0.4);
+  ctx.closePath(); ctx.fill();
+}
+function mkPts(canvas,which){
+  const W=canvas.width,H=canvas.height;
+  return[
+    {x:0,y:0},{x:W,y:0},{x:W,y:H},{x:0,y:H},
+    {x:W/2,y:0},{x:W,y:H/2},{x:W/2,y:H},{x:0,y:H/2},
+    ...S.nodes.map(n=>toPx(canvas,which==='start'?n.sx:n.ex,which==='start'?n.sy:n.ey))
+  ];
+}
+function updCount(){document.getElementById('nodeCount').textContent=S.nodes.length;}
+
+// ── Delaunay ──────────────────────────────────────────────────────────────────
+function delaunay(pts){
+  const n=pts.length;if(n<3)return[];
+  const xs=pts.map(p=>p.x),ys=pts.map(p=>p.y);
+  const d=Math.max(Math.max(...xs)-Math.min(...xs),Math.max(...ys)-Math.min(...ys))*20;
+  const mx=(Math.min(...xs)+Math.max(...xs))/2,my=(Math.min(...ys)+Math.max(...ys))/2;
+  // Super-triangle vertices ordered so inCirc (which needs CCW) works correctly
+  const all=[...pts,{x:mx+d,y:my-d},{x:mx,y:my+d},{x:mx-d,y:my-d}];
+  let tris=[[n,n+1,n+2]];
+  for(let i=0;i<n;i++){
+    const p=all[i],edges=[];
+    tris=tris.filter(t=>{
+      const[a,b,c]=t.map(v=>all[v]);
+      if(inCirc(p,a,b,c)){edges.push([t[0],t[1]],[t[1],t[2]],[t[2],t[0]]);return false;}
+      return true;
+    });
+    edges.filter((e,ei)=>!edges.some((f,fi)=>fi!==ei&&((f[0]===e[0]&&f[1]===e[1])||(f[0]===e[1]&&f[1]===e[0]))))
+         .forEach(e=>tris.push([e[0],e[1],i]));
+  }
+  return tris.filter(t=>!t.some(v=>v>=n));
+}
+function inCirc(p,a,b,c){
+  const ax=a.x-p.x,ay=a.y-p.y,bx=b.x-p.x,by=b.y-p.y,cx=c.x-p.x,cy=c.y-p.y;
+  return ax*(by*(cx*cx+cy*cy)-cy*(bx*bx+by*by))-ay*(bx*(cx*cx+cy*cy)-cx*(bx*bx+by*by))+(ax*ax+ay*ay)*(bx*cy-by*cx)>0;
+}
+
+// ── Render overlay onto an export frame canvas ────────────────────────────────
+function renderOverlayOntoFrame(ctx, W, H, t) {
+  const brightness = parseFloat(document.getElementById('overlayBrightness').value) || 3;
+  const alpha = Math.min(255, Math.round(brightness * 25)).toString(16).padStart(2,'0');
+
+  // Interpolate node positions at time t (matches the morph frame)
+  const iPts = S.nodes.map(n => ({
+    x: (n.sx + (n.ex - n.sx) * t) * W,
+    y: (n.sy + (n.ey - n.sy) * t) * H,
+  }));
+
+  if (S.method === 'delaunay') {
+    const corners = [
+      {x:0,y:0},{x:W,y:0},{x:W,y:H},{x:0,y:H},
+      {x:W/2,y:0},{x:W,y:H/2},{x:W/2,y:H},{x:0,y:H/2},
+    ];
+    const pts = [...corners, ...iPts];
+    const tris = delaunay(pts);
+    ctx.strokeStyle = '#378ADD' + alpha;
+    ctx.lineWidth = Math.max(1, W / 800);
+    tris.forEach(([a,b,c]) => {
+      ctx.beginPath();
+      ctx.moveTo(pts[a].x, pts[a].y);
+      ctx.lineTo(pts[b].x, pts[b].y);
+      ctx.lineTo(pts[c].x, pts[c].y);
+      ctx.closePath(); ctx.stroke();
+    });
+  } else {
+    // Interpolated displacement arrows — arrow length shrinks toward 0 at t=0.5,
+    // showing start→mid direction at t<0.5 and mid→end direction at t>0.5
+    const sPts = S.nodes.map(n => ({x: n.sx*W, y: n.sy*H}));
+    const ePts = S.nodes.map(n => ({x: n.ex*W, y: n.ey*H}));
+    const ARROW_COL = '#64B5F6' + alpha;
+    S.nodes.forEach((n, i) => {
+      const from = iPts[i];
+      // Arrow points from current interpolated position toward end position
+      const to = ePts[i];
+      const len = Math.hypot(to.x - from.x, to.y - from.y);
+      if (len < 2) return;
+      ctx.lineWidth = Math.max(1.5, W / 600);
+      drawArrow(ctx, from, to, ARROW_COL);
+    });
+  }
+
+  // Node dots at interpolated positions
+  iPts.forEach((p, i) => {
+    const r = Math.max(4, W / 200);
+    ctx.beginPath(); ctx.arc(p.x, p.y, r, 0, Math.PI*2);
+    ctx.fillStyle = '#378ADD' + alpha; ctx.fill();
+    ctx.fillStyle = '#000';
+    ctx.font = `bold ${Math.max(8, Math.round(W/120))}px monospace`;
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText(i+1, p.x, p.y);
+  });
+}
+// Solves for TPS weights given source and destination points.
+// Returns a function: (x,y) → {dx,dy} displacement in output space.
+function buildTPS(srcPts, dstPts) {
+  const n = srcPts.length;
+  if (n === 0) return () => ({dx:0, dy:0});
+
+  // Radial basis function: r^2 * log(r^2)
+  const U = (r2) => r2 < 1e-10 ? 0 : r2 * Math.log(r2);
+
+  // Build K matrix (n×n)
+  const K = Array.from({length:n}, (_, i) =>
+    Array.from({length:n}, (_, j) => {
+      const dx = srcPts[i].x - srcPts[j].x;
+      const dy = srcPts[i].y - srcPts[j].y;
+      return U(dx*dx + dy*dy);
+    })
+  );
+
+  // Build system: [K P; P^T 0] * [w; a] = [v; 0]
+  // P = [1, x, y] for each point (n×3)
+  const size = n + 3;
+  const M = Array.from({length:size}, () => new Float64Array(size));
+  for (let i=0; i<n; i++) {
+    for (let j=0; j<n; j++) M[i][j] = K[i][j];
+    M[i][n]   = 1;
+    M[i][n+1] = srcPts[i].x;
+    M[i][n+2] = srcPts[i].y;
+    M[n][i]   = 1;
+    M[n+1][i] = srcPts[i].x;
+    M[n+2][i] = srcPts[i].y;
+  }
+
+  // Solve for x and y displacements separately using Gaussian elimination
+  function solve(rhs) {
+    const A = M.map(row => Float64Array.from(row));
+    const b = Float64Array.from(rhs);
+    for (let col=0; col<size; col++) {
+      // Pivot
+      let maxRow = col;
+      for (let row=col+1; row<size; row++)
+        if (Math.abs(A[row][col]) > Math.abs(A[maxRow][col])) maxRow = row;
+      [A[col], A[maxRow]] = [A[maxRow], A[col]];
+      [b[col], b[maxRow]] = [b[maxRow], b[col]];
+      if (Math.abs(A[col][col]) < 1e-10) continue;
+      for (let row=col+1; row<size; row++) {
+        const f = A[row][col] / A[col][col];
+        for (let k=col; k<size; k++) A[row][k] -= f * A[col][k];
+        b[row] -= f * b[col];
+      }
+    }
+    const x = new Float64Array(size);
+    for (let i=size-1; i>=0; i--) {
+      x[i] = b[i];
+      for (let j=i+1; j<size; j++) x[i] -= A[i][j] * x[j];
+      x[i] /= A[i][i] || 1;
+    }
+    return x;
+  }
+
+  const rhsX = [...dstPts.map(p=>p.x), 0, 0, 0];
+  const rhsY = [...dstPts.map(p=>p.y), 0, 0, 0];
+  const wx = solve(rhsX);
+  const wy = solve(rhsY);
+
+  return (x, y) => {
+    let rx = wx[n] + wx[n+1]*x + wx[n+2]*y;
+    let ry = wy[n] + wy[n+1]*x + wy[n+2]*y;
+    for (let i=0; i<n; i++) {
+      const dx = x - srcPts[i].x, dy = y - srcPts[i].y;
+      const u = U(dx*dx + dy*dy);
+      rx += wx[i] * u;
+      ry += wy[i] * u;
+    }
+    return {x: rx, y: ry};
+  };
+}
+
+// ── MLS warp ──────────────────────────────────────────────────────────────────
+// Returns a function: (x,y) → {x,y} mapped output position
+function buildMLS(srcPts, dstPts) {
+  const n = srcPts.length;
+  if (n === 0) return (x,y) => ({x,y});
+  const alpha = parseFloat(document.getElementById('mlsAlpha').value) || 1.0;
+
+  return (x, y) => {
+    // Compute weights w_i = 1 / |p_i - v|^(2*alpha)
+    const w = srcPts.map(p => {
+      const d2 = (x-p.x)*(x-p.x) + (y-p.y)*(y-p.y);
+      if (d2 < 1e-6) return 1e10; // snap to node
+      return 1 / Math.pow(d2, alpha);
+    });
+
+    // Check for snap case
+    for (let i=0; i<n; i++) {
+      if (w[i] >= 1e9) return {x: dstPts[i].x, y: dstPts[i].y};
+    }
+
+    const wSum = w.reduce((a,b)=>a+b, 0);
+
+    // Weighted centroids of src and dst
+    let pStarX=0, pStarY=0, qStarX=0, qStarY=0;
+    for (let i=0; i<n; i++) {
+      pStarX += w[i]*srcPts[i].x; pStarY += w[i]*srcPts[i].y;
+      qStarX += w[i]*dstPts[i].x; qStarY += w[i]*dstPts[i].y;
+    }
+    pStarX/=wSum; pStarY/=wSum;
+    qStarX/=wSum; qStarY/=wSum;
+
+    // Compute MLS affine matrix M = (sum w_i * ph_i^T * ph_i)^-1 * (sum w_i * ph_i^T * qh_i)
+    // where ph_i = p_i - p*, qh_i = q_i - q*
+    let A=0, B=0, C=0, D=0, Ex=0, Ey=0;
+    for (let i=0; i<n; i++) {
+      const phx = srcPts[i].x - pStarX, phy = srcPts[i].y - pStarY;
+      const qhx = dstPts[i].x - qStarX, qhy = dstPts[i].y - qStarY;
+      A  += w[i]*phx*phx;
+      B  += w[i]*phx*phy;
+      C  += w[i]*phy*phy;
+      Ex += w[i]*(phx*qhx + phy*qhy);
+      Ey += w[i]*(phx*qhy - phy*qhx);
+    }
+    // A=M00, B=M01=M10, C=M11 (symmetric)
+    const det = A*C - B*B || 1;
+    const M00 = (C*Ex - B*Ey)/det;
+    const M01 = (-B*Ex + A*Ey)/det;
+
+    // Map query point through affine
+    const vx = x - pStarX, vy = y - pStarY;
+    return {
+      x: M00*vx - M01*vy + qStarX,
+      y: M01*vx + M00*vy + qStarY,
+    };
+  };
+}
+
+// ── Grid-based warp (for TPS and MLS) ────────────────────────────────────────
+// Computes a displacement field on a coarse grid, then applies it via bilinear
+// interpolation — much faster than per-pixel computation.
+function renderFrameGridWarp(t, W, H, warpFn) {
+  const out = document.createElement('canvas');
+  out.width=W; out.height=H;
+  const ctx = out.getContext('2d');
+
+  if (!S.nodes.length) {
+    ctx.drawImage(S.startBaked, 0, 0, W, H);
+    ctx.globalAlpha = t; ctx.drawImage(S.endBaked, 0, 0, W, H); ctx.globalAlpha=1;
+    return out;
+  }
+
+  // Build displacement grids at coarse resolution
+  const GRID = 32;
+  const gw = GRID+1, gh = GRID+1;
+  const sField = new Float32Array(gw*gh*2); // source lookup per grid cell
+  const eField = new Float32Array(gw*gh*2); // end lookup per grid cell
+
+  // Node positions in output space
+  const sPts = S.nodes.map(n=>({x:n.sx*W, y:n.sy*H}));
+  const ePts = S.nodes.map(n=>({x:n.ex*W, y:n.ey*H}));
+  // Interpolated positions at time t
+  const mPts = sPts.map((p,i)=>({x:p.x+(ePts[i].x-p.x)*t, y:p.y+(ePts[i].y-p.y)*t}));
+
+  // Build two warp functions: one mapping mid→start, one mapping mid→end
+  const warpS = warpFn(mPts, sPts); // mid mesh → start image
+  const warpE = warpFn(mPts, ePts); // mid mesh → end image
+
+  for (let gy=0; gy<=GRID; gy++) {
+    for (let gx=0; gx<=GRID; gx++) {
+      const px = gx/GRID*W, py = gy/GRID*H;
+      const rs = warpS(px, py);
+      const re = warpE(px, py);
+      const idx = (gy*gw+gx)*2;
+      sField[idx]   = rs.x; sField[idx+1] = rs.y;
+      eField[idx]   = re.x; eField[idx+1] = re.y;
+    }
+  }
+
+  // Render using grid — draw each grid cell quad
+  const cA = document.createElement('canvas'); cA.width=W; cA.height=H;
+  const cB = document.createElement('canvas'); cB.width=W; cB.height=H;
+  const ctxA = cA.getContext('2d'), ctxB = cB.getContext('2d');
+
+  for (let gy=0; gy<GRID; gy++) {
+    for (let gx=0; gx<GRID; gx++) {
+      warpQuad(S.startBaked, ctxA, sField, gx, gy, gw, GRID, W, H);
+      warpQuad(S.endBaked,   ctxB, eField, gx, gy, gw, GRID, W, H);
+    }
+  }
+
+  ctx.drawImage(cA,0,0);
+  ctx.globalAlpha=t; ctx.drawImage(cB,0,0); ctx.globalAlpha=1;
+  return out;
+}
+
+// Draw one grid quad from src canvas onto dst context using two triangles
+function warpQuad(srcCanvas, dstCtx, field, gx, gy, gw, GRID, W, H) {
+  // Grid cell corners in output space
+  const cx0=gx/GRID*W, cy0=gy/GRID*H;
+  const cx1=(gx+1)/GRID*W, cy1=(gy+1)/GRID*H;
+
+  // Source positions from field
+  const idx00=(gy*gw+gx)*2,    idx10=(gy*gw+gx+1)*2;
+  const idx01=((gy+1)*gw+gx)*2, idx11=((gy+1)*gw+gx+1)*2;
+
+  const s00={x:field[idx00],  y:field[idx00+1]};
+  const s10={x:field[idx10],  y:field[idx10+1]};
+  const s01={x:field[idx01],  y:field[idx01+1]};
+  const s11={x:field[idx11],  y:field[idx11+1]};
+
+  const d00={x:cx0,y:cy0}, d10={x:cx1,y:cy0};
+  const d01={x:cx0,y:cy1}, d11={x:cx1,y:cy1};
+
+  // Two triangles per quad
+  warpTri(srcCanvas, dstCtx, [s00,s10,s01], [d00,d10,d01], W, H);
+  warpTri(srcCanvas, dstCtx, [s10,s11,s01], [d10,d11,d01], W, H);
+}
+// srcCanvas: baked HTMLCanvasElement at NATURAL resolution (srcW × srcH)
+// dstCtx:    destination context at OUTPUT resolution (W × H)
+// srcTri:    triangle in OUTPUT space — where to SAMPLE FROM (scaled to W×H)
+// dstTri:    triangle in OUTPUT space — where to DRAW TO
+// W, H:      output frame dimensions
+//
+// The key insight: srcTri and dstTri are BOTH in output (W×H) space.
+// We first scale srcCanvas to W×H on a scratch canvas, then apply the
+// affine transform (which maps srcTri → dstTri in output space), then
+// mask to dstTri using destination-in compositing (avoids clip() taint bug).
+//
+function warpTri(srcCanvas, dstCtx, srcTri, dstTri, W, H) {
+  const [s0,s1,s2]=srcTri, [d0,d1,d2]=dstTri;
+
+  // Affine transform: maps src points → dst points (both in output space)
+  const det=(s1.x-s0.x)*(s2.y-s0.y)-(s2.x-s0.x)*(s1.y-s0.y);
+  if(Math.abs(det)<1e-8) return;
+  const a=((d1.x-d0.x)*(s2.y-s0.y)-(d2.x-d0.x)*(s1.y-s0.y))/det;
+  const b=((d1.y-d0.y)*(s2.y-s0.y)-(d2.y-d0.y)*(s1.y-s0.y))/det;
+  const c=((d2.x-d0.x)*(s1.x-s0.x)-(d1.x-d0.x)*(s2.x-s0.x))/det;
+  const d=((d2.y-d0.y)*(s1.x-s0.x)-(d1.y-d0.y)*(s2.x-s0.x))/det;
+  const e=d0.x-a*s0.x-c*s0.y;
+  const f=d0.y-b*s0.x-d*s0.y;
+
+  // Expand each triangle vertex outward from centroid by 1.5px
+  // This makes adjacent triangles overlap slightly, eliminating seam lines
+  const cx=(d0.x+d1.x+d2.x)/3, cy=(d0.y+d1.y+d2.y)/3;
+  const exp=1.5;
+  const expand=p=>{
+    const dx=p.x-cx, dy=p.y-cy;
+    const len=Math.hypot(dx,dy)||1;
+    return {x:p.x+dx/len*exp, y:p.y+dy/len*exp};
+  };
+  const e0=expand(d0), e1=expand(d1), e2=expand(d2);
+
+  // Scratch canvas at output dimensions
+  const scratch=document.createElement('canvas');
+  scratch.width=W; scratch.height=H;
+  const sc=scratch.getContext('2d');
+
+  // Step 1: draw srcCanvas scaled to output size, apply affine transform
+  sc.transform(a,b,c,d,e,f);
+  sc.drawImage(srcCanvas, 0, 0, W, H);
+  sc.setTransform(1,0,0,1,0,0);
+
+  // Step 2: mask to expanded destination triangle
+  sc.globalCompositeOperation='destination-in';
+  sc.fillStyle='#fff';
+  sc.beginPath();
+  sc.moveTo(e0.x,e0.y); sc.lineTo(e1.x,e1.y); sc.lineTo(e2.x,e2.y);
+  sc.closePath();
+  sc.fill();
+
+  // Step 3: composite masked scratch onto destination
+  dstCtx.drawImage(scratch,0,0);
+}
+
+// ── Frame renderer ────────────────────────────────────────────────────────────
+function renderFrame(t, W, H) {
+  t = applyEase(t);
+
+  // Dispatch to correct warp method
+  if (S.method === 'tps')      return renderFrameGridWarp(t, W, H, buildTPS);
+  if (S.method === 'mls')      return renderFrameGridWarp(t, W, H, buildMLS);
+  return renderFrameDelaunay(t, W, H); // default: delaunay
+}
+
+function renderFrameDelaunay(t, W, H) {
+
+  const out=document.createElement('canvas');
+  out.width=W; out.height=H;
+  const ctx=out.getContext('2d');
+
+  // Crossfade only (no nodes)
+  if(!S.nodes.length){
+    ctx.drawImage(S.startBaked,0,0,W,H);
+    ctx.globalAlpha=t;
+    ctx.drawImage(S.endBaked,0,0,W,H);
+    ctx.globalAlpha=1;
+    return out;
+  }
+
+  // Corner anchors in output space — these never move
+  const corners=[
+    {x:0,y:0},{x:W,y:0},{x:W,y:H},{x:0,y:H},
+    {x:W/2,y:0},{x:W,y:H/2},{x:W/2,y:H},{x:0,y:H/2},
+  ];
+
+  // Node positions in output space for start, end, and interpolated mid
+  const sPts=[...corners,...S.nodes.map(n=>({x:n.sx*W,y:n.sy*H}))];
+  const ePts=[...corners,...S.nodes.map(n=>({x:n.ex*W,y:n.ey*H}))];
+  const mPts=sPts.map((p,i)=>({
+    x:p.x+(ePts[i].x-p.x)*t,
+    y:p.y+(ePts[i].y-p.y)*t,
+  }));
+
+  // Triangulate on the interpolated mesh
+  const tris=delaunay(mPts);
+
+  // Warp start image: each src triangle (start position) → dst triangle (mid position)
+  const cA=document.createElement('canvas'); cA.width=W; cA.height=H;
+  const ctxA=cA.getContext('2d');
+
+  // Warp end image: each src triangle (end position) → dst triangle (mid position)
+  const cB=document.createElement('canvas'); cB.width=W; cB.height=H;
+  const ctxB=cB.getContext('2d');
+
+  tris.forEach(([i,j,k])=>{
+    warpTri(S.startBaked, ctxA, [sPts[i],sPts[j],sPts[k]], [mPts[i],mPts[j],mPts[k]], W, H);
+    warpTri(S.endBaked,   ctxB, [ePts[i],ePts[j],ePts[k]], [mPts[i],mPts[j],mPts[k]], W, H);
+  });
+
+  // Cross-dissolve: start layer (1-t) + end layer (t)
+  ctx.drawImage(cA,0,0);
+  ctx.globalAlpha=t;
+  ctx.drawImage(cB,0,0);
+  ctx.globalAlpha=1;
+  return out;
+}
+
+// ── Preview ───────────────────────────────────────────────────────────────────
+let prevPending=false;
+
+function showPreview(t){
+  if(!S.startBaked||!S.endBaked) return;
+  prevModal.classList.add('show');
+  prevSpin.classList.add('show');
+  prevLabel.textContent=`t = ${t.toFixed(2)}  (${(t*DURATION).toFixed(1)}s)`;
+
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{
+    const divisor = S.previewFull ? 1 : 2;
+    const W=Math.round(S.startBaked.width/divisor);
+    const H=Math.round(S.startBaked.height/divisor);
+    console.log(`[Preview] ${W}×${H} t=${t.toFixed(2)} nodes=${S.nodes.length}`);
+
+    const frame=renderFrame(t,W,H);
+    const px=frame.getContext('2d').getImageData(Math.floor(W/2),Math.floor(H/2),1,1).data;
+    console.log(`[Preview] centre: ${px[0]},${px[1]},${px[2]},${px[3]}`);
+
+    prevCanvas.width=W; prevCanvas.height=H;
+    prevCtx.drawImage(frame,0,0);
+    prevSpin.classList.remove('show');
+    prevPending=false;
+  }));
+}
+
+function closePrev(){prevModal.classList.remove('show');}
+
+document.getElementById('btnPreview').addEventListener('click',()=>showPreview(prevSlider.value/100));
+prevSlider.addEventListener('input',()=>{
+  if(prevPending) return;
+  prevPending=true;
+  showPreview(prevSlider.value/100);
+});
+prevModal.addEventListener('click',e=>{if(e.target===prevModal)closePrev();});
+
+// ── Clear ─────────────────────────────────────────────────────────────────────
+// ── Spacebar: reset zoom ──────────────────────────────────────────────────────
+document.addEventListener('keydown', e => {
+  if(e.code==='Space' && document.activeElement.tagName!=='INPUT') {
+    e.preventDefault();
+    S.zoom = {scale:1, focusX:0.5, focusY:0.5};
+    redrawBase();
+    drawOverlays();
+  }
+});
+
+function clearAllNodes(){S.nodes=[];drawOverlays();updCount();}
+
+// ── Copy Nodes ────────────────────────────────────────────────────────────────
+function copyStartToEnd() {
+  if (!S.startBaked) { alert('No start image loaded.'); return; }
+  // Copy start image to end
+  S.endBaked     = S.startBaked;
+  S.endImageName = S.startImageName;
+  fitDraw(csEnd, ctxE, S.endBaked);
+  document.getElementById('hintEnd').classList.add('hidden');
+  document.getElementById('sdEnd').classList.add('ok');
+  document.getElementById('slEnd').textContent = `End: ${S.endBaked.width}×${S.endBaked.height}`;
+  // Copy start node positions to end node positions
+  S.nodes.forEach(n => { n.ex = n.sx; n.ey = n.sy; });
+  updateReady();
+  syncOverlays();
+}
+
+function copyEndToStart() {
+  if (!S.endBaked) { alert('No end image loaded.'); return; }
+  // Copy end image to start
+  S.startBaked     = S.endBaked;
+  S.startImageName = S.endImageName;
+  fitDraw(csStart, ctxS, S.startBaked);
+  document.getElementById('hintStart').classList.add('hidden');
+  document.getElementById('sdStart').classList.add('ok');
+  document.getElementById('slStart').textContent = `Start: ${S.startBaked.width}×${S.startBaked.height}`;
+  // Copy end node positions to start node positions
+  S.nodes.forEach(n => { n.sx = n.ex; n.sy = n.ey; });
+  updateReady();
+  syncOverlays();
+}
+
+// ── Export ────────────────────────────────────────────────────────────────────
+// ── Pure-JS MP4 writer ────────────────────────────────────────────────────────
+// Writes an MP4 container from encoded video chunks (AVC/H.264).
+// Uses the browser's built-in VideoEncoder API (Chrome 94+, no external deps).
+
+const MP4 = (() => {
+  const u8  = v => [v & 0xff];
+  const u16 = v => [(v>>8)&0xff, v&0xff];
+  const u32 = v => [(v>>>24)&0xff,(v>>>16)&0xff,(v>>>8)&0xff,v&0xff];
+  const str = s => [...s].map(c=>c.charCodeAt(0));
+  const flat = a => { const o=[]; const w=x=>{Array.isArray(x)?x.forEach(w):o.push(x);}; w(a); return o; };
+
+  const box = (type,...p) => { const b=flat(p); const s=8+b.length; return [...u32(s),...str(type),...b]; };
+  const full = (type,ver,fl,...p) => box(type,ver,...u32(fl).slice(1),...flat(p));
+
+  function build(chunks, sps, pps, fps, width, height) {
+    // chunks: [{data:Uint8Array, isKey:bool}]
+    const timescale = 90000;
+    const frameDur  = Math.round(timescale / fps);
+    const totalDur  = chunks.length * frameDur;
+    const W=width, H=height;
+
+    // Compute mdat payload
+    // Each sample: 4-byte length prefix + NAL data (AVC1 format)
+    const samples = chunks.map(c => {
+      // VideoEncoder gives Annex B (starts with 00 00 00 01)
+      // Convert to AVCC (4-byte length prefix)
+      let src = c.data;
+      // Strip Annex B start codes and re-prefix with 4-byte length
+      const nals = [];
+      let i = 0;
+      while (i < src.length) {
+        // Find next start code
+        let next = src.length;
+        for (let j = i+4; j < src.length-3; j++) {
+          if (src[j]===0&&src[j+1]===0&&src[j+2]===0&&src[j+3]===1) { next=j; break; }
+          if (src[j]===0&&src[j+1]===0&&src[j+2]===1) { next=j; break; }
+        }
+        // Skip start code
+        let start = i;
+        if (src[start]===0&&src[start+1]===0&&src[start+2]===0&&src[start+3]===1) start+=4;
+        else if (src[start]===0&&src[start+1]===0&&src[start+2]===1) start+=3;
+        const nal = src.slice(start, next);
+        if (nal.length > 0) nals.push(nal);
+        i = next;
+        if (i < src.length && src[i]===0&&src[i+1]===0&&src[i+2]===0&&src[i+3]===1) i+=4;
+        else if (i < src.length && src[i]===0&&src[i+1]===0&&src[i+2]===1) i+=3;
+      }
+      const avcc = flat(nals.map(n=>[...u32(n.length),...Array.from(n)]));
+      return { data: new Uint8Array(avcc), isKey: c.isKey };
+    });
+
+    const mdatData = flat(samples.map(s=>Array.from(s.data)));
+    const mdatSize = 8 + mdatData.length;
+
+    // Build avcC box (decoder config)
+    const avcC = box('avcC',
+      0x01,           // configurationVersion
+      sps[1],sps[2],sps[3], // profile, compatibility, level
+      0xff,           // lengthSizeMinusOne = 3 (4-byte lengths)
+      0xe1,           // numSPS = 1
+      ...u16(sps.length), ...Array.from(sps),
+      0x01,           // numPPS = 1
+      ...u16(pps.length), ...Array.from(pps)
+    );
+
+    const avc1 = box('avc1',
+      0,0,0,0,0,0,    // reserved (6 bytes)
+      ...u16(1),      // data reference index
+      0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, // reserved
+      ...u16(W),...u16(H),
+      ...u32(0x00480000), // horiz res 72dpi
+      ...u32(0x00480000), // vert res 72dpi
+      ...u32(0),      // data size
+      ...u16(1),      // frame count
+      ...new Array(32).fill(0), // compressor name
+      ...u16(0x0018), // depth
+      ...u16(0xffff), // colour table
+      ...avcC
+    );
+
+    const stsd = full('stsd',0,0,...u32(1),...avc1);
+
+    // stts: all frames same duration
+    const stts = full('stts',0,0,...u32(1),...u32(chunks.length),...u32(frameDur));
+
+    // stss: sync (key) sample table
+    const keySamples = samples.map((s,i)=>s.isKey?i+1:-1).filter(i=>i>0);
+    const stss = full('stss',0,0,...u32(keySamples.length),...flat(keySamples.map(i=>u32(i))));
+
+    // stsc: 1 sample per chunk
+    const stsc = full('stsc',0,0,...u32(1),...u32(1),...u32(1),...u32(1));
+
+    // stsz: variable sample sizes
+    const stsz = full('stsz',0,0,...u32(0),...u32(samples.length),...flat(samples.map(s=>u32(s.data.length))));
+
+    function buildMoov(mdatOffset) {
+      // stco: absolute chunk offsets
+      let off = mdatOffset;
+      const offsets = samples.map(s=>{ const o=off; off+=s.data.length; return o; });
+      const stco = full('stco',0,0,...u32(offsets.length),...flat(offsets.map(o=>u32(o))));
+
+      const stbl = box('stbl',stsd,stts,stss,stsc,stsz,stco);
+      const url  = full('url ',0,1);
+      const dref = full('dref',0,0,...u32(1),...url);
+      const dinf = box('dinf',dref);
+      const vmhd = full('vmhd',0,1,...u16(0),...u16(0),...u16(0),...u16(0));
+      const minf = box('minf',vmhd,dinf,stbl);
+
+      const mdhd = full('mdhd',0,0,...u32(0),...u32(0),...u32(timescale),...u32(totalDur),0x55,0xc4,0,0);
+      const hdlr = full('hdlr',0,0,...u32(0),...str('vide'),...u32(0),...u32(0),...u32(0),...str('VideoHandler'),0);
+      const mdia = box('mdia',mdhd,hdlr,minf);
+
+      const tkhd = full('tkhd',0,3,
+        ...u32(0),...u32(0),...u32(1),...u32(0),...u32(totalDur),
+        ...u32(0),...u32(0),...u16(0),...u16(0),...u16(0x0100),...u16(0),
+        ...u32(0x00010000),0,0,0,0,0,0,0,0,0,...u32(0x00010000),0,0,0,0,0,0,0,0,0,...u32(0x40000000),
+        ...u32(W<<16),...u32(H<<16)
+      );
+      const trak = box('trak',tkhd,mdia);
+
+      const mvhd = full('mvhd',0,0,
+        ...u32(0),...u32(0),...u32(timescale),...u32(totalDur),
+        ...u32(0x00010000),...u16(0x0100),...u16(0),...u32(0),...u32(0),
+        ...u32(0x00010000),0,0,0,0,0,0,0,0,0,...u32(0x00010000),0,0,0,0,0,0,0,0,0,...u32(0x40000000),
+        ...u32(0),...u32(0),...u32(0),...u32(0),...u32(0),...u32(0),
+        ...u32(2)
+      );
+      return box('moov',mvhd,trak);
+    }
+
+    // Two-pass to get correct offsets
+    const ftyp = box('ftyp',...str('isom'),...u32(0x200),...str('isomiso2avc1'));
+    const moov1 = flat(buildMoov(0));
+    const dataOffset = ftyp.length + moov1.length + 8;
+    const moovFinal = flat(buildMoov(dataOffset));
+    const mdat = [...u32(mdatSize),...str('mdat'),...mdatData];
+
+    return new Uint8Array([...ftyp,...moovFinal,...mdat]);
+  }
+
+  return { build };
+})();
+
+// Split Annex B bitstream into individual NAL units
+function splitAnnexB(buf) {
+  const nals = [];
+  let i = 0;
+  while(i < buf.length) {
+    // Find start code (00 00 00 01 or 00 00 01)
+    let start = -1, startLen = 0;
+    if(i+3 < buf.length && buf[i]===0 && buf[i+1]===0 && buf[i+2]===0 && buf[i+3]===1) {
+      start = i; startLen = 4;
+    } else if(i+2 < buf.length && buf[i]===0 && buf[i+1]===0 && buf[i+2]===1) {
+      start = i; startLen = 3;
+    }
+    if(start === -1) { i++; continue; }
+    const nalStart = start + startLen;
+    // Find next start code
+    let nalEnd = buf.length;
+    for(let j = nalStart; j < buf.length - 2; j++) {
+      if(buf[j]===0 && buf[j+1]===0 && buf[j+2]===1) { nalEnd = j; break; }
+      if(j+3 < buf.length && buf[j]===0 && buf[j+1]===0 && buf[j+2]===0 && buf[j+3]===1) { nalEnd = j; break; }
+    }
+    if(nalEnd > nalStart) nals.push(buf.slice(nalStart, nalEnd));
+    i = nalEnd;
+  }
+  return nals;
+}
+
+async function doExport(scale) {
+  if(!S.startBaked||!S.endBaked) return;
+  const fill=document.getElementById('progFill'),label=document.getElementById('progLabel');
+  document.getElementById('progModal').classList.add('show');
+  fill.style.width='0%';
+
+  if(typeof VideoEncoder === 'undefined'){
+    label.textContent='Error: VideoEncoder not supported. Use Chrome 94+.';
+    setTimeout(()=>document.getElementById('progModal').classList.remove('show'),4000);
+    return;
+  }
+
+  try{
+    const fullW = S.startBaked.width  % 2 === 0 ? S.startBaked.width  : S.startBaked.width  - 1;
+    const fullH = S.startBaked.height % 2 === 0 ? S.startBaked.height : S.startBaked.height - 1;
+    const W = Math.round(fullW * scale) % 2 === 0 ? Math.round(fullW * scale) : Math.round(fullW * scale) - 1;
+    const H = Math.round(fullH * scale) % 2 === 0 ? Math.round(fullH * scale) : Math.round(fullH * scale) - 1;
+
+    const useTitle    = document.getElementById('chkTitle').checked;
+    const useHoldStart= document.getElementById('chkHoldStart').checked;
+    const useHoldEnd  = document.getElementById('chkHoldEnd').checked;
+    const TITLE_FRAMES = useTitle     ? FPS * 2 : 0; // 2 seconds
+    const HOLD_S_FRAMES= useHoldStart ? FPS * 1 : 0; // 1 second
+    const HOLD_E_FRAMES= useHoldEnd   ? FPS * 1 : 0; // 1 second
+    const TOTAL        = TITLE_FRAMES + HOLD_S_FRAMES + NFRAMES + HOLD_E_FRAMES;
+
+    label.textContent=`Initialising H.264 encoder… (${W}×${H})`;
+
+    const chunks=[], spsRef={data:null}, ppsRef={data:null};
+
+    await new Promise((resolve,reject)=>{
+      const encoder=new VideoEncoder({
+        output:(chunk,meta)=>{
+          try{
+            if(meta&&meta.decoderConfig&&meta.decoderConfig.description){
+              const desc=new Uint8Array(meta.decoderConfig.description);
+              try{
+                let i=5;
+                const numSPS=desc[i++]&0x1f;
+                for(let s=0;s<numSPS;s++){const len=(desc[i]<<8)|desc[i+1];i+=2;spsRef.data=desc.slice(i,i+len);i+=len;}
+                const numPPS=desc[i++];
+                for(let p=0;p<numPPS;p++){const len=(desc[i]<<8)|desc[i+1];i+=2;ppsRef.data=desc.slice(i,i+len);i+=len;}
+              }catch(e){}
+            }
+            const buf=new Uint8Array(chunk.byteLength);
+            chunk.copyTo(buf);
+            if(chunk.type==='key'&&(!spsRef.data||!ppsRef.data)){
+              const nals=splitAnnexB(buf);
+              for(const nal of nals){
+                const t=nal[0]&0x1f;
+                if(t===7) spsRef.data=nal;
+                if(t===8) ppsRef.data=nal;
+              }
+            }
+            chunks.push({data:buf,isKey:chunk.type==='key'});
+          }catch(e){reject(e);}
+        },
+        error:e=>reject(e)
+      });
+
+      encoder.configure({
+        codec:'avc1.640033',
+        width:W, height:H,
+        framerate:FPS,
+        bitrate:8_000_000,
+        avc:{format:'annexb'}
+      });
+
+      const scratch=document.createElement('canvas');
+      scratch.width=W; scratch.height=H;
+      const sctx=scratch.getContext('2d');
+
+      (async()=>{
+        try{
+          // Helper: stamp one canvas onto scratch and encode
+          const exportMorph = document.getElementById('chkExportMorph').checked;
+          async function encodeFrame(srcCanvas, frameIndex, t=0) {
+            sctx.drawImage(srcCanvas,0,0,W,H);
+            if (exportMorph && S.nodes.length) renderOverlayOntoFrame(sctx, W, H, t);
+            const vf=new VideoFrame(scratch,{
+              timestamp:Math.round(frameIndex*1_000_000/FPS),
+              duration: Math.round(1_000_000/FPS),
+            });
+            encoder.encode(vf,{keyFrame:frameIndex%30===0});
+            vf.close();
+            await encoder.flush();
+          }
+
+          let fi=0;
+
+          // 1. Title frames (t=0, no overlay needed)
+          if(useTitle){
+            const titleC=renderTitleFrame(W,H);
+            for(let f=0;f<TITLE_FRAMES;f++){
+              await encodeFrame(titleC,fi++,0);
+              fill.style.width=Math.round(fi/TOTAL*85)+'%';
+              label.textContent=`Title frame ${f+1} / ${TITLE_FRAMES}`;
+              await new Promise(r=>setTimeout(r,0));
+            }
+          }
+
+          // 2. Hold start (freeze t=0)
+          if(useHoldStart){
+            const holdC=renderFrame(0,W,H);
+            for(let f=0;f<HOLD_S_FRAMES;f++){
+              await encodeFrame(holdC,fi++,0);
+              fill.style.width=Math.round(fi/TOTAL*85)+'%';
+              label.textContent=`Hold start ${f+1} / ${HOLD_S_FRAMES}`;
+              await new Promise(r=>setTimeout(r,0));
+            }
+          }
+
+          // 3. Morph frames — pass eased t for overlay interpolation
+          for(let f=0;f<NFRAMES;f++){
+            const tRaw=f/(NFRAMES-1);
+            const frame=renderFrame(tRaw,W,H);
+            await encodeFrame(frame,fi++,applyEase(tRaw));
+            fill.style.width=Math.round(fi/TOTAL*85)+'%';
+            label.textContent=`Morph frame ${f+1} / ${NFRAMES}`;
+            await new Promise(r=>setTimeout(r,0));
+          }
+
+          // 4. Hold end (freeze t=1)
+          if(useHoldEnd){
+            const holdC=renderFrame(1,W,H);
+            for(let f=0;f<HOLD_E_FRAMES;f++){
+              await encodeFrame(holdC,fi++,1);
+              fill.style.width=Math.round(fi/TOTAL*85)+'%';
+              label.textContent=`Hold end ${f+1} / ${HOLD_E_FRAMES}`;
+              await new Promise(r=>setTimeout(r,0));
+            }
+          }
+
+          await encoder.flush();
+          encoder.close();
+          resolve();
+        }catch(e){reject(e);}
+      })();
+    });
+
+    label.textContent='Writing MP4…';
+    fill.style.width='92%';
+    await new Promise(r=>setTimeout(r,50));
+
+    if(!spsRef.data) spsRef.data=new Uint8Array([0x67,0x42,0xE0,0x1E,0xDA,0x05,0x84,0x35,0x20]);
+    if(!ppsRef.data) ppsRef.data=new Uint8Array([0x68,0xCE,0x38,0x80]);
+
+    const mp4=MP4.build(chunks,spsRef.data,ppsRef.data,FPS,W,H);
+    const easeTag = {'linear':'lin','inout':'in_out','in':'in','out':'out','bounce':'bounce'}[S.ease] || 'lin';
+    const fname = scale===1
+      ? `morph_[${easeTag}].mp4`
+      : `morph_half_[${easeTag}].mp4`;
+    const url=URL.createObjectURL(new Blob([mp4],{type:'video/mp4'}));
+    Object.assign(document.createElement('a'),{href:url,download:fname}).click();
+
+    fill.style.width='100%'; label.textContent='Done!';
+    setTimeout(()=>document.getElementById('progModal').classList.remove('show'),1500);
+
+  }catch(err){
+    document.getElementById('progLabel').textContent='Error: '+err.message;
+    console.error(err);
+    setTimeout(()=>document.getElementById('progModal').classList.remove('show'),5000);
+  }
+}
+
+document.getElementById('btnExport').addEventListener('click',()=>doExport(S.previewFull ? 1 : 0.5));
+
+// ── Resize ────────────────────────────────────────────────────────────────────
+window.addEventListener('resize',()=>{
+  if(S.startBaked) fitDraw(csStart,ctxS,S.startBaked);
+  if(S.endBaked)   fitDraw(csEnd,ctxE,S.endBaked);
+  redrawBase();
+  syncOverlays();
+});
+</script>
+</body>
+</html>

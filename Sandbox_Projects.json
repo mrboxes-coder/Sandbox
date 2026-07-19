@@ -498,7 +498,7 @@
         }
       ],
       "carousel": false,
-      "link": "",
+      "link": "./glb_viewer/glb-slideshow.html",
       "tags": [],
       "thumb": "",
       "youtube": ""
@@ -822,7 +822,7 @@
         }
       ],
       "carousel": true,
-      "link": "",
+      "link": "./image_meshmorph/morpher.html",
       "tags": [],
       "thumb": "images/mesh_morph02.jpg",
       "youtube": ""
