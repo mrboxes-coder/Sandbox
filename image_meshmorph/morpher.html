@@ -26,12 +26,14 @@
   body { background:var(--bg); color:var(--text); font-family:var(--ui); font-size:14px; font-weight:400; height:100vh; display:flex; flex-direction:column; overflow:hidden; }
 
   /* ── Header ── */
-  header { display:flex; align-items:center; justify-content:space-between; padding:10px 20px; border-bottom:1px solid var(--border); background:var(--panel); flex-shrink:0; height:52px; }
-  .logo { display:flex; align-items:center; gap:10px; }
-  .logo-icon { width:28px; height:28px; flex-shrink:0; }
-  .logo-text { font-family:var(--ui); font-weight:700; font-size:24px; letter-spacing:0.04em; }
+  header { display:flex; align-items:center; justify-content:space-between; padding:10px 24px; border-bottom:1px solid var(--border); background:var(--panel); flex-shrink:0; height:68px; }
+  .logo { display:flex; align-items:center; gap:14px; }
+  .logo-icon { width:42px; height:42px; flex-shrink:0; }
+  .logo-titles { display:flex; flex-direction:column; gap:3px; }
+  .logo-text { font-family:var(--ui); font-weight:700; font-size:36px; letter-spacing:0.02em; line-height:1; }
   .logo-text .l1 { color:var(--text); }
   .logo-text .l2 { color:var(--accent); font-weight:700; }
+  .logo-sub { font-family:var(--mono); font-size:11px; font-weight:300; letter-spacing:0.14em; color:var(--dim); text-transform:uppercase; }
   .hctrl { display:flex; gap:8px; }
 
   /* ── Buttons ── */
@@ -167,7 +169,10 @@
     <svg class="logo-icon" viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg">
       <path d="M220 40 L90 220 H190 L180 360 L310 180 H210 L220 40Z" stroke="#378ADD" stroke-width="36" stroke-linejoin="round" stroke-linecap="round" fill="none"/>
     </svg>
-    <div class="logo-text"><span class="l1">Mesh</span><span class="l2">Morph</span></div>
+    <div class="logo-titles">
+      <div class="logo-text"><span class="l1">Mesh</span><span class="l2">Morph</span></div>
+      <div class="logo-sub">Node-guided Image Morphing</div>
+    </div>
   </div>
   <div class="hctrl">
     <button id="btnRes" onclick="toggleRes()">Half Res</button>
@@ -202,8 +207,9 @@
   <div class="sidebar">
 
     <details class="sb-section" open>
-      <summary>Mode</summary>
+      <summary>Nodes</summary>
       <div class="sb-body">
+        <div class="bignum" id="nodeCount" style="margin-bottom:4px;">0</div>
         <button class="mode-btn active" id="modeAdd"  onclick="setMode('add')">+ Add Nodes</button>
         <button class="mode-btn"        id="modeMove" onclick="setMode('move')">&#8598; Move Nodes</button>
         <button class="mode-btn"        id="modeDel"  onclick="setMode('delete')">&#10005; Delete Node</button>
@@ -211,14 +217,7 @@
       </div>
     </details>
 
-    <details class="sb-section" open>
-      <summary>Nodes</summary>
-      <div class="sb-body">
-        <div class="bignum" id="nodeCount">0</div>
-      </div>
-    </details>
-
-    <details class="sb-section" open>
+    <details class="sb-section">
       <summary>Copy Nodes</summary>
       <div class="sb-body">
         <button class="mode-btn" onclick="copyStartToEnd()">Start Frame &gt; End Frame</button>
@@ -226,7 +225,7 @@
       </div>
     </details>
 
-    <details class="sb-section" open>
+    <details class="sb-section">
       <summary>Morph Method</summary>
       <div class="sb-body">
         <button class="mode-btn active" id="methodDelaunay" onclick="setMethod('delaunay')">&#9651; Delaunay</button>
@@ -244,7 +243,18 @@
       </div>
     </details>
 
-    <details class="sb-section" open>
+    <details class="sb-section">
+      <summary>Easing</summary>
+      <div class="sb-body">
+        <button class="mode-btn active" id="easeLinear" onclick="setEase('linear')">&#9135; Linear</button>
+        <button class="mode-btn"        id="easeInOut"  onclick="setEase('inout')">&#9096; Ease In / Out</button>
+        <button class="mode-btn"        id="easeIn"     onclick="setEase('in')">&#8599; Ease In</button>
+        <button class="mode-btn"        id="easeOut"    onclick="setEase('out')">&#8600; Ease Out</button>
+        <button class="mode-btn"        id="easeBounce" onclick="setEase('bounce')">&#8645; Bounce</button>
+      </div>
+    </details>
+
+    <details class="sb-section">
       <summary>Display</summary>
       <div class="sb-body">
         <div class="toggle-row">
@@ -254,6 +264,14 @@
         <div class="toggle-row">
           <span class="toggle-label">Show morph in export</span>
           <label class="toggle"><input type="checkbox" id="chkExportMorph"><span class="toggle-track"></span></label>
+        </div>
+        <div class="toggle-row">
+          <span class="toggle-label">Reference grid</span>
+          <label class="toggle"><input type="checkbox" id="chkGrid" onchange="onGridToggle(this)"><span class="toggle-track"></span></label>
+        </div>
+        <div class="color-row" id="gridColorRow" style="display:none;">
+          <span>Grid colour</span>
+          <input type="color" id="gridColor" value="#ffffff" oninput="drawOverlays()">
         </div>
         <div style="display:flex;align-items:center;gap:8px;margin-top:2px;">
           <span style="font-family:var(--ui);font-size:13px;font-weight:400;color:var(--text);flex-shrink:0;">Brightness</span>
@@ -265,18 +283,7 @@
     </details>
 
     <details class="sb-section" open>
-      <summary>Easing</summary>
-      <div class="sb-body">
-        <button class="mode-btn active" id="easeLinear" onclick="setEase('linear')">&#9135; Linear</button>
-        <button class="mode-btn"        id="easeInOut"  onclick="setEase('inout')">&#9096; Ease In / Out</button>
-        <button class="mode-btn"        id="easeIn"     onclick="setEase('in')">&#8599; Ease In</button>
-        <button class="mode-btn"        id="easeOut"    onclick="setEase('out')">&#8600; Ease Out</button>
-        <button class="mode-btn"        id="easeBounce" onclick="setEase('bounce')">&#8645; Bounce</button>
-      </div>
-    </details>
-
-    <details class="sb-section" open>
-      <summary>Session</summary>
+      <summary>Save / Load Session</summary>
       <div class="sb-body">
         <button class="mode-btn" onclick="saveSession()">&#8681; Save Session</button>
         <button class="mode-btn" onclick="document.getElementById('sessionLoader').click()">&#8679; Load Session</button>
@@ -285,21 +292,19 @@
       </div>
     </details>
 
-    <details class="sb-section" open>
-      <summary>Export Duration</summary>
+    <details class="sb-section">
+      <summary>Save MP4</summary>
       <div class="sb-body">
+
+        <div class="sb-title" style="font-family:var(--mono);font-size:9px;font-weight:400;letter-spacing:0.15em;color:var(--dim);text-transform:uppercase;margin-bottom:2px;">Duration</div>
         <div style="display:flex;align-items:center;gap:8px;">
           <input type="range" id="durSlider" min="1" max="10" value="5" step="1" style="flex:1;"
                  oninput="updateDuration(this.value)">
           <span id="durLabel" style="font-family:var(--mono);font-size:13px;font-weight:400;color:var(--accent);min-width:28px;">5s</span>
         </div>
         <div class="infobox" id="exportInfo">60 frames · 12fps · 5sec</div>
-      </div>
-    </details>
 
-    <details class="sb-section" open>
-      <summary>Title Screen</summary>
-      <div class="sb-body">
+        <div class="sb-title" style="font-family:var(--mono);font-size:9px;font-weight:400;letter-spacing:0.15em;color:var(--dim);text-transform:uppercase;margin-top:8px;margin-bottom:2px;">Title Screen</div>
         <input type="text" id="titleText" value="MESHMORPH" placeholder="Title text…" maxlength="12"
                style="font-family:var(--mono);font-size:13px;font-weight:400;background:var(--bg);border:1px solid var(--border);color:var(--text);padding:5px 8px;width:100%;border-radius:2px;">
         <div class="toggle-row">
@@ -316,12 +321,8 @@
             <input type="color" id="titleFg" value="#ffffff">
           </div>
         </div>
-      </div>
-    </details>
 
-    <details class="sb-section" open>
-      <summary>Hold Frames</summary>
-      <div class="sb-body">
+        <div class="sb-title" style="font-family:var(--mono);font-size:9px;font-weight:400;letter-spacing:0.15em;color:var(--dim);text-transform:uppercase;margin-top:8px;margin-bottom:2px;">Hold Frames</div>
         <div class="toggle-row">
           <span class="toggle-label">Start : 1 - second</span>
           <label class="toggle"><input type="checkbox" id="chkHoldStart"><span class="toggle-track"></span></label>
@@ -330,6 +331,7 @@
           <span class="toggle-label">End : 1 - second</span>
           <label class="toggle"><input type="checkbox" id="chkHoldEnd"><span class="toggle-track"></span></label>
         </div>
+
       </div>
     </details>
 
@@ -381,6 +383,12 @@ document.getElementById('chkTitle').addEventListener('change', e => {
   document.getElementById('titleOpts').style.display = e.target.checked ? 'block' : 'none';
 });
 document.getElementById('chkShowMorph').addEventListener('change', () => drawOverlays());
+document.getElementById('chkGrid') && document.getElementById('chkGrid').addEventListener('change', () => drawOverlays());
+
+function onGridToggle(cb) {
+  document.getElementById('gridColorRow').style.display = cb.checked ? 'flex' : 'none';
+  drawOverlays();
+}
 
 // Render a title card canvas at W×H
 function renderTitleFrame(W, H) {
@@ -400,7 +408,7 @@ function renderTitleFrame(W, H) {
 }
 
 // ── Session save / load ───────────────────────────────────────────────────────
-function saveSession() {
+async function saveSession() {
   if (!S.nodes.length) { alert('No nodes to save.'); return; }
   const session = {
     version:    1,
@@ -410,6 +418,10 @@ function saveSession() {
     duration:   DURATION,
     holdStart:  document.getElementById('chkHoldStart').checked,
     holdEnd:    document.getElementById('chkHoldEnd').checked,
+    grid: {
+      enabled: document.getElementById('chkGrid').checked,
+      color:   document.getElementById('gridColor').value,
+    },
     title: {
       enabled: document.getElementById('chkTitle').checked,
       text:    document.getElementById('titleText').value,
@@ -418,18 +430,37 @@ function saveSession() {
     },
     startImage: S.startImageName || '(unknown)',
     endImage:   S.endImageName   || '(unknown)',
-    nodes:      S.nodes.map(n=>({
-      sx: +n.sx.toFixed(6), sy: +n.sy.toFixed(6),
-      ex: +n.ex.toFixed(6), ey: +n.ey.toFixed(6),
+    nodes: S.nodes.map(n=>({
+      sx:+n.sx.toFixed(6), sy:+n.sy.toFixed(6),
+      ex:+n.ex.toFixed(6), ey:+n.ey.toFixed(6),
     })),
   };
   const json = JSON.stringify(session, null, 2);
+
+  // Use native Save As dialog if available (Chrome 86+)
+  if (window.showSaveFilePicker) {
+    try {
+      const handle = await window.showSaveFilePicker({
+        suggestedName: 'morph_session.json',
+        types: [{ description: 'MeshMorph Session', accept: {'application/json': ['.json']} }],
+      });
+      const writable = await handle.createWritable();
+      await writable.write(json);
+      await writable.close();
+      document.getElementById('sessionInfo').textContent = `Saved: ${session.nodes.length} nodes`;
+      return;
+    } catch(e) {
+      if (e.name === 'AbortError') return; // user cancelled
+      // fall through to download fallback
+    }
+  }
+
+  // Fallback: direct download
   const blob = new Blob([json], {type:'application/json'});
   const url  = URL.createObjectURL(blob);
   Object.assign(document.createElement('a'), {href:url, download:'morph_session.json'}).click();
   URL.revokeObjectURL(url);
-  document.getElementById('sessionInfo').textContent =
-    `Saved: ${session.nodes.length} nodes`;
+  document.getElementById('sessionInfo').textContent = `Saved: ${session.nodes.length} nodes`;
 }
 
 function loadSession(input) {
@@ -461,6 +492,13 @@ function loadSession(input) {
         document.getElementById('durLabel').textContent = DURATION + 's';
         document.getElementById('exportInfo').textContent =
           `${NFRAMES} frames · ${FPS}fps · ${DURATION}sec`;
+      }
+
+      // Restore grid settings
+      if (session.grid) {
+        document.getElementById('chkGrid').checked = !!session.grid.enabled;
+        document.getElementById('gridColorRow').style.display = session.grid.enabled ? 'flex' : 'none';
+        if (session.grid.color) document.getElementById('gridColor').value = session.grid.color;
       }
 
       // Restore hold settings
@@ -692,12 +730,13 @@ function setupEvents(overlay,canvas,which) {
   overlay.style.pointerEvents='auto'; overlay.style.cursor='crosshair';
 
   overlay.addEventListener('mousedown',e=>{
-    // Shift+click = pan mode
+    e.preventDefault(); // prevent browser native drag on canvas element
+
     if(e.shiftKey){
       S.panning=true;
-      S.panStart={x:e.clientX, y:e.clientY, focusX:S.zoom.focusX, focusY:S.zoom.focusY};
+      S.panStart={x:e.clientX,y:e.clientY,focusX:S.zoom.focusX,focusY:S.zoom.focusY};
       overlay.style.cursor='grabbing';
-      e.preventDefault(); return;
+      return;
     }
     if(!S.startBaked||!S.endBaked) return;
     const{x,y}=evXY(overlay,e);
@@ -718,57 +757,53 @@ function setupEvents(overlay,canvas,which) {
     }
   });
 
-  overlay.addEventListener('mousemove',e=>{
-    // Pan
-    if(S.panning){
-      const dx=e.clientX-S.panStart.x;
-      const dy=e.clientY-S.panStart.y;
-      S.zoom.focusX=S.panStart.focusX - dx/(canvas.width *S.zoom.scale);
-      S.zoom.focusY=S.panStart.focusY - dy/(canvas.height*S.zoom.scale);
-      redrawBase(); drawOverlays(); return;
-    }
-    // Node drag
-    if(!S.drag||S.drag.which!==which) return;
-    const{x,y}=evXY(overlay,e);
-    const{nx,ny}=toNorm(canvas,x,y);
-    const n=S.nodes[S.drag.idx];
-    if(which==='start'){n.sx=nx;n.sy=ny;}else{n.ex=nx;n.ey=ny;}
-    drawOverlays();
-  });
+  overlay.addEventListener('mouseenter',e=>{if(e.shiftKey&&!S.panning) overlay.style.cursor='grab';});
 
-  overlay.addEventListener('mouseup',()=>{
-    if(S.panning){S.panning=false; overlay.style.cursor='crosshair'; return;}
-    S.drag=null; S.highlightedNode=-1; drawOverlays();
-  });
-  overlay.addEventListener('mouseleave',()=>{
-    if(S.panning){S.panning=false; overlay.style.cursor='crosshair'; return;}
-    S.drag=null; S.highlightedNode=-1; drawOverlays();
-  });
-
-  // Shift key: show grab cursor
-  overlay.addEventListener('keydown',e=>{ if(e.shiftKey) overlay.style.cursor='grab'; });
-  overlay.addEventListener('keyup',  e=>{ if(!e.shiftKey&&!S.panning) overlay.style.cursor='crosshair'; });
-
-  // Wheel zoom (zoom centred on cursor, both panels linked)
-  overlay.addEventListener('wheel', e=>{
+  // Wheel zoom
+  overlay.addEventListener('wheel',e=>{
     e.preventDefault();
     const{x,y}=evXY(overlay,e);
     const{tx,ty}=getZT(canvas);
-    // Normalised coords under cursor
     const curNX=(x-tx)/(canvas.width *S.zoom.scale);
     const curNY=(y-ty)/(canvas.height*S.zoom.scale);
-    // New scale
     const factor=e.deltaY<0?1.15:1/1.15;
     const newScale=Math.max(0.5,Math.min(20,S.zoom.scale*factor));
-    // Adjust focus so the point under the cursor stays fixed
     S.zoom.focusX=curNX+(canvas.width/2 -x)/(canvas.width *newScale);
     S.zoom.focusY=curNY+(canvas.height/2-y)/(canvas.height*newScale);
-    S.zoom.scale =newScale;
-    redrawBase(); drawOverlays();
+    S.zoom.scale=newScale;
+    redrawBase();drawOverlays();
   },{passive:false});
 }
 setupEvents(ovStart,csStart,'start');
 setupEvents(ovEnd,csEnd,'end');
+
+// Document-level move/up: tracks drag and pan even when cursor leaves the overlay
+document.addEventListener('mousemove',e=>{
+  if(S.panning&&S.panStart){
+    const dx=e.clientX-S.panStart.x, dy=e.clientY-S.panStart.y;
+    S.zoom.focusX=S.panStart.focusX - dx/(csStart.width *S.zoom.scale);
+    S.zoom.focusY=S.panStart.focusY - dy/(csStart.height*S.zoom.scale);
+    redrawBase();drawOverlays();return;
+  }
+  if(S.drag){
+    const canvas =S.drag.which==='start'?csStart:csEnd;
+    const overlay=S.drag.which==='start'?ovStart:ovEnd;
+    const{x,y}=evXY(overlay,e);
+    const{nx,ny}=toNorm(canvas,x,y);
+    const n=S.nodes[S.drag.idx];
+    if(S.drag.which==='start'){n.sx=nx;n.sy=ny;}else{n.ex=nx;n.ey=ny;}
+    drawOverlays();
+  }
+});
+
+document.addEventListener('mouseup',()=>{
+  if(S.panning){
+    S.panning=false;
+    ovStart.style.cursor='crosshair';
+    ovEnd.style.cursor='crosshair';
+  }
+  if(S.drag){S.drag=null;S.highlightedNode=-1;drawOverlays();}
+});
 
 // ── Overlay drawing ──────────────────────────────────────────────────────────
 function drawOverlays() {
@@ -778,6 +813,28 @@ function drawOverlays() {
 
 function drawOv(ctx, canvas, which, col) {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  // ── Reference grid (canvas-space, unaffected by zoom) ──────────────────────
+  if (document.getElementById('chkGrid').checked) {
+    const gridCol = document.getElementById('gridColor').value;
+    const cols    = 8;
+    const cellW   = canvas.width / cols;
+    const rows    = Math.ceil(canvas.height / cellW);
+    ctx.strokeStyle = gridCol;
+    ctx.lineWidth   = 0.5;
+    ctx.globalAlpha = 0.35;
+    ctx.beginPath();
+    for (let i = 0; i <= cols; i++) {
+      const x = Math.round(i * cellW) + 0.5;
+      ctx.moveTo(x, 0); ctx.lineTo(x, canvas.height);
+    }
+    for (let j = 0; j <= rows; j++) {
+      const y = Math.round(j * cellW) + 0.5;
+      ctx.moveTo(0, y); ctx.lineTo(canvas.width, y);
+    }
+    ctx.stroke();
+    ctx.globalAlpha = 1;
+  }
   if (!S.nodes.length) return;
 
   const showMorph = document.getElementById('chkShowMorph').checked;
@@ -1086,52 +1143,47 @@ function buildMLS(srcPts, dstPts) {
 // Computes a displacement field on a coarse grid, then applies it via bilinear
 // interpolation — much faster than per-pixel computation.
 function renderFrameGridWarp(t, W, H, warpFn) {
-  const out = document.createElement('canvas');
-  out.width=W; out.height=H;
+  const out = document.createElement('canvas'); out.width=W; out.height=H;
   const ctx = out.getContext('2d');
 
   if (!S.nodes.length) {
-    ctx.drawImage(S.startBaked, 0, 0, W, H);
-    ctx.globalAlpha = t; ctx.drawImage(S.endBaked, 0, 0, W, H); ctx.globalAlpha=1;
+    ctx.drawImage(S.startBaked,0,0,W,H);
+    ctx.globalAlpha=t; ctx.drawImage(S.endBaked,0,0,W,H); ctx.globalAlpha=1;
     return out;
   }
 
-  // Build displacement grids at coarse resolution
-  const GRID = 32;
-  const gw = GRID+1, gh = GRID+1;
-  const sField = new Float32Array(gw*gh*2); // source lookup per grid cell
-  const eField = new Float32Array(gw*gh*2); // end lookup per grid cell
+  // Reduced from 32→20: 2.5× fewer triangle ops, negligible quality loss
+  const GRID = 20;
+  const gw = GRID+1;
+  const sField = new Float32Array(gw*gw*2);
+  const eField = new Float32Array(gw*gw*2);
 
-  // Node positions in output space
   const sPts = S.nodes.map(n=>({x:n.sx*W, y:n.sy*H}));
   const ePts = S.nodes.map(n=>({x:n.ex*W, y:n.ey*H}));
-  // Interpolated positions at time t
   const mPts = sPts.map((p,i)=>({x:p.x+(ePts[i].x-p.x)*t, y:p.y+(ePts[i].y-p.y)*t}));
 
-  // Build two warp functions: one mapping mid→start, one mapping mid→end
-  const warpS = warpFn(mPts, sPts); // mid mesh → start image
-  const warpE = warpFn(mPts, ePts); // mid mesh → end image
+  const warpS = warpFn(mPts, sPts);
+  const warpE = warpFn(mPts, ePts);
 
   for (let gy=0; gy<=GRID; gy++) {
     for (let gx=0; gx<=GRID; gx++) {
-      const px = gx/GRID*W, py = gy/GRID*H;
-      const rs = warpS(px, py);
-      const re = warpE(px, py);
-      const idx = (gy*gw+gx)*2;
-      sField[idx]   = rs.x; sField[idx+1] = rs.y;
-      eField[idx]   = re.x; eField[idx+1] = re.y;
+      const px=gx/GRID*W, py=gy/GRID*H;
+      const rs=warpS(px,py), re=warpE(px,py);
+      const idx=(gy*gw+gx)*2;
+      sField[idx]=rs.x; sField[idx+1]=rs.y;
+      eField[idx]=re.x; eField[idx+1]=re.y;
     }
   }
 
-  // Render using grid — draw each grid cell quad
-  const cA = document.createElement('canvas'); cA.width=W; cA.height=H;
-  const cB = document.createElement('canvas'); cB.width=W; cB.height=H;
-  const ctxA = cA.getContext('2d'), ctxB = cB.getContext('2d');
+  // Single shared scratch canvas for all triangle warps
+  const scratch=document.createElement('canvas'); scratch.width=W; scratch.height=H;
+  const cA=document.createElement('canvas'); cA.width=W; cA.height=H; const ctxA=cA.getContext('2d');
+  const cB=document.createElement('canvas'); cB.width=W; cB.height=H; const ctxB=cB.getContext('2d');
 
   for (let gy=0; gy<GRID; gy++) {
     for (let gx=0; gx<GRID; gx++) {
-      warpQuad(S.startBaked, ctxA, sField, gx, gy, gw, GRID, W, H);
-      warpQuad(S.endBaked,   ctxB, eField, gx, gy, gw, GRID, W, H);
+      warpQuad(S.startBaked,ctxA,sField,gx,gy,gw,GRID,W,H,scratch);
+      warpQuad(S.endBaked,  ctxB,eField,gx,gy,gw,GRID,W,H,scratch);
     }
   }
 
@@ -1140,27 +1192,19 @@ function renderFrameGridWarp(t, W, H, warpFn) {
   return out;
 }
 
-// Draw one grid quad from src canvas onto dst context using two triangles
-function warpQuad(srcCanvas, dstCtx, field, gx, gy, gw, GRID, W, H) {
-  // Grid cell corners in output space
+function warpQuad(srcCanvas, dstCtx, field, gx, gy, gw, GRID, W, H, scratch) {
   const cx0=gx/GRID*W, cy0=gy/GRID*H;
   const cx1=(gx+1)/GRID*W, cy1=(gy+1)/GRID*H;
-
-  // Source positions from field
-  const idx00=(gy*gw+gx)*2,    idx10=(gy*gw+gx+1)*2;
+  const idx00=(gy*gw+gx)*2,     idx10=(gy*gw+gx+1)*2;
   const idx01=((gy+1)*gw+gx)*2, idx11=((gy+1)*gw+gx+1)*2;
-
-  const s00={x:field[idx00],  y:field[idx00+1]};
-  const s10={x:field[idx10],  y:field[idx10+1]};
-  const s01={x:field[idx01],  y:field[idx01+1]};
-  const s11={x:field[idx11],  y:field[idx11+1]};
-
-  const d00={x:cx0,y:cy0}, d10={x:cx1,y:cy0};
-  const d01={x:cx0,y:cy1}, d11={x:cx1,y:cy1};
-
-  // Two triangles per quad
-  warpTri(srcCanvas, dstCtx, [s00,s10,s01], [d00,d10,d01], W, H);
-  warpTri(srcCanvas, dstCtx, [s10,s11,s01], [d10,d11,d01], W, H);
+  const s00={x:field[idx00],y:field[idx00+1]};
+  const s10={x:field[idx10],y:field[idx10+1]};
+  const s01={x:field[idx01],y:field[idx01+1]};
+  const s11={x:field[idx11],y:field[idx11+1]};
+  const d00={x:cx0,y:cy0},d10={x:cx1,y:cy0};
+  const d01={x:cx0,y:cy1},d11={x:cx1,y:cy1};
+  warpTri(srcCanvas,dstCtx,[s00,s10,s01],[d00,d10,d01],W,H,scratch);
+  warpTri(srcCanvas,dstCtx,[s10,s11,s01],[d10,d11,d01],W,H,scratch);
 }
 // srcCanvas: baked HTMLCanvasElement at NATURAL resolution (srcW × srcH)
 // dstCtx:    destination context at OUTPUT resolution (W × H)
@@ -1173,10 +1217,11 @@ function warpQuad(srcCanvas, dstCtx, field, gx, gy, gw, GRID, W, H) {
 // affine transform (which maps srcTri → dstTri in output space), then
 // mask to dstTri using destination-in compositing (avoids clip() taint bug).
 //
-function warpTri(srcCanvas, dstCtx, srcTri, dstTri, W, H) {
+// warpTri accepts a pre-allocated scratch canvas to avoid per-triangle allocation.
+// At 2K with 80+ triangles per frame this was creating ~160 x 2K canvases per frame.
+function warpTri(srcCanvas, dstCtx, srcTri, dstTri, W, H, scratch) {
   const [s0,s1,s2]=srcTri, [d0,d1,d2]=dstTri;
 
-  // Affine transform: maps src points → dst points (both in output space)
   const det=(s1.x-s0.x)*(s2.y-s0.y)-(s2.x-s0.x)*(s1.y-s0.y);
   if(Math.abs(det)<1e-8) return;
   const a=((d1.x-d0.x)*(s2.y-s0.y)-(d2.x-d0.x)*(s1.y-s0.y))/det;
@@ -1186,8 +1231,6 @@ function warpTri(srcCanvas, dstCtx, srcTri, dstTri, W, H) {
   const e=d0.x-a*s0.x-c*s0.y;
   const f=d0.y-b*s0.x-d*s0.y;
 
-  // Expand each triangle vertex outward from centroid by 1.5px
-  // This makes adjacent triangles overlap slightly, eliminating seam lines
   const cx=(d0.x+d1.x+d2.x)/3, cy=(d0.y+d1.y+d2.y)/3;
   const exp=1.5;
   const expand=p=>{
@@ -1197,26 +1240,27 @@ function warpTri(srcCanvas, dstCtx, srcTri, dstTri, W, H) {
   };
   const e0=expand(d0), e1=expand(d1), e2=expand(d2);
 
-  // Scratch canvas at output dimensions
-  const scratch=document.createElement('canvas');
-  scratch.width=W; scratch.height=H;
-  const sc=scratch.getContext('2d');
+  // Reuse the shared scratch canvas — clear only the bounding box of this triangle
+  const sc = scratch.getContext('2d');
+  const minX=Math.max(0,Math.floor(Math.min(e0.x,e1.x,e2.x)-2));
+  const minY=Math.max(0,Math.floor(Math.min(e0.y,e1.y,e2.y)-2));
+  const maxX=Math.min(W, Math.ceil(Math.max(e0.x,e1.x,e2.x)+2));
+  const maxY=Math.min(H, Math.ceil(Math.max(e0.y,e1.y,e2.y)+2));
+  sc.clearRect(minX, minY, maxX-minX, maxY-minY);
 
-  // Step 1: draw srcCanvas scaled to output size, apply affine transform
   sc.transform(a,b,c,d,e,f);
-  sc.drawImage(srcCanvas, 0, 0, W, H);
+  sc.drawImage(srcCanvas,0,0,W,H);
   sc.setTransform(1,0,0,1,0,0);
-
-  // Step 2: mask to expanded destination triangle
   sc.globalCompositeOperation='destination-in';
   sc.fillStyle='#fff';
   sc.beginPath();
   sc.moveTo(e0.x,e0.y); sc.lineTo(e1.x,e1.y); sc.lineTo(e2.x,e2.y);
   sc.closePath();
   sc.fill();
+  sc.globalCompositeOperation='source-over';
 
-  // Step 3: composite masked scratch onto destination
-  dstCtx.drawImage(scratch,0,0);
+  dstCtx.drawImage(scratch, minX, minY, maxX-minX, maxY-minY,
+                            minX, minY, maxX-minX, maxY-minY);
 }
 
 // ── Frame renderer ────────────────────────────────────────────────────────────
@@ -1230,55 +1274,36 @@ function renderFrame(t, W, H) {
 }
 
 function renderFrameDelaunay(t, W, H) {
-
-  const out=document.createElement('canvas');
-  out.width=W; out.height=H;
+  const out=document.createElement('canvas'); out.width=W; out.height=H;
   const ctx=out.getContext('2d');
 
-  // Crossfade only (no nodes)
   if(!S.nodes.length){
     ctx.drawImage(S.startBaked,0,0,W,H);
-    ctx.globalAlpha=t;
-    ctx.drawImage(S.endBaked,0,0,W,H);
-    ctx.globalAlpha=1;
+    ctx.globalAlpha=t; ctx.drawImage(S.endBaked,0,0,W,H); ctx.globalAlpha=1;
     return out;
   }
 
-  // Corner anchors in output space — these never move
   const corners=[
     {x:0,y:0},{x:W,y:0},{x:W,y:H},{x:0,y:H},
     {x:W/2,y:0},{x:W,y:H/2},{x:W/2,y:H},{x:0,y:H/2},
   ];
-
-  // Node positions in output space for start, end, and interpolated mid
   const sPts=[...corners,...S.nodes.map(n=>({x:n.sx*W,y:n.sy*H}))];
   const ePts=[...corners,...S.nodes.map(n=>({x:n.ex*W,y:n.ey*H}))];
-  const mPts=sPts.map((p,i)=>({
-    x:p.x+(ePts[i].x-p.x)*t,
-    y:p.y+(ePts[i].y-p.y)*t,
-  }));
-
-  // Triangulate on the interpolated mesh
+  const mPts=sPts.map((p,i)=>({x:p.x+(ePts[i].x-p.x)*t,y:p.y+(ePts[i].y-p.y)*t}));
   const tris=delaunay(mPts);
 
-  // Warp start image: each src triangle (start position) → dst triangle (mid position)
-  const cA=document.createElement('canvas'); cA.width=W; cA.height=H;
-  const ctxA=cA.getContext('2d');
-
-  // Warp end image: each src triangle (end position) → dst triangle (mid position)
-  const cB=document.createElement('canvas'); cB.width=W; cB.height=H;
-  const ctxB=cB.getContext('2d');
+  // One shared scratch + two compositing canvases — no per-triangle allocation
+  const scratch=document.createElement('canvas'); scratch.width=W; scratch.height=H;
+  const cA=document.createElement('canvas'); cA.width=W; cA.height=H; const ctxA=cA.getContext('2d');
+  const cB=document.createElement('canvas'); cB.width=W; cB.height=H; const ctxB=cB.getContext('2d');
 
   tris.forEach(([i,j,k])=>{
-    warpTri(S.startBaked, ctxA, [sPts[i],sPts[j],sPts[k]], [mPts[i],mPts[j],mPts[k]], W, H);
-    warpTri(S.endBaked,   ctxB, [ePts[i],ePts[j],ePts[k]], [mPts[i],mPts[j],mPts[k]], W, H);
+    warpTri(S.startBaked,ctxA,[sPts[i],sPts[j],sPts[k]],[mPts[i],mPts[j],mPts[k]],W,H,scratch);
+    warpTri(S.endBaked,  ctxB,[ePts[i],ePts[j],ePts[k]],[mPts[i],mPts[j],mPts[k]],W,H,scratch);
   });
 
-  // Cross-dissolve: start layer (1-t) + end layer (t)
   ctx.drawImage(cA,0,0);
-  ctx.globalAlpha=t;
-  ctx.drawImage(cB,0,0);
-  ctx.globalAlpha=1;
+  ctx.globalAlpha=t; ctx.drawImage(cB,0,0); ctx.globalAlpha=1;
   return out;
 }
 
@@ -1606,8 +1631,9 @@ async function doExport(scale) {
 
       (async()=>{
         try{
-          // Helper: stamp one canvas onto scratch and encode
+          // Helper: encode frame, flush only every 10 frames to batch GPU work
           const exportMorph = document.getElementById('chkExportMorph').checked;
+          const FLUSH_INTERVAL = 10;
           async function encodeFrame(srcCanvas, frameIndex, t=0) {
             sctx.drawImage(srcCanvas,0,0,W,H);
             if (exportMorph && S.nodes.length) renderOverlayOntoFrame(sctx, W, H, t);
@@ -1617,7 +1643,8 @@ async function doExport(scale) {
             });
             encoder.encode(vf,{keyFrame:frameIndex%30===0});
             vf.close();
-            await encoder.flush();
+            // Batch flush: only flush every N frames to avoid serialising every encode
+            if(frameIndex % FLUSH_INTERVAL === 0) await encoder.flush();
           }
 
           let fi=0;
