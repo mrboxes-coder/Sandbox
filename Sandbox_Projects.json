@@ -465,7 +465,10 @@
       "id": 15,
       "name": "GLB File Viewer / Slideshow",
       "tier": "2",
-      "categories": [],
+      "categories": [
+        "Animation Tool",
+        "Three.js"
+      ],
       "date": "2026-07-07",
       "desc": "GLB Slideshow is a self-contained browser-based 3D viewer built with Three.js. It supports loading, viewing and presenting GLB files with full lighting, camera, metadata and scene-state controls — all saved as a curated, reloadable slideshow playlist.",
       "fullDesc": "GLB Slideshow is a self-contained, browser-based 3D presentation and research tool built entirely in a single HTML file using Three.js r160. It requires no installation, no server, and no build pipeline — opening it in any modern browser gives immediate access to a full-featured GLB viewing and curation environment.\n       \nThe tool operates in two complementary modes. In standard viewing mode it functions as a professional GLB viewer with granular control over lighting (exposure, ambient, key, fill and rim lights with studio/outdoor/dramatic presets), camera (FOV, orbit, auto-rotate with bidirectional speed control), background (greyscale and custom colour swatches, background image with brightness and opacity blending), grid, display and overlay settings. All of these scene attributes can be embedded directly into a GLB file as metadata alongside authoring information — name, author, contact, tags, description and notes — and recalled precisely on reload.\n   \nIn slideshow mode a horizontal filmstrip panel opens along the bottom of the viewport, accepting GLB files by drag and drop. Each card in the filmstrip stores its own complete scene state — camera position and orientation, lighting values, background colour, grid settings, rotation speed, and metadata overlay style — which is restored automatically when the card is selected. Slideshows are saved as lightweight JSON playlists and reloaded by pointing to a folder of GLB files, making the format portable and archival.\n   \nExport options include PNG screenshots, transparent-background PNG renders for compositing, and GLB files with embedded scene state and version history.\n     \nFor immersive practice and research the tool has significant potential as a presentation layer for 3D asset libraries, a comparative review environment for iterative model development, a lightweight alternative to game-engine previsualisaton pipelines, and a portable portfolio or exhibition format that travels as two files — a JSON playlist and a folder of GLBs — with no dependency on cloud infrastructure or proprietary software.",
@@ -473,15 +476,15 @@
       "resourceLink": "",
       "gallery": [
         {
-          "img": "",
+          "img": "images/glb_slideshow01.jpg",
           "caption": ""
         },
         {
-          "img": "",
+          "img": "images/glb_slideshow02.jpg",
           "caption": ""
         },
         {
-          "img": "",
+          "img": "images/glb_slideshow00.jpg",
           "caption": ""
         },
         {
@@ -497,10 +500,10 @@
           "caption": ""
         }
       ],
-      "carousel": false,
+      "carousel": true,
       "link": "./glb_viewer/glb-slideshow.html",
       "tags": [],
-      "thumb": "",
+      "thumb": "images/glb_slideshow02.jpg",
       "youtube": ""
     },
     {
@@ -1054,8 +1057,8 @@
   "sortMode": "tier",
   "site": {
     "eyebrow": "Browser-based creative exploration : Chris Shaw",
-    "title": "Immersive Lab",
-    "accent": "Sandbox",
+    "title": "Creative AI",
+    "accent": "Sandbox Framework",
     "subtitle": "The projects here exist at the intersection of exploration and imagination. A collection of real-time creative experiments using webcam, MediaPipe, and the Web Audio API, built through vibe coding: an intuitive, improvisational approach to making where curiosity leads and outcomes follow. They exist to probe, to test, to ask what if. Because imagination needs space before it needs purpose - and the most interesting discoveries tend to live just past the point where the plan ran out.",
     "about": "This sandbox is a exploratory environment where interactive and immersive technologies can be tested, broken, and reassembled without consequence. Built through vibe coding: an intuitive, improvisational approach to making where curiosity leads and outcomes follow.\n\nMany of the projects here have no immediate purpose beyond the experience of discovering what happens when technology is given room to play. They exist to probe, to test, to ask what if. Because imagination needs space before it needs purpose - and the most interesting discoveries tend to live just past the point where the plan ran out.\n\nPotential rarely arrives fully formed. It surfaces through experimentation - through the willingness to begin without knowing the end.\n\n- Chris Shaw\nHead, Puttnam School of Film & Animation\nLASALLE College of the Arts\nUniversity of the Arts Singapore "
   }
