@@ -1,0 +1,3947 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stop Motion Studio</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#1a1a1a;
+  --surface:#242424;
+  --surface2:#2e2e2e;
+  --surface3:#383838;
+  --border:rgba(255,255,255,0.08);
+  --border-strong:rgba(255,255,255,0.15);
+  --text:#f0ede6;
+  --text-muted:#888;
+  --blue:#378ADD;
+  --blue-hover:#4a9eff;
+  --blue-dim:#1a3d5c;
+  --red:#e55;
+  --green:#4c4;
+  --lime:#aaff00;
+  --radius:8px;
+  --panel:260px;
+}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);height:100vh;display:flex;flex-direction:column;overflow:hidden;}
+
+/* ── TOP BAR ── */
+.topbar{display:flex;align-items:center;gap:12px;padding:8px 16px;background:var(--surface);border-bottom:0.5px solid var(--border);flex-shrink:0;}
+.topbar h1{font-size:15px;font-weight:700;letter-spacing:-0.01em;}
+.topbar .pill{font-size:10px;font-weight:700;background:var(--blue-dim);color:var(--blue);border-radius:4px;padding:2px 7px;text-transform:uppercase;letter-spacing:0.06em;}
+.topbar-sep{flex:1;}
+.tb-btn{border:0.5px solid var(--border-strong);border-radius:var(--radius);background:var(--surface2);color:var(--text);padding:6px 12px;font-size:12px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px;transition:background 0.1s;}
+.tb-btn:hover{background:var(--surface3);}
+.tb-btn.danger{border-color:#a33;color:var(--red);}
+.tb-btn.danger:hover{background:#2a1212;}
+.tb-btn svg{flex-shrink:0;}
+
+/* ── MAIN LAYOUT ── */
+.main{display:flex;flex:1;overflow:hidden;}
+
+/* ── LEFT PANEL (camera controls) ── */
+.left-panel{width:var(--panel);flex-shrink:0;background:var(--surface);border-right:0.5px solid var(--border);display:flex;flex-direction:column;overflow-y:auto;overflow-x:hidden;scrollbar-width:none;}
+.left-panel::-webkit-scrollbar{display:none;}
+
+/* collapsible sections */
+.panel-section{border-bottom:0.5px solid var(--border);}
+.panel-section:last-child{border-bottom:none;}
+.section-header{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;cursor:pointer;user-select:none;}
+.section-header:hover{background:var(--surface2);}
+.section-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);}
+.section-chevron{transition:transform 0.2s;color:var(--text-muted);}
+.section-header.collapsed .section-chevron{transform:rotate(-90deg);}
+.section-body{padding:0 14px 12px;}
+.section-body.hidden{display:none;}
+
+/* ── CENTER (two windows + filmstrip) ── */
+.center{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+.windows{display:flex;flex:1;gap:8px;padding:8px;overflow:hidden;}
+.win-wrap{flex:1;display:flex;flex-direction:column;gap:6px;min-width:0;}
+.win-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);text-align:center;}
+.video-box{flex:1;background:#000;border-radius:var(--radius);overflow:hidden;position:relative;display:flex;align-items:center;justify-content:center;border:0.5px solid var(--border);}
+.video-box video,.video-box canvas{width:100%;height:100%;object-fit:contain;display:block;}
+.video-box .placeholder{color:#444;font-size:13px;text-align:center;padding:20px;}
+.overlay-badge{position:absolute;top:8px;left:8px;font-size:10px;font-weight:700;background:rgba(0,0,0,0.6);color:var(--text-muted);padding:2px 7px;border-radius:4px;letter-spacing:0.06em;text-transform:uppercase;}
+.rec-dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--red);margin-right:4px;animation:blink 1s step-start infinite;}
+@keyframes blink{50%{opacity:0;}}
+.onion-overlay{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;}
+
+/* ── FILMSTRIP ── */
+/* ── GUIDES ── */
+.guide-tool-row{display:flex;gap:4px;margin-bottom:8px;flex-wrap:wrap;}
+.guide-tool-btn{width:32px;height:32px;border:0.5px solid var(--border-strong);border-radius:6px;background:var(--surface2);color:var(--text);cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background 0.1s;}
+.guide-tool-btn:hover{background:var(--surface3);}
+.guide-tool-btn.active{border-color:var(--blue);background:var(--blue-dim);color:var(--blue);}
+.colour-swatch{width:24px;height:24px;border-radius:4px;border:2px solid transparent;cursor:pointer;flex-shrink:0;transition:border-color 0.1s;}
+.colour-swatch.active{border-color:#fff;}
+.colour-swatch:hover{border-color:rgba(255,255,255,0.5);}
+.swatch-row{display:flex;gap:5px;align-items:center;margin-bottom:8px;}
+.colour-edit{width:24px;height:24px;border-radius:4px;border:none;cursor:pointer;padding:0;overflow:hidden;flex-shrink:0;}
+.guide-sep{height:0.5px;background:var(--border);margin:8px 0;}
+.line-handle{position:absolute;width:10px;height:10px;border-radius:50%;background:#fff;border:2px solid #378ADD;cursor:move;transform:translate(-50%,-50%);}
+.filmstrip-bar{flex-shrink:0;background:var(--surface);border-top:0.5px solid var(--border);width:100%;}
+.filmstrip-header{display:flex;align-items:center;gap:8px;padding:6px 8px;border-bottom:0.5px solid var(--border);width:100%;box-sizing:border-box;}
+.filmstrip-header span{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:var(--text-muted);}
+.frame-count{font-size:11px;color:var(--blue);font-weight:700;}
+.zoom-label{font-size:10px;color:var(--text-muted);white-space:nowrap;}
+.zoom-slider{width:80px;accent-color:var(--blue);cursor:pointer;}
+
+/* Timeline canvas area */
+.timeline-wrap{position:relative;overflow:hidden;background:var(--bg);width:100%;}
+#timeline-ruler{display:block;width:100%;background:var(--surface2);cursor:ew-resize;}
+#timeline-canvas{display:block;width:100%;cursor:pointer;}
+#timeline-canvas.dragging{cursor:ew-resize;}
+
+/* old thumb styles kept for selected-frame highlight only */
+.empty-filmstrip{color:#444;font-size:12px;padding:12px 16px;}
+
+/* ── RIGHT PANEL (playback controls) ── */
+.right-panel{width:var(--panel);flex-shrink:0;background:var(--surface);border-left:0.5px solid var(--border);display:flex;flex-direction:column;overflow-y:auto;overflow-x:hidden;scrollbar-width:none;}
+.right-panel::-webkit-scrollbar{display:none;}
+
+/* ── SHARED PANEL STYLES ── */
+.panel-section{padding:12px 14px;border-bottom:0.5px solid var(--border);}
+.panel-section:last-child{border-bottom:none;}
+.ctrl-row{display:flex;align-items:center;gap:6px;margin-bottom:8px;}
+.ctrl-row:last-child{margin-bottom:0;}
+.ctrl-row label{font-size:11px;color:var(--text-muted);min-width:54px;white-space:nowrap;flex-shrink:0;}
+.ctrl-row span{font-size:11px;font-weight:600;min-width:36px;text-align:right;flex-shrink:0;}
+.ctrl-row input[type=range]{flex:1;min-width:0;accent-color:var(--blue);cursor:pointer;}
+.big-btn{width:100%;border:none;border-radius:var(--radius);padding:10px;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;transition:background 0.1s,transform 0.08s;margin-bottom:7px;}
+.big-btn:last-child{margin-bottom:0;}
+.big-btn:active{transform:scale(0.97);}
+.big-btn.capture{background:var(--red);color:#fff;}
+.big-btn.capture:hover{background:#c33;}
+.big-btn.primary{background:var(--blue);color:#fff;}
+.big-btn.primary:hover{background:var(--blue-hover);}
+.big-btn.ghost{background:var(--surface2);color:var(--text);border:0.5px solid var(--border-strong);}
+.big-btn.ghost:hover{background:var(--surface3);}
+
+/* resolution picker */
+.res-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:5px;}
+.res-btn{border:0.5px solid var(--border-strong);border-radius:6px;background:var(--surface2);color:var(--text);padding:5px 4px;font-size:10px;font-weight:600;cursor:pointer;text-align:center;transition:background 0.1s;}
+.res-btn:hover{background:var(--surface3);}
+.res-btn.active{border-color:var(--blue);background:var(--blue-dim);color:var(--blue);}
+
+/* playback transport */
+.transport{display:flex;gap:5px;margin-bottom:10px;}
+.tp-btn{border:0.5px solid var(--border-strong);border-radius:6px;background:var(--surface2);color:var(--text);width:36px;height:36px;flex:none;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background 0.1s;}
+.tp-btn:hover{background:var(--surface3);}
+.tp-btn.active{border-color:var(--blue);background:var(--blue-dim);color:var(--blue);}
+.tp-btn svg{flex-shrink:0;}
+
+/* fps grid */
+.fps-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;}
+.fps-btn{border:0.5px solid var(--border-strong);border-radius:6px;background:var(--surface2);color:var(--text);padding:5px 2px;font-size:11px;font-weight:700;cursor:pointer;text-align:center;transition:background 0.1s;}
+.fps-btn:hover{background:var(--surface3);}
+.fps-btn.active{border-color:var(--lime);background:#1a2a00;color:var(--lime);}
+
+/* onion skin */
+.onion-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+.toggle-switch{position:relative;width:36px;height:20px;}
+.toggle-switch input{opacity:0;width:0;height:0;}
+.toggle-slider{position:absolute;inset:0;background:#444;border-radius:10px;cursor:pointer;transition:background 0.2s;}
+.toggle-switch input:checked+.toggle-slider{background:var(--blue);}
+.toggle-slider::before{content:'';position:absolute;width:14px;height:14px;left:3px;top:3px;background:#fff;border-radius:50%;transition:transform 0.2s;}
+.toggle-switch input:checked+.toggle-slider::before{transform:translateX(16px);}
+
+/* frame info */
+.frame-info{font-size:12px;color:var(--text-muted);text-align:center;margin-bottom:8px;}
+.frame-info strong{color:var(--text);}
+
+select.dark-sel{background:var(--surface2);border:0.5px solid var(--border-strong);border-radius:6px;color:var(--text);padding:5px 8px;font-size:12px;width:100%;cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 7px center;padding-right:24px;}
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <h1>Stop Motion Studio</h1>
+  <div class="pill">Beta</div>
+  <div class="topbar-sep"></div>
+</div>
+
+<div class="main">
+
+  <!-- LEFT PANEL: Camera controls -->
+  <div class="left-panel">
+
+    <div class="panel-section">
+    <div class="section-header" onclick="toggleSection(this)">
+      <div class="section-label">Camera</div>
+      <svg class="section-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="section-body">
+      <div style="margin-bottom:10px;">
+        <div style="font-size:10px;color:var(--text-muted);margin-bottom:4px;">Source</div>
+        <select class="dark-sel" id="camera-select" onchange="onCameraChange()">
+          <option value="">— Select camera —</option>
+        </select>
+      </div>
+      <button class="big-btn primary" id="btn-cam" onclick="toggleCamera()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 7 16 12 23 17z"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
+        Activate Camera
+      </button>
+    </div>
+  </div>
+    <div class="panel-section">
+    <div class="section-header collapsed" onclick="toggleSection(this)">
+      <div class="section-label">Resolution</div>
+      <svg class="section-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="section-body hidden">
+<div class="res-grid">
+        <button class="res-btn active" id="res-320"  onclick="setRes(320,240,'res-320')">320×240</button>
+        <button class="res-btn"        id="res-640"  onclick="setRes(640,480,'res-640')">640×480</button>
+        <button class="res-btn"        id="res-720"  onclick="setRes(720,576,'res-720')">720×576</button>
+        <button class="res-btn"        id="res-1280" onclick="setRes(1280,720,'res-1280')">1280×720</button>
+        <button class="res-btn"        id="res-1920" onclick="setRes(1920,1080,'res-1920')">1920×1080</button>
+        <button class="res-btn"        id="res-2560" onclick="setRes(2560,1440,'res-2560')">2560×1440</button>
+    </div>
+  </div>
+    </div>
+
+    <div class="panel-section">
+    <div class="section-header collapsed" onclick="toggleSection(this)">
+      <div class="section-label">Camera Settings</div>
+      <svg class="section-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="section-body hidden">
+<div class="ctrl-row"><label>Brightness</label><input type="range" id="f-bright" min="-100" max="100" value="0" oninput="applyLiveFilter()"><span id="v-bright">0</span></div>
+      <div class="ctrl-row"><label>Contrast</label><input type="range" id="f-contrast" min="-100" max="100" value="0" oninput="applyLiveFilter()"><span id="v-contrast">0</span></div>
+      <div class="ctrl-row"><label>Saturation</label><input type="range" id="f-sat" min="-100" max="100" value="0" oninput="applyLiveFilter()"><span id="v-sat">0</span></div>
+      <div class="ctrl-row"><label>Sharpen</label><input type="range" id="f-warm" min="0" max="10" value="0" step="0.5" oninput="applyLiveFilter()"><span id="v-warm">0</span></div>
+      <div class="ctrl-row"><label>Blur</label><input type="range" id="f-blur" min="0" max="10" value="0" step="0.5" oninput="applyLiveFilter()"><span id="v-blur">0</span></div>
+      <button class="big-btn ghost" onclick="resetCameraSettings()" style="margin-top:6px;">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+        Reset Settings
+      </button>
+    </div>
+  </div>
+    <div class="panel-section">
+    <div class="section-header collapsed" onclick="toggleSection(this)">
+      <div class="section-label">Guides</div>
+      <svg class="section-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="section-body hidden">
+<!-- Overlays sub-section -->
+      <div style="font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:6px;">Overlays</div>
+      <div class="onion-row"><span style="font-size:12px;">Grid</span>
+        <label class="toggle-switch"><input type="checkbox" id="guide-grid" onchange="drawGuides()"><div class="toggle-slider"></div></label>
+      </div>
+      <div class="ctrl-row"><label>Grid Size</label><input type="range" id="guide-grid-size" min="20" max="200" value="40" step="20" oninput="updateGuideLabel('guide-grid-size','v-grid-size','px');drawGuides()"><span id="v-grid-size">40px</span></div>
+      <div class="swatch-row">
+        <span style="font-size:11px;color:var(--text-muted);min-width:54px;">Grid Colour</span>
+        <input type="color" id="guide-grid-colour" class="colour-edit" value="#00ff88" onchange="drawGuides()" title="Grid colour">
+      </div>
+      <div class="guide-sep"></div>
+      <div class="onion-row"><span style="font-size:12px;">Centre Cross</span>
+        <label class="toggle-switch"><input type="checkbox" id="guide-cross" onchange="drawGuides()"><div class="toggle-slider"></div></label>
+      </div>
+      <div class="onion-row"><span style="font-size:12px;">Rule Of Thirds</span>
+        <label class="toggle-switch"><input type="checkbox" id="guide-thirds" onchange="drawGuides()"><div class="toggle-slider"></div></label>
+      </div>
+      <div class="onion-row"><span style="font-size:12px;">Safe Area</span>
+        <label class="toggle-switch"><input type="checkbox" id="guide-safe" onchange="drawGuides()"><div class="toggle-slider"></div></label>
+      </div>
+
+      <!-- Drawing Tools collapsible sub-section -->
+      <div class="guide-sep"></div>
+      <div class="section-header collapsed" onclick="toggleSection(this)" style="padding:8px 0;margin:0;">
+        <div class="section-label">Drawing Tools</div>
+        <svg class="section-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+      <div class="section-body hidden" style="padding:8px 0 0;">
+
+        <div class="guide-tool-row">
+          <button class="guide-tool-btn" id="gtool-pen" title="Pen" onclick="setGuideTool('pen')">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/><path d="M2 2l7.586 7.586"/><circle cx="11" cy="11" r="2"/></svg>
+          </button>
+          <button class="guide-tool-btn" id="gtool-eraser" title="Eraser" onclick="setGuideTool('eraser')">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m7 21-4.3-4.3c-1-1-1-2.5 0-3.4l9.6-9.6c1-1 2.5-1 3.4 0l5.6 5.6c1 1 1 2.5 0 3.4L13 21"/><path d="M22 21H7"/><path d="m5 11 9 9"/></svg>
+          </button>
+          <button class="guide-tool-btn" id="gtool-line" title="Line" onclick="setGuideTool('line')">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="19" x2="19" y2="5"/></svg>
+          </button>
+          <button class="guide-tool-btn" id="gtool-select" title="Select Line (Delete key removes)" onclick="setGuideTool('select')">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3l14 9-7 1-4 7z"/></svg>
+          </button>
+        </div>
+
+        <!-- Pen options -->
+        <div id="guide-pen-opts" style="display:none;">
+          <div class="ctrl-row"><label>Pen Size</label><input type="range" id="guide-pen-size" min="1" max="30" value="3" oninput="updateGuideLabel('guide-pen-size','v-pen-size','px')"><span id="v-pen-size">3px</span></div>
+          <div class="swatch-row">
+            <span style="font-size:11px;color:var(--text-muted);min-width:54px;">Colour</span>
+            <div class="colour-swatch active" style="background:#ffffff;" data-colour="#ffffff" onclick="selectPenColour(this)"></div>
+            <div class="colour-swatch" style="background:#000000;" data-colour="#000000" onclick="selectPenColour(this)"></div>
+            <div class="colour-swatch" style="background:#ff3333;" data-colour="#ff3333" onclick="selectPenColour(this)"></div>
+            <div class="colour-swatch" style="background:#00cc44;" data-colour="#00cc44" onclick="selectPenColour(this)"></div>
+            <div class="colour-swatch" style="background:#3388ff;" data-colour="#3388ff" onclick="selectPenColour(this)"></div>
+          </div>
+        </div>
+
+        <!-- Eraser options -->
+        <div id="guide-eraser-opts" style="display:none;">
+          <div class="ctrl-row"><label>Eraser Size</label><input type="range" id="guide-eraser-size" min="5" max="60" value="15" oninput="updateGuideLabel('guide-eraser-size','v-eraser-size','px')"><span id="v-eraser-size">15px</span></div>
+        </div>
+
+        <!-- Line options -->
+        <div id="guide-line-opts" style="display:none;">
+          <div class="ctrl-row"><label>Thickness</label><input type="range" id="guide-line-size" min="1" max="20" value="2" oninput="updateGuideLabel('guide-line-size','v-line-size','px')"><span id="v-line-size">2px</span></div>
+          <div class="swatch-row">
+            <span style="font-size:11px;color:var(--text-muted);min-width:54px;">Colour</span>
+            <input type="color" id="line-colour-picker" class="colour-edit" value="#ff3333" title="Line colour">
+          </div>
+          <div style="font-size:10px;color:var(--text-muted);margin-top:4px;">Select a line, then press Delete to remove it.</div>
+        </div>
+
+      </div><!-- end Drawing Tools body -->
+
+      <div class="guide-sep"></div>
+      <button class="big-btn ghost" onclick="clearGuides()" style="margin-top:0;">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+        Clear All Guides
+      </button>
+    </div>
+  </div>
+
+    <div class="panel-section">
+    <div class="section-header collapsed" onclick="toggleSection(this)">
+      <div class="section-label">Onion Skin</div>
+      <svg class="section-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="section-body hidden">
+      <div class="onion-row">
+        <span style="font-size:12px;">Show Onion Skin</span>
+        <label class="toggle-switch"><input type="checkbox" id="onion-toggle" onchange="onOnionToggle()"><div class="toggle-slider"></div></label>
+      </div>
+      <div id="onion-controls" style="display:none;">
+        <div style="font-size:10px;color:var(--text-muted);margin-bottom:5px;">Frames</div>
+        <div class="fps-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:8px;">
+          <button class="fps-btn active" id="onion-f1" onclick="setOnionFrames(1)">1</button>
+          <button class="fps-btn"        id="onion-f2" onclick="setOnionFrames(2)">2</button>
+          <button class="fps-btn"        id="onion-f3" onclick="setOnionFrames(3)">3</button>
+        </div>
+        <div class="ctrl-row">
+          <label>Opacity</label>
+          <input type="range" id="onion-opacity" min="5" max="80" value="40"
+                 oninput="document.getElementById('v-onion-opacity').textContent=this.value+'%'">
+          <span id="v-onion-opacity">40%</span>
+        </div>
+        <div style="font-size:10px;color:var(--text-muted);margin-top:2px;">Previous frames shown on live camera, oldest most transparent.</div>
+      </div>
+    </div>
+    </div>
+
+    <div class="panel-section">
+    <div class="section-header collapsed" onclick="toggleSection(this)">
+      <div class="section-label">Time Lapse</div>
+      <svg class="section-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="section-body hidden">
+<div class="onion-row">
+        <span style="font-size:12px;">Enable Time Lapse</span>
+        <label class="toggle-switch"><input type="checkbox" id="timelapse-toggle" onchange="onTimeLapseToggle()"><div class="toggle-slider"></div></label>
+      </div>
+      <div id="timelapse-controls" style="display:none;">
+        <div class="ctrl-row" style="margin-top:8px;"><label>Interval</label><input type="range" id="tl-interval" min="0.5" max="10" value="1" step="0.5" oninput="updateTLLabels()"><span id="v-tl-interval">1s</span></div>
+        <div class="ctrl-row"><label>Duration</label><input type="range" id="tl-duration" min="0.5" max="100" value="1" step="0.5" oninput="updateTLLabels()"><span id="v-tl-duration">1s</span></div>
+        <div style="font-size:10px;color:var(--text-muted);margin-top:4px;" id="tl-calc">12 frames saved @ 12 fps
+    </div>
+  </div>
+      </div>
+      <div id="tl-recording-warning" style="display:none;margin-top:10px;padding:8px 10px;border-radius:6px;background:#3a0000;border:1px solid var(--red);">
+        <div style="display:flex;align-items:center;gap:7px;">
+          <span class="rec-dot"></span>
+          <span style="font-size:11px;font-weight:700;color:var(--red);">Recording In Progress</span>
+        </div>
+        <div style="font-size:10px;color:#cc8888;margin-top:4px;" id="tl-progress-label">Frame 0 captured</div>
+      </div>
+    </div>
+
+
+    <div class="panel-section">
+    <div class="section-header collapsed" onclick="toggleSection(this)">
+      <div class="section-label">Auto-Save Reminder</div>
+      <svg class="section-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="section-body hidden">
+      <div class="onion-row">
+        <span style="font-size:12px;">Enable Reminder</span>
+        <label class="toggle-switch"><input type="checkbox" id="autosave-toggle" onchange="updateAutoSave()"><div class="toggle-slider"></div></label>
+      </div>
+      <div class="ctrl-row">
+        <label>Every</label>
+        <input type="range" id="autosave-interval" min="5" max="120" value="60" step="5"
+               oninput="document.getElementById('v-autosave').textContent=this.value+'min';updateAutoSave()">
+        <span id="v-autosave">60min</span>
+      </div>
+      <div style="font-size:10px;color:var(--text-muted);margin-top:2px;" id="autosave-status">Reminder off</div>
+    </div>
+    </div>
+
+    <div class="panel-section">
+    <div class="section-header" onclick="toggleSection(this)">
+      <div class="section-label">Capture</div>
+      <svg class="section-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="section-body">
+<button class="big-btn capture" id="btn-capture" onclick="captureFrame()" disabled>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M20 7h-3.4l-1.6-2H9L7.4 7H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/></svg>
+        Capture Frame
+      </button>
+      <button class="big-btn ghost" onclick="importFrames()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        Import Frames
+      </button>
+      <button class="big-btn ghost" onclick="importRotoFrames()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        Import Roto
+      </button>
+      <button class="big-btn ghost" onclick="saveProject()" id="btn-save-project" style="position:relative;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+        Save Project
+        <span id="unsaved-dot" style="display:none;position:absolute;top:6px;right:8px;width:7px;height:7px;border-radius:50%;background:#ff9500;"></span>
+      </button>
+      <button class="big-btn ghost" onclick="loadProject()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+        Load Project
+      </button>
+      <input type="file" id="import-input"      accept="image/*" multiple style="display:none" onchange="handleImport(event)">
+      <input type="file" id="import-roto-input" accept="image/png" multiple style="display:none" onchange="handleRotoImport(event)">
+      <input type="file" id="load-project-input" accept=".json" style="display:none" onchange="handleLoadProject(event)">
+    </div>
+  </div>
+  </div>
+
+  <!-- AUTO-SAVE REMINDER SECTION -->
+
+  <!-- CENTER: Two video windows + filmstrip -->
+  <div class="center">
+    <div class="windows" style="flex:1;min-height:0;">
+
+      <!-- Window 1: Live camera -->
+      <div class="win-wrap">
+        <div class="win-label">
+          <span id="cam-label-badge">&#9679;</span> Window 1 — Live Camera
+        </div>
+        <div class="video-box" id="win1-box">
+          <div class="placeholder" id="cam-placeholder">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M23 7 16 12 23 17z"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
+            <div style="margin-top:10px;">Click Activate Camera<br>to begin</div>
+          </div>
+          <video id="cam-video" autoplay playsinline muted style="display:none;"></video>
+          <canvas id="cam-canvas" style="display:none;width:100%;height:100%;object-fit:contain;"></canvas>
+          <canvas id="guide-canvas" style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;pointer-events:none;display:none;"></canvas>
+          <div class="overlay-badge" id="rec-badge" style="display:none;"><span class="rec-dot"></span>LIVE</div>
+        </div>
+      </div>
+
+      <!-- Window 2: Preview / playback -->
+      <div class="win-wrap">
+        <div class="win-label">Window 2 — Preview</div>
+        <div class="video-box" id="win2-box">
+          <canvas id="preview-canvas" style="width:100%;height:100%;object-fit:contain;"></canvas>
+          <canvas id="roto-canvas" style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;pointer-events:none;display:none;"></canvas>
+          <div class="overlay-badge" id="play-badge" style="display:none;"><span style="color:var(--lime);">&#9654;</span> PLAYING</div>
+          <div class="overlay-badge" style="top:auto;bottom:8px;" id="frame-badge">—</div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Filmstrip / Timeline -->
+    <div class="filmstrip-bar">
+      <!-- Header row: left info | centre transport | right zoom+actions -->
+      <div class="filmstrip-header" style="gap:8px;">
+
+        <!-- LEFT: timeline info -->
+        <div style="display:flex;align-items:center;gap:6px;white-space:nowrap;flex-shrink:0;">
+          <span style="font-size:11px;font-weight:700;color:var(--text);">Timeline</span>
+          <span class="frame-count" id="frame-count-label" style="font-size:11px;">0 frames</span>
+          <span style="font-size:11px;color:var(--text-muted);">·</span>
+          <span style="font-size:11px;color:var(--text-muted);" id="tl-fps-label">12 fps</span>
+        </div>
+
+        <!-- CENTRE: transport controls -->
+        <div style="flex:1;display:flex;justify-content:center;align-items:center;gap:3px;">
+
+          <button class="tp-btn" title="First Frame Of Timeline" onclick="goFirst()" style="width:36px;height:36px;flex:none;border-radius:6px;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 19 2 12 11 5 11 19"/><polygon points="22 19 13 12 22 5 22 19"/></svg>
+          </button>
+
+          <button class="tp-btn" title="Jump To IN Point" onclick="goInPoint()" style="width:36px;height:36px;flex:none;border-radius:6px;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#00dd44" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>
+          </button>
+
+          <button class="tp-btn" title="Back One Frame" onclick="stepBack()" style="width:36px;height:36px;flex:none;border-radius:6px;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="19 20 9 12 19 4"/><line x1="5" y1="19" x2="5" y2="5"/></svg>
+          </button>
+
+          <button class="tp-btn" title="Play / Pause" id="btn-play-pause" onclick="togglePlayPause()" style="width:36px;height:36px;flex:none;border-radius:6px;border-color:var(--blue);background:var(--blue-dim);">
+            <svg id="play-pause-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          </button>
+
+          <button class="tp-btn" title="Forward One Frame" onclick="stepFwd()" style="width:36px;height:36px;flex:none;border-radius:6px;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 4 15 12 5 20"/><line x1="19" y1="4" x2="19" y2="20"/></svg>
+          </button>
+
+          <button class="tp-btn" title="Jump To OUT Point" onclick="goOutPoint()" style="width:36px;height:36px;flex:none;border-radius:6px;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#dd2222" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>
+          </button>
+
+          <button class="tp-btn" title="Last Frame Of Timeline" onclick="goLast()" style="width:36px;height:36px;flex:none;border-radius:6px;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 19 22 12 13 5 13 19"/><polygon points="2 19 11 12 2 5 2 19"/></svg>
+          </button>
+
+        </div>
+
+        <!-- RIGHT: zoom + frame actions -->
+        <div style="display:flex;align-items:center;gap:5px;flex-shrink:0;">
+          <span class="zoom-label">Zoom</span>
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+          <input type="range" class="zoom-slider" id="zoom-slider" min="1" max="150" value="20" oninput="onZoomChange()" style="width:70px;">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+          <button class="tp-btn" onclick="zoomFitAll()" title="Zoom To Fit All Frames" style="width:36px;height:36px;flex:none;border-radius:6px;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>
+          </button>
+          <button class="tp-btn" onclick="zoomFitRange()" title="Zoom To Fit IN / OUT Range" style="width:36px;height:36px;flex:none;border-radius:6px;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 14 10 14 10 20"/><polyline points="20 10 14 10 14 4"/><line x1="14" y1="10" x2="21" y2="3"/><line x1="3" y1="21" x2="10" y2="14"/></svg>
+          </button>
+          <button class="tb-btn" onclick="duplicateSelected()" style="height:36px;padding:0 10px;font-size:11px;" title="Duplicate Frame">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            Duplicate
+          </button>
+          <button class="tb-btn" onclick="deleteSelected()" style="height:36px;padding:0 10px;font-size:11px;" title="Delete Frame">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
+            Delete
+          </button>
+          <button class="tb-btn danger" onclick="clearAll()" style="height:36px;padding:0 10px;font-size:11px;" title="Delete All Frames">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
+            Delete All
+          </button>
+        </div>
+      </div>
+
+      <!-- Timeline canvas area -->
+      <div class="timeline-wrap" id="timeline-wrap">
+        <canvas id="timeline-ruler" height="22"></canvas>
+        <canvas id="audio-canvas" height="60" style="display:none;width:100%;background:#0a1a0a;cursor:pointer;"></canvas>
+        <canvas id="timeline-canvas" height="80"></canvas>
+        <div class="empty-filmstrip" id="empty-label" style="display:none;">No frames yet — capture or import images to begin.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT PANEL: Playback + Rotoscope + Export + Audio -->
+  <div class="right-panel">
+
+    <div class="panel-section">
+    <div class="section-header" onclick="toggleSection(this)">
+      <div class="section-label">Playback</div>
+      <svg class="section-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="section-body">
+      <div style="font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:6px;">Frame Rate</div>
+      <div class="fps-grid">
+        <button class="fps-btn" id="fps-8"  onclick="setFps(8)">8 Fps</button>
+        <button class="fps-btn active" id="fps-12" onclick="setFps(12)">12 Fps</button>
+        <button class="fps-btn" id="fps-15" onclick="setFps(15)">15 Fps</button>
+        <button class="fps-btn" id="fps-25" onclick="setFps(25)">25 Fps</button>
+        <button class="fps-btn" id="fps-30" onclick="setFps(30)">30 Fps</button>
+        <button class="fps-btn" id="fps-custom" onclick="promptCustomFps()">...</button>
+      </div>
+      <div class="guide-sep" style="margin:10px 0 8px;"></div>
+      <div class="onion-row">
+        <span style="font-size:12px;">Loop</span>
+        <label class="toggle-switch"><input type="checkbox" id="loop-toggle" checked><div class="toggle-slider"></div></label>
+      </div>
+    </div>
+    </div>
+
+    <div class="panel-section">
+    <div class="section-header collapsed" onclick="toggleSection(this)">
+      <div class="section-label">Rotoscope</div>
+      <svg class="section-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="section-body hidden">
+
+      <!-- Show/Hide roto layer -->
+      <div class="onion-row" style="margin-bottom:10px;">
+        <span style="font-size:12px;">Show Roto Layer</span>
+        <label class="toggle-switch"><input type="checkbox" id="roto-visible" onchange="toggleRotoVisible()"><div class="toggle-slider"></div></label>
+      </div>
+
+      <!-- Tools -->
+      <div style="font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:6px;">Tools</div>
+      <div class="guide-tool-row">
+        <button class="guide-tool-btn" id="rtool-pen" title="Pen" onclick="setRotoTool('pen')">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/><path d="M2 2l7.586 7.586"/><circle cx="11" cy="11" r="2"/></svg>
+        </button>
+        <button class="guide-tool-btn" id="rtool-eraser" title="Eraser" onclick="setRotoTool('eraser')">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m7 21-4.3-4.3c-1-1-1-2.5 0-3.4l9.6-9.6c1-1 2.5-1 3.4 0l5.6 5.6c1 1 1 2.5 0 3.4L13 21"/><path d="M22 21H7"/><path d="m5 11 9 9"/></svg>
+        </button>
+        <button class="guide-tool-btn" id="rtool-line" title="Line (drag)" onclick="setRotoTool('line')">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="19" x2="19" y2="5"/></svg>
+        </button>
+      </div>
+
+      <!-- Pen options -->
+      <div id="roto-pen-opts" style="display:none;">
+        <div class="ctrl-row"><label>Size</label><input type="range" id="roto-pen-size" min="1" max="30" value="3" oninput="updateRotoLabel('roto-pen-size','v-rpen-size','px')"><span id="v-rpen-size">3px</span></div>
+        <div style="font-size:11px;color:var(--text-muted);margin-bottom:5px;">Colour</div>
+        <div id="roto-colour-grid" style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:6px;">
+        </div>
+      </div>
+
+      <!-- Eraser options -->
+      <div id="roto-eraser-opts" style="display:none;">
+        <div class="ctrl-row"><label>Size</label><input type="range" id="roto-eraser-size" min="5" max="60" value="15" oninput="updateRotoLabel('roto-eraser-size','v-reraser-size','px')"><span id="v-reraser-size">15px</span></div>
+      </div>
+
+      <!-- Line options -->
+      <div id="roto-line-opts" style="display:none;">
+        <div class="ctrl-row"><label>Thickness</label><input type="range" id="roto-line-size" min="1" max="20" value="2" oninput="updateRotoLabel('roto-line-size','v-rline-size','px')"><span id="v-rline-size">2px</span></div>
+        <div class="swatch-row">
+          <span style="font-size:11px;color:var(--text-muted);min-width:40px;">Colour</span>
+          <input type="color" id="roto-line-colour" class="colour-edit" value="#ff3333">
+        </div>
+      </div>
+
+      <!-- Frame actions -->
+      <div class="guide-sep" style="margin:8px 0;"></div>
+      <div style="font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:6px;">Frame Actions</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-bottom:6px;">
+        <button class="big-btn ghost" style="margin:0;font-size:11px;padding:7px;" onclick="rotoUndo()">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7v6h6"/><path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"/></svg>
+          Undo
+        </button>
+        <button class="big-btn ghost" style="margin:0;font-size:11px;padding:7px;" onclick="rotoClear()">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg>
+          Clear
+        </button>
+        <button class="big-btn ghost" style="margin:0;font-size:11px;padding:7px;" onclick="rotoCopy()">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          Copy
+        </button>
+        <button class="big-btn ghost" style="margin:0;font-size:11px;padding:7px;" onclick="rotoPaste()">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>
+          Paste
+        </button>
+      </div>
+      <button class="big-btn ghost" style="margin:5px 0 0;font-size:11px;padding:7px;" onclick="rotoClearAll()">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
+        Clear All Roto Frames
+      </button>
+      <div style="font-size:10px;color:var(--text-muted);margin-top:6px;">Ctrl+Z = Undo (5 steps per frame)</div>
+
+    </div>
+    </div>
+
+    <div class="panel-section">
+    <div class="section-header" onclick="toggleSection(this)">
+      <div class="section-label">Export Frames</div>
+      <svg class="section-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="section-body">
+      <div style="margin-bottom:8px;">
+        <div style="font-size:10px;color:var(--text-muted);margin-bottom:4px;">Export Mode</div>
+        <div class="fps-grid" style="grid-template-columns:1fr 1fr 1fr;">
+          <button class="fps-btn active" id="emode-captured" onclick="setExportMode('captured')" title="Captured frames only">Captured</button>
+          <button class="fps-btn" id="emode-roto" onclick="setExportMode('roto')" title="Roto frames only (PNG)">Roto</button>
+          <button class="fps-btn" id="emode-comp" onclick="setExportMode('comp')" title="Roto composited over captured">Composited</button>
+        </div>
+      </div>
+      <div style="margin-bottom:8px;">
+        <div style="font-size:10px;color:var(--text-muted);margin-bottom:4px;">Range</div>
+        <div class="fps-grid" style="grid-template-columns:1fr 1fr;">
+          <button class="fps-btn active" id="export-range-all" onclick="setExportRange('all')">All Frames</button>
+          <button class="fps-btn" id="export-range-in" onclick="setExportRange('range')">In / Out Range</button>
+        </div>
+      </div>
+      <div style="margin-bottom:8px;">
+        <div style="font-size:10px;color:var(--text-muted);margin-bottom:4px;">Format</div>
+        <select class="dark-sel" id="export-format" onchange="onExportFormatChange()">
+          <option value="png-zip">PNG Frames (ZIP)</option>
+          <option value="jpg-zip">JPG Frames (ZIP)</option>
+          <option value="gif">Animated GIF</option>
+          <option value="mp4">MP4 — H.264 (Chrome/Edge)</option>
+        </select>
+      </div>
+      <div id="jpg-quality-row" style="display:none;margin-bottom:8px;">
+        <div class="ctrl-row"><label>Quality</label><input type="range" id="jpg-quality" min="10" max="100" value="85" step="1" oninput="document.getElementById('v-jpg-q').textContent=this.value+'%'"><span id="v-jpg-q">85%</span></div>
+      </div>
+      <div id="export-progress-wrap" style="display:none;margin-bottom:8px;">
+        <div style="font-size:10px;color:var(--text-muted);margin-bottom:4px;" id="export-progress-label">Encoding…</div>
+        <div style="background:var(--surface2);border-radius:4px;height:6px;overflow:hidden;">
+          <div id="export-progress-bar" style="height:100%;width:0%;background:var(--blue);transition:width 0.1s;"></div>
+        </div>
+      </div>
+      <div class="onion-row" id="export-audio-row" style="margin-bottom:8px;display:none;">
+        <span style="font-size:12px;">Include Audio Track</span>
+        <label class="toggle-switch"><input type="checkbox" id="export-audio"><div class="toggle-slider"></div></label>
+      </div>
+      <button class="big-btn primary" id="btn-export-all" onclick="exportProject()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Export Frames
+      </button>
+    </div>
+    </div>
+
+    <div class="panel-section">
+    <div class="section-header collapsed" onclick="toggleSection(this)">
+      <div class="section-label">Snapshot Frame</div>
+      <svg class="section-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="section-body hidden">
+      <div style="margin-bottom:8px;">
+        <div style="font-size:10px;color:var(--text-muted);margin-bottom:4px;">Format</div>
+        <select class="dark-sel" id="single-format" onchange="onSingleFormatChange()">
+          <option value="png">PNG</option>
+          <option value="jpg">JPG</option>
+        </select>
+      </div>
+      <div id="single-quality-row" style="display:none;margin-bottom:8px;">
+        <div class="ctrl-row"><label>Quality</label><input type="range" id="single-quality" min="10" max="100" value="90" step="1" oninput="document.getElementById('v-sq').textContent=this.value+'%'"><span id="v-sq">90%</span></div>
+      </div>
+      <button class="big-btn ghost" onclick="exportSelectedFrame()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Save Snapshot
+      </button>
+      <div style="font-size:10px;color:var(--text-muted);margin-top:8px;" id="export-size-label"></div>
+    </div>
+    </div>
+
+    <!-- AUDIO -->
+    <div class="panel-section">
+    <div class="section-header" onclick="toggleSection(this)">
+      <div class="section-label">Audio Scratch Track</div>
+      <svg class="section-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="section-body">
+<button class="big-btn ghost" onclick="document.getElementById('audio-input').click()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+        Import Audio
+      </button>
+      <input type="file" id="audio-input" accept="audio/*" style="display:none" onchange="loadAudio(event)">
+      <div id="audio-info" style="display:none;margin-top:8px;">
+        <div style="font-size:11px;color:var(--text-muted);" id="audio-filename">—</div>
+        <div style="display:flex;gap:6px;margin-top:6px;">
+          <button class="tb-btn danger" style="flex:1;padding:5px;" onclick="removeAudio()">✕ Delete Audio</button>
+        </div>
+        <div class="ctrl-row" style="margin-top:6px;"><label>Volume</label><input type="range" id="audio-vol" min="0" max="100" value="80" oninput="setAudioVol()"><span id="v-audio-vol">80%</span>
+    </div>
+  </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- hidden inputs keep JS rangeStart/rangeEnd sync working -->
+<input type="hidden" id="range-start" value="1">
+<input type="hidden" id="range-end" value="1">
+
+<script>
+// ── STATE ─────────────────────────────────────────────────────────────────────
+let frames = [];           // array of {dataURL, img}
+let selectedFrame = -1;
+let playInterval = null;
+let playDir = 1;           // 1=forward, -1=reverse
+let currentFPS = 12;
+let playbackCurrent = 0;
+let camStream = null;
+let camActive = false;
+let captureW = 320, captureH = 240;
+let rangeStart = 1, rangeEnd = 1;
+// dragging state for IN/OUT handles
+let rangeDragging = null; // 'in' | 'out' | null
+let onionOpacity    = 0.40;
+let onionFrames     = 1;
+let onionEnabled    = false;
+let onionFrameCount = 1;
+
+function onOnionToggle(){
+  onionEnabled = document.getElementById('onion-toggle').checked;
+  document.getElementById('onion-controls').style.display = onionEnabled ? 'block' : 'none';
+}
+
+function setOnionFrames(n){
+  onionFrameCount = n;
+  onionFrames = n;
+  [1,2,3].forEach(i => {
+    const b = document.getElementById('onion-f'+i);
+    if(b) b.classList.toggle('active', i === n);
+  });
+}
+
+// ── ELEMENTS ─────────────────────────────────────────────────────────────────
+const camVideo      = document.getElementById('cam-video');
+const camCanvas     = document.getElementById('cam-canvas');
+const camCtx        = camCanvas.getContext('2d');
+const previewCanvas = document.getElementById('preview-canvas');
+const previewCtx    = previewCanvas.getContext('2d');
+
+function toggleSection(header){
+  header.classList.toggle('collapsed');
+  const body = header.nextElementSibling;
+  if(body && body.classList.contains('section-body')) body.classList.toggle('hidden');
+}
+
+// ── GUIDES ───────────────────────────────────────────────────────────────────
+const guideCanvas = document.getElementById('guide-canvas');
+const guideCtx    = guideCanvas.getContext('2d');
+
+// State
+let guideTool     = null;        // no tool selected by default
+let penColour     = '#ffffff';
+let guideDrawing  = false;
+let guideLastX    = 0, guideLastY = 0;
+
+// Persistent pen strokes stored as ImageData
+let penLayer      = null;        // ImageData snapshot of pen/erase strokes
+
+// Lines: [{x1,y1,x2,y2,colour,width}]
+let guideLines    = [];
+let selectedLine  = -1;
+let lineDragPart  = null;        // 'p1'|'p2'|'body' while dragging
+let lineDragStart = null;
+let linePreview   = null;        // {x1,y1,x2,y2} while drawing
+
+function updateGuideLabel(sliderId, labelId, suffix){
+  document.getElementById(labelId).textContent = document.getElementById(sliderId).value + suffix;
+}
+
+function setGuideTool(tool){
+  if(guideTool === tool) tool = null;
+  guideTool = tool;
+  ['pen','eraser','line','select'].forEach(t => {
+    const b = document.getElementById('gtool-'+t);
+    if(b) b.classList.toggle('active', t === tool);
+  });
+  document.getElementById('guide-pen-opts').style.display    = tool === 'pen'    ? 'block' : 'none';
+  document.getElementById('guide-eraser-opts').style.display = tool === 'eraser' ? 'block' : 'none';
+  document.getElementById('guide-line-opts').style.display   = (tool === 'line' || tool === 'select') ? 'block' : 'none';
+  if(tool !== 'select') selectedLine = -1;
+  enableGuideInput(tool !== null);
+  updateGuideCursor();
+  drawGuides();
+}
+
+function selectPenColour(el){
+  penColour = el.dataset.colour;
+  document.querySelectorAll('#guide-pen-opts .colour-swatch').forEach(s => s.classList.remove('active'));
+  el.classList.add('active');
+}
+
+function updateGuideCursor(){
+  const tool = guideTool;
+  guideCanvas.style.cursor = tool==='pen' ? 'crosshair'
+    : tool==='eraser' ? 'cell'
+    : tool==='line'   ? 'crosshair'
+    : 'default';
+}
+
+// ── GUIDE CANVAS SIZING ───────────────────────────────────────────────────────
+function sizeGuideCanvas(){
+  const cam = document.getElementById('cam-canvas');
+  if(!cam || cam.style.display === 'none') return;
+  // Match the rendered video area (same logic as onion skin)
+  const vW = camVideo.videoWidth || captureW;
+  const vH = camVideo.videoHeight || captureH;
+  const box = cam.getBoundingClientRect();
+  const scale = Math.min(box.width/vW, box.height/vH);
+  const rW = Math.round(vW * scale);
+  const rH = Math.round(vH * scale);
+  const offX = (box.width  - rW) / 2;
+  const offY = (box.height - rH) / 2;
+  const par  = document.getElementById('win1-box').getBoundingClientRect();
+
+  if(guideCanvas.width !== rW || guideCanvas.height !== rH){
+    // Save pen layer before resize
+    if(penLayer && guideCanvas.width > 0){
+      penLayer = guideCtx.getImageData(0, 0, guideCanvas.width, guideCanvas.height);
+    }
+    guideCanvas.width  = rW;
+    guideCanvas.height = rH;
+    if(penLayer) guideCtx.putImageData(penLayer, 0, 0);
+  }
+  guideCanvas.style.left   = (box.left - par.left + offX) + 'px';
+  guideCanvas.style.top    = (box.top  - par.top  + offY) + 'px';
+  guideCanvas.style.width  = rW + 'px';
+  guideCanvas.style.height = rH + 'px';
+  guideCanvas.style.display = 'block';
+}
+
+function guideXY(e){
+  const r = guideCanvas.getBoundingClientRect();
+  const scaleX = guideCanvas.width  / r.width;
+  const scaleY = guideCanvas.height / r.height;
+  return { x: (e.clientX - r.left) * scaleX, y: (e.clientY - r.top) * scaleY };
+}
+
+// ── DRAW ALL GUIDES ───────────────────────────────────────────────────────────
+function drawGuides(){
+  if(!camActive) return;
+  sizeGuideCanvas();
+  const W = guideCanvas.width, H = guideCanvas.height;
+  guideCtx.clearRect(0, 0, W, H);
+
+  // 1. Pen layer
+  if(penLayer) guideCtx.putImageData(penLayer, 0, 0);
+
+  // 2. Grid
+  if(document.getElementById('guide-grid').checked){
+    const sz    = +document.getElementById('guide-grid-size').value;
+    const gcol  = document.getElementById('guide-grid-colour').value;
+    guideCtx.strokeStyle = gcol + '88';
+    guideCtx.lineWidth   = 1;
+    guideCtx.setLineDash([]);
+    for(let x = sz; x < W; x += sz){ guideCtx.beginPath(); guideCtx.moveTo(x,0); guideCtx.lineTo(x,H); guideCtx.stroke(); }
+    for(let y = sz; y < H; y += sz){ guideCtx.beginPath(); guideCtx.moveTo(0,y); guideCtx.lineTo(W,y); guideCtx.stroke(); }
+  }
+
+  // 4. Centre cross
+  if(document.getElementById('guide-cross').checked){
+    guideCtx.strokeStyle = 'rgba(255,255,255,0.6)';
+    guideCtx.lineWidth   = 1;
+    guideCtx.setLineDash([4,4]);
+    guideCtx.beginPath(); guideCtx.moveTo(W/2,0); guideCtx.lineTo(W/2,H); guideCtx.stroke();
+    guideCtx.beginPath(); guideCtx.moveTo(0,H/2); guideCtx.lineTo(W,H/2); guideCtx.stroke();
+    guideCtx.setLineDash([]);
+  }
+
+  // 5. Rule of thirds
+  if(document.getElementById('guide-thirds').checked){
+    guideCtx.strokeStyle = 'rgba(255,220,0,0.5)';
+    guideCtx.lineWidth   = 1;
+    guideCtx.setLineDash([4,4]);
+    [1,2].forEach(i => {
+      const x=W*i/3, y=H*i/3;
+      guideCtx.beginPath(); guideCtx.moveTo(x,0); guideCtx.lineTo(x,H); guideCtx.stroke();
+      guideCtx.beginPath(); guideCtx.moveTo(0,y); guideCtx.lineTo(W,y); guideCtx.stroke();
+    });
+    guideCtx.setLineDash([]);
+  }
+
+  // 6. Safe areas (title 80%, action 90%)
+  if(document.getElementById('guide-safe').checked){
+    [[0.9,'rgba(0,200,255,0.5)'],[0.8,'rgba(255,100,0,0.5)']].forEach(([pct,col]) => {
+      const mx=(W*(1-pct))/2, my=(H*(1-pct))/2;
+      guideCtx.strokeStyle = col;
+      guideCtx.lineWidth   = 1.5;
+      guideCtx.setLineDash([]);
+      guideCtx.strokeRect(mx, my, W*pct, H*pct);
+    });
+    guideCtx.fillStyle='rgba(0,200,255,0.5)';guideCtx.font='9px sans-serif';guideCtx.textAlign='left';
+    guideCtx.fillText('Action Safe (90%)', W*0.05+4, H*0.05+10);
+    guideCtx.fillStyle='rgba(255,100,0,0.5)';
+    guideCtx.fillText('Title Safe (80%)', W*0.1+4, H*0.1+10);
+  }
+
+  // 7. Saved lines
+  guideLines.forEach((l,i) => {
+    guideCtx.strokeStyle = l.colour;
+    guideCtx.lineWidth   = l.width;
+    guideCtx.setLineDash([]);
+    guideCtx.beginPath(); guideCtx.moveTo(l.x1,l.y1); guideCtx.lineTo(l.x2,l.y2); guideCtx.stroke();
+    if(i === selectedLine){
+      // draw endpoint handles
+      [l.x1,l.y1,l.x2,l.y2].forEach((v,j) => {
+        if(j%2===0){
+          const hx=l['x'+(j/2+1)], hy=l['y'+(j/2+1)];
+          guideCtx.beginPath(); guideCtx.arc(hx,hy,6,0,Math.PI*2);
+          guideCtx.fillStyle='#fff'; guideCtx.fill();
+          guideCtx.strokeStyle='#378ADD'; guideCtx.lineWidth=2; guideCtx.stroke();
+        }
+      });
+    }
+  });
+
+  // 8. Line preview while drawing
+  if(linePreview){
+    const col = document.getElementById('line-colour-picker').value;
+    const w   = +document.getElementById('guide-line-size').value;
+    guideCtx.strokeStyle=col; guideCtx.lineWidth=w; guideCtx.setLineDash([4,4]);
+    guideCtx.beginPath(); guideCtx.moveTo(linePreview.x1,linePreview.y1); guideCtx.lineTo(linePreview.x2,linePreview.y2); guideCtx.stroke();
+    guideCtx.setLineDash([]);
+  }
+}
+
+function pickRulerStep(size){
+  const steps=[10,20,50,100,200,500];
+  return steps.find(s => size/s < 20) || 500;
+}
+
+// ── GUIDE POINTER EVENTS ──────────────────────────────────────────────────────
+function enableGuideInput(on){
+  guideCanvas.style.pointerEvents = on ? 'auto' : 'none';
+}
+
+// Called after camera starts
+function initGuideEvents(){
+  guideCanvas.addEventListener('pointerdown', guidePointerDown);
+  window.addEventListener('pointermove',     guidePointerMove);
+  window.addEventListener('pointerup',       guidePointerUp);
+}
+
+let lineFirstClick = null;
+
+function guidePointerDown(e){
+  e.stopPropagation();
+  const p = guideXY(e);
+
+  if(guideTool === 'pen'){
+    guideDrawing = true;
+    guideLastX = p.x; guideLastY = p.y;
+    // Stamp a dot
+    flushPenLayer();
+    const sz = +document.getElementById('guide-pen-size').value;
+    guideCtx.globalCompositeOperation = 'source-over';
+    guideCtx.fillStyle = penColour;
+    guideCtx.beginPath(); guideCtx.arc(p.x, p.y, sz/2, 0, Math.PI*2); guideCtx.fill();
+    savePenLayer();
+  }
+  else if(guideTool === 'eraser'){
+    guideDrawing = true;
+    guideLastX = p.x; guideLastY = p.y;
+    eraseAt(p.x, p.y);
+  }
+  else if(guideTool === 'line'){
+    if(!lineFirstClick){
+      lineFirstClick = {x:p.x, y:p.y};
+      linePreview = {x1:p.x,y1:p.y,x2:p.x,y2:p.y};
+    } else {
+      // Commit line
+      guideLines.push({
+        x1:lineFirstClick.x, y1:lineFirstClick.y,
+        x2:p.x, y2:p.y,
+        colour: document.getElementById('line-colour-picker').value,
+        width:  +document.getElementById('guide-line-size').value
+      });
+      lineFirstClick = null; linePreview = null;
+      drawGuides();
+    }
+  }
+  else if(guideTool === 'select'){
+    // Check if clicking near a handle or line body
+    let hit = -1, part = null;
+    for(let i=guideLines.length-1;i>=0;i--){
+      const l = guideLines[i];
+      if(Math.hypot(p.x-l.x1,p.y-l.y1)<10){hit=i;part='p1';break;}
+      if(Math.hypot(p.x-l.x2,p.y-l.y2)<10){hit=i;part='p2';break;}
+      if(distToSegment(p.x,p.y,l.x1,l.y1,l.x2,l.y2)<8){hit=i;part='body';break;}
+    }
+    selectedLine = hit;
+    if(hit>=0){ lineDragPart=part; lineDragStart={...p,...guideLines[hit]}; guideCanvas.setPointerCapture(e.pointerId); }
+    drawGuides();
+  }
+}
+
+function guidePointerMove(e){
+  if(!guideCanvas.isConnected) return;
+  const p = guideXY(e);
+
+  if(guideTool==='pen' && guideDrawing){
+    const sz = +document.getElementById('guide-pen-size').value;
+    flushPenLayer();
+    guideCtx.globalCompositeOperation = 'source-over';
+    guideCtx.strokeStyle = penColour;
+    guideCtx.lineWidth   = sz;
+    guideCtx.lineCap     = 'round';
+    guideCtx.lineJoin    = 'round';
+    guideCtx.beginPath(); guideCtx.moveTo(guideLastX,guideLastY); guideCtx.lineTo(p.x,p.y); guideCtx.stroke();
+    savePenLayer();
+    guideLastX=p.x; guideLastY=p.y;
+    drawGuides();
+  }
+  else if(guideTool==='eraser' && guideDrawing){
+    eraseAt(p.x,p.y);
+    drawGuides();
+  }
+  else if(guideTool==='line' && lineFirstClick){
+    linePreview = {x1:lineFirstClick.x,y1:lineFirstClick.y,x2:p.x,y2:p.y};
+    drawGuides();
+  }
+  else if(guideTool==='select' && lineDragPart && selectedLine>=0){
+    const l = guideLines[selectedLine];
+    const dx=p.x-lineDragStart.x, dy=p.y-lineDragStart.y;
+    if(lineDragPart==='p1'){ l.x1=lineDragStart.x1+dx; l.y1=lineDragStart.y1+dy; }
+    else if(lineDragPart==='p2'){ l.x2=lineDragStart.x2+dx; l.y2=lineDragStart.y2+dy; }
+    else { l.x1=lineDragStart.x1+dx;l.y1=lineDragStart.y1+dy;l.x2=lineDragStart.x2+dx;l.y2=lineDragStart.y2+dy; }
+    drawGuides();
+  }
+}
+
+function guidePointerUp(e){
+  guideDrawing=false;
+  lineDragPart=null; lineDragStart=null;
+}
+
+function eraseAt(x,y){
+  flushPenLayer();
+  const sz = +document.getElementById('guide-eraser-size').value;
+  guideCtx.globalCompositeOperation = 'destination-out';
+  guideCtx.beginPath(); guideCtx.arc(x,y,sz/2,0,Math.PI*2);
+  guideCtx.fillStyle='rgba(0,0,0,1)'; guideCtx.fill();
+  guideCtx.globalCompositeOperation = 'source-over';
+  savePenLayer();
+}
+
+function flushPenLayer(){
+  if(penLayer) guideCtx.putImageData(penLayer,0,0);
+}
+function savePenLayer(){
+  penLayer = guideCtx.getImageData(0,0,guideCanvas.width,guideCanvas.height);
+}
+
+function distToSegment(px,py,ax,ay,bx,by){
+  const dx=bx-ax,dy=by-ay;
+  const t=Math.max(0,Math.min(1,((px-ax)*dx+(py-ay)*dy)/(dx*dx+dy*dy||1)));
+  return Math.hypot(px-(ax+t*dx),py-(ay+t*dy));
+}
+
+function deleteSelectedLine(){
+  if(selectedLine<0||selectedLine>=guideLines.length) return;
+  guideLines.splice(selectedLine,1);
+  selectedLine=-1;
+  drawGuides();
+}
+
+function clearGuides(){
+  penLayer=null;
+  guideLines=[];
+  selectedLine=-1;
+  lineFirstClick=null;
+  linePreview=null;
+  guideCtx.clearRect(0,0,guideCanvas.width,guideCanvas.height);
+  drawGuides();
+}
+
+// ── CAMERA DEVICE SELECTION ──────────────────────────────────────────────────
+let selectedDeviceId = null;
+
+async function populateCameraList(){
+  const sel = document.getElementById('camera-select');
+  try {
+    // Must request permission first so device labels are populated
+    const devices = await navigator.mediaDevices.enumerateDevices();
+    const cameras = devices.filter(d => d.kind === 'videoinput');
+    sel.innerHTML = '';
+    if(cameras.length === 0){
+      sel.innerHTML = '<option value="">No cameras found</option>';
+      return;
+    }
+    cameras.forEach((cam, i) => {
+      const opt = document.createElement('option');
+      opt.value = cam.deviceId;
+      opt.textContent = cam.label || `Camera ${i + 1}`;
+      sel.appendChild(opt);
+    });
+    // Default to first camera
+    selectedDeviceId = cameras[0].deviceId;
+  } catch(e) {
+    sel.innerHTML = '<option value="">Unable to list cameras</option>';
+  }
+}
+
+function onCameraChange(){
+  const sel = document.getElementById('camera-select');
+  selectedDeviceId = sel.value || null;
+  // Restart camera with new device if already active
+  if(camActive){ stopCamera(); startCamera(); }
+}
+
+// ── CAMERA ───────────────────────────────────────────────────────────────────
+async function toggleCamera() {
+  if (camActive) stopCamera();
+  else await startCamera();
+}
+
+async function startCamera() {
+  try {
+    const constraints = {
+      video: selectedDeviceId
+        ? { deviceId: { exact: selectedDeviceId }, width:{ideal:captureW}, height:{ideal:captureH} }
+        : { width:{ideal:captureW}, height:{ideal:captureH}, facingMode:'user' },
+      audio: false
+    };
+    camStream = await navigator.mediaDevices.getUserMedia(constraints);
+    // Populate camera list now that we have permission (labels become available)
+    await populateCameraList();
+    // Sync dropdown to the active stream's device
+    const track = camStream.getVideoTracks()[0];
+    if(track){
+      const settings = track.getSettings();
+      if(settings.deviceId){
+        selectedDeviceId = settings.deviceId;
+        document.getElementById('camera-select').value = settings.deviceId;
+      }
+    }
+    camVideo.srcObject = camStream;
+
+    // Wait until the video is actually playing and has frame data
+    await new Promise(r => {
+      camVideo.onloadedmetadata = () => camVideo.play().then(r).catch(r);
+    });
+
+    camCanvas.width  = camVideo.videoWidth  || captureW;
+    camCanvas.height = camVideo.videoHeight || captureH;
+
+    document.getElementById('cam-placeholder').style.display = 'none';
+    camCanvas.style.display = 'block';
+    document.getElementById('rec-badge').style.display = 'block';
+    document.getElementById('btn-capture').disabled = false;
+    document.getElementById('btn-cam').innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 7 16 12 23 17z"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg> Stop Camera`;
+    document.getElementById('btn-cam').style.background = '#555';
+    camActive = true;
+    initGuideEvents();
+    enableGuideInput(true);
+    compositeLoop();
+  } catch(e) {
+    alert('Camera access denied or unavailable.\n\n' + e.message);
+  }
+}
+
+function stopCamera() {
+  if (camStream) { camStream.getTracks().forEach(t => t.stop()); camStream = null; }
+  camActive = false;
+  if (animFrameId) { cancelAnimationFrame(animFrameId); animFrameId = null; }
+  camCanvas.style.display = 'none';
+  document.getElementById('cam-placeholder').style.display = 'flex';
+  document.getElementById('rec-badge').style.display = 'none';
+  document.getElementById('btn-capture').disabled = true;
+  document.getElementById('btn-cam').innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 7 16 12 23 17z"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg> Activate Camera`;
+  document.getElementById('btn-cam').style.background = '';
+}
+
+// ── RESOLUTION ───────────────────────────────────────────────────────────────
+function setRes(w, h, btnId){
+  captureW = w; captureH = h;
+  document.querySelectorAll('.res-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(btnId).classList.add('active');
+  if(camActive){ stopCamera(); startCamera(); }
+}
+
+function compositeLoop() {
+  if (!camActive) return;
+  animFrameId = requestAnimationFrame(compositeLoop);
+
+  if (camVideo.readyState < 2 || camVideo.videoWidth === 0) return;
+
+  if (camCanvas.width !== camVideo.videoWidth || camCanvas.height !== camVideo.videoHeight) {
+    camCanvas.width  = camVideo.videoWidth;
+    camCanvas.height = camVideo.videoHeight;
+  }
+
+  const W = camCanvas.width, H = camCanvas.height;
+  camCtx.clearRect(0, 0, W, H);
+
+  // 1. Draw live camera at full opacity (background)
+  camCtx.globalAlpha = 1;
+  camCtx.globalCompositeOperation = 'source-over';
+  camCtx.drawImage(camVideo, 0, 0, W, H);
+
+  // Apply sharpen kernel to the camera pixels before compositing onion skin
+  const sharpAmt = +document.getElementById('f-warm').value;
+  if(sharpAmt > 0) applySharpenToCanvas(camCtx, W, H, sharpAmt);
+
+  // 2. Onion skin frames as semi-transparent ghosts over the live view.
+  const onionToggle = document.getElementById('onion-toggle');
+  const onionOn = onionToggle ? onionToggle.checked : false;
+  if(onionOn && frames.length > 0){
+    const opacityEl = document.getElementById('onion-opacity');
+    const maxAlpha = opacityEl ? +opacityEl.value / 100 : onionOpacity;
+    // Base from selected frame, or last frame if nothing selected
+    const baseIdx = selectedFrame >= 0 ? selectedFrame : frames.length;
+    const count = Math.min(onionFrameCount, baseIdx);
+    // Draw oldest first (most transparent), newest last (most opaque)
+    for(let i = count; i >= 1; i--){
+      const frameIdx = baseIdx - i;
+      if(frameIdx < 0 || frameIdx >= frames.length) continue;
+      const f = frames[frameIdx];
+      if(!f || !f.img || !f.img.complete || f.img.naturalWidth === 0) continue;
+      // i=1 (nearest previous) → maxAlpha; i=2 → half; i=3 → quarter
+      const alpha = maxAlpha / Math.pow(2, i - 1);
+      camCtx.globalAlpha = Math.max(0.05, Math.min(0.95, alpha));
+      camCtx.globalCompositeOperation = 'source-over';
+      camCtx.drawImage(f.img, 0, 0, W, H);
+    }
+    camCtx.globalAlpha = 1;
+    camCtx.globalCompositeOperation = 'source-over';
+  }
+
+  applyLiveFilter();
+  drawGuides();
+}
+
+// ── FILTERS ───────────────────────────────────────────────────────────────────
+function applyLiveFilter() {
+  const b  = document.getElementById('f-bright').value;
+  const c  = document.getElementById('f-contrast').value;
+  const s  = document.getElementById('f-sat').value;
+  const sh = +document.getElementById('f-warm').value;  // sharpen 0–10
+  const bl = document.getElementById('f-blur').value;
+  document.getElementById('v-bright').textContent   = b;
+  document.getElementById('v-contrast').textContent = c;
+  document.getElementById('v-sat').textContent      = s;
+  document.getElementById('v-warm').textContent     = sh;
+  document.getElementById('v-blur').textContent     = bl;
+
+  const brightness = 1 + b / 100;
+  const contrast   = 1 + c / 100;
+  const saturate   = Math.max(0, 1 + s / 100);
+  const blur       = +bl;
+
+  // CSS filter handles brightness/contrast/saturation/blur (fast, GPU)
+  // Sharpen is handled in compositeLoop via pixel convolution
+  camCanvas.style.filter = `brightness(${brightness}) contrast(${contrast}) saturate(${saturate})${blur > 0 ? ` blur(${blur}px)` : ''}`;
+}
+
+function resetCameraSettings(){
+  document.getElementById('f-bright').value   = 0;
+  document.getElementById('f-contrast').value = 0;
+  document.getElementById('f-sat').value      = 0;
+  document.getElementById('f-warm').value     = 0;
+  document.getElementById('f-blur').value     = 0;
+  document.getElementById('v-bright').textContent   = '0';
+  document.getElementById('v-contrast').textContent = '0';
+  document.getElementById('v-sat').textContent      = '0';
+  document.getElementById('v-warm').textContent     = '0';
+  document.getElementById('v-blur').textContent     = '0';
+  applyLiveFilter();
+}
+function applySharpenToCanvas(ctx, w, h, amount){
+  if(amount <= 0) return;
+  const src = ctx.getImageData(0, 0, w, h);
+  const dst = ctx.createImageData(w, h);
+  const s = src.data, d = dst.data;
+  const k = amount * 0.15; // scale: slider 1→10 gives k 0.15→1.5
+  // Laplacian unsharp kernel: centre boosted, neighbours subtracted
+  for(let y = 1; y < h-1; y++){
+    for(let x = 1; x < w-1; x++){
+      const i = (y*w + x)*4;
+      for(let c = 0; c < 3; c++){
+        const centre = s[i+c];
+        const neighbours = s[((y-1)*w+x)*4+c] + s[((y+1)*w+x)*4+c] +
+                           s[(y*w+(x-1))*4+c] + s[(y*w+(x+1))*4+c];
+        d[i+c] = Math.max(0, Math.min(255, centre + k*(4*centre - neighbours)));
+      }
+      d[i+3] = s[i+3];
+    }
+  }
+  ctx.putImageData(dst, 0, 0);
+}
+
+// ── ONION SKIN CONTROLS ───────────────────────────────────────────────────────
+function updateOnionOpacity() {
+  const v = document.getElementById('onion-opacity')?.value ?? '20';
+  onionOpacity = v / 100;
+  const _vo=document.getElementById('v-onion'); if(_vo) _vo.textContent = v + '%';
+}
+
+function updateOnionFrames() {
+  const v = document.getElementById('onion-frames')?.value ?? '1';
+  onionFrames = +v;
+  const _vof=document.getElementById('v-onion-frames'); if(_vof) _vof.textContent = v;
+}
+
+// drawOnion is now handled inside compositeLoop — keep a stub for the toggle change handler
+function drawOnion() { /* compositeLoop handles drawing continuously */ }
+
+// ── TIME LAPSE ───────────────────────────────────────────────────────────────
+let tlRecording = false;
+let tlRecordInterval = null;
+let tlFramesCaptured = 0;
+let tlTotalFrames = 0;
+let tlRecordTimeout = null;
+
+function onTimeLapseToggle(){
+  const on = document.getElementById('timelapse-toggle').checked;
+  document.getElementById('timelapse-controls').style.display = on ? 'block' : 'none';
+  updateTLLabels();
+}
+
+function updateTLLabels(){
+  const interval  = +document.getElementById('tl-interval').value;
+  const duration  = +document.getElementById('tl-duration').value;
+  document.getElementById('v-tl-interval').textContent = interval + 's';
+  document.getElementById('v-tl-duration').textContent = duration + 's';
+  const framesSaved  = Math.round(duration * currentFPS);
+  const wallClockSec = (framesSaved * interval).toFixed(1);
+  document.getElementById('tl-calc').textContent =
+    `${framesSaved.toLocaleString()} frame${framesSaved !== 1 ? 's' : ''} saved @ ${currentFPS} fps`;
+}
+
+function startTimeLapseRecording(){
+  if(!camActive || camVideo.readyState < 2){ alert('Activate the camera first.'); return; }
+  const interval   = +document.getElementById('tl-interval').value * 1000; // ms between captures
+  const duration   = +document.getElementById('tl-duration').value;         // clip length in seconds
+  tlTotalFrames    = Math.round(duration * currentFPS);                     // frames = duration × fps
+  tlFramesCaptured = 0;
+  tlRecording = true;
+
+  // Update UI
+  document.getElementById('btn-capture').textContent = 'Stop Recording';
+  document.getElementById('btn-capture').classList.remove('capture');
+  document.getElementById('btn-capture').classList.add('ghost');
+  document.getElementById('btn-capture').style.borderColor = 'var(--red)';
+  document.getElementById('btn-capture').style.color = 'var(--red)';
+  document.getElementById('tl-recording-warning').style.display = 'block';
+  document.getElementById('tl-progress-label').textContent = 'Frame 0 captured';
+
+  // Disable controls during recording
+  document.getElementById('tl-interval').disabled = true;
+  document.getElementById('tl-duration').disabled = true;
+  document.getElementById('timelapse-toggle').disabled = true;
+
+  // Capture at interval, stop after frameCount frames
+  tlRecordInterval = setInterval(() => {
+    captureSingleFrame();
+    tlFramesCaptured++;
+    document.getElementById('tl-progress-label').textContent =
+      `Frame ${tlFramesCaptured} of ${tlTotalFrames} captured`;
+    if(tlFramesCaptured >= tlTotalFrames) stopTimeLapseRecording();
+  }, interval);
+}
+
+function stopTimeLapseRecording(){
+  if(!tlRecording) return;
+  tlRecording = false;
+  clearInterval(tlRecordInterval); tlRecordInterval = null;
+  clearTimeout(tlRecordTimeout);   tlRecordTimeout = null;
+
+  // Restore UI
+  const btn = document.getElementById('btn-capture');
+  btn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M20 7h-3.4l-1.6-2H9L7.4 7H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/></svg> Capture Frame`;
+  btn.classList.add('capture');
+  btn.classList.remove('ghost');
+  btn.style.borderColor = '';
+  btn.style.color = '';
+  document.getElementById('tl-recording-warning').style.display = 'none';
+  document.getElementById('tl-interval').disabled = false;
+  document.getElementById('tl-duration').disabled = false;
+  document.getElementById('timelapse-toggle').disabled = false;
+  document.getElementById('tl-progress-label').textContent =
+    `Done — ${tlFramesCaptured} frame${tlFramesCaptured !== 1 ? 's' : ''} captured`;
+}
+
+// ── CAPTURE ──────────────────────────────────────────────────────────────────
+function captureFrame(){
+  const timeLapseOn = document.getElementById('timelapse-toggle').checked;
+  if(timeLapseOn){
+    if(tlRecording) stopTimeLapseRecording();
+    else startTimeLapseRecording();
+    return;
+  }
+  captureSingleFrame();
+}
+
+function captureSingleFrame(){
+  if(!camActive || camVideo.readyState < 2) return;
+  const tmpC = document.createElement('canvas');
+  tmpC.width  = camVideo.videoWidth  || captureW;
+  tmpC.height = camVideo.videoHeight || captureH;
+  const tmpCtx = tmpC.getContext('2d');
+  // Draw raw video (no onion skin) then apply camera filters only
+  tmpCtx.filter = camCanvas.style.filter || 'none';
+  tmpCtx.drawImage(camVideo, 0, 0, tmpC.width, tmpC.height);
+  tmpCtx.filter = 'none';
+  // Apply sharpen if active (pixel-level, not CSS filter)
+  const sharpVal = parseFloat(document.getElementById('f-warm')?.value || 0);
+  if(sharpVal > 0) applySharpenToCanvas(tmpCtx, tmpC.width, tmpC.height, sharpVal);
+  insertFrame(tmpC.toDataURL('image/jpeg', 0.92));
+  if(!tlRecording){
+    const flash = document.createElement('div');
+    flash.style.cssText = 'position:absolute;inset:0;background:#fff;opacity:0.7;pointer-events:none;border-radius:8px;transition:opacity 0.2s;z-index:10;';
+    document.getElementById('win1-box').appendChild(flash);
+    setTimeout(()=>{ flash.style.opacity='0'; setTimeout(()=>flash.remove(), 200); }, 50);
+  }
+}
+
+function insertFrame(dataURL){
+  const img = new Image();
+  const newFrame = {dataURL, img};
+
+  // Determine insert position: after selectedFrame, or at end
+  const insertAfter = (selectedFrame >= 0 && selectedFrame < frames.length)
+    ? selectedFrame
+    : frames.length - 1;
+  const insertIdx = insertAfter + 1;
+
+  // Insert into frames array
+  frames.splice(insertIdx, 0, newFrame);
+
+  // Shift roto frames to stay aligned
+  ensureRotoArrays();
+  rotoFrames.splice(insertIdx, 0, null);
+  rotoHistory.splice(insertIdx, 0, []);
+
+  // Shift IN/OUT range markers if they are at or beyond insert point
+  if(rangeStart > insertIdx) rangeStart++;
+  if(rangeEnd   >= insertIdx) rangeEnd++;
+  // Clamp to valid bounds
+  rangeStart = Math.max(1, Math.min(rangeStart, frames.length));
+  rangeEnd   = Math.max(rangeStart, Math.min(rangeEnd, frames.length));
+
+  // Wait for image to load before drawing thumbnail
+  img.onload = () => {
+    buildFilmstrip();
+    selectFrameIdx(insertIdx);
+    updateRangeEnd();
+  };
+  img.src = dataURL; // data URLs load synchronously but onload still fires async
+  // Fallback: if already complete (data URLs), fire manually
+  if(img.complete) {
+    buildFilmstrip();
+    selectFrameIdx(insertIdx);
+    updateRangeEnd();
+  }
+}
+
+function addFrame(dataURL){
+  // Used by import — always appends to end
+  const img = new Image();
+  img.src = dataURL;
+  frames.push({dataURL, img});
+  buildFilmstrip();
+  selectFrameIdx(frames.length - 1);
+  updateRangeEnd();
+}
+
+// ── IMPORT ───────────────────────────────────────────────────────────────────
+function importFrames(){ document.getElementById('import-input').click(); }
+function handleImport(e){
+  const files = [...e.target.files].sort((a,b) => a.name.localeCompare(b.name));
+  if(files.length === 0) return;
+
+  const results = new Array(files.length);
+  let completed = 0;
+
+  files.forEach((file, idx) => {
+    const r = new FileReader();
+    r.onload = ev => {
+      results[idx] = ev.target.result;
+      completed++;
+      if(completed === files.length){
+        // Add all frames in order, wait for all images to load before drawing
+        const imageLoadPromises = results.map(dataURL => new Promise(resolve => {
+          const img = new Image();
+          img.onload = () => resolve({dataURL, img});
+          img.onerror = () => resolve({dataURL, img}); // continue even on error
+          img.src = dataURL;
+        }));
+
+        Promise.all(imageLoadPromises).then(loaded => {
+          loaded.forEach(frame => frames.push(frame));
+          updateRangeEnd();
+          tlPageOffset = 0;
+          buildFilmstrip();
+          selectFrameIdx(0);
+          // Poll until the timeline wrapper has a real width, then draw
+          function tryDrawTimeline(attempts){
+            const W = tlWrap.offsetWidth || tlWrap.clientWidth;
+            if(W > 10){
+              invalidateWaveformCache();
+              drawTimeline();
+            } else if(attempts > 0){
+              requestAnimationFrame(() => tryDrawTimeline(attempts - 1));
+            }
+          }
+          requestAnimationFrame(() => tryDrawTimeline(10));
+        });
+      }
+    };
+    r.readAsDataURL(file);
+  });
+  e.target.value = '';
+}
+
+// ── TIMELINE STATE ────────────────────────────────────────────────────────────
+let tlFrameWidth = 72;     // px per frame at current zoom (recalc on zoom)
+let tlPageOffset = 0;      // index of first visible frame in current page
+let tlZoom = 20;           // slider value 1–150 (maps to frameWidth)
+let tlDragging = false;
+
+const tlRuler  = document.getElementById('timeline-ruler');
+const tlCanvas = document.getElementById('timeline-canvas');
+const tlWrap   = document.getElementById('timeline-wrap');
+const tlAudio  = document.getElementById('audio-canvas');
+const tlRCtx   = tlRuler.getContext('2d');
+const tlCtx    = tlCanvas.getContext('2d');
+const tlACtx   = tlAudio.getContext('2d');
+
+const THUMB_H  = 80;
+const RULER_H  = 22;
+const AUDIO_H  = 60;
+const MIN_FW   = 4;    // minimum px per frame (fully zoomed out)
+const MAX_FW   = 140;  // maximum px per frame (fully zoomed in)
+
+function zoomToFrameWidth(z){
+  // z: 1 → MIN_FW,  150 → MAX_FW  (exponential feel)
+  const t = (z - 1) / 149;
+  return MIN_FW + (MAX_FW - MIN_FW) * (t * t);
+}
+function onZoomChange(){
+  tlZoom = +document.getElementById('zoom-slider').value;
+  tlFrameWidth = zoomToFrameWidth(tlZoom);
+  const visible = visibleFrameCount();
+  tlPageOffset = Math.max(0, Math.min(playbackCurrent, frames.length - visible));
+  invalidateWaveformCache();
+  drawTimeline();
+}
+
+// Convert a desired px-per-frame back to slider value (inverse of zoomToFrameWidth)
+function frameWidthToZoom(fw){
+  const t = Math.sqrt(Math.max(0, Math.min(1, (fw - MIN_FW) / (MAX_FW - MIN_FW))));
+  return Math.round(1 + t * 149);
+}
+
+function setZoom(fw, pageOffset){
+  tlFrameWidth = Math.max(MIN_FW, Math.min(MAX_FW, fw));
+  tlZoom = frameWidthToZoom(tlFrameWidth);
+  document.getElementById('zoom-slider').value = tlZoom;
+  tlPageOffset = Math.max(0, pageOffset);
+  invalidateWaveformCache();
+  drawTimeline();
+}
+
+// Zoom to fit ALL frames in the timeline window
+function zoomFitAll(){
+  if(frames.length === 0) return;
+  const W = tlWrap.offsetWidth || 800;
+  const fw = W / frames.length;
+  setZoom(fw, 0);
+}
+
+// Zoom to fit only the IN→OUT range in the timeline window
+function zoomFitRange(){
+  if(frames.length === 0) return;
+  const rangeFrames = Math.max(1, rangeEnd - rangeStart + 1);
+  const W = tlWrap.offsetWidth || 800;
+  const fw = W / rangeFrames;
+  setZoom(fw, rangeStart - 1);
+}
+
+function visibleFrameCount(){
+  const w = tlCanvas.width || tlWrap.clientWidth || 800;
+  return Math.max(1, Math.floor(w / tlFrameWidth));
+}
+
+// ── TIMELINE DRAW ─────────────────────────────────────────────────────────────
+function drawTimeline(){
+  const bar = tlWrap.closest('.filmstrip-bar') || tlWrap.parentElement;
+  const W = (bar ? bar.clientWidth : 0) || tlWrap.offsetWidth || tlWrap.clientWidth || tlCanvas.width || 800;
+  if(W < 10) return;
+  // Resize if needed (auto-clears), then always explicitly clear
+  if(tlRuler.width  !== W || tlRuler.height  !== RULER_H) { tlRuler.width=W;  tlRuler.height=RULER_H; }
+  if(tlCanvas.width !== W || tlCanvas.height !== THUMB_H) { tlCanvas.width=W; tlCanvas.height=THUMB_H; }
+  tlRCtx.clearRect(0, 0, W, RULER_H);
+  tlCtx.clearRect(0,  0, W, THUMB_H);
+
+  const visible = Math.ceil(W / tlFrameWidth) + 1;
+  const startIdx = tlPageOffset;
+
+  // ── ruler ──
+  tlRCtx.fillStyle = '#2a2a2a';
+  tlRCtx.fillRect(0, 0, W, RULER_H);
+  tlRCtx.strokeStyle = 'rgba(255,255,255,0.12)';
+  tlRCtx.fillStyle   = '#888';
+  tlRCtx.font = '9px -apple-system, sans-serif';
+  tlRCtx.textAlign = 'center';
+
+  const tickEvery = chooseTickInterval(tlFrameWidth, currentFPS);
+
+  for(let i = 0; i <= visible; i++){
+    const fi = startIdx + i;
+    const x  = Math.round(i * tlFrameWidth);
+    if(x > W) break;
+    // minor tick every frame
+    if(fi % tickEvery === 0){
+      const secs = fi / currentFPS;
+      const label = formatTimecode(secs);
+      tlRCtx.beginPath();
+      tlRCtx.moveTo(x, RULER_H - 10);
+      tlRCtx.lineTo(x, RULER_H);
+      tlRCtx.strokeStyle = '#666';
+      tlRCtx.lineWidth = 1;
+      tlRCtx.stroke();
+      if(tlFrameWidth * tickEvery > 28){
+        tlRCtx.fillStyle = '#aaa';
+        tlRCtx.fillText(label, x + tlFrameWidth * tickEvery / 2, 12);
+      }
+    } else {
+      // minor subtick
+      tlRCtx.beginPath();
+      tlRCtx.moveTo(x, RULER_H - 5);
+      tlRCtx.lineTo(x, RULER_H);
+      tlRCtx.strokeStyle = '#444';
+      tlRCtx.lineWidth = 0.5;
+      tlRCtx.stroke();
+    }
+  }
+  // ruler bottom border
+  tlRCtx.beginPath();
+  tlRCtx.moveTo(0, RULER_H - 1);
+  tlRCtx.lineTo(W, RULER_H - 1);
+  tlRCtx.strokeStyle = '#444';
+  tlRCtx.lineWidth = 1;
+  tlRCtx.stroke();
+
+  // ── IN/OUT range highlight on ruler ──
+  if(frames.length > 0){
+    const inFrame  = rangeStart - 1; // 0-based
+    const outFrame = rangeEnd   - 1;
+    const inX  = Math.round((inFrame  - tlPageOffset) * tlFrameWidth);
+    const outX = Math.round((outFrame - tlPageOffset) * tlFrameWidth + tlFrameWidth);
+    const clampedInX  = Math.max(0, Math.min(W, inX));
+    const clampedOutX = Math.max(0, Math.min(W, outX));
+    if(clampedOutX > clampedInX){
+      tlRCtx.fillStyle = 'rgba(55,138,221,0.18)';
+      tlRCtx.fillRect(clampedInX, 0, clampedOutX - clampedInX, RULER_H - 1);
+    }
+    // IN handle (green)
+    if(inX >= -8 && inX <= W + 8) drawRangeHandle(tlRCtx, inX, 'in');
+    // OUT handle (red)
+    if(outX >= -8 && outX <= W + 8) drawRangeHandle(tlRCtx, outX, 'out');
+  }
+
+  // ── frames ──
+  tlCtx.fillStyle = '#111';
+  tlCtx.fillRect(0, 0, W, THUMB_H);
+
+  for(let i = 0; i < visible; i++){
+    const fi = startIdx + i;
+    if(fi >= frames.length) break;
+    const x = Math.round(i * tlFrameWidth);
+    const fw = Math.max(1, Math.round(tlFrameWidth) - 1);
+
+    if(tlFrameWidth >= 10 && frames[fi].img.complete){
+      // draw thumbnail
+      tlCtx.drawImage(frames[fi].img, x, 0, fw, THUMB_H);
+      // darken unselected
+      if(fi !== selectedFrame){
+        tlCtx.fillStyle = 'rgba(0,0,0,0.25)';
+        tlCtx.fillRect(x, 0, fw, THUMB_H);
+      }
+    } else {
+      // solid colour block
+      const hue = (fi * 17) % 360;
+      tlCtx.fillStyle = fi === selectedFrame ? `hsl(${hue},60%,38%)` : `hsl(${hue},40%,22%)`;
+      tlCtx.fillRect(x, 0, fw, THUMB_H);
+    }
+
+    // selected highlight
+    if(fi === selectedFrame){
+      tlCtx.strokeStyle = '#378ADD';
+      tlCtx.lineWidth = 2;
+      tlCtx.strokeRect(x + 1, 1, fw - 2, THUMB_H - 2);
+    }
+
+    // frame number (only if wide enough)
+    if(tlFrameWidth >= 20){
+      tlCtx.fillStyle = 'rgba(0,0,0,0.55)';
+      tlCtx.fillRect(x, THUMB_H - 14, fw, 14);
+      tlCtx.fillStyle = '#ccc';
+      tlCtx.font = '9px -apple-system, sans-serif';
+      tlCtx.textAlign = 'center';
+      tlCtx.fillText(fi + 1, x + fw / 2, THUMB_H - 4);
+    }
+  }
+
+  // empty label
+  document.getElementById('empty-label').style.display = frames.length === 0 ? 'block' : 'none';
+
+  // ── Shade frames outside the playback range ──
+  if(frames.length > 0){
+    const inFrame  = rangeStart - 1;
+    const outFrame = rangeEnd   - 1;
+    tlCtx.fillStyle = 'rgba(0,0,0,0.45)';
+    // shade before IN
+    if(inFrame > tlPageOffset){
+      const shadeW = Math.min(W, Math.round((inFrame - tlPageOffset) * tlFrameWidth));
+      if(shadeW > 0) tlCtx.fillRect(0, 0, shadeW, THUMB_H);
+    } else if(inFrame <= tlPageOffset){
+      // entire visible region is before IN — shade all
+    }
+    // shade after OUT
+    const outX = Math.round((outFrame - tlPageOffset + 1) * tlFrameWidth);
+    if(outX < W) tlCtx.fillRect(Math.max(0, outX), 0, W - Math.max(0, outX), THUMB_H);
+
+    // IN marker line on frame canvas
+    const inX  = Math.round((inFrame  - tlPageOffset) * tlFrameWidth);
+    const outLineX = Math.round((outFrame - tlPageOffset) * tlFrameWidth + tlFrameWidth);
+    if(inX >= 0 && inX <= W){
+      tlCtx.fillStyle = '#00cc44'; tlCtx.fillRect(inX, 0, 2, THUMB_H);
+    }
+    if(outLineX >= 0 && outLineX <= W){
+      tlCtx.fillStyle = '#cc3333'; tlCtx.fillRect(outLineX - 2, 0, 2, THUMB_H);
+    }
+  }
+
+  // audio waveform track
+  drawAudioTrack();
+
+  // ── extend drag preview overlay ──────────────────────────────────────────
+  if(extendDrag && extendDrag.active && extendDrag.previewCount > 0){
+    const srcScreenIdx = extendDrag.sourceIdx - tlPageOffset;
+    const startScreenIdx = srcScreenIdx + 1;
+    const count = extendDrag.previewCount;
+    for(let i = 0; i < count; i++){
+      const sx = Math.round((startScreenIdx + i) * tlFrameWidth);
+      if(sx < 0 || sx > W) continue;
+      const fw = Math.round(tlFrameWidth);
+      // Green tint fill
+      tlCtx.fillStyle = 'rgba(80,200,80,0.35)';
+      tlCtx.fillRect(sx, 0, fw, THUMB_H);
+      // Green border
+      tlCtx.strokeStyle = '#50c850';
+      tlCtx.lineWidth = 2;
+      tlCtx.strokeRect(sx+1, 1, fw-2, THUMB_H-2);
+    }
+    // Count badge on last preview frame
+    const lastX = Math.round((startScreenIdx + count - 1) * tlFrameWidth);
+    if(lastX >= 0 && lastX <= W){
+      const badge = `×${count}`;
+      tlCtx.font = 'bold 13px sans-serif';
+      const bw = tlCtx.measureText(badge).width + 10;
+      const bx = Math.min(lastX + tlFrameWidth - bw - 4, W - bw - 4);
+      tlCtx.fillStyle = '#50c850';
+      tlCtx.beginPath();
+      tlCtx.roundRect(bx, THUMB_H - 22, bw, 18, 4);
+      tlCtx.fill();
+      tlCtx.fillStyle = '#000';
+      tlCtx.fillText(badge, bx + 5, THUMB_H - 8);
+    }
+  }
+
+  // ── scroll head — drawn last via rAF so nothing overwrites it ──
+  requestAnimationFrame(drawScrollHead);
+}
+
+function drawScrollHead(){
+  // Determine x position based on mode
+  let x;
+  if(frames.length > 0){
+    x = Math.round((playbackCurrent - tlPageOffset) * tlFrameWidth);
+    if(x < -10 || x > (tlCanvas.width||800) + 10) return;
+  } else if(tlAudioBuffer){
+    const W = tlCanvas.width || tlWrap.clientWidth || 800;
+    x = Math.round((audioScrubOffset / tlAudioBuffer.duration) * W);
+  } else {
+    return;
+  }
+
+  // Line on frame canvas (only if frames exist)
+  if(frames.length > 0){
+    tlCtx.beginPath(); tlCtx.moveTo(x,0); tlCtx.lineTo(x,THUMB_H);
+    tlCtx.strokeStyle='rgba(255,255,255,0.7)'; tlCtx.lineWidth=1.5; tlCtx.stroke();
+  }
+
+  // Line on audio canvas
+  if(tlAudioBuffer){
+    tlACtx.beginPath(); tlACtx.moveTo(x,0); tlACtx.lineTo(x,AUDIO_H);
+    tlACtx.strokeStyle='rgba(255,255,255,0.8)'; tlACtx.lineWidth=1.5; tlACtx.stroke();
+  }
+
+  // Pin head on ruler
+  const hw=12, hh=16;
+  tlRCtx.fillStyle='#e0e0e0'; tlRCtx.strokeStyle='#777'; tlRCtx.lineWidth=1;
+  tlRCtx.beginPath(); tlRCtx.roundRect(x-hw/2, 0, hw, hh-4, 3);
+  tlRCtx.fill(); tlRCtx.stroke();
+  tlRCtx.beginPath();
+  tlRCtx.moveTo(x-4,hh-6); tlRCtx.lineTo(x+4,hh-6); tlRCtx.lineTo(x,hh);
+  tlRCtx.closePath(); tlRCtx.fillStyle='#e0e0e0'; tlRCtx.fill(); tlRCtx.stroke();
+  tlRCtx.beginPath(); tlRCtx.moveTo(x,0); tlRCtx.lineTo(x,RULER_H);
+  tlRCtx.strokeStyle='rgba(255,255,255,0.5)'; tlRCtx.lineWidth=1; tlRCtx.stroke();
+}
+
+let waveformCache = null;        // offscreen canvas with waveform pixels
+let waveformCacheW = 0;          // width it was generated at
+let waveformCacheOffset = -1;    // tlPageOffset it was generated at
+
+function invalidateWaveformCache(){ waveformCache = null; waveformCacheW = 0; waveformCacheOffset = -1; }
+
+function drawAudioTrack(){
+  if(!tlAudioBuffer){ tlAudio.style.display='none'; return; }
+  const W = tlCanvas.width || tlWrap.clientWidth || 800;
+  if(tlAudio.width !== W || tlAudio.height !== AUDIO_H){ tlAudio.width=W; tlAudio.height=AUDIO_H; }
+  tlACtx.clearRect(0, 0, W, AUDIO_H);
+  tlAudio.style.display='block';
+
+  // Regenerate waveform cache if size or page changed
+  if(!waveformCache || waveformCacheW !== W || waveformCacheOffset !== tlPageOffset){
+    waveformCache = document.createElement('canvas');
+    waveformCache.width = W; waveformCache.height = AUDIO_H;
+    const wCtx = waveformCache.getContext('2d');
+    _renderWaveform(wCtx, W);
+    waveformCacheW = W;
+    waveformCacheOffset = tlPageOffset;
+  }
+
+  // Blit cached waveform
+  tlACtx.drawImage(waveformCache, 0, 0);
+}
+
+function _renderWaveform(wCtx, W){
+  wCtx.fillStyle='#0a1a0a';
+  wCtx.fillRect(0,0,W,AUDIO_H);
+
+  const channelData = tlAudioBuffer.getChannelData(0);
+  const totalSamples = channelData.length;
+  const audioDur = tlAudioBuffer.duration;
+
+  let startSample, endSample;
+  if(frames.length > 0){
+    const startSec = tlPageOffset / currentFPS;
+    const endSec   = (tlPageOffset + W / tlFrameWidth) / currentFPS;
+    startSample = Math.floor(startSec / audioDur * totalSamples);
+    endSample   = Math.min(totalSamples, Math.ceil(endSec / audioDur * totalSamples));
+  } else {
+    startSample = 0; endSample = totalSamples;
+  }
+
+  const samplesPerPixel = Math.max(1, Math.floor((endSample - startSample) / W));
+  const midY = AUDIO_H / 2;
+  const grad = wCtx.createLinearGradient(0,0,0,AUDIO_H);
+  grad.addColorStop(0,'#00aa33');
+  grad.addColorStop(0.45,'#00ff55');
+  grad.addColorStop(0.55,'#00ff55');
+  grad.addColorStop(1,'#007722');
+  wCtx.fillStyle = grad;
+
+  wCtx.beginPath();
+  for(let px=0;px<W;px++){
+    const si=startSample+px*samplesPerPixel;
+    let peak=0;
+    const end=Math.min(si+samplesPerPixel,totalSamples);
+    for(let s=si;s<end;s++) peak=Math.max(peak,Math.abs(channelData[s]));
+    const h=peak*midY*0.95;
+    if(px===0) wCtx.moveTo(px,midY-h); else wCtx.lineTo(px,midY-h);
+  }
+  for(let px=W-1;px>=0;px--){
+    const si=startSample+px*samplesPerPixel;
+    let peak=0;
+    const end=Math.min(si+samplesPerPixel,totalSamples);
+    for(let s=si;s<end;s++) peak=Math.max(peak,Math.abs(channelData[s]));
+    const h=peak*midY*0.95;
+    wCtx.lineTo(px,midY+h);
+  }
+  wCtx.closePath(); wCtx.fill();
+
+  wCtx.beginPath(); wCtx.moveTo(0,midY); wCtx.lineTo(W,midY);
+  wCtx.strokeStyle='rgba(0,220,70,0.25)'; wCtx.lineWidth=0.5; wCtx.stroke();
+}
+
+// Draw just the ruler + audio + scrollhead (no frame canvas) for audio-only mode
+function drawTimelineAudioOnly(){
+  const W = tlWrap.clientWidth || 800;
+  // Size ruler
+  tlRuler.width=W; tlRuler.height=RULER_H;
+  tlRCtx.fillStyle='#2a2a2a'; tlRCtx.fillRect(0,0,W,RULER_H);
+  // Ruler ticks showing audio time
+  if(tlAudioBuffer){
+    const dur = tlAudioBuffer.duration;
+    tlRCtx.fillStyle='#888'; tlRCtx.font='9px -apple-system,sans-serif'; tlRCtx.textAlign='left';
+    const tickCount = 10;
+    for(let i=0;i<=tickCount;i++){
+      const px = Math.round(i/tickCount*W);
+      const sec = (i/tickCount*dur).toFixed(1);
+      tlRCtx.beginPath(); tlRCtx.moveTo(px,RULER_H-10); tlRCtx.lineTo(px,RULER_H);
+      tlRCtx.strokeStyle='#555'; tlRCtx.lineWidth=1; tlRCtx.stroke();
+      if(i<tickCount) tlRCtx.fillText(sec+'s', px+2, 12);
+    }
+  }
+  // Size frame canvas (show empty)
+  tlCanvas.width=W; tlCanvas.height=THUMB_H;
+  tlCtx.fillStyle='#111'; tlCtx.fillRect(0,0,W,THUMB_H);
+  document.getElementById('empty-label').style.display='block';
+  drawAudioTrack();
+  drawScrollHead();
+}
+
+function scrubAudioAtOffset(offsetSec){
+  if(!audioBuffer) return;
+  startAudioAt(offsetSec, 0.1); // 100ms preview burst
+}
+
+function drawRangeHandle(ctx, x, type){
+  const isIn = type === 'in';
+  const col   = isIn ? '#00dd44' : '#dd2222';
+  const label = isIn ? 'IN' : 'OUT';
+  const hw = isIn ? 22 : 26; // wider for OUT label
+  const hh = RULER_H - 1;
+
+  // vertical line full ruler height
+  ctx.strokeStyle = col; ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, hh); ctx.stroke();
+
+  // flag tab
+  const fx = isIn ? x : x - hw;
+  ctx.fillStyle = col;
+  ctx.beginPath();
+  ctx.roundRect(fx, 0, hw, 15, 3);
+  ctx.fill();
+
+  // label
+  ctx.fillStyle = '#fff';
+  ctx.font = 'bold 9px -apple-system, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText(label, fx + hw / 2, 11);
+
+  // bottom triangle pointer
+  ctx.fillStyle = col;
+  ctx.beginPath();
+  ctx.moveTo(x - 5, hh - 8);
+  ctx.lineTo(x + 5, hh - 8);
+  ctx.lineTo(x, hh);
+  ctx.closePath();
+  ctx.fill();
+}
+
+// ── IN/OUT RULER DRAG ─────────────────────────────────────────────────────────
+const RANGE_HIT = 14; // px hit zone around handle
+
+function hitRangeHandle(x){
+  if(frames.length === 0) return null;
+  const inX  = Math.round((rangeStart - 1 - tlPageOffset) * tlFrameWidth);
+  const outX = Math.round((rangeEnd   - 1 - tlPageOffset) * tlFrameWidth + tlFrameWidth);
+  if(Math.abs(x - inX)  <= RANGE_HIT) return 'in';
+  if(Math.abs(x - outX) <= RANGE_HIT) return 'out';
+  return null;
+}
+
+function xToFrame(x){
+  const fi = tlPageOffset + Math.floor(x / tlFrameWidth);
+  return Math.max(0, Math.min(frames.length - 1, fi));
+}
+
+tlRuler.addEventListener('mousedown', e => {
+  const handle = hitRangeHandle(e.offsetX);
+  if(handle){
+    rangeDragging = handle;
+    tlRuler.style.cursor = 'ew-resize';
+    return; // don't seek
+  }
+  // fallthrough to normal ruler seek
+  tlDragging = true;
+  tlRuler.style.cursor = 'ew-resize';
+  if(playInterval){ clearInterval(playInterval); playInterval=null; setPlayPauseIcon(false); document.getElementById('play-badge').style.display='none'; }
+  seekToX(e.offsetX);
+});
+
+// cursor hint on hover
+tlRuler.addEventListener('mousemove', e => {
+  if(rangeDragging || tlDragging) return;
+  tlRuler.style.cursor = hitRangeHandle(e.offsetX) ? 'ew-resize' : 'default';
+});
+
+function chooseTickInterval(fw, fps){
+  // choose label frequency: aim for labels every ~60–120px
+  const target = 80;
+  const candidates = [1, 2, 5, 10, 25, 50, 100, 200, 500];
+  for(const c of candidates){
+    if(fw * c >= target) return c;
+  }
+  return 500;
+}
+
+function formatTimecode(secs){
+  const m = Math.floor(secs / 60);
+  const s = (secs % 60).toFixed(2).padStart(5, '0');
+  return `${m > 0 ? m + ':' : ''}${s}`;
+}
+
+// ── TIMELINE CLICK / DRAG ────────────────────────────────────────────────────
+// ── EXTEND FRAME (drag bottom half right to duplicate) ────────────────────────
+let extendDrag = null;
+// extendDrag = { sourceIdx, startX, currentCount, previewCount }
+
+function xToFrameIdx(x){
+  return Math.floor(x / tlFrameWidth) + tlPageOffset;
+}
+
+tlCanvas.addEventListener('mousedown', e => {
+  const y = e.offsetY;
+  const bottomHalf = y > THUMB_H / 2;
+
+  if(bottomHalf && frames.length > 0){
+    // Start potential extend drag
+    const fi = xToFrameIdx(e.offsetX);
+    if(fi >= 0 && fi < frames.length){
+      extendDrag = {
+        sourceIdx: fi,
+        startX: e.offsetX,
+        previewCount: 0,
+        active: false  // only activates after half-thumbnail threshold
+      };
+      tlCanvas.setPointerCapture?.(e.pointerId);
+      e.preventDefault();
+      return;
+    }
+  }
+
+  // Normal seek behaviour (top half)
+  tlDragging = true;
+  tlCanvas.classList.add('dragging');
+  if(playInterval){ clearInterval(playInterval); playInterval=null; setPlayPauseIcon(false); document.getElementById('play-badge').style.display='none'; }
+  seekToX(e.offsetX);
+});
+
+window.addEventListener('mousemove', e => {
+  if(extendDrag){
+    const rect = tlCanvas.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const dx = x - extendDrag.startX;
+
+    // Activate after half a thumbnail width threshold
+    if(!extendDrag.active && dx > tlFrameWidth * 0.5){
+      extendDrag.active = true;
+    }
+
+    if(extendDrag.active){
+      // How many extra frames to insert (right-drag only)
+      const count = Math.max(0, Math.floor(dx / tlFrameWidth));
+      if(count !== extendDrag.previewCount){
+        extendDrag.previewCount = count;
+        drawTimeline(); // redraw with preview overlay
+      }
+    }
+    return;
+  }
+
+  if(rangeDragging){
+    const rect = tlRuler.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const fi = xToFrame(x) + 1;
+    if(rangeDragging === 'in'){
+      rangeStart = Math.min(fi, rangeEnd);
+      document.getElementById('range-start').value = rangeStart;
+    } else {
+      rangeEnd = Math.max(fi, rangeStart);
+      document.getElementById('range-end').value = rangeEnd;
+    }
+    drawTimeline(); return;
+  }
+  if(!tlDragging) return;
+  const rect = tlCanvas.getBoundingClientRect();
+  seekToX(e.clientX - rect.left);
+});
+
+window.addEventListener('mouseup', () => {
+  if(extendDrag){
+    if(extendDrag.active && extendDrag.previewCount > 0){
+      commitExtend(extendDrag.sourceIdx, extendDrag.previewCount);
+    }
+    extendDrag = null;
+    drawTimeline();
+    return;
+  }
+  if(rangeDragging){ rangeDragging=null; tlRuler.style.cursor='ew-resize'; return; }
+  tlDragging = false;
+  tlCanvas.classList.remove('dragging');
+  tlAudio.style.cursor = 'pointer';
+  tlRuler.style.cursor = 'ew-resize';
+});
+
+tlCanvas.addEventListener('mousemove', e => {
+  if(extendDrag) return;
+  const bottomHalf = e.offsetY > THUMB_H / 2;
+  const fi = xToFrameIdx(e.offsetX);
+  tlCanvas.style.cursor = (bottomHalf && fi >= 0 && fi < frames.length) ? 'ew-resize' : 'pointer';
+});
+
+tlAudio.addEventListener('mousedown', e => {
+  tlDragging = true;
+  tlAudio.style.cursor = 'ew-resize';
+  if(playInterval){ clearInterval(playInterval); playInterval=null; setPlayPauseIcon(false); document.getElementById('play-badge').style.display='none'; }
+  seekToX(e.offsetX);
+});
+
+function commitExtend(sourceIdx, count){
+  if(count <= 0) return;
+  const src = frames[sourceIdx];
+  // Insert duplicates immediately after sourceIdx
+  for(let i = 0; i < count; i++){
+    const img = new Image();
+    img.src = src.dataURL;
+    const dup = {dataURL: src.dataURL, img};
+    const insertAt = sourceIdx + 1 + i;
+    frames.splice(insertAt, 0, dup);
+    ensureRotoArrays();
+    rotoFrames.splice(insertAt, 0, null);
+    rotoHistory.splice(insertAt, 0, []);
+  }
+  // Shift range markers
+  const insertStart = sourceIdx + 1;
+  if(rangeStart > insertStart) rangeStart += count;
+  if(rangeEnd   >= insertStart) rangeEnd = Math.min(frames.length, rangeEnd + count);
+  rangeStart = Math.max(1, Math.min(rangeStart, frames.length));
+  rangeEnd   = Math.max(rangeStart, Math.min(rangeEnd, frames.length));
+  buildFilmstrip();
+  selectFrameIdx(sourceIdx + count);
+  updateRangeEnd();
+}
+function seekToX(x){
+  if(frames.length > 0){
+    const fi = tlPageOffset + Math.floor(x / tlFrameWidth);
+    const clamped = Math.max(0, Math.min(frames.length - 1, fi));
+    selectFrameIdx(clamped);
+    scrubAudio(clamped);
+  } else if(tlAudioBuffer){
+    // Audio-only scrub: map pixel position to time
+    const W = tlCanvas.width || tlWrap.clientWidth || 800;
+    const pct = Math.max(0, Math.min(1, x / W));
+    audioScrubOffset = pct * tlAudioBuffer.duration;
+    drawTimelineAudioOnly();
+    scrubAudioAtOffset(audioScrubOffset);
+  }
+}
+
+// resize observer to redraw on width change — debounced to prevent loop
+if(window.ResizeObserver){
+  let _roTimer = null;
+  new ResizeObserver(()=>{
+    if(_roTimer) return; // already scheduled
+    _roTimer = requestAnimationFrame(()=>{
+      _roTimer = null;
+      if(tlWrap.clientWidth !== (tlCanvas.width||0)) invalidateWaveformCache();
+      if(frames.length >= 0) drawTimeline();
+    });
+  }).observe(tlWrap);
+}
+
+// ── PAGE SCROLLING DURING PLAYBACK ────────────────────────────────────────────
+function ensurePlayheadVisible(fi){
+  const visible = visibleFrameCount();
+  if(fi < tlPageOffset || fi >= tlPageOffset + visible){
+    tlPageOffset = Math.floor(fi / visible) * visible;
+    tlPageOffset = Math.max(0, Math.min(tlPageOffset, Math.max(0, frames.length - visible)));
+    invalidateWaveformCache();
+  }
+  drawTimeline();
+}
+
+// ── FILMSTRIP API (replaces old DOM version) ──────────────────────────────────
+function buildFilmstrip(){
+  document.getElementById('frame-count-label').textContent =
+    frames.length + ' frame' + (frames.length !== 1 ? 's' : '');
+  syncFpsLabel();
+  tlPageOffset = Math.max(0, Math.min(tlPageOffset, Math.max(0, frames.length - 1)));
+  drawTimeline();
+}
+
+function selectFrameIdx(i){
+  if(i < 0 || i >= frames.length) return;
+  selectedFrame = i;
+  playbackCurrent = i;
+  ensurePlayheadVisible(i);
+  // Always clear rotoCanvas immediately on frame change
+  rotoCtx.clearRect(0, 0, rotoCanvas.width, rotoCanvas.height);
+  showFrameInPreview(i);
+  if(rotoVisible) loadRotoFrame(i);
+}
+
+function showFrameInPreview(i){
+  if(i < 0 || i >= frames.length) return;
+  const f = frames[i];
+  const drawFrame = () => {
+    const w = f.img.naturalWidth  || captureW;
+    const h = f.img.naturalHeight || captureH;
+    previewCanvas.width  = 0;
+    previewCanvas.width  = w;
+    previewCanvas.height = h;
+    previewCtx.drawImage(f.img, 0, 0);
+    const fb = document.getElementById('frame-badge');
+    if(fb) fb.textContent = `Frame ${i+1} / ${frames.length}`;
+    const cn = document.getElementById('cur-frame-num');
+    const tn = document.getElementById('total-frame-num');
+    if(cn) cn.textContent = i + 1;
+    if(tn) tn.textContent = frames.length;
+  };
+  if(f.img.complete && f.img.naturalWidth > 0) drawFrame();
+  else f.img.onload = drawFrame;
+}
+
+// Draw roto for frame i on top of previewCanvas — synchronous only (uses cache)
+function overlayRotoOnPreview(i){
+  if(!rotoVisible) return;
+  ensureRotoArrays();
+  const src = rotoFrames[i];
+  if(!src) return;
+  const img = rotoImgCache[src];
+  if(img && img.complete && img.naturalWidth > 0){
+    previewCtx.drawImage(img, 0, 0, previewCanvas.width, previewCanvas.height);
+  }
+}
+
+// Pre-load all roto images into cache
+function preloadRotoCache(){
+  ensureRotoArrays();
+  rotoFrames.forEach(src => {
+    if(src && !rotoImgCache[src]){
+      const img = new Image();
+      img.src = src;
+      rotoImgCache[src] = img;
+    }
+  });
+}
+
+function deleteFrame(i){
+  frames.splice(i, 1);
+  if(selectedFrame >= frames.length) selectedFrame = frames.length - 1;
+
+  // Adjust IN/OUT points based on which frame was deleted (i is 0-based, rangeStart/End are 1-based)
+  const deletedFrame1 = i + 1; // convert to 1-based
+  if(deletedFrame1 < rangeStart){
+    // Scenario 1: deleted before IN — both shift down by 1
+    rangeStart = Math.max(1, rangeStart - 1);
+    rangeEnd   = Math.max(rangeStart, rangeEnd - 1);
+  } else if(deletedFrame1 <= rangeEnd){
+    // Scenario 2: deleted between IN and OUT — OUT shifts down by 1
+    rangeEnd = Math.max(rangeStart, rangeEnd - 1);
+  }
+  // Scenario 3: deleted after OUT — no change
+
+  // Clamp to valid range
+  rangeEnd   = Math.min(rangeEnd, frames.length);
+  rangeStart = Math.min(rangeStart, rangeEnd);
+  document.getElementById('range-start').value = rangeStart;
+  document.getElementById('range-end').value   = rangeEnd;
+
+  buildFilmstrip();
+  if(frames.length > 0) selectFrameIdx(selectedFrame);
+  else { previewCtx.clearRect(0,0,previewCanvas.width,previewCanvas.height); }
+}
+
+function deleteSelected(){
+  if(selectedFrame < 0 || frames.length === 0) return;
+  deleteFrame(selectedFrame);
+}
+
+function duplicateSelected(){
+  if(selectedFrame < 0 || frames.length === 0) return;
+  const copy = frames[selectedFrame];
+  const newImg = new Image(); newImg.src = copy.dataURL;
+  frames.splice(selectedFrame + 1, 0, {dataURL: copy.dataURL, img: newImg});
+
+  // Adjust IN/OUT points (selectedFrame is 0-based, rangeStart/End are 1-based)
+  const dupFrame1 = selectedFrame + 1; // 1-based position of the duplicated frame
+  if(dupFrame1 < rangeStart){
+    // Scenario 1: duplicated before IN — both shift up by 1
+    rangeStart++;
+    rangeEnd++;
+  } else if(dupFrame1 <= rangeEnd){
+    // Scenario 2: duplicated between IN and OUT — OUT shifts up by 1
+    rangeEnd++;
+  }
+  // Scenario 3: duplicated after OUT — no change
+
+  document.getElementById('range-start').value = rangeStart;
+  document.getElementById('range-end').value   = rangeEnd;
+
+  buildFilmstrip();
+  selectFrameIdx(selectedFrame + 1);
+}
+
+function moveFrameUp(){
+  if(selectedFrame <= 0) return;
+  [frames[selectedFrame], frames[selectedFrame-1]] = [frames[selectedFrame-1], frames[selectedFrame]];
+  selectedFrame--;
+  playbackCurrent = selectedFrame;
+  buildFilmstrip();
+  showFrameInPreview(selectedFrame);
+}
+
+function moveFrameDown(){
+  if(selectedFrame >= frames.length - 1) return;
+  [frames[selectedFrame], frames[selectedFrame+1]] = [frames[selectedFrame+1], frames[selectedFrame]];
+  selectedFrame++;
+  playbackCurrent = selectedFrame;
+  buildFilmstrip();
+  showFrameInPreview(selectedFrame);
+}
+
+function scrollThumbIntoView(i){ ensurePlayheadVisible(i); }
+
+function updateRangeEnd(){
+  // When frames are added, extend rangeEnd to cover the new total
+  rangeEnd = frames.length;
+  if(rangeStart < 1) rangeStart = 1;
+  document.getElementById('range-end').value   = rangeEnd;
+  document.getElementById('range-start').value  = rangeStart;
+  const tn = document.getElementById('total-frame-num'); if(tn) tn.textContent = frames.length;
+}
+// play = triangle + bar on right (play icon), pause = two bars
+const PLAY_ICON  = `<polygon points="5 3 19 12 5 21 5 3"/>`;
+const PAUSE_ICON = `<line x1="10" y1="15" x2="10" y2="9"/><line x1="15" y1="15" x2="15" y2="9"/>`;
+function setPlayPauseIcon(playing){ const el=document.getElementById('play-pause-icon'); if(el) el.innerHTML=playing?PAUSE_ICON:PLAY_ICON; }
+function togglePlayPause(){ if(playInterval) pausePlayback(); else playForward(); }
+
+function goInPoint(){
+  pausePlayback();
+  if(frames.length > 0) selectFrameIdx(rangeStart - 1);
+  else if(audioBuffer){ audioScrubOffset = (rangeStart-1)/currentFPS; drawTimelineAudioOnly(); }
+}
+function goOutPoint(){
+  pausePlayback();
+  if(frames.length > 0) selectFrameIdx(rangeEnd - 1);
+  else if(audioBuffer){ audioScrubOffset = (rangeEnd-1)/currentFPS; drawTimelineAudioOnly(); }
+}
+function stepFwd(){
+  pausePlayback();
+  if(frames.length>0) selectFrameIdx(Math.min(frames.length-1,(playbackCurrent<0?0:playbackCurrent)+1));
+  else if(audioBuffer){audioScrubOffset=Math.min(audioBuffer.duration,audioScrubOffset+1/currentFPS);drawTimelineAudioOnly();}
+}
+function stepBack(){
+  pausePlayback();
+  if(frames.length>0) selectFrameIdx(Math.max(0,(playbackCurrent<0?0:playbackCurrent)-1));
+  else if(audioBuffer){audioScrubOffset=Math.max(0,audioScrubOffset-1/currentFPS);drawTimelineAudioOnly();}
+}
+function syncFpsLabel(){ const el=document.getElementById('tl-fps-label'); if(el) el.textContent=currentFPS+' fps'; }
+
+function setFPS(fps){
+  currentFPS=fps;
+  document.querySelectorAll('.fps-btn').forEach(b=>b.classList.remove('active'));
+  const el=document.getElementById('fps-'+fps);
+  if(el) el.classList.add('active');
+  if(playInterval){pausePlayback();playDir>0?playForward():playReverse();}
+  updateTLLabels();
+  syncFpsLabel();
+}
+
+function customFPS(){
+  const v=prompt('Enter custom FPS (1–60):');
+  if(!v) return;
+  const n=Math.max(1,Math.min(60,+v||12));
+  currentFPS=n;
+  document.querySelectorAll('.fps-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('fps-custom').textContent=n+' Fps';
+  document.getElementById('fps-custom').classList.add('active');
+  if(playInterval){pausePlayback();playDir>0?playForward():playReverse();}
+}
+
+function playForward(){
+  pausePlayback();
+  playDir=1;
+
+  if(frames.length === 0){
+    // Audio-only mode
+    if(!audioBuffer){ return; }
+    document.getElementById('play-badge').style.display='block';
+    setPlayPauseIcon(true);
+    let loopStartTime = audioCtx ? audioCtx.currentTime : 0;
+    let loopStartOffset = audioScrubOffset;
+    startAudioAt(loopStartOffset);
+    playInterval = setInterval(()=>{
+      ensureAudioCtx();
+      const elapsed = audioCtx.currentTime - loopStartTime;
+      audioScrubOffset = loopStartOffset + elapsed;
+      if(audioScrubOffset >= audioBuffer.duration){
+        const loop = document.getElementById('loop-toggle').checked;
+        if(loop){
+          audioScrubOffset = 0;
+          loopStartOffset = 0;
+          loopStartTime = audioCtx.currentTime;
+          startAudioAt(0);
+        } else {
+          pausePlayback();
+          return;
+        }
+      }
+      drawTimelineAudioOnly();
+    }, 1000/currentFPS);
+    return;
+  }
+
+  playbackCurrent = selectedFrame>=0 ? selectedFrame : rangeStart-1;
+  // Safety: clamp rangeEnd to actual frames
+  if(rangeEnd < 1 || rangeEnd > frames.length) rangeEnd = frames.length;
+  if(rangeStart < 1 || rangeStart > rangeEnd) rangeStart = 1;
+  document.getElementById('play-badge').style.display='block';
+  setPlayPauseIcon(true);
+  // Deselect all frames during playback and hide roto overlay
+  selectedFrame = -1;
+  rotoCanvas.style.display = 'none';
+  // Pre-load all roto images into cache before playback starts
+  if(rotoVisible) preloadRotoCache();
+  startPlaybackAudio(playbackCurrent);
+  playInterval=setInterval(()=>{
+    const loop=document.getElementById('loop-toggle').checked;
+    let next=playbackCurrent+1;
+    if(next>=rangeEnd){
+      if(loop){ next=rangeStart-1; startPlaybackAudio(next); }
+      else{ pausePlayback(); return; }
+    }
+    playbackCurrent=next;
+    showFrameInPreview(playbackCurrent);
+    overlayRotoOnPreview(playbackCurrent);
+    ensurePlayheadVisible(playbackCurrent);
+  },1000/currentFPS);
+}
+
+function playReverse(){
+  pausePlayback();
+  playDir=-1;
+
+  if(frames.length === 0){
+    // Audio-only reverse — play from current position backwards (no Web Audio reverse, so just seek backwards)
+    if(!audioBuffer){ return; }
+    document.getElementById('play-badge').style.display='block';
+    // Step the visual head backwards; audio plays normally from decreasing offsets
+    const stepSec = 1/currentFPS;
+    playInterval = setInterval(()=>{
+      audioScrubOffset = Math.max(0, audioScrubOffset - stepSec);
+      startAudioAt(audioScrubOffset, stepSec);
+      if(audioScrubOffset <= 0){
+        const loop = document.getElementById('loop-toggle').checked;
+        if(loop) audioScrubOffset = audioBuffer.duration;
+        else{ pausePlayback(); return; }
+      }
+      drawTimelineAudioOnly();
+    }, 1000/currentFPS);
+    return;
+  }
+
+  playbackCurrent = selectedFrame>=0 ? selectedFrame : rangeEnd-1;
+  document.getElementById('play-badge').style.display='block';
+  playInterval=setInterval(()=>{
+    const loop=document.getElementById('loop-toggle').checked;
+    let next=playbackCurrent-1;
+    if(next<rangeStart-1){if(loop)next=rangeEnd-1;else{pausePlayback();return;}}
+    playbackCurrent=next;
+    showFrameInPreview(playbackCurrent);
+    ensurePlayheadVisible(playbackCurrent);
+  },1000/currentFPS);
+}
+
+function pausePlayback(){
+  if(playInterval){ clearInterval(playInterval); playInterval=null; }
+  stopPlaybackAudio();
+  stopAllAudio();
+  setPlayPauseIcon(false);
+  document.getElementById('play-badge').style.display='none';
+  // Reselect the frame the playhead stopped on
+  if(playbackCurrent >= 0 && playbackCurrent < frames.length){
+    selectFrameIdx(playbackCurrent);
+  }
+  // Restore roto canvas overlay
+  if(rotoVisible) rotoCanvas.style.display = 'block';
+  drawTimeline();
+}
+
+function goFirst(){
+  pausePlayback();
+  if(frames.length > 0) selectFrameIdx(0);
+  else { audioScrubOffset=0; drawTimelineAudioOnly(); }
+}
+function goLast(){
+  pausePlayback();
+  if(frames.length > 0) selectFrameIdx(frames.length-1);
+  else if(audioBuffer){ audioScrubOffset=audioBuffer.duration; drawTimelineAudioOnly(); }
+}
+
+function scrollThumbIntoView(i){ ensurePlayheadVisible(i); }
+
+function updateRangeEnd(){
+  rangeEnd=frames.length;
+  const re=document.getElementById('range-end'); if(re) re.value=rangeEnd;
+  const rs=document.getElementById('range-start'); if(rs) rs.value=rangeStart;
+  const tn=document.getElementById('total-frame-num'); if(tn) tn.textContent=frames.length;
+}
+
+function applyRange(){
+  rangeStart=Math.max(1,Math.min(+document.getElementById('range-start').value,frames.length));
+  rangeEnd  =Math.max(rangeStart,Math.min(+document.getElementById('range-end').value,frames.length));
+  document.getElementById('range-start').value=rangeStart;
+  document.getElementById('range-end').value=rangeEnd;
+}
+
+// ── EXPORT RANGE ──────────────────────────────────────────────────────────────
+let exportRangeMode = 'all'; // 'all' | 'range'
+
+function setExportRange(mode){
+  exportRangeMode = mode;
+  document.getElementById('export-range-all').classList.toggle('active', mode === 'all');
+  document.getElementById('export-range-in').classList.toggle('active', mode === 'range');
+}
+
+function getExportFrames(){
+  if(exportRangeMode === 'range'){
+    const start = Math.max(0, rangeStart - 1);
+    const end   = Math.min(frames.length, rangeEnd);
+    return frames.slice(start, end);
+  }
+  return frames;
+}
+
+// ── EXPORT FORMAT UI ─────────────────────────────────────────────────────────
+function onExportFormatChange(){
+  const fmt = document.getElementById('export-format').value;
+  document.getElementById('jpg-quality-row').style.display  = fmt === 'jpg-zip' ? 'block' : 'none';
+  document.getElementById('export-audio-row').style.display = fmt === 'mp4'     ? 'flex'  : 'none';
+}
+function onSingleFormatChange(){
+  const fmt = document.getElementById('single-format').value;
+  document.getElementById('single-quality-row').style.display = fmt === 'jpg' ? 'block' : 'none';
+}
+
+// ── EXPORT ALL FRAMES ─────────────────────────────────────────────────────────
+async function exportProject(){
+  const exportFrames = getExportFrames();
+  if(exportFrames.length === 0){ alert('No frames to export.'); return; }
+  const fmt = document.getElementById('export-format').value;
+  if(exportMode === 'captured'){
+    if(fmt === 'png-zip') await exportZIP('png', exportFrames);
+    else if(fmt === 'jpg-zip') await exportZIP('jpg', exportFrames);
+    else if(fmt === 'gif') await exportGIF(exportFrames);
+    else if(fmt === 'mp4'){ showMp4Modal(exportFrames); return; }
+  } else {
+    if(fmt === 'png-zip') await exportRotoZIP('png', exportFrames);
+    else if(fmt === 'jpg-zip') await exportRotoZIP('jpg', exportFrames);
+    else if(fmt === 'gif') await exportRotoGIF(exportFrames);
+    else if(fmt === 'mp4'){ showMp4Modal(exportFrames); return; }
+  }
+}
+
+async function exportRotoZIP(format, exportFrames){
+  await loadJSZip();
+  const zip = new JSZip();
+  const ext = format === 'jpg' ? 'jpg' : 'png';
+  const mime = ext === 'jpg' ? 'image/jpeg' : 'image/png';
+  setExportProgress(0, `Building ${exportMode} ${ext.toUpperCase()} ZIP…`);
+  const prefix = exportMode === 'roto' ? 'roto' : 'frame';
+  for(let i=0; i<exportFrames.length; i++){
+    const globalIdx = frames.indexOf(exportFrames[i]);
+    const c = await buildExportCanvas(globalIdx >= 0 ? globalIdx : i);
+    const quality = ext === 'jpg' ? +document.getElementById('jpg-quality').value/100 : undefined;
+    zip.file(`${prefix}_${String(i+1).padStart(4,'0')}.${ext}`, c.toDataURL(mime,quality).split(',')[1], {base64:true});
+    setExportProgress((i+1)/exportFrames.length*100, `Packing frame ${i+1}/${exportFrames.length}…`);
+    if(i%5===0) await tick();
+  }
+  setExportProgress(95,'Compressing…');
+  const blob = await zip.generateAsync({type:'blob',compression:'DEFLATE'});
+  triggerDownload(blob, `stopmotion_${exportMode}.zip`);
+  setExportProgress(100,`Done — ${(blob.size/1024).toFixed(1)} KB`);
+  setTimeout(()=>hideExportProgress(),3000);
+}
+
+async function exportRotoGIF(exportFrames){
+  if(!window.GIF){
+    const s = document.createElement('script');
+    s.src='https://cdnjs.cloudflare.com/ajax/libs/gif.js/0.2.0/gif.js';
+    document.head.appendChild(s);
+    await new Promise(r=>s.onload=r);
+  }
+  setExportProgress(0,'Building GIF…');
+  const gif = new GIF({ workers:2, quality:10, workerScript:'https://cdnjs.cloudflare.com/ajax/libs/gif.js/0.2.0/gif.worker.js' });
+  const delay = Math.round(1000/currentFPS);
+  for(let i=0;i<exportFrames.length;i++){
+    const globalIdx = frames.indexOf(exportFrames[i]);
+    const c = await buildExportCanvas(globalIdx >= 0 ? globalIdx : i);
+    gif.addFrame(c,{delay});
+    setExportProgress((i+1)/exportFrames.length*80,`Adding frame ${i+1}/${exportFrames.length}…`);
+    if(i%5===0) await tick();
+  }
+  gif.on('progress', p=>setExportProgress(80+p*20,'Rendering GIF…'));
+  gif.on('finished', blob=>{
+    triggerDownload(blob,`stopmotion_${exportMode}.gif`);
+    setExportProgress(100,`Done — ${(blob.size/1024).toFixed(1)} KB`);
+    setTimeout(()=>hideExportProgress(),3000);
+  });
+  gif.render();
+}
+
+async function exportRotoMP4(exportFrames){
+  if(!window.VideoEncoder){ alert('MP4 export requires Chrome or Edge 94+.'); return; }
+  // Build composite canvases, then treat them as frames for the MP4 encoder
+  setExportProgress(0, 'Building composite frames…');
+  const tempFrames = [];
+  for(let i=0;i<exportFrames.length;i++){
+    const globalIdx = frames.indexOf(exportFrames[i]);
+    const c = await buildExportCanvas(globalIdx >= 0 ? globalIdx : i);
+    const img = new Image(); img.src = c.toDataURL('image/png');
+    await new Promise(r=>{ if(img.complete) r(); else img.onload=r; });
+    tempFrames.push({dataURL: c.toDataURL('image/png'), img});
+    setExportProgress((i+1)/exportFrames.length*30, `Compositing frame ${i+1}/${exportFrames.length}…`);
+    await tick();
+  }
+  // Temporarily swap frames, export, restore
+  const savedFrames = frames;
+  frames = tempFrames;
+  await exportMP4(tempFrames);
+  frames = savedFrames;
+}
+
+async function loadJSZip(){
+  if(window.JSZip) return;
+  const s = document.createElement('script');
+  s.src = 'https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js';
+  document.head.appendChild(s);
+  await new Promise(r => s.onload = r);
+}
+
+async function exportZIP(format, exportFrames){
+  await loadJSZip();
+  const zip = new JSZip();
+  const quality = +document.getElementById('jpg-quality').value / 100;
+  setExportProgress(0, `Building ${format.toUpperCase()} ZIP…`);
+
+  for(let i = 0; i < exportFrames.length; i++){
+    const f = exportFrames[i];
+    let dataURL = f.dataURL;
+    const tmpC = document.createElement('canvas');
+    tmpC.width = f.img.naturalWidth; tmpC.height = f.img.naturalHeight;
+    tmpC.getContext('2d').drawImage(f.img, 0, 0);
+    dataURL = format === 'jpg'
+      ? tmpC.toDataURL('image/jpeg', quality)
+      : tmpC.toDataURL('image/png');
+    zip.file(`frame_${String(i+1).padStart(4,'0')}.${format === 'jpg' ? 'jpg' : 'png'}`,
+             dataURL.split(',')[1], {base64:true});
+    setExportProgress((i+1)/exportFrames.length * 100, `Packing frame ${i+1}/${exportFrames.length}…`);
+    if(i % 10 === 0) await tick();
+  }
+
+  setExportProgress(95, 'Compressing ZIP…');
+  const blob = await zip.generateAsync({type:'blob', compression:'DEFLATE'});
+  triggerDownload(blob, `stopmotion_${format}.zip`);
+  setExportProgress(100, `Done — ${(blob.size/1024).toFixed(1)} KB`);
+  setTimeout(()=>hideExportProgress(), 3000);
+}
+
+async function exportGIF(exportFrames){
+  // Load gif.js from CDN
+  if(!window.GIF){
+    const s = document.createElement('script');
+    s.src='https://cdnjs.cloudflare.com/ajax/libs/gif.js/0.2.0/gif.js';
+    document.head.appendChild(s);
+    await new Promise(r=>s.onload=r);
+  }
+  setExportProgress(0, 'Building GIF…');
+  const gif = new GIF({ workers:2, quality:10, workerScript:'https://cdnjs.cloudflare.com/ajax/libs/gif.js/0.2.0/gif.worker.js' });
+  const delay = Math.round(1000 / currentFPS);
+  for(let i=0;i<exportFrames.length;i++){
+    const tmpC=document.createElement('canvas');
+    tmpC.width=exportFrames[i].img.naturalWidth; tmpC.height=exportFrames[i].img.naturalHeight;
+    tmpC.getContext('2d').drawImage(exportFrames[i].img,0,0);
+    gif.addFrame(tmpC,{delay});
+    setExportProgress((i+1)/exportFrames.length*80,`Adding frame ${i+1}/${exportFrames.length}…`);
+    if(i%5===0) await tick();
+  }
+  gif.on('progress', p=>setExportProgress(80+p*20,'Rendering GIF…'));
+  gif.on('finished', blob=>{
+    triggerDownload(blob,'stopmotion.gif');
+    setExportProgress(100,`Done — ${(blob.size/1024).toFixed(1)} KB`);
+    setTimeout(()=>hideExportProgress(),3000);
+  });
+  gif.render();
+}
+
+// ── EXPORT SELECTED FRAME ─────────────────────────────────────────────────────
+function exportSelectedFrame(){
+  if(selectedFrame < 0 || frames.length === 0){ alert('No frame selected.'); return; }
+  const f = frames[selectedFrame];
+  const fmt = document.getElementById('single-format').value;
+  const quality = +document.getElementById('single-quality').value / 100;
+  const tmpC = document.createElement('canvas');
+  tmpC.width = f.img.naturalWidth; tmpC.height = f.img.naturalHeight;
+  tmpC.getContext('2d').drawImage(f.img, 0, 0);
+  const dataURL = fmt === 'jpg' ? tmpC.toDataURL('image/jpeg', quality) : tmpC.toDataURL('image/png');
+  const blob = dataURLToBlob(dataURL);
+  triggerDownload(blob, `frame_${String(selectedFrame+1).padStart(4,'0')}.${fmt}`);
+  document.getElementById('export-size-label').textContent = `Saved: ${(blob.size/1024).toFixed(1)} KB`;
+}
+
+function dataURLToBlob(dataURL){
+  const [header, data] = dataURL.split(',');
+  const mime = header.match(/:(.*?);/)[1];
+  const binary = atob(data);
+  const arr = new Uint8Array(binary.length);
+  for(let i=0;i<binary.length;i++) arr[i]=binary.charCodeAt(i);
+  return new Blob([arr],{type:mime});
+}
+
+// ── MP4 EXPORT (WebCodecs + pure-JS muxer) ───────────────────────────────────
+async function exportMP4(exportFrames, filename='stopmotion.mp4'){
+  if(!window.VideoEncoder){ alert('MP4 export requires Chrome or Edge 94+. Please use a supported browser.'); return; }
+  if(exportFrames.length === 0){ alert('No frames to export.'); return; }
+
+  const btn = document.getElementById('btn-export-all');
+  btn.disabled = true;
+  setExportProgress(0, 'Initialising encoder…');
+
+  try {
+    const firstImg = exportFrames[0].img;
+    const encW = Math.floor((firstImg.naturalWidth  || captureW) / 2) * 2;
+    const encH = Math.floor((firstImg.naturalHeight || captureH) / 2) * 2;
+    const nFrames = exportFrames.length;
+    const fps = currentFPS;
+
+    const chunks = []; // {buf, type, ts}
+    let decoderConfig = null;
+
+    const encoder = new VideoEncoder({
+      output(chunk, meta){
+        const buf = new Uint8Array(chunk.byteLength);
+        chunk.copyTo(buf);
+        chunks.push({ buf, type: chunk.type, ts: chunk.timestamp });
+        if(meta?.decoderConfig) decoderConfig = meta.decoderConfig;
+      },
+      error(e){ throw e; }
+    });
+
+    encoder.configure({
+      codec: 'avc1.640033',
+      width: encW, height: encH,
+      bitrate: 10_000_000,
+      framerate: fps,
+      latencyMode: 'quality'
+    });
+
+    // Scratch canvas
+    const sc = document.createElement('canvas');
+    sc.width = encW; sc.height = encH;
+    const sCtx = sc.getContext('2d');
+
+    for(let f = 0; f < nFrames; f++){
+      sCtx.clearRect(0, 0, encW, encH);
+      sCtx.drawImage(exportFrames[f].img, 0, 0, encW, encH);
+      const ts = Math.round(f / fps * 1_000_000);
+      const dur = Math.round(1 / fps * 1_000_000);
+      const vf = new VideoFrame(sc, { timestamp: ts, duration: dur });
+      encoder.encode(vf, { keyFrame: f === 0 || f % 30 === 0 });
+      vf.close();
+      if(f % 5 === 0) await encoder.flush();
+      setExportProgress((f+1)/nFrames*70, `Encoding frame ${f+1}/${nFrames}…`);
+      if(f % 10 === 0) await tick();
+    }
+    await encoder.flush();
+    encoder.close();
+
+    setExportProgress(75, 'Extracting SPS/PPS…');
+
+    // SPS/PPS extraction — 3-level fallback
+    let sps, pps;
+    try {
+      const desc = new Uint8Array(decoderConfig?.description);
+      // Parse AVCC descriptor
+      let i = 6;
+      const spsLen = (desc[i]<<8)|desc[i+1]; i+=2;
+      sps = desc.slice(i, i+spsLen); i+=spsLen;
+      i++; // numPPS
+      const ppsLen = (desc[i]<<8)|desc[i+1]; i+=2;
+      pps = desc.slice(i, i+ppsLen);
+    } catch(e){
+      // Level 2: Annex B scan
+      for(const ch of chunks){
+        let i=0; const d=ch.buf;
+        while(i<d.length-4){
+          if(d[i]===0&&d[i+1]===0&&d[i+2]===0&&d[i+3]===1){
+            const nt=d[i+4]&0x1f;
+            let end=d.length;
+            for(let j=i+4;j<d.length-3;j++){if(d[j]===0&&d[j+1]===0&&d[j+2]===0&&d[j+3]===1){end=j;break;}}
+            if(nt===7) sps=d.slice(i+4,end);
+            if(nt===8) pps=d.slice(i+4,end);
+            i=end;
+          } else i++;
+        }
+        if(sps&&pps) break;
+      }
+    }
+    if(!sps||!pps){
+      // Level 3: hardcoded fallback
+      sps=new Uint8Array([0x67,0x64,0x00,0x33,0xac,0xd9,0x40,0xa0,0xfd,0x00,0xda,0x10,0x00,0x00,0x03,0x00,0x10,0x00,0x00,0x03,0x03,0x20,0xf1,0x83,0x19,0x60]);
+      pps=new Uint8Array([0x68,0xeb,0xe3,0xcb,0x22,0xc0]);
+    }
+
+    setExportProgress(80, 'Muxing MP4…');
+
+    // AVCC conversion
+    function annexBtoAVCC(buf){
+      if(buf[0]!==0||buf[1]!==0||buf[2]!==0||buf[3]!==1) return buf;
+      const out=[]; let i=0;
+      while(i<buf.length){
+        if(buf[i]===0&&buf[i+1]===0&&buf[i+2]===0&&buf[i+3]===1){
+          let end=buf.length;
+          for(let j=i+4;j<buf.length-3;j++){if(buf[j]===0&&buf[j+1]===0&&buf[j+2]===0&&buf[j+3]===1){end=j;break;}}
+          const nal=buf.slice(i+4,end);
+          const len=nal.length;
+          out.push((len>>24)&0xff,(len>>16)&0xff,(len>>8)&0xff,len&0xff,...nal);
+          i=end;
+        } else i++;
+      }
+      return new Uint8Array(out);
+    }
+
+    const avccChunks = chunks.map(c=>({...c, buf:annexBtoAVCC(c.buf)}));
+
+    // MP4 muxer helpers
+    const u32=(v)=>{const b=new Uint8Array(4);new DataView(b.buffer).setUint32(0,v);return b;};
+    const u16=(v)=>{const b=new Uint8Array(2);new DataView(b.buffer).setUint16(0,v);return b;};
+    const i16=(v)=>{const b=new Uint8Array(2);new DataView(b.buffer).setInt16(0,v);return b;};
+    const str4=(s)=>new Uint8Array([s.charCodeAt(0),s.charCodeAt(1),s.charCodeAt(2),s.charCodeAt(3)]);
+    function concat(...arrs){
+      const total=arrs.reduce((n,a)=>n+a.length,0);
+      const out=new Uint8Array(total); let off=0;
+      for(const a of arrs){out.set(a,off);off+=a.length;}
+      return out;
+    }
+    function box(type,...payloads){
+      const payload=concat(...payloads);
+      return concat(u32(8+payload.length),str4(type),payload);
+    }
+    function fullbox(type,version,flags,...payloads){
+      return box(type,new Uint8Array([version,(flags>>16)&0xff,(flags>>8)&0xff,flags&0xff]),...payloads);
+    }
+
+    const timescale = fps * 100;
+    const frameDur  = 100;
+    const totalDur  = nFrames * frameDur;
+
+    const profile  = sps[1], compat = sps[2], level = sps[3];
+    const avcC = concat(
+      new Uint8Array([1, profile, compat, level, 0xff, 0xe1]),
+      u16(sps.length), sps, new Uint8Array([0x01]), u16(pps.length), pps
+    );
+    const avcCbox = box('avcC', avcC);
+
+    const avc1box = box('avc1',
+      new Uint8Array(6), u16(1), new Uint8Array(16),
+      u16(encW), u16(encH),
+      u32(0x00480000), u32(0x00480000), u32(0),
+      u16(1), new Uint8Array(32), u16(0x0018), i16(-1),
+      avcCbox
+    );
+    const stsd = fullbox('stsd',0,0, u32(1), avc1box);
+    const stts = fullbox('stts',0,0, u32(1), u32(nFrames), u32(frameDur));
+
+    const keysArr=[]; for(let f=0;f<nFrames;f++){if(avccChunks[f].type==='key') keysArr.push(u32(f+1));}
+    const stss = fullbox('stss',0,0, u32(keysArr.length), ...keysArr);
+
+    const sizes=[]; avccChunks.forEach(c=>sizes.push(u32(c.buf.length)));
+    const stsz = fullbox('stsz',0,0, u32(0), u32(nFrames), ...sizes);
+    const stsc = fullbox('stsc',0,0, u32(1), u32(1), u32(nFrames), u32(1));
+    const stcoPlaceholder = fullbox('stco',0,0, u32(1), u32(0)); // offset patched below
+
+    const stbl = box('stbl', stsd, stts, stss, stsz, stsc, stcoPlaceholder);
+    const dinf = box('dinf', fullbox('dref',0,0, u32(1), fullbox('url ',0,1)));
+    const minf = box('minf', fullbox('vmhd',0,1), dinf, stbl);
+    const mdhd = fullbox('mdhd',0,0, u32(0),u32(0), u32(timescale),u32(totalDur), u16(0x55c4),u16(0));
+    const hdlr = fullbox('hdlr',0,0, u32(0),str4('vide'), new Uint8Array(12), new TextEncoder().encode('VideoHandler\0'));
+    const mdia = box('mdia', mdhd, hdlr, minf);
+
+    const tkhd = fullbox('tkhd',0,3, u32(0),u32(0),u32(1),u32(0),u32(totalDur),
+      new Uint8Array(8), u16(0),u16(0),u16(0),u16(0),
+      u32(0x00010000),u32(0),u32(0),u32(0),u32(0x00010000),u32(0),u32(0),u32(0),u32(0x40000000),
+      u32(encW<<16), u32(encH<<16)
+    );
+    const trak = box('trak', tkhd, mdia);
+
+    const mvhd = fullbox('mvhd',0,0, u32(0),u32(0),u32(timescale),u32(totalDur),
+      u32(0x00010000), u16(0x0100), new Uint8Array(10),
+      u32(0x00010000),u32(0),u32(0),u32(0),u32(0x00010000),u32(0),u32(0),u32(0),u32(0x40000000),
+      new Uint8Array(24), u32(2)
+    );
+    const ftyp = box('ftyp', str4('isom'), u32(0x200), str4('isom'), str4('iso2'), str4('avc1'), str4('mp41'));
+
+    setExportProgress(90, 'Assembling file…');
+    const includeAudio = document.getElementById('export-audio').checked && audioBuffer;
+    let audioTrackData = null;
+
+    if(includeAudio && window.AudioEncoder){
+      setExportProgress(82, 'Encoding audio…');
+      const sampleRate = audioBuffer.sampleRate;
+      const numChannels = audioBuffer.numberOfChannels;
+      const audioChunks = [];
+      await new Promise((resolve, reject) => {
+        const audioEncoder = new AudioEncoder({
+          output(chunk){ const b=new Uint8Array(chunk.byteLength); chunk.copyTo(b); audioChunks.push({buf:b, ts:chunk.timestamp, dur:chunk.duration, type:chunk.type}); },
+          error(e){ reject(e); }
+        });
+        audioEncoder.configure({ codec:'mp4a.40.2', sampleRate, numberOfChannels:numChannels, bitrate:128000 });
+        // Feed audio data as AudioData chunks
+        const videoDurationSec = nFrames / fps;
+        const totalSamples = Math.min(audioBuffer.length, Math.ceil(videoDurationSec * sampleRate));
+        // Detect which AudioData format Chrome supports
+        let audioFormat = 'f32';
+        try {
+          const testData = new Float32Array(1024);
+          const testAd = new AudioData({ format:'f32-planar', sampleRate, numberOfChannels:1, numberOfFrames:1024, timestamp:0, data:testData });
+          testAd.close();
+          audioFormat = 'f32-planar';
+        } catch(e){ audioFormat = 'f32'; }
+
+        const chunkSize = sampleRate; // 1s chunks
+        for(let offset=0; offset<totalSamples; offset+=chunkSize){
+          const len = Math.min(chunkSize, totalSamples-offset);
+          let data;
+          if(audioFormat === 'f32-planar'){
+            // f32-planar: channel 0 plane, then channel 1 plane
+            data = new Float32Array(len * numChannels);
+            for(let ch=0;ch<numChannels;ch++){
+              const src = audioBuffer.getChannelData(ch);
+              for(let s=0;s<len;s++) data[ch*len+s] = src[offset+s];
+            }
+          } else {
+            // f32 interleaved: L R L R ...
+            data = new Float32Array(len * numChannels);
+            for(let s=0;s<len;s++){
+              for(let ch=0;ch<numChannels;ch++){
+                data[s*numChannels+ch] = audioBuffer.getChannelData(ch)[offset+s];
+              }
+            }
+          }
+          const ad = new AudioData({
+            format: audioFormat,
+            sampleRate,
+            numberOfChannels: numChannels,
+            numberOfFrames: len,
+            timestamp: Math.round(offset/sampleRate*1_000_000),
+            data
+          });
+          audioEncoder.encode(ad); ad.close();
+        }
+        audioEncoder.flush().then(()=>{ audioEncoder.close(); resolve(); }).catch(reject);
+      });
+
+      // Build audio trak boxes
+      const audioTimescale = sampleRate;
+      const totalAudioSamples = audioChunks.length * 1024; // 1024 samples per AAC frame
+      const audioTotalDur = totalAudioSamples;
+
+      // Build correct AudioSpecificConfig for esds
+      // AAC-LC = audioObjectType 2, sample rate index, channel config
+      const srTable = [96000,88200,64000,48000,44100,32000,24000,22050,16000,12000,11025,8000,7350];
+      const srIndex = srTable.indexOf(sampleRate);
+      const srIdx = srIndex >= 0 ? srIndex : 4; // default 44100 if not found
+      const chCfg = numChannels;
+      // AudioSpecificConfig: 5 bits objectType(2=AAC-LC) + 4 bits srIdx + 4 bits chCfg
+      const asc0 = (0x02 << 3) | (srIdx >> 1);
+      const asc1 = ((srIdx & 1) << 7) | (chCfg << 3);
+      const ascBytes = new Uint8Array([asc0, asc1]);
+
+      const esdsPayload = concat(
+        new Uint8Array([0x00,0x00,0x00,0x00]), // version+flags
+        new Uint8Array([0x03,0x19]),            // ES_Descriptor tag + length
+        u16(0x0001), new Uint8Array([0x00]),    // ES_ID, streamPriority
+        new Uint8Array([0x04,0x11]),            // DecoderConfigDescriptor tag + length
+        new Uint8Array([0x40]),                 // objectTypeIndication = Audio ISO/IEC 14496-3
+        new Uint8Array([0x15,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00]), // streamType+bufferSize+maxBitrate+avgBitrate
+        new Uint8Array([0x05,0x02]),            // DecoderSpecificInfo tag + length
+        ascBytes,                              // AudioSpecificConfig
+        new Uint8Array([0x06,0x01,0x02])        // SLConfigDescriptor
+      );
+      const esds = fullbox('esds',0,0, esdsPayload);
+      const mp4aBox = box('mp4a', new Uint8Array(6), u16(1), new Uint8Array(8), u16(numChannels), u16(16), u16(0), u16(0), u32(sampleRate<<16), esds);
+      const audioStsd = fullbox('stsd',0,0, u32(1), mp4aBox);
+
+      // Audio stts — one consolidated entry: all frames have delta=1024 samples
+      const samplesPerFrame = 1024;
+      const audioStts = fullbox('stts',0,0, u32(1), u32(audioChunks.length), u32(samplesPerFrame));
+      const audioSizes = audioChunks.map(c=>u32(c.buf.length));
+      const audioStsz = fullbox('stsz',0,0, u32(0), u32(audioChunks.length), ...audioSizes);
+      const audioStsc = fullbox('stsc',0,0, u32(1), u32(1), u32(1), u32(1)); // 1 sample per chunk
+      // stco needs one offset per chunk — build incrementally
+      const audioChunkOffsets = [];
+      // Offsets calculated after we know ftyp+moov size — use placeholder, patch later
+      const audioStco = fullbox('stco',0,0, u32(audioChunks.length), ...audioChunks.map(()=>u32(0)));
+      const audioStbl = box('stbl', audioStsd, audioStts, audioStsz, audioStsc, audioStco);
+      const audioDinf = box('dinf', fullbox('dref',0,0, u32(1), fullbox('url ',0,1)));
+      const audioMinf = box('minf', fullbox('smhd',0,0,u16(0),u16(0)), audioDinf, audioStbl);
+      const audioMdhd = fullbox('mdhd',0,0, u32(0),u32(0), u32(audioTimescale),u32(audioTotalDur), u16(0x55c4),u16(0));
+      const audioHdlr = fullbox('hdlr',0,0, u32(0),str4('soun'), new Uint8Array(12), new TextEncoder().encode('SoundHandler\0'));
+      const audioMdia = box('mdia', audioMdhd, audioHdlr, audioMinf);
+      const audioTkhd = fullbox('tkhd',0,3, u32(0),u32(0),u32(2),u32(0),u32(totalDur), new Uint8Array(8), u16(0),u16(0),u16(0x0100),u16(0), u32(0x00010000),u32(0),u32(0),u32(0),u32(0x00010000),u32(0),u32(0),u32(0),u32(0x40000000), u32(0),u32(0));
+      const audioTrak = box('trak', audioTkhd, audioMdia);
+      audioTrackData = { trak: audioTrak, chunks: audioChunks };
+    }
+
+    // ── FINAL ASSEMBLY ───────────────────────────────────────────────────────
+    const parts = [ftyp];
+    const totalVideoBytes = avccChunks.reduce((n,c)=>n+c.buf.length,0);
+    const totalAudioBytes = audioTrackData ? audioTrackData.chunks.reduce((n,c)=>n+c.buf.length,0) : 0;
+    const mdatHdr = concat(u32(8+totalVideoBytes+totalAudioBytes), str4('mdat'));
+
+    let moov = box('moov', mvhd, trak, ...(audioTrackData ? [audioTrackData.trak] : []));
+    const chunkOffset = ftyp.length + moov.length + mdatHdr.length;
+
+    // Patch stco offsets
+    const moovArr = new Uint8Array(moov);
+    const stcoTag = new TextEncoder().encode('stco');
+    let stcoCount = 0;
+    let videoDataSize = avccChunks.reduce((n,c)=>n+c.buf.length,0);
+    for(let i=0;i<moovArr.length-4;i++){
+      if(moovArr[i]===stcoTag[0]&&moovArr[i+1]===stcoTag[1]&&moovArr[i+2]===stcoTag[2]&&moovArr[i+3]===stcoTag[3]){
+        const dv = new DataView(moovArr.buffer);
+        const entryCount = dv.getUint32(i+8);
+        if(stcoCount === 0){
+          // Video: single chunk
+          dv.setUint32(i+12, chunkOffset);
+        } else if(stcoCount === 1 && audioTrackData){
+          // Audio: one offset per AAC frame
+          let audioOff = chunkOffset + videoDataSize;
+          for(let e=0;e<entryCount;e++){
+            dv.setUint32(i+12+e*4, audioOff);
+            audioOff += audioTrackData.chunks[e].buf.length;
+          }
+        }
+        stcoCount++;
+        i += 8 + entryCount*4; // skip past this stco
+      }
+    }
+    moov = moovArr;
+
+    const allParts = [ftyp, moov, mdatHdr, ...avccChunks.map(c=>c.buf)];
+    if(audioTrackData) audioTrackData.chunks.forEach(c => allParts.push(c.buf));
+    const total2 = allParts.reduce((n,p)=>n+p.length,0);
+    const mp4 = new Uint8Array(total2);
+    let off=0; for(const p of allParts){mp4.set(p,off);off+=p.length;}
+
+    const blob = new Blob([mp4],{type:'video/mp4'});
+    triggerDownload(blob, filename);
+    setExportProgress(100,`Done — ${(blob.size/1024).toFixed(0)} KB`);
+    setTimeout(()=>hideExportProgress(),3000);
+
+  } catch(err){
+    alert('MP4 export failed:\n'+err.message);
+    hideExportProgress();
+  } finally {
+    document.getElementById('btn-export-all').disabled=false;
+  }
+}
+
+// ── EXPORT HELPERS ────────────────────────────────────────────────────────────
+function setExportProgress(pct, label){
+  document.getElementById('export-progress-wrap').style.display='block';
+  document.getElementById('export-progress-bar').style.width=pct+'%';
+  document.getElementById('export-progress-label').textContent=label;
+}
+function hideExportProgress(){
+  document.getElementById('export-progress-wrap').style.display='none';
+}
+function triggerDownload(blob, filename){
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob); a.download=filename;
+  document.body.appendChild(a); a.click();
+  document.body.removeChild(a);
+}
+function tick(){ return new Promise(r=>setTimeout(r,0)); }
+
+// ── AUDIO ─────────────────────────────────────────────────────────────────────
+let audioBuffer = null, audioCtx = null;
+let activeAudioNode = null, activeGainNode = null;
+let audioScrubOffset = 0;
+
+function ensureAudioCtx(){
+  if(!audioCtx) audioCtx = new (window.AudioContext||window.webkitAudioContext)();
+  if(audioCtx.state==='suspended') audioCtx.resume();
+}
+
+function stopAllAudio(){
+  if(activeAudioNode){
+    activeAudioNode.onended = null;
+    try{ activeAudioNode.stop(); }catch(e){}
+    activeAudioNode = null;
+  }
+  activeGainNode = null;
+}
+
+function startAudioAt(offsetSec, stopAfter){
+  if(!audioBuffer) return;
+  ensureAudioCtx();
+  stopAllAudio();
+  if(offsetSec >= audioBuffer.duration) return;
+  const gain = audioCtx.createGain();
+  gain.gain.value = +document.getElementById('audio-vol').value / 100;
+  gain.connect(audioCtx.destination);
+  activeGainNode = gain;
+  const src = audioCtx.createBufferSource();
+  src.buffer = audioBuffer;
+  src.connect(gain);
+  src.start(0, offsetSec);
+  if(stopAfter != null) src.stop(audioCtx.currentTime + stopAfter);
+  src.onended = () => { if(activeAudioNode===src){ activeAudioNode=null; activeGainNode=null; } };
+  activeAudioNode = src;
+}
+
+function loadAudio(e){
+  const file = e.target.files[0]; if(!file) return;
+  const reader = new FileReader();
+  reader.onload = async ev => {
+    ensureAudioCtx();
+    audioBuffer = await audioCtx.decodeAudioData(ev.target.result.slice(0));
+    document.getElementById('audio-filename').textContent = file.name;
+    document.getElementById('audio-info').style.display = 'block';
+    drawAudioWaveform();
+  };
+  reader.readAsArrayBuffer(file);
+  e.target.value='';
+}
+
+function playAudio(){ if(!audioBuffer) return; startAudioAt(audioScrubOffset); }
+function stopAudio(){ stopAllAudio(); }
+function removeAudio(){ stopAllAudio(); audioBuffer=null; audioScrubOffset=0; document.getElementById('audio-info').style.display='none'; clearAudioWaveform(); }
+function setAudioVol(){
+  const v = document.getElementById('audio-vol').value;
+  document.getElementById('v-audio-vol').textContent = v+'%';
+  if(activeGainNode) activeGainNode.gain.value = v/100;
+}
+
+function getAudioOffset(frameIndex){ return frameIndex / currentFPS; }
+function startPlaybackAudio(startFrame){ startAudioAt(getAudioOffset(startFrame)); }
+function stopPlaybackAudio(){ stopAllAudio(); }
+
+function scrubAudio(frameIndex){ scrubAudioAtOffset(getAudioOffset(frameIndex)); }
+function scrubAudioAtOffset(offsetSec){
+  if(!audioBuffer) return;
+  audioScrubOffset = offsetSec;
+  startAudioAt(offsetSec, 0.08);
+}
+
+// Draw waveform in timeline ruler area
+function drawAudioWaveform(){
+  tlAudioBuffer = audioBuffer;
+  audioScrubOffset = 0;
+  invalidateWaveformCache();
+  if(frames.length === 0) drawTimelineAudioOnly();
+  else drawTimeline();
+}
+function clearAudioWaveform(){ tlAudioBuffer=null; audioScrubOffset=0; invalidateWaveformCache(); tlAudio.style.display='none'; drawTimeline(); }
+let tlAudioBuffer = null;
+
+// ── KEYBOARD SHORTCUTS ─────────────────────────────────────────────────────────
+document.addEventListener('keydown', e => {
+  const tag = document.activeElement.tagName;
+  if(tag==='INPUT'||tag==='TEXTAREA'||tag==='SELECT') return;
+
+  if(e.code==='Space'){
+    e.preventDefault();
+    if(tlRecording) stopTimeLapseRecording();
+    else if(document.getElementById('timelapse-toggle').checked) startTimeLapseRecording();
+    else captureSingleFrame();
+  }
+  if(e.code==='Enter'){
+    e.preventDefault();
+    togglePlayPause();
+  }
+  if(e.code==='ArrowRight'){ e.preventDefault(); stepFwd(); }
+  if(e.code==='ArrowLeft'){  e.preventDefault(); stepBack(); }
+  if(e.code==='ArrowUp'){    e.preventDefault(); e.shiftKey ? goFirst() : playForward(); }
+  if(e.code==='ArrowDown'){  e.preventDefault(); e.shiftKey ? goLast()  : pausePlayback(); }
+  if(e.code==='Delete'||e.code==='Backspace'){
+    e.preventDefault();
+    if(guideTool === 'select' && selectedLine >= 0) deleteSelectedLine();
+    else deleteSelected();
+  }
+  if(e.code==='KeyD'){ e.preventDefault(); duplicateSelected(); }
+  if(e.code==='KeyL'){
+    e.preventDefault();
+    const loop = document.getElementById('loop-toggle');
+    loop.checked = !loop.checked;
+  }
+  if(e.code==='KeyO'){
+    e.preventDefault();
+    const onion = document.getElementById('onion-toggle');
+    if(onion){ onion.checked = !onion.checked; onion.dispatchEvent(new Event('change')); }
+  }
+});
+
+function clearAll(){
+  const hasFrames = frames.length > 0;
+  const hasAudio  = !!audioBuffer;
+  if(!hasFrames && !hasAudio) return;
+  if(!confirm('Delete all frames' + (hasAudio ? ' and audio' : '') + '?')) return;
+  pausePlayback();
+  frames=[]; selectedFrame=-1; playbackCurrent=0; tlPageOffset=0;
+  buildFilmstrip();
+  previewCtx.clearRect(0,0,previewCanvas.width,previewCanvas.height);
+  const fb=document.getElementById('frame-badge'); if(fb) fb.textContent='—';
+  const cn=document.getElementById('cur-frame-num'); if(cn) cn.textContent='—';
+  const tn=document.getElementById('total-frame-num'); if(tn) tn.textContent='0';
+  if(hasAudio) removeAudio();
+}
+
+// ── ROTOSCOPE ─────────────────────────────────────────────────────────────────
+const rotoCanvas = document.getElementById('roto-canvas');
+const rotoCtx    = rotoCanvas.getContext('2d');
+
+// State
+let rotoTool     = null;         // 'pen' | 'eraser' | 'line' | null
+let rotoColour   = '#ffffff';
+let rotoDrawing  = false;
+let rotoLastX    = 0, rotoLastY = 0;
+let rotoLineStart = null;        // {x,y} for line drag-start
+let rotoVisible  = false;
+
+// Per-frame roto data: array of dataURL strings (null = empty)
+let rotoFrames   = [];
+// Per-frame undo stacks
+let rotoHistory  = [];
+// Clipboard
+let rotoClipboard = null;
+// Cache of loaded Image objects keyed by dataURL
+let rotoImgCache = {};
+
+let exportMode = 'captured'; // 'captured' | 'roto' | 'comp'
+
+// ── ROTO CANVAS SIZING ────────────────────────────────────────────────────────
+function sizeRotoCanvas(){
+  const pc = document.getElementById('preview-canvas');
+  if(!pc) return;
+  const box = pc.getBoundingClientRect();
+  const par = document.getElementById('win2-box').getBoundingClientRect();
+  // Match object-fit:contain rendered area
+  const imgW = previewCanvas.width  || captureW;
+  const imgH = previewCanvas.height || captureH;
+  const scale = Math.min(box.width/imgW, box.height/imgH);
+  const rW = Math.round(imgW * scale);
+  const rH = Math.round(imgH * scale);
+  const offX = (box.width  - rW) / 2;
+  const offY = (box.height - rH) / 2;
+  if(rotoCanvas.width !== rW || rotoCanvas.height !== rH){
+    rotoCanvas.width  = rW;
+    rotoCanvas.height = rH;
+  }
+  rotoCanvas.style.left   = (box.left - par.left + offX) + 'px';
+  rotoCanvas.style.top    = (box.top  - par.top  + offY) + 'px';
+  rotoCanvas.style.width  = rW + 'px';
+  rotoCanvas.style.height = rH + 'px';
+}
+
+function rotoXY(e){
+  const r = rotoCanvas.getBoundingClientRect();
+  const scaleX = rotoCanvas.width  / r.width;
+  const scaleY = rotoCanvas.height / r.height;
+  return { x:(e.clientX - r.left)*scaleX, y:(e.clientY - r.top)*scaleY };
+}
+
+// ── ROTO TOOL SELECTION ───────────────────────────────────────────────────────
+function setRotoTool(tool){
+  if(rotoTool === tool) tool = null;
+  rotoTool = tool;
+  ['pen','eraser','line'].forEach(t => {
+    const b = document.getElementById('rtool-'+t);
+    if(b) b.classList.toggle('active', t === tool);
+  });
+  document.getElementById('roto-pen-opts').style.display    = tool === 'pen'    ? 'block' : 'none';
+  document.getElementById('roto-eraser-opts').style.display = tool === 'eraser' ? 'block' : 'none';
+  document.getElementById('roto-line-opts').style.display   = tool === 'line'   ? 'block' : 'none';
+  // Build palette now that roto-pen-opts is visible
+  if(tool === 'pen'){
+    const grid = document.getElementById('roto-colour-grid');
+    if(grid && grid.children.length === 0) buildRotoPalette();
+  }
+  rotoCanvas.style.pointerEvents = tool ? 'auto' : 'none';
+  rotoCanvas.style.cursor = tool === 'pen' ? 'crosshair'
+    : tool === 'eraser'   ? 'cell'
+    : tool === 'line'     ? 'crosshair'
+    : 'default';
+}
+
+// ── ROTO COLOUR PALETTE (25 swatches, 5×5) ───────────────────────────────────
+// Row 1 (0-4):   Greyscale black→white (fixed)
+// Rows 2-3 (5-14): Rainbow spectrum (fixed)
+// Rows 4-5 (15-24): Customisable (double-click to edit)
+const ROTO_PALETTE_FIXED = [
+  // Row 1 — greyscale
+  '#000000','#404040','#808080','#c0c0c0','#ffffff',
+  // Row 2 — rainbow part 1
+  '#ff0000','#ff7700','#ffee00','#88cc00','#00bb44',
+  // Row 3 — rainbow part 2
+  '#00cccc','#0088ff','#4433ff','#aa00ff','#ff00aa',
+];
+const ROTO_PALETTE_CUSTOM_DEFAULTS = [
+  null, null, null, null, null,
+  null, null, null, null, null,
+];
+const ROTO_PALETTE_DEFAULTS = [...ROTO_PALETTE_FIXED, ...ROTO_PALETTE_CUSTOM_DEFAULTS];
+let rotoPalette = [...ROTO_PALETTE_DEFAULTS];
+const ROTO_FIXED_COUNT = 15; // indices 0-14 are fixed, 15-24 are editable
+
+function buildRotoPalette(){
+  const grid = document.getElementById('roto-colour-grid');
+  if(!grid) return;
+  grid.innerHTML = '';
+  // Set grid to 5 columns
+  grid.style.display = 'grid';
+  grid.style.gridTemplateColumns = 'repeat(5, 1fr)';
+  grid.style.gap = '4px';
+  grid.style.marginBottom = '6px';
+
+  // One shared hidden colour picker
+  let sharedPicker = document.getElementById('roto-shared-picker');
+  if(!sharedPicker){
+    sharedPicker = document.createElement('input');
+    sharedPicker.type = 'color';
+    sharedPicker.id = 'roto-shared-picker';
+    sharedPicker.style.cssText = 'position:absolute;opacity:0;width:0;height:0;pointer-events:none;';
+    document.body.appendChild(sharedPicker);
+  }
+
+  let editingIndex = -1;
+  sharedPicker.oninput = () => {
+    if(editingIndex < 0) return;
+    rotoPalette[editingIndex] = sharedPicker.value;
+    const swatch = grid.children[editingIndex];
+    if(swatch){
+      swatch.style.background = sharedPicker.value;
+      swatch.style.border = '2px solid transparent';
+      swatch.innerHTML = ''; // remove plus sign
+    }
+    if(grid.children[editingIndex]?.classList.contains('active')) rotoColour = sharedPicker.value;
+  };
+
+  rotoPalette.forEach((col, i) => {
+    const swatch = document.createElement('div');
+    const isEditable = i >= ROTO_FIXED_COUNT;
+    const isEmpty = col === null;
+
+    swatch.className = 'colour-swatch' + (!isEmpty && i === 0 ? ' active' : '');
+    const bg = isEmpty ? 'transparent' : col;
+    const border = isEmpty ? '1.5px dashed #555' : '2px solid transparent';
+    swatch.style.cssText = `background:${bg};width:100%;aspect-ratio:1;border-radius:4px;border:${border};cursor:pointer;box-sizing:border-box;display:flex;align-items:center;justify-content:center;`;
+    swatch.title = isEditable
+      ? (isEmpty ? 'Double-click to add colour' : 'Click to select · Double-click to edit')
+      : 'Click to select';
+
+    if(isEmpty && isEditable){
+      swatch.innerHTML = '<span style="font-size:14px;color:#555;line-height:1;pointer-events:none;user-select:none;">+</span>';
+    }
+
+    swatch.addEventListener('click', () => {
+      if(isEmpty) return;
+      selectRotoColourByIndex(i);
+    });
+
+    if(isEditable){
+      swatch.addEventListener('dblclick', e => {
+        e.preventDefault();
+        editingIndex = i;
+        sharedPicker.value = col || '#ff0000';
+        sharedPicker.click();
+      });
+    }
+
+    grid.appendChild(swatch);
+  });
+
+  // Row label hint
+  const hint = document.createElement('div');
+  hint.style.cssText = 'font-size:9px;color:var(--text-muted);grid-column:1/-1;margin-top:2px;';
+  hint.textContent = 'Rows 4-5: double-click to add/edit';
+  grid.appendChild(hint);
+}
+
+function selectRotoColourByIndex(i){
+  if(rotoPalette[i] === null) return; // empty swatch — not selectable
+  rotoColour = rotoPalette[i];
+  document.querySelectorAll('#roto-colour-grid .colour-swatch').forEach((s,j) => {
+    s.classList.toggle('active', j === i);
+  });
+}
+
+function selectRotoColour(el){
+  // Legacy call — map to index-based system
+  const i = +el.dataset.index;
+  if(!isNaN(i)) selectRotoColourByIndex(i);
+}
+
+function rotoClearAll(){
+  if(!confirm('Clear ALL rotoscope frames? This cannot be undone.')) return;
+  rotoFrames  = new Array(frames.length).fill(null);
+  rotoHistory = frames.map(()=>[]);
+  rotoImgCache = {};
+  rotoCtx.clearRect(0, 0, rotoCanvas.width, rotoCanvas.height);
+  if(selectedFrame >= 0) showFrameInPreview(selectedFrame);
+}
+
+function updateRotoLabel(sliderId, labelId, suffix){
+  document.getElementById(labelId).textContent = document.getElementById(sliderId).value + suffix;
+}
+
+// ── ROTO VISIBILITY ───────────────────────────────────────────────────────────
+function toggleRotoVisible(){
+  rotoVisible = document.getElementById('roto-visible').checked;
+  if(rotoVisible){
+    rotoCanvas.style.display = 'block';
+    sizeRotoCanvas();
+    loadRotoFrame(selectedFrame);
+  } else {
+    rotoCanvas.style.display = 'none';
+    if(rotoTool) setRotoTool(null);
+  }
+  // Refresh preview to show/hide roto composite
+  if(selectedFrame >= 0) showFrameInPreview(selectedFrame);
+}
+
+// ── ROTO FRAME LOAD/SAVE ──────────────────────────────────────────────────────
+function ensureRotoArrays(){
+  while(rotoFrames.length < frames.length)  rotoFrames.push(null);
+  while(rotoHistory.length < frames.length) rotoHistory.push([]);
+}
+
+function loadRotoFrame(i){
+  if(i < 0 || i >= frames.length) return;
+  ensureRotoArrays();
+  sizeRotoCanvas();
+  rotoCtx.clearRect(0, 0, rotoCanvas.width, rotoCanvas.height);
+  const src = rotoFrames[i];
+  if(!src) return;
+  // Data URLs load synchronously — get or create cached image
+  if(!rotoImgCache[src]){
+    const img = new Image();
+    img.src = src; // data: URL loads synchronously
+    rotoImgCache[src] = img;
+  }
+  const img = rotoImgCache[src];
+  if(img.complete && img.naturalWidth > 0){
+    rotoCtx.drawImage(img, 0, 0, rotoCanvas.width, rotoCanvas.height);
+  }
+}
+
+function saveRotoFrame(i){
+  if(i < 0 || i >= frames.length) return;
+  ensureRotoArrays();
+  const dataURL = rotoCanvas.toDataURL('image/png');
+  // Invalidate old cache entry
+  if(rotoFrames[i]) delete rotoImgCache[rotoFrames[i]];
+  rotoFrames[i] = dataURL;
+  // Pre-cache the new image
+  const img = new Image();
+  img.src = dataURL;
+  rotoImgCache[dataURL] = img;
+}
+
+// ── UNDO ──────────────────────────────────────────────────────────────────────
+function pushRotoHistory(i){
+  ensureRotoArrays();
+  const snap = rotoCanvas.toDataURL('image/png');
+  rotoHistory[i].push(snap);
+  if(rotoHistory[i].length > 5) rotoHistory[i].shift();
+}
+
+function rotoUndo(){
+  const i = selectedFrame;
+  if(i < 0 || !rotoHistory[i] || rotoHistory[i].length === 0) return;
+  const prev = rotoHistory[i].pop();
+  rotoCtx.clearRect(0, 0, rotoCanvas.width, rotoCanvas.height);
+  const img = new Image();
+  img.onload = () => {
+    rotoCtx.drawImage(img, 0, 0, rotoCanvas.width, rotoCanvas.height);
+    saveRotoFrame(i);
+  };
+  img.src = prev;
+}
+
+// ── FRAME ACTIONS ─────────────────────────────────────────────────────────────
+function rotoClear(){
+  const i = selectedFrame;
+  if(i < 0) return;
+  pushRotoHistory(i);
+  rotoCtx.clearRect(0, 0, rotoCanvas.width, rotoCanvas.height);
+  saveRotoFrame(i);
+}
+
+function rotoCopy(){
+  const i = selectedFrame;
+  if(i < 0) return;
+  ensureRotoArrays();
+  rotoClipboard = rotoFrames[i] || null;
+}
+
+function rotoPaste(){
+  const i = selectedFrame;
+  if(i < 0 || !rotoClipboard) return;
+  pushRotoHistory(i);
+  const img = new Image();
+  img.onload = () => {
+    // Composite clipboard content ON TOP of existing roto content
+    rotoCtx.globalCompositeOperation = 'source-over';
+    rotoCtx.drawImage(img, 0, 0, rotoCanvas.width, rotoCanvas.height);
+    rotoCtx.globalCompositeOperation = 'source-over';
+    saveRotoFrame(i);
+  };
+  img.src = rotoClipboard;
+}
+
+// ── POINTER EVENTS ────────────────────────────────────────────────────────────
+let rotoActiveFrame = -1; // frame index locked at pointerdown
+
+rotoCanvas.addEventListener('pointerdown', e => {
+  if(!rotoTool || selectedFrame < 0) return;
+  e.stopPropagation();
+  rotoCanvas.setPointerCapture(e.pointerId);
+  rotoActiveFrame = selectedFrame; // lock to this frame for the entire stroke
+  pushRotoHistory(rotoActiveFrame);
+  const p = rotoXY(e);
+  rotoDrawing = true;
+  rotoLastX = p.x; rotoLastY = p.y;
+  if(rotoTool === 'pen'){
+    const sz = +document.getElementById('roto-pen-size').value;
+    rotoCtx.globalCompositeOperation = 'source-over';
+    rotoCtx.fillStyle = rotoColour;
+    rotoCtx.beginPath(); rotoCtx.arc(p.x, p.y, sz/2, 0, Math.PI*2); rotoCtx.fill();
+  } else if(rotoTool === 'line'){
+    rotoLineStart = {x:p.x, y:p.y};
+  }
+});
+
+rotoCanvas.addEventListener('pointermove', e => {
+  if(!rotoDrawing || rotoActiveFrame < 0) return;
+  const p = rotoXY(e);
+  if(rotoTool === 'pen'){
+    const sz = +document.getElementById('roto-pen-size').value;
+    rotoCtx.globalCompositeOperation = 'source-over';
+    rotoCtx.strokeStyle = rotoColour;
+    rotoCtx.lineWidth = sz; rotoCtx.lineCap = 'round'; rotoCtx.lineJoin = 'round';
+    rotoCtx.beginPath(); rotoCtx.moveTo(rotoLastX, rotoLastY); rotoCtx.lineTo(p.x, p.y); rotoCtx.stroke();
+    rotoLastX = p.x; rotoLastY = p.y;
+  } else if(rotoTool === 'eraser'){
+    const sz = +document.getElementById('roto-eraser-size').value;
+    rotoCtx.globalCompositeOperation = 'destination-out';
+    rotoCtx.beginPath(); rotoCtx.arc(p.x, p.y, sz/2, 0, Math.PI*2);
+    rotoCtx.fillStyle = 'rgba(0,0,0,1)'; rotoCtx.fill();
+    rotoCtx.globalCompositeOperation = 'source-over';
+    rotoLastX = p.x; rotoLastY = p.y;
+  } else if(rotoTool === 'line' && rotoLineStart){
+    const src = rotoFrames[rotoActiveFrame];
+    rotoCtx.clearRect(0, 0, rotoCanvas.width, rotoCanvas.height);
+    if(src && rotoImgCache[src] && rotoImgCache[src].complete)
+      rotoCtx.drawImage(rotoImgCache[src], 0, 0, rotoCanvas.width, rotoCanvas.height);
+    const col = document.getElementById('roto-line-colour').value;
+    const w   = +document.getElementById('roto-line-size').value;
+    rotoCtx.strokeStyle = col; rotoCtx.lineWidth = w; rotoCtx.lineCap = 'round';
+    rotoCtx.setLineDash([4,4]);
+    rotoCtx.beginPath(); rotoCtx.moveTo(rotoLineStart.x, rotoLineStart.y); rotoCtx.lineTo(p.x, p.y); rotoCtx.stroke();
+    rotoCtx.setLineDash([]);
+  }
+});
+
+rotoCanvas.addEventListener('pointerup', e => {
+  if(!rotoDrawing || rotoActiveFrame < 0) return;
+  rotoDrawing = false;
+  const p = rotoXY(e);
+  if(rotoTool === 'line' && rotoLineStart){
+    const src = rotoFrames[rotoActiveFrame];
+    rotoCtx.clearRect(0, 0, rotoCanvas.width, rotoCanvas.height);
+    if(src && rotoImgCache[src] && rotoImgCache[src].complete)
+      rotoCtx.drawImage(rotoImgCache[src], 0, 0, rotoCanvas.width, rotoCanvas.height);
+    const col = document.getElementById('roto-line-colour').value;
+    const w   = +document.getElementById('roto-line-size').value;
+    rotoCtx.strokeStyle = col; rotoCtx.lineWidth = w; rotoCtx.lineCap = 'round'; rotoCtx.setLineDash([]);
+    rotoCtx.beginPath(); rotoCtx.moveTo(rotoLineStart.x, rotoLineStart.y); rotoCtx.lineTo(p.x, p.y); rotoCtx.stroke();
+    rotoLineStart = null;
+  }
+  rotoCtx.globalCompositeOperation = 'source-over';
+  saveRotoFrame(rotoActiveFrame); // always save to the locked frame
+  rotoActiveFrame = -1;
+});
+
+// ── EXPORT MODE ───────────────────────────────────────────────────────────────
+function setExportMode(mode){
+  exportMode = mode;
+  ['captured','roto','comp'].forEach(m => {
+    document.getElementById('emode-'+m).classList.toggle('active', m === mode);
+  });
+}
+
+
+// ── ROTO EXPORT CANVAS BUILDER ────────────────────────────────────────────────
+async function buildExportCanvas(frameIndex){
+  const f = frames[frameIndex];
+  const c = document.createElement('canvas');
+  c.width  = f.img.naturalWidth  || captureW;
+  c.height = f.img.naturalHeight || captureH;
+  const ctx = c.getContext('2d');
+  if(exportMode === 'roto'){
+    if(rotoFrames[frameIndex]){
+      const img = new Image(); img.src = rotoFrames[frameIndex];
+      await new Promise(r => { if(img.complete) r(); else img.onload=r; });
+      ctx.drawImage(img, 0, 0, c.width, c.height);
+    }
+  } else {
+    ctx.drawImage(f.img, 0, 0);
+    if(exportMode === 'comp' && rotoFrames[frameIndex]){
+      const img = new Image(); img.src = rotoFrames[frameIndex];
+      await new Promise(r => { if(img.complete) r(); else img.onload=r; });
+      ctx.drawImage(img, 0, 0, c.width, c.height);
+    }
+  }
+  return c;
+}
+
+// Ctrl+Z for roto undo
+document.addEventListener('keydown', e => {
+  if((e.ctrlKey || e.metaKey) && e.code === 'KeyZ' && rotoTool && selectedFrame >= 0){
+    e.preventDefault(); rotoUndo();
+  }
+});
+
+// ── MP4 FILENAME MODAL ────────────────────────────────────────────────────────
+let _pendingMp4Export = null; // stores {exportFrames} while modal is open
+
+function showMp4Modal(exportFrames){
+  _pendingMp4Export = exportFrames;
+  // Pre-fill with date-based name
+  const d = new Date();
+  const stamp = `${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}`;
+  document.getElementById('mp4-filename-input').value = `stopmotion_${stamp}`;
+  const modal = document.getElementById('mp4-filename-modal');
+  modal.style.display = 'flex';
+  setTimeout(() => {
+    const inp = document.getElementById('mp4-filename-input');
+    inp.focus(); inp.select();
+  }, 50);
+}
+
+function closeMp4Modal(){
+  document.getElementById('mp4-filename-modal').style.display = 'none';
+  _pendingMp4Export = null;
+}
+
+function confirmMp4Export(){
+  const rawName = document.getElementById('mp4-filename-input').value.trim() || 'stopmotion';
+  // Strip any .mp4 the user may have typed, we add it
+  const filename = rawName.replace(/\.mp4$/i,'') + '.mp4';
+  document.getElementById('mp4-filename-modal').style.display = 'none';
+  const exportFrames = _pendingMp4Export;
+  _pendingMp4Export = null;
+  if(exportFrames) exportMP4(exportFrames, filename);
+}
+
+// ── PROJECT SAVE / LOAD ───────────────────────────────────────────────────────
+let projectDirty = false;
+
+function markDirty(){
+  projectDirty = true;
+  const dot = document.getElementById('unsaved-dot');
+  if(dot) dot.style.display = 'block';
+}
+function markClean(){
+  projectDirty = false;
+  const dot = document.getElementById('unsaved-dot');
+  if(dot) dot.style.display = 'none';
+}
+
+function collectProjectSettings(){
+  const getVal = id => { const el=document.getElementById(id); return el?el.value:null; };
+  const getChk = id => { const el=document.getElementById(id); return el?el.checked:false; };
+  return {
+    version: 1,
+    savedAt: new Date().toISOString(),
+    frameCount: frames.length,
+    fps: currentFPS,
+    resolution: { w: captureW, h: captureH },
+    playback: { loop: getChk('loop-toggle'), rangeStart, rangeEnd },
+    camera: { brightness:getVal('f-bright'), contrast:getVal('f-contrast'), saturation:getVal('f-sat'), sharpen:getVal('f-warm'), blur:getVal('f-blur') },
+    guides: { gridEnabled:getChk('guide-grid'), gridSize:getVal('grid-size'), gridColour:getVal('grid-colour'), crossEnabled:getChk('guide-cross'), thirdsEnabled:getChk('guide-thirds'), safeEnabled:getChk('guide-safe') },
+    onionSkin: { enabled:getChk('onion-toggle'), frameCount:onionFrameCount, opacity:getVal('onion-opacity') },
+    rotoscope: { visible:getChk('roto-visible'), penSize:getVal('roto-pen-size'), eraserSize:getVal('roto-eraser-size'), lineSize:getVal('roto-line-size'), lineColour:getVal('roto-line-colour'), palette:rotoPalette.slice(), rotoFrameCount:rotoFrames.filter(f=>f!==null).length },
+    export: { mode:exportMode, format:getVal('export-format'), range:getVal('export-range'), audio:getChk('export-audio'), jpgQuality:getVal('jpg-quality') },
+    timeline: { zoom:tlZoom, pageOffset:tlPageOffset },
+    audio: { hasTrack:!!audioBuffer, volume:getVal('audio-volume') },
+    autoSave: { enabled:getChk('autosave-toggle'), interval:getVal('autosave-interval') }
+  };
+}
+
+function saveProject(){
+  const settings = collectProjectSettings();
+  const blob = new Blob([JSON.stringify(settings,null,2)],{type:'application/json'});
+  const d = new Date();
+  const stamp = `${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}`;
+  triggerDownload(blob, `stopmotion_project_${stamp}.json`);
+  markClean();
+}
+
+function loadProject(){
+  document.getElementById('load-project-input').click();
+}
+
+function handleLoadProject(e){
+  const file = e.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    try{ applyProjectSettings(JSON.parse(ev.target.result)); }
+    catch(err){ alert('Could not load project file:\n' + err.message); }
+  };
+  reader.readAsText(file);
+  e.target.value = '';
+}
+
+function applyProjectSettings(s){
+  const setVal = (id,v) => { if(v==null) return; const el=document.getElementById(id); if(el) el.value=v; };
+  const setChk = (id,v) => { if(v==null) return; const el=document.getElementById(id); if(el) el.checked=!!v; };
+
+  if(s.fps) setFps(s.fps);
+  if(s.resolution){ captureW=s.resolution.w; captureH=s.resolution.h; document.querySelectorAll('.res-btn').forEach(b=>b.classList.toggle('active', b.textContent.trim()===`${s.resolution.w}×${s.resolution.h}`)); }
+  if(s.playback){ setChk('loop-toggle',s.playback.loop); if(s.playback.rangeStart) rangeStart=s.playback.rangeStart; if(s.playback.rangeEnd) rangeEnd=s.playback.rangeEnd; }
+  if(s.camera){ setVal('f-bright',s.camera.brightness); setVal('f-contrast',s.camera.contrast); setVal('f-sat',s.camera.saturation); setVal('f-warm',s.camera.sharpen); setVal('f-blur',s.camera.blur); applyLiveFilter(); }
+  if(s.guides){ setChk('guide-grid',s.guides.gridEnabled); setVal('grid-size',s.guides.gridSize); setVal('grid-colour',s.guides.gridColour); setChk('guide-cross',s.guides.crossEnabled); setChk('guide-thirds',s.guides.thirdsEnabled); setChk('guide-safe',s.guides.safeEnabled); }
+  if(s.onionSkin){ setChk('onion-toggle',s.onionSkin.enabled); setVal('onion-opacity',s.onionSkin.opacity); if(s.onionSkin.frameCount) setOnionFrames(s.onionSkin.frameCount); const ctrl=document.getElementById('onion-controls'); if(ctrl) ctrl.style.display=s.onionSkin.enabled?'block':'none'; }
+  if(s.rotoscope){ setChk('roto-visible',s.rotoscope.visible); setVal('roto-pen-size',s.rotoscope.penSize); setVal('roto-eraser-size',s.rotoscope.eraserSize); setVal('roto-line-size',s.rotoscope.lineSize); setVal('roto-line-colour',s.rotoscope.lineColour); if(Array.isArray(s.rotoscope.palette)){ rotoPalette=s.rotoscope.palette.map(c=>c||null); buildRotoPalette(); } }
+  if(s.export){ exportMode=s.export.mode||'captured'; setExportMode(exportMode); setVal('export-format',s.export.format); setVal('export-range',s.export.range); setChk('export-audio',s.export.audio); setVal('jpg-quality',s.export.jpgQuality); onExportFormatChange(); }
+  if(s.timeline){ tlZoom=s.timeline.zoom||tlZoom; tlPageOffset=s.timeline.pageOffset||0; tlFrameWidth=zoomToFrameWidth(tlZoom); const zsl=document.getElementById('zoom-slider'); if(zsl) zsl.value=tlZoom; }
+  if(s.audio){ setVal('audio-volume',s.audio.volume); }
+  if(s.autoSave){ setChk('autosave-toggle',s.autoSave.enabled); setVal('autosave-interval',s.autoSave.interval); const lbl=document.getElementById('v-autosave'); if(lbl&&s.autoSave.interval) lbl.textContent=s.autoSave.interval+'min'; updateAutoSave(); }
+
+  markClean();
+  drawTimeline();
+
+  // Show reminder modal
+  const info = document.getElementById('project-load-info');
+  if(info){
+    const savedAt = s.savedAt ? new Date(s.savedAt).toLocaleString() : 'Unknown';
+    info.innerHTML = `<b>${s.frameCount||0}</b> captured frame${s.frameCount!==1?'s':''}<br><b>${s.rotoscope?.rotoFrameCount||0}</b> rotoscope frame${(s.rotoscope?.rotoFrameCount||0)!==1?'s':''}<br>Audio track: <b>${s.audio?.hasTrack?'Yes — re-import needed':'None'}</b><br>Saved: <b>${savedAt}</b>`;
+  }
+  document.getElementById('project-load-modal').style.display = 'flex';
+}
+
+// ── IMPORT ROTO ───────────────────────────────────────────────────────────────
+function importRotoFrames(){
+  document.getElementById('import-roto-input').click();
+}
+
+function handleRotoImport(e){
+  const files = [...e.target.files].sort((a,b)=>a.name.localeCompare(b.name));
+  if(!files.length) return;
+  if(!frames.length){ alert('Import your captured frames first, then import roto frames.'); return; }
+  const results = new Array(files.length);
+  let completed = 0;
+  files.forEach((file,idx)=>{
+    const r = new FileReader();
+    r.onload = ev => {
+      results[idx] = ev.target.result;
+      if(++completed === files.length){
+        ensureRotoArrays();
+        results.forEach((dataURL,i)=>{
+          if(i>=frames.length||!dataURL) return;
+          rotoFrames[i]=dataURL;
+          const img=new Image(); img.src=dataURL; rotoImgCache[dataURL]=img;
+        });
+        if(selectedFrame>=0){
+          // Auto-enable Show Roto Layer so the imported roto is visible immediately
+          const visToggle = document.getElementById('roto-visible');
+          if(visToggle && !visToggle.checked){
+            visToggle.checked = true;
+            toggleRotoVisible();
+          }
+          loadRotoFrame(selectedFrame);
+          showFrameInPreview(selectedFrame);
+        }
+        alert(`Loaded ${Math.min(files.length,frames.length)} roto frame${files.length!==1?'s':''}.`);
+        markDirty();
+      }
+    };
+    r.readAsDataURL(file);
+  });
+  e.target.value='';
+}
+
+// ── AUTO-SAVE REMINDER ────────────────────────────────────────────────────────
+let autoSaveTimer = null;
+
+function updateAutoSave(){
+  clearInterval(autoSaveTimer); autoSaveTimer=null;
+  const enabled  = document.getElementById('autosave-toggle')?.checked;
+  const minutes  = +(document.getElementById('autosave-interval')?.value||60);
+  const status   = document.getElementById('autosave-status');
+  if(enabled){ autoSaveTimer=setInterval(showAutoSaveToast, minutes*60*1000); if(status) status.textContent=`Reminder every ${minutes} min`; }
+  else { if(status) status.textContent='Reminder off'; }
+}
+
+function showAutoSaveToast(){
+  if(!projectDirty) return;
+  document.getElementById('autosave-toast').style.display='block';
+}
+
+function dismissAutoSaveToast(){
+  document.getElementById('autosave-toast').style.display='none';
+}
+
+// Close modal on backdrop click — deferred so DOM is ready
+// Close on Escape — also handles roto Ctrl+Z (already registered above)
+previewCanvas.width=640; previewCanvas.height=480;
+previewCtx.fillStyle='#111';
+previewCtx.fillRect(0,0,640,480);
+previewCtx.fillStyle='#333';
+previewCtx.font='14px sans-serif';
+previewCtx.textAlign='center';
+previewCtx.fillText('Preview window',320,240);
+updateRangeEnd();
+tlFrameWidth = zoomToFrameWidth(tlZoom);
+setTimeout(drawTimeline, 50);
+buildRotoPalette();
+
+// Wire modal backdrop click after DOM is fully parsed
+window.addEventListener('DOMContentLoaded', () => {
+  const modal = document.getElementById('mp4-filename-modal');
+  if(modal) modal.addEventListener('click', e => {
+    if(e.target === e.currentTarget) closeMp4Modal();
+  });
+});
+// Fallback if DOMContentLoaded already fired (script is deferred)
+if(document.readyState !== 'loading'){
+  const modal = document.getElementById('mp4-filename-modal');
+  if(modal) modal.addEventListener('click', e => {
+    if(e.target === e.currentTarget) closeMp4Modal();
+  });
+}
+
+// Suppress ResizeObserver loop warnings (browser cosmetic, not a real error)
+window.addEventListener('error', e => {
+  if(e.message && e.message.includes('ResizeObserver loop')) e.stopImmediatePropagation();
+}, true);
+
+// Populate camera list on load (labels available if permission already granted)
+populateCameraList();
+// Re-enumerate if devices are plugged/unplugged
+navigator.mediaDevices.addEventListener('devicechange', populateCameraList);
+</script>
+<!-- Project load reminder modal -->
+<div id="project-load-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:9999;align-items:center;justify-content:center;">
+  <div style="background:var(--surface);border:0.5px solid var(--border-strong);border-radius:var(--radius);padding:24px;width:380px;box-shadow:0 8px 32px rgba(0,0,0,0.5);">
+    <div style="font-size:14px;font-weight:700;margin-bottom:8px;">Project Loaded</div>
+    <div style="font-size:12px;color:var(--text-muted);margin-bottom:16px;">All settings have been applied. This project had:</div>
+    <div id="project-load-info" style="background:var(--surface2);border-radius:6px;padding:12px;font-size:12px;margin-bottom:16px;line-height:1.7;"></div>
+    <div style="font-size:12px;color:var(--text-muted);margin-bottom:20px;">Use <strong style="color:var(--text);">Import Frames</strong> to reload your captured frames, and <strong style="color:var(--text);">Import Roto</strong> to reload rotoscope frames (if any).</div>
+    <div style="display:flex;justify-content:flex-end;">
+      <button onclick="document.getElementById('project-load-modal').style.display='none'"
+              style="background:var(--blue);border:none;border-radius:6px;color:#fff;padding:8px 20px;font-size:12px;font-weight:700;cursor:pointer;">OK, Got It</button>
+    </div>
+  </div>
+</div>
+
+<!-- Auto-save reminder toast -->
+<div id="autosave-toast" style="display:none;position:fixed;bottom:24px;right:24px;background:var(--surface);border:0.5px solid #ff9500;border-radius:var(--radius);padding:14px 18px;z-index:9998;box-shadow:0 4px 20px rgba(0,0,0,0.4);max-width:280px;">
+  <div style="font-size:13px;font-weight:700;color:#ff9500;margin-bottom:4px;">💾 Save Reminder</div>
+  <div style="font-size:12px;color:var(--text-muted);margin-bottom:10px;">It's been a while — don't forget to save your project.</div>
+  <div style="display:flex;gap:8px;justify-content:flex-end;">
+    <button onclick="dismissAutoSaveToast()" style="background:var(--surface2);border:0.5px solid var(--border-strong);border-radius:6px;color:var(--text);padding:5px 12px;font-size:11px;font-weight:600;cursor:pointer;">Dismiss</button>
+    <button onclick="saveProject();dismissAutoSaveToast()" style="background:#ff9500;border:none;border-radius:6px;color:#000;padding:5px 12px;font-size:11px;font-weight:700;cursor:pointer;">Save Now</button>
+  </div>
+</div>
+
+<!-- MP4 filename modal -->
+<div id="mp4-filename-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:9999;align-items:center;justify-content:center;">
+  <div style="background:var(--surface);border:0.5px solid var(--border-strong);border-radius:var(--radius);padding:24px;width:340px;box-shadow:0 8px 32px rgba(0,0,0,0.5);">
+    <div style="font-size:14px;font-weight:700;margin-bottom:16px;">Export MP4</div>
+    <div style="font-size:11px;color:var(--text-muted);margin-bottom:6px;">Filename</div>
+    <div style="display:flex;align-items:center;gap:6px;margin-bottom:20px;">
+      <input type="text" id="mp4-filename-input"
+             style="flex:1;background:var(--surface2);border:0.5px solid var(--border-strong);border-radius:6px;color:var(--text);padding:7px 10px;font-size:13px;outline:none;"
+             value="stopmotion">
+      <span style="font-size:13px;color:var(--text-muted);">.mp4</span>
+    </div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;">
+      <button onclick="closeMp4Modal()" style="background:var(--surface2);border:0.5px solid var(--border-strong);border-radius:6px;color:var(--text);padding:7px 16px;font-size:12px;font-weight:600;cursor:pointer;">Cancel</button>
+      <button onclick="confirmMp4Export()" style="background:var(--blue);border:none;border-radius:6px;color:#fff;padding:7px 16px;font-size:12px;font-weight:700;cursor:pointer;">Export</button>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

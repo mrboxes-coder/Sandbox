@@ -1,0 +1,3348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Asteroid</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:         #0e0e0f;
+  --panel:      #161618;
+  --border:     rgba(255,255,255,0.07);
+  --text:       #e8e8e6;
+  --muted:      #9b9b97;
+  --accent:     #c8f060;
+  --accent-dim: rgba(200,240,96,0.12);
+  --select:     #60c8f0;
+  --danger:     #f08080;
+  --danger-dim: rgba(240,128,128,0.10);
+  --radius:     8px;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 300;
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── Header ─────────────────────────────────────────────── */
+#header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 20px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+  position: relative;
+  z-index: 50;
+  background: var(--bg);
+}
+.logo {
+  font-family: 'DM Mono', monospace;
+  font-size: 13px;
+  letter-spacing: 0.1em;
+  color: var(--accent);
+  text-transform: uppercase;
+}
+.logo span { color: var(--danger); }
+
+#hud-bar {
+  display: flex;
+  gap: 18px;
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  color: var(--muted);
+  letter-spacing: 0.06em;
+}
+#hud-bar .hud-item { display: flex; gap: 5px; align-items: baseline; }
+#hud-bar .hud-label { font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); opacity: 0.6; }
+#hud-bar .hud-val { color: var(--text); font-size: 12px; }
+#hud-bar .hud-val.warn { color: var(--danger); }
+#hud-bar .hud-val.ok   { color: var(--accent); }
+#hud-bar .hud-val.blue { color: var(--select); }
+
+/* ── Main layout ─────────────────────────────────────────── */
+#main { display: flex; flex: 1; min-height: 0; overflow: hidden; }
+
+/* ── Viewport ────────────────────────────────────────────── */
+#viewport-area {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  position: relative;
+  background: #000;
+  overflow: hidden;
+  cursor: crosshair;
+}
+#main-canvas { width: 100%; height: 100%; display: block; }
+
+/* ── Overlays ────────────────────────────────────────────── */
+#warn-overlay {
+  display: none;
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 5;
+  border: 4px solid rgba(240,128,128,0.5);
+  background: rgba(240,128,128,0.04);
+}
+#mine-warn-overlay {
+  display: none;
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 7;
+  border: 6px solid rgba(255,80,0,0.7);
+  background: rgba(255,80,0,0.06);
+  animation: mineflash 0.5s infinite;
+}
+@keyframes mineflash { 0%,100%{opacity:1} 50%{opacity:0.15} }
+#mine-countdown {
+  display: none;
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%,-50%);
+  pointer-events: none;
+  z-index: 8;
+  font-family: 'DM Mono', monospace;
+  font-size: 96px;
+  font-weight: 400;
+  color: #ff2200;
+  text-shadow: 0 0 40px #ff2200, 0 0 80px #ff0000;
+  letter-spacing: 0.1em;
+}
+#mine-warn-text {
+  display: none;
+  position: absolute;
+  top: 35%; left: 50%;
+  transform: translateX(-50%);
+  pointer-events: none;
+  z-index: 8;
+  font-family: 'DM Mono', monospace;
+  font-size: 18px;
+  color: #ff6600;
+  text-align: center;
+  letter-spacing: 0.15em;
+  text-shadow: 0 0 12px #ff4400;
+  white-space: nowrap;
+}
+#hit-flash {
+  display: none;
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 6;
+  background: rgba(240,128,128,0.22);
+  animation: hitfade 0.35s ease-out forwards;
+}
+@keyframes hitfade { from { opacity:1; } to { opacity:0; } }
+
+/* ── Modal boxes ─────────────────────────────────────────── */
+#modal-box {
+  display: none;
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(14,14,15,0.96);
+  border: 1px solid rgba(240,128,128,0.4);
+  border-radius: var(--radius);
+  padding: 32px 56px;
+  z-index: 40;
+  min-width: 480px;
+  text-align: center;
+  backdrop-filter: blur(12px);
+}
+#modal-box.active { display: block; }
+#modal-title {
+  font-family: 'DM Mono', monospace;
+  font-size: 24px;
+  letter-spacing: 0.14em;
+  color: var(--danger);
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+#modal-title.win { color: var(--accent); }
+#modal-msg {
+  font-family: 'DM Mono', monospace;
+  font-size: 13px;
+  color: rgba(240,128,128,0.75);
+  letter-spacing: 0.04em;
+  line-height: 1.8;
+  white-space: pre-line;
+}
+#modal-msg.win { color: rgba(200,240,96,0.75); }
+#modal-restart {
+  margin-top: 22px;
+  padding: 10px 32px;
+  background: var(--accent-dim);
+  border: 1px solid rgba(200,240,96,0.35);
+  border-radius: 6px;
+  color: var(--accent);
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+#modal-restart:hover { background: rgba(200,240,96,0.2); }
+
+#status-box {
+  display: none;
+  position: absolute;
+  top: 12px; left: 50%;
+  transform: translateX(-50%);
+  background: rgba(14,14,15,0.88);
+  border: 1px solid rgba(200,240,96,0.25);
+  border-radius: var(--radius);
+  padding: 7px 18px;
+  z-index: 30;
+  min-width: 260px;
+  text-align: center;
+  pointer-events: none;
+  backdrop-filter: blur(8px);
+}
+#status-box.active { display: block; }
+#status-title { font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.14em;color:var(--accent);text-transform:uppercase;margin-bottom:2px; }
+#status-msg   { font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:0.04em; }
+
+/* ── Right panel ─────────────────────────────────────────── */
+#control-panel {
+  width: 240px;
+  flex-shrink: 0;
+  background: var(--panel);
+  border-left: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  padding: 16px 14px;
+  gap: 18px;
+  position: relative;
+  z-index: 50;
+}
+#control-panel::-webkit-scrollbar { width: 4px; }
+#control-panel::-webkit-scrollbar-track { background: transparent; }
+#control-panel::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+.panel-section { display: flex; flex-direction: column; gap: 0; }
+.section-title {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  color: var(--accent);
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+.section-title.danger { color: var(--danger); }
+.section-title.blue   { color: var(--select); }
+.divider { height: 1px; background: var(--border); margin: 0 -14px; }
+
+.stat-row { display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; }
+.stat-label { font-size:11px; color:var(--muted); }
+.stat-value { font-family:'DM Mono',monospace;font-size:11px;color:var(--accent);min-width:50px;text-align:right; }
+.stat-value.danger { color: var(--danger); }
+.stat-value.blue   { color: var(--select); }
+
+/* Health bar */
+.health-bar-wrap { height:4px;background:var(--border);border-radius:2px;margin-top:2px;margin-bottom:10px;overflow:hidden; }
+#health-bar { height:100%;background:var(--accent);width:100%;transition:width 0.2s,background 0.2s;border-radius:2px; }
+
+/* Ammo pips */
+#ammo-pips { display:flex; gap:3px; flex-wrap:wrap; margin-bottom:10px; }
+.ammo-pip { width:8px;height:8px;border-radius:2px;background:var(--select); }
+.ammo-pip.spent { background:var(--border); }
+
+/* Attitude indicator */
+.attitude-indicator { width:80px;height:80px;border-radius:50%;border:1px solid var(--border);margin:0 auto 10px;position:relative;overflow:hidden;background:#0a0a0b; }
+#attitude-canvas { width:80px;height:80px;display:block;flex-shrink:0; }
+
+/* Key hints */
+.key-hint { display:flex;gap:6px;align-items:center;margin-bottom:4px;font-size:11px;color:var(--muted); }
+.key { font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.06em;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:4px;padding:2px 5px;color:var(--text);white-space:nowrap; }
+
+/* Radar */
+#radar-canvas { display:block;margin:0 auto;border-radius:4px;border:1px solid var(--border); }
+
+/* Toggle */
+.toggle-row { display:flex;align-items:center;justify-content:space-between;margin-bottom:8px; }
+.toggle-label { font-size:11px;color:var(--muted); }
+.toggle { position:relative;width:32px;height:17px;flex-shrink:0; }
+.toggle input { opacity:0;width:0;height:0;position:absolute; }
+.toggle-track { position:absolute;inset:0;background:var(--border);border-radius:17px;cursor:pointer;transition:background 0.2s; }
+.toggle input:checked + .toggle-track { background:rgba(200,240,96,0.35); }
+.toggle-thumb { position:absolute;width:11px;height:11px;border-radius:50%;background:var(--muted);top:3px;left:3px;transition:transform 0.2s,background 0.2s;pointer-events:none; }
+.toggle input:checked ~ .toggle-thumb { transform:translateX(15px);background:var(--accent); }
+
+.btn { width:100%;padding:7px 0;background:transparent;border:1px solid var(--border);border-radius:6px;color:var(--muted);font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.08em;text-transform:uppercase;cursor:pointer;transition:border-color 0.2s,color 0.2s,background 0.2s;text-align:center;margin-bottom:6px; }
+.btn:hover { border-color:rgba(200,240,96,0.3);color:var(--accent);background:var(--accent-dim); }
+.btn.primary { background:var(--accent-dim);color:var(--accent);border-color:rgba(200,240,96,0.3); }
+.btn.danger  { background:var(--danger-dim);color:var(--danger);border-color:rgba(240,128,128,0.3); }
+
+.panel-spacer { flex:1;min-height:16px; }
+
+/* ── Setup panel (left) ──────────────────────────────────── */
+#setup-panel {
+  width: 256px;
+  flex-shrink: 0;
+  min-height: 0;
+  background: var(--panel);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  padding: 8px 0;
+  position: relative;
+  z-index: 50;
+}
+#setup-panel::-webkit-scrollbar { width: 4px; }
+#setup-panel::-webkit-scrollbar-track { background: transparent; }
+#setup-panel::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+/* ── Accordion ───────────────────────────────────────────── */
+.accordion-item { border-bottom: 1px solid var(--border); }
+.accordion-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 11px 16px; cursor: pointer; user-select: none; transition: background 0.15s;
+}
+.accordion-header:hover { background: rgba(255,255,255,0.03); }
+.accordion-title {
+  font-family: 'DM Mono', monospace; font-size: 10px;
+  letter-spacing: 0.12em; color: var(--accent); text-transform: uppercase;
+}
+.accordion-chevron { font-size: 10px; color: var(--muted); transition: transform 0.2s; line-height: 1; }
+.accordion-item.open .accordion-chevron { transform: rotate(180deg); }
+.accordion-body {
+  display: none; padding: 4px 16px 16px 16px;
+  flex-direction: column; gap: 0; overflow: visible;
+}
+.accordion-item.open .accordion-body { display: flex; }
+#setup-panel.hidden   { display: none; }
+#control-panel.hidden { display: none; }
+
+/* ── Control rows & sliders ──────────────────────────────── */
+.control-row { display:flex; align-items:center; margin-bottom:10px; gap:8px; width:100%; }
+.control-row:last-child { margin-bottom: 0; }
+.ctrl-label { font-size:11px; color:var(--muted); flex:0 0 52px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.ctrl-value { font-family:'DM Mono',monospace; font-size:11px; color:var(--accent); flex:0 0 36px; text-align:right; }
+input[type=range] { -webkit-appearance:none; flex:1; min-width:0; height:2px; background:var(--border); border-radius:2px; outline:none; cursor:pointer; }
+input[type=range]::-webkit-slider-thumb { -webkit-appearance:none; width:12px; height:12px; border-radius:50%; background:var(--accent); cursor:pointer; transition:transform 0.15s; }
+input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.3); }
+
+/* ── Colour inputs ───────────────────────────────────────── */
+.color-row { display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; }
+.color-row:last-child { margin-bottom: 0; }
+.color-label { font-size:12px; color:var(--muted); }
+.color-input-wrap { display:flex; align-items:center; gap:8px; }
+.color-hex { font-family:'DM Mono',monospace; font-size:10px; color:var(--muted); min-width:54px; }
+input[type=color] { width:30px; height:22px; border:1px solid var(--border); border-radius:4px; background:transparent; cursor:pointer; padding:1px 2px; }
+
+/* ── Number spinners ─────────────────────────────────────── */
+.spinner-row { display:flex; align-items:center; gap:8px; margin-bottom:8px; flex-wrap:nowrap; }
+.spinner-row:last-child { margin-bottom: 0; }
+.spinner-group { display:flex; align-items:center; gap:3px; flex:1; }
+.spinner-label { font-size:10px; color:var(--muted); flex-shrink:0; }
+input[type=number] { -moz-appearance:textfield; flex:1; background:rgba(255,255,255,0.04); border:1px solid var(--border); border-radius:4px; color:var(--accent); font-family:'DM Mono',monospace; font-size:10px; padding:3px 4px; outline:none; width:52px; max-width:52px; text-align:center; }
+input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button { opacity:0.4; }
+input[type=number]:focus { border-color: rgba(200,240,96,0.35); }
+
+/* ── Light subsection ────────────────────────────────────── */
+.light-sub { border-top:1px solid var(--border); padding-top:10px; margin-top:4px; }
+.light-sub-title { font-family:'DM Mono',monospace; font-size:9px; letter-spacing:0.12em; color:var(--accent); text-transform:uppercase; margin-bottom:8px; }
+</style>
+</head>
+<body>
+
+<div id="header">
+  <div class="logo">Boid <span>Chase</span></div>
+  <div id="hud-bar">
+    <div class="hud-item"><span class="hud-label">IAS</span><span class="hud-val ok" id="hud-speed">0 kt</span></div>
+    <div class="hud-item"><span class="hud-label">Alt</span><span class="hud-val" id="hud-alt">0</span></div>
+    <div class="hud-item"><span class="hud-label">HP</span><span class="hud-val warn" id="hud-hp">100</span></div>
+    <div class="hud-item"><span class="hud-label">AMMO</span><span class="hud-val blue" id="hud-ammo">100</span></div>
+    <div class="hud-item"><span class="hud-label">BOID HP</span><span class="hud-val danger" id="hud-boid-hp">100</span></div>
+    <div class="hud-item"><span class="hud-label">LOCK</span><span class="hud-val" id="hud-lock">—</span></div>
+    <div class="hud-item"><span class="hud-label">BRK</span><span class="hud-val ok" id="hud-brakes">OFF</span></div>
+    <div class="hud-item"><span class="hud-label">CAM</span><span class="hud-val blue" id="cam-label">FLIGHT CAM</span></div>
+  </div>
+</div>
+
+<div id="main">
+
+<!-- ── Setup Control Panel (left) ───────────────────────── -->
+<div id="setup-panel">
+
+  <!-- 1. Environment -->
+  <div class="accordion-item">
+    <div class="accordion-header">
+      <span class="accordion-title">Environment</span>
+      <span class="accordion-chevron">&#9662;</span>
+    </div>
+    <div class="accordion-body">
+      <div class="color-row">
+        <span class="color-label">Background</span>
+        <div class="color-input-wrap">
+          <input type="color" id="bg-color" value="#333333">
+          <span class="color-hex" id="bg-hex">#333333</span>
+        </div>
+      </div>
+      <div class="color-row" style="margin-bottom:12px">
+        <span class="color-label">Grid</span>
+        <div class="color-input-wrap">
+          <input type="color" id="grid-color" value="#646464">
+          <span class="color-hex" id="grid-hex">#646464</span>
+        </div>
+      </div>
+      <div class="toggle-row">
+        <span class="toggle-label">Grid</span>
+        <label class="toggle">
+          <input type="checkbox" id="btn-grid" checked>
+          <div class="toggle-track"></div><div class="toggle-thumb"></div>
+        </label>
+      </div>
+      <div class="toggle-row">
+        <span class="toggle-label">Ground</span>
+        <label class="toggle">
+          <input type="checkbox" id="btn-ground" checked>
+          <div class="toggle-track"></div><div class="toggle-thumb"></div>
+        </label>
+      </div>
+      <div class="toggle-row">
+        <span class="toggle-label">Shadows</span>
+        <label class="toggle">
+          <input type="checkbox" id="btn-shadows" checked>
+          <div class="toggle-track"></div><div class="toggle-thumb"></div>
+        </label>
+      </div>
+      <div class="toggle-row" style="margin-bottom:0">
+        <span class="toggle-label">Light Helpers</span>
+        <label class="toggle">
+          <input type="checkbox" id="btn-light-helpers">
+          <div class="toggle-track"></div><div class="toggle-thumb"></div>
+        </label>
+      </div>
+      <div class="color-row" style="margin-top:10px;margin-bottom:8px">
+        <span class="color-label">Ground</span>
+        <div class="color-input-wrap">
+          <input type="color" id="ground-color" value="#888888">
+          <span class="color-hex" id="ground-color-hex">#888888</span>
+        </div>
+      </div>
+      <div class="color-row" style="margin-bottom:8px">
+        <span class="color-label">HUD</span>
+        <div class="color-input-wrap">
+          <input type="color" id="hud-color" value="#00ff00">
+          <span class="color-hex" id="hud-color-hex">#00ff00</span>
+        </div>
+      </div>
+      <div class="control-row" style="margin-top:2px;margin-bottom:0">
+        <span class="ctrl-label">Cam FOV</span>
+        <input type="range" id="cam-fov" min="30" max="80" step="1" value="72">
+        <span class="ctrl-value" id="cam-fov-val">72°</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. Lights -->
+  <div class="accordion-item">
+    <div class="accordion-header">
+      <span class="accordion-title">Lights</span>
+      <span class="accordion-chevron">&#9662;</span>
+    </div>
+    <div class="accordion-body">
+      <div class="control-row">
+        <span class="ctrl-label">Exposure</span>
+        <input type="range" id="light-exposure" min="0" max="3" step="0.01" value="1">
+        <span class="ctrl-value" id="light-exposure-val">1.00</span>
+      </div>
+      <div class="control-row" style="margin-bottom:12px">
+        <span class="ctrl-label">Ambient</span>
+        <input type="range" id="light-ambient" min="0" max="2" step="0.01" value="0.4">
+        <span class="ctrl-value" id="light-ambient-val">0.40</span>
+      </div>
+      <div class="light-sub">
+        <div class="light-sub-title">Sun</div>
+        <div class="color-row">
+          <span class="color-label">Colour</span>
+          <div class="color-input-wrap">
+            <input type="color" id="sun-color" value="#fff7c2">
+            <span class="color-hex" id="sun-color-hex">#fff7c2</span>
+          </div>
+        </div>
+        <div class="control-row" style="margin-bottom:8px">
+          <span class="ctrl-label">Intensity</span>
+          <input type="range" id="sun-intensity" min="0" max="3" step="0.01" value="1">
+          <span class="ctrl-value" id="sun-intensity-val">1.00</span>
+        </div>
+        <div class="spinner-row">
+          <div class="spinner-group"><span class="spinner-label">X</span><input type="number" id="sun-x" value="70" step="10"></div>
+          <div class="spinner-group"><span class="spinner-label">Y</span><input type="number" id="sun-y" value="90" step="10"></div>
+          <div class="spinner-group"><span class="spinner-label">Z</span><input type="number" id="sun-z" value="70" step="10"></div>
+        </div>
+      </div>
+      <div class="light-sub">
+        <div class="light-sub-title">Fill 1</div>
+        <div class="color-row">
+          <span class="color-label">Colour</span>
+          <div class="color-input-wrap">
+            <input type="color" id="fill-color" value="#dcf8fe">
+            <span class="color-hex" id="fill-color-hex">#dcf8fe</span>
+          </div>
+        </div>
+        <div class="control-row" style="margin-bottom:8px">
+          <span class="ctrl-label">Intensity</span>
+          <input type="range" id="fill-intensity" min="0" max="3" step="0.01" value="0.4">
+          <span class="ctrl-value" id="fill-intensity-val">0.40</span>
+        </div>
+        <div class="spinner-row">
+          <div class="spinner-group"><span class="spinner-label">X</span><input type="number" id="fill-x" value="-70" step="10"></div>
+          <div class="spinner-group"><span class="spinner-label">Y</span><input type="number" id="fill-y" value="30" step="10"></div>
+          <div class="spinner-group"><span class="spinner-label">Z</span><input type="number" id="fill-z" value="-70" step="10"></div>
+        </div>
+      </div>
+      <div class="light-sub">
+        <div class="light-sub-title">Fill 2</div>
+        <div class="color-row">
+          <span class="color-label">Colour</span>
+          <div class="color-input-wrap">
+            <input type="color" id="fill2-color" value="#dcf8fe">
+            <span class="color-hex" id="fill2-color-hex">#dcf8fe</span>
+          </div>
+        </div>
+        <div class="control-row" style="margin-bottom:8px">
+          <span class="ctrl-label">Intensity</span>
+          <input type="range" id="fill2-intensity" min="0" max="3" step="0.01" value="0.4">
+          <span class="ctrl-value" id="fill2-intensity-val">0.40</span>
+        </div>
+        <div class="spinner-row">
+          <div class="spinner-group"><span class="spinner-label">X</span><input type="number" id="fill2-x" value="80" step="10"></div>
+          <div class="spinner-group"><span class="spinner-label">Y</span><input type="number" id="fill2-y" value="60" step="10"></div>
+          <div class="spinner-group"><span class="spinner-label">Z</span><input type="number" id="fill2-z" value="-80" step="10"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. Scene Objects -->
+  <div class="accordion-item">
+    <div class="accordion-header">
+      <span class="accordion-title">Scene Objects</span>
+      <span class="accordion-chevron">&#9662;</span>
+    </div>
+    <div class="accordion-body">
+      <div class="control-row" style="margin-bottom:10px">
+        <span class="ctrl-label">Cube Count</span>
+        <input type="range" id="cube-count" min="10" max="300" step="1" value="50">
+        <span class="ctrl-value" id="cube-count-val" style="min-width:32px;text-align:right">50</span>
+      </div>
+      <div class="spinner-row" style="margin-bottom:10px">
+        <div class="spinner-group">
+          <span class="spinner-label" style="width:auto;margin-right:4px;font-size:11px;color:var(--muted)">Size Min</span>
+          <input type="number" id="cube-size-min" value="5" min="1" max="20" step="1">
+        </div>
+        <div class="spinner-group">
+          <span class="spinner-label" style="width:auto;margin-right:4px;font-size:11px;color:var(--muted)">Max</span>
+          <input type="number" id="cube-size-max" value="10" min="1" max="20" step="1">
+        </div>
+      </div>
+      <div class="color-row" style="margin-bottom:8px">
+        <span class="color-label">Colour</span>
+        <div class="color-input-wrap">
+          <input type="color" id="cube-color" value="#82afd7">
+          <span class="color-hex" id="cube-color-hex">#82afd7</span>
+        </div>
+      </div>
+      <div class="control-row" style="margin-bottom:10px">
+        <span class="ctrl-label">Tolerance</span>
+        <input type="range" id="cube-tolerance" min="0" max="50" step="1" value="20">
+        <span class="ctrl-value" id="cube-tolerance-val">20%</span>
+      </div>
+      <div class="spinner-row" style="margin-bottom:12px">
+        <div class="spinner-group">
+          <span class="spinner-label" style="width:auto;margin-right:4px;font-size:11px;color:var(--muted)">Height Min</span>
+          <input type="number" id="cube-height-min" value="5" min="0" max="200" step="1">
+        </div>
+        <div class="spinner-group">
+          <span class="spinner-label" style="width:auto;margin-right:4px;font-size:11px;color:var(--muted)">Max</span>
+          <input type="number" id="cube-height-max" value="80" min="0" max="200" step="1">
+        </div>
+      </div>
+      <div class="btn-row" style="margin-bottom:6px">
+        <button class="btn primary" id="btn-spawn-cubes">Cubes</button>
+        <button class="btn primary" id="btn-spawn-stars">Stars</button>
+      </div>
+      <div class="btn-row">
+        <button class="btn danger" id="btn-clear-cubes">Remove Scene Objects</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. Asteroid Debris -->
+  <div class="accordion-item">
+    <div class="accordion-header">
+      <span class="accordion-title">Asteroid Debris</span>
+      <span class="accordion-chevron">&#9662;</span>
+    </div>
+    <div class="accordion-body">
+      <div class="toggle-row" style="margin-bottom:12px">
+        <span class="toggle-label">Debris Active</span>
+        <label class="toggle">
+          <input type="checkbox" id="btn-debris" checked>
+          <div class="toggle-track"></div><div class="toggle-thumb"></div>
+        </label>
+      </div>
+      <div class="spinner-row" style="margin-bottom:10px">
+        <div class="spinner-group">
+          <span class="spinner-label" style="width:auto;margin-right:4px;font-size:11px;color:var(--muted)">Count Min</span>
+          <input type="number" id="debris-count-min" value="2" min="1" max="5" step="1">
+        </div>
+        <div class="spinner-group">
+          <span class="spinner-label" style="width:auto;margin-right:4px;font-size:11px;color:var(--muted)">Max</span>
+          <input type="number" id="debris-count-max" value="6" min="3" max="10" step="1">
+        </div>
+      </div>
+      <div class="spinner-row" style="margin-bottom:10px">
+        <div class="spinner-group">
+          <span class="spinner-label" style="width:auto;margin-right:4px;font-size:11px;color:var(--muted)">Size Min</span>
+          <input type="number" id="debris-size-min" value="0.1" min="0.1" max="2" step="0.1">
+        </div>
+        <div class="spinner-group">
+          <span class="spinner-label" style="width:auto;margin-right:4px;font-size:11px;color:var(--muted)">Max</span>
+          <input type="number" id="debris-size-max" value="0.5" min="0.1" max="2" step="0.1">
+        </div>
+      </div>
+      <div class="spinner-row" style="margin-bottom:10px">
+        <div class="spinner-group">
+          <span class="spinner-label" style="width:auto;margin-right:4px;font-size:11px;color:var(--muted)">Life Min</span>
+          <input type="number" id="debris-life-min" value="0.5" min="0.5" max="3" step="0.1">
+        </div>
+        <div class="spinner-group">
+          <span class="spinner-label" style="width:auto;margin-right:4px;font-size:11px;color:var(--muted)">Max</span>
+          <input type="number" id="debris-life-max" value="5.0" min="0.5" max="10" step="0.1">
+        </div>
+      </div>
+      <div class="spinner-row" style="margin-bottom:10px">
+        <div class="spinner-group">
+          <span class="spinner-label" style="width:auto;margin-right:4px;font-size:11px;color:var(--muted)">Speed Min</span>
+          <input type="number" id="debris-speed-min" value="3" min="1" max="5" step="0.5">
+        </div>
+        <div class="spinner-group">
+          <span class="spinner-label" style="width:auto;margin-right:4px;font-size:11px;color:var(--muted)">Max</span>
+          <input type="number" id="debris-speed-max" value="5" min="1" max="10" step="0.5">
+        </div>
+      </div>
+      <div class="control-row" style="margin-bottom:0">
+        <span class="ctrl-label">Dampening</span>
+        <input type="range" id="debris-dampen" min="0" max="0.99" step="0.01" value="0.01">
+        <span class="ctrl-value" id="debris-dampen-val">0.01</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5. Target Object -->
+  <div class="accordion-item">
+    <div class="accordion-header">
+      <span class="accordion-title">Target Object</span>
+      <span class="accordion-chevron">&#9662;</span>
+    </div>
+    <div class="accordion-body">
+      <div class="toggle-row">
+        <span class="toggle-label">Visible</span>
+        <label class="toggle">
+          <input type="checkbox" id="target-visible">
+          <div class="toggle-track"></div><div class="toggle-thumb"></div>
+        </label>
+      </div>
+      <div class="control-row">
+        <span class="ctrl-label">Velocity</span>
+        <input type="range" id="target-velocity" min="0" max="20" step="0.01" value="12">
+        <span class="ctrl-value" id="target-velocity-val">12.00</span>
+      </div>
+      <div class="spinner-row" style="margin-bottom:8px">
+        <div class="spinner-group">
+          <span class="spinner-label" style="width:auto;margin-right:4px;font-size:11px;color:var(--muted)">Box W/D</span>
+          <input type="number" id="bbox-half" value="100" min="10" max="300" step="10">
+        </div>
+        <div class="spinner-group">
+          <span class="spinner-label" style="width:auto;margin-right:4px;font-size:11px;color:var(--muted)">Height</span>
+          <input type="number" id="bbox-h" value="100" min="10" max="300" step="10">
+        </div>
+      </div>
+      <div class="toggle-row" style="margin-bottom:0">
+        <span class="toggle-label">Show BBox</span>
+        <label class="toggle">
+          <input type="checkbox" id="bbox-visible">
+          <div class="toggle-track"></div><div class="toggle-thumb"></div>
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <!-- 6. Boid -->
+  <div class="accordion-item">
+    <div class="accordion-header">
+      <span class="accordion-title">Boid</span>
+      <span class="accordion-chevron">&#9662;</span>
+    </div>
+    <div class="accordion-body">
+      <div class="color-row" style="margin-bottom:10px">
+        <span class="color-label">Colour</span>
+        <div class="color-input-wrap">
+          <input type="color" id="boid-color" value="#ff0000">
+          <span class="color-hex" id="boid-color-hex">#ff0000</span>
+        </div>
+      </div>
+      <div class="control-row">
+        <span class="ctrl-label">Velocity</span>
+        <input type="range" id="boid-velocity" min="0" max="20" step="0.01" value="8.5">
+        <span class="ctrl-value" id="boid-velocity-val">8.50</span>
+      </div>
+      <div class="control-row" style="margin-bottom:0">
+        <span class="ctrl-label">Turn Rate</span>
+        <input type="range" id="boid-turnrate" min="0.1" max="3" step="0.01" value="0.5">
+        <span class="ctrl-value" id="boid-turnrate-val">0.50</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 7. Princess -->
+  <div class="accordion-item">
+    <div class="accordion-header">
+      <span class="accordion-title">Princess</span>
+      <span class="accordion-chevron">&#9662;</span>
+    </div>
+    <div class="accordion-body">
+      <div class="color-row" style="margin-bottom:10px">
+        <span class="color-label">Colour</span>
+        <div class="color-input-wrap">
+          <input type="color" id="princess-color" value="#ffff00">
+          <span class="color-hex" id="princess-color-hex">#ffff00</span>
+        </div>
+      </div>
+      <div class="control-row">
+        <span class="ctrl-label">Velocity</span>
+        <input type="range" id="princess-velocity" min="0" max="20" step="0.01" value="9.75">
+        <span class="ctrl-value" id="princess-velocity-val">9.75</span>
+      </div>
+      <div class="control-row" style="margin-bottom:0">
+        <span class="ctrl-label">Turn Rate</span>
+        <input type="range" id="princess-turnrate" min="0.1" max="3" step="0.01" value="0.5">
+        <span class="ctrl-value" id="princess-turnrate-val">0.50</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 8. Space Mines -->
+  <div class="accordion-item">
+    <div class="accordion-header">
+      <span class="accordion-title">Space Mines</span>
+      <span class="accordion-chevron">&#9662;</span>
+    </div>
+    <div class="accordion-body">
+      <div class="btn-row" style="margin-bottom:10px">
+        <button class="btn primary" id="btn-spawn-mines">Spawn Mines</button>
+        <button class="btn danger"  id="btn-clear-mines">Remove All</button>
+      </div>
+      <!-- Orange Mines -->
+      <div class="light-sub">
+        <div class="light-sub-title" style="color:#f08030">Orange Mines</div>
+        <div class="toggle-row">
+          <span class="toggle-label">Active</span>
+          <label class="toggle">
+            <input type="checkbox" id="orange-mine-active" checked>
+            <div class="toggle-track"></div><div class="toggle-thumb"></div>
+          </label>
+        </div>
+        <div class="spinner-row" style="margin-bottom:8px">
+          <div class="spinner-group">
+            <span class="spinner-label" style="font-size:11px;color:var(--muted);margin-right:4px">Count</span>
+            <input type="number" id="orange-mine-count" value="5" min="0" max="20" step="1">
+          </div>
+          <div class="spinner-group">
+            <span class="spinner-label" style="font-size:11px;color:var(--muted);margin-right:4px">Radius</span>
+            <input type="number" id="orange-mine-radius" value="10" min="1" max="30" step="1">
+          </div>
+        </div>
+      </div>
+      <!-- Red Mines -->
+      <div class="light-sub" style="margin-top:8px">
+        <div class="light-sub-title" style="color:#f03030">Red Mines</div>
+        <div class="toggle-row">
+          <span class="toggle-label">Active</span>
+          <label class="toggle">
+            <input type="checkbox" id="red-mine-active" checked>
+            <div class="toggle-track"></div><div class="toggle-thumb"></div>
+          </label>
+        </div>
+        <div class="spinner-row" style="margin-bottom:0">
+          <div class="spinner-group">
+            <span class="spinner-label" style="font-size:11px;color:var(--muted);margin-right:4px">Count</span>
+            <input type="number" id="red-mine-count" value="5" min="0" max="20" step="1">
+          </div>
+          <div class="spinner-group">
+            <span class="spinner-label" style="font-size:11px;color:var(--muted);margin-right:4px">Radius</span>
+            <input type="number" id="red-mine-radius" value="10" min="1" max="30" step="1">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 9. Orbit Camera -->
+  <div class="accordion-item">
+    <div class="accordion-header">
+      <span class="accordion-title">Orbit Camera</span>
+      <span class="accordion-chevron">&#9662;</span>
+    </div>
+    <div class="accordion-body">
+      <div class="btn-row" style="margin-bottom:10px">
+        <button class="btn primary" id="btn-cam1">1 — Flight</button>
+        <button class="btn" id="btn-cam2">2 — Orbit</button>
+      </div>
+      <div class="control-row">
+        <span class="ctrl-label">FOV</span>
+        <input type="range" id="orbit-fov" min="20" max="100" step="1" value="45">
+        <span class="ctrl-value" id="orbit-fov-val">45°</span>
+      </div>
+      <div class="toggle-row" style="margin-bottom:0">
+        <span class="toggle-label">Auto-rotate</span>
+        <label class="toggle">
+          <input type="checkbox" id="orbit-autorotate">
+          <div class="toggle-track"></div><div class="toggle-thumb"></div>
+        </label>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- 8. Audio -->
+  <div class="accordion-item open">
+    <div class="accordion-header">
+      <span class="accordion-title">Audio</span>
+      <span class="accordion-chevron">&#9662;</span>
+    </div>
+    <div class="accordion-body">
+      <div class="toggle-row" style="margin-bottom:10px">
+        <span class="toggle-label">Mute</span>
+        <label class="toggle">
+          <input type="checkbox" id="audio-mute">
+          <div class="toggle-track"></div><div class="toggle-thumb"></div>
+        </label>
+      </div>
+      <div class="control-row" style="margin-bottom:0">
+        <span class="ctrl-label">Volume</span>
+        <input type="range" id="audio-volume" min="0" max="1" step="0.01" value="0.6">
+        <span class="ctrl-value" id="audio-volume-val">0.60</span>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ── Viewport ─────────────────────────────────────────── -->
+<div id="viewport-area">
+  <canvas id="main-canvas"></canvas>
+
+  <div id="warn-overlay"></div>
+  <div id="hit-flash"></div>
+  <div id="mine-warn-overlay"></div>
+  <div id="mine-warn-text"></div>
+  <div id="mine-countdown"></div>
+
+  <div id="modal-box">
+    <div id="modal-title">Mission Failed</div>
+    <div id="modal-msg">Your craft was destroyed.</div>
+    <button id="modal-restart">↺ Restart Mission</button>
+  </div>
+
+  <div id="status-box">
+    <div id="status-title">Brakes On</div>
+    <div id="status-msg">SPACE / click to launch • W/S throttle • Mouse steer • Left click to fire</div>
+  </div>
+
+  <!-- HUD canvas: position:fixed, z-index 20 -->
+  <canvas id="hud-canvas" style="position:fixed;pointer-events:none;z-index:20;"></canvas>
+</div>
+
+<!-- ── Right panel ──────────────────────────────────────── -->
+<div id="control-panel">
+
+  <!-- Instruments -->
+  <div class="panel-section">
+    <div class="section-title">Instruments</div>
+    <div class="attitude-indicator">
+      <canvas id="attitude-canvas" width="80" height="80"></canvas>
+    </div>
+    <div class="stat-row"><span class="stat-label">Speed</span><span class="stat-value" id="cp-speed">0%</span></div>
+    <div class="stat-row"><span class="stat-label">Altitude</span><span class="stat-value" id="cp-alt">0.0</span></div>
+    <div class="stat-row"><span class="stat-label">Heading</span><span class="stat-value" id="cp-hdg">0°</span></div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- Combat -->
+  <div class="panel-section">
+    <div class="section-title danger">Combat Status</div>
+    <div class="stat-row"><span class="stat-label">Hull Integrity</span><span class="stat-value danger" id="cp-hp">100%</span></div>
+    <div class="health-bar-wrap"><div id="health-bar"></div></div>
+    <div class="stat-row"><span class="stat-label">Missiles</span><span class="stat-value blue" id="cp-ammo">100 / 100</span></div>
+    <div id="ammo-pips"></div>
+    <div class="stat-row"><span class="stat-label">Boid HP</span><span class="stat-value danger" id="cp-boid-hp">100%</span></div>
+    <div class="stat-row"><span class="stat-label">Lock Range</span><span class="stat-value" id="cp-lock">—</span></div>
+    <div class="stat-row" style="margin-bottom:0"><span class="stat-label">Asteroids</span><span class="stat-value" id="cp-asteroids">50</span></div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- Radar -->
+  <div class="panel-section">
+    <div class="section-title blue">Radar</div>
+    <canvas id="radar-canvas" width="200" height="200"></canvas>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- Options -->
+  <div class="panel-section">
+    <div class="section-title">Options</div>
+    <div class="toggle-row">
+      <span class="toggle-label">HUD Active</span>
+      <label class="toggle">
+        <input type="checkbox" id="btn-hud" checked>
+        <div class="toggle-track"></div><div class="toggle-thumb"></div>
+      </label>
+    </div>
+    <div class="toggle-row" style="margin-bottom:0">
+      <span class="toggle-label">Boid Beacon</span>
+      <label class="toggle">
+        <input type="checkbox" id="btn-beacon" checked>
+        <div class="toggle-track"></div><div class="toggle-thumb"></div>
+      </label>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="panel-section">
+    <div class="section-title">Mission</div>
+    <button class="btn primary" id="btn-restart">↺ Restart</button>
+  </div>
+
+  <div class="panel-spacer"></div>
+</div>
+
+</div><!-- #main -->
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.158/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.158/examples/jsm/"
+  }
+}
+</script>
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+'use strict';
+
+// ══════════════════════════════════════════════════════════════════════════════
+//  CONSTANTS & TUNING
+// ══════════════════════════════════════════════════════════════════════════════
+const MAX_SPEED       = 0.5;
+const GEAR_HEIGHT     = 1.5;
+const ASTEROID_COUNT  = 50;
+const ASTEROID_SPREAD = 200;   // ±100 units (200 units wide/deep)
+const ASTEROID_ALT_MIN = 5;
+const ASTEROID_ALT_MAX = 120;
+const MAX_HP          = 100;
+const MAX_AMMO        = 100;
+const MISSILE_SPEED   = 50.0;
+const MISSILE_LIFE    = 4.0;   // seconds
+const LOCK_RANGE      = 80;    // units – must be within this to fire
+const BOID_SPEED      = 0.09;
+const BOID_WOBBLE     = 0.018;
+const COLLISION_RADIUS = 3.5;  // player collision sphere
+const ASTEROID_COLLISION_SCALE = 0.55; // fraction of visual size
+const DAMAGE_ASTEROID  = 18;
+const DAMAGE_COOLDOWN  = 1500;  // ms invincibility after hit
+const MISSILE_DAMAGE   = 34;
+
+// ══════════════════════════════════════════════════════════════════════════════
+//  GAME STATE
+// ══════════════════════════════════════════════════════════════════════════════
+let speed          = 0.35 * 0.7; // 70% of MAX_SPEED * 0.5 movement factor
+let thrust         = 0.7;
+let targetSpeed    = 0.35 * 0.7;
+let brakesOn       = false;
+let gamePaused     = true;
+let gameOver       = false;
+let gameWon        = false;
+
+// ── Boid destruction state ───────────────────────────────────────────────────
+let boidDeathPhase  = 0;     // 0=alive, 1=scenario1 (exploded), 2=scenario2 (crashing)
+let boidModalShown  = false; // guard against calling showModal multiple times
+let boidDeathTimer  = 0;     // counts up after death event
+let boidCrashPitch  = 0;     // current nose-down pitch during crash (radians)
+const BOID_CRASH_DURATION  = 5.0;  // seconds to pitch nose to ground
+const BOID_WIN_DELAY       = 5.0;  // seconds after explosion before modal
+const boidTetParticles     = [];   // explosion tetrahedra
+const hitParticles         = [];   // small red burst on hit (scenario 2)
+const smokeTrail           = [];   // grey cube smoke trail (scenario 2)
+let   smokeTimer           = 0;    // counts time since last smoke cube emitted
+let   nextSmokeInterval    = 0.08; // 80-170ms between cubes
+// Crash trajectory state — captured at moment of death
+const _boidCrashQuat       = new THREE.Quaternion(); // rotation at death
+const _boidCrashTargetQuat = new THREE.Quaternion(); // world-down-facing target
+const _boidCrashForward    = new THREE.Vector3();    // forward direction at death
+const _boidCrashTargetDir  = new THREE.Vector3();    // target travel direction (angled down)
+let flightPhase    = 3;    // 0=parked 1=taxi 2=rolling 3=airborne — start airborne
+let gearDown       = false;
+let hasBeenAirborne = true;
+let airborneTime   = 5001; // start past missile lockout
+let vertVelocity   = 0;
+let prevAlt        = 50;
+let vsi            = 0;
+const bounceVel    = new THREE.Vector3(); // impulse applied after asteroid collision
+
+const mouse        = { x: 0, y: 0 };
+const camYaw       = { val: 0 };
+const camPitch     = { val: 0 };
+const camRoll      = { val: 0 };
+let pitchEasedTarget = 0;
+
+let playerHP       = MAX_HP;
+let ammo           = MAX_AMMO;
+let boidHP         = MAX_HP;
+let damageCooldown = 0;
+let hudActive      = true;
+let beaconActive   = true;
+let lastTime       = performance.now();
+
+// Missiles in flight
+const missiles     = [];
+
+// Debris particles
+const debrisParticles = [];
+const debrisGeo = new THREE.BoxGeometry(1, 1, 1); // shared, scaled per piece
+
+// ── Environment / lighting state (left panel) ─────────────────────────────
+let bgColor    = '#333333';
+let bgColorInt = 0x333333;
+let gridColor  = '#646464';
+let hudColor   = '#00ff00';
+
+// ══════════════════════════════════════════════════════════════════════════════
+//  THREE.JS SETUP
+// ══════════════════════════════════════════════════════════════════════════════
+const scene    = new THREE.Scene();
+scene.background = new THREE.Color(0x333333);
+
+const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('main-canvas'), antialias: true });
+renderer.setPixelRatio(window.devicePixelRatio);
+renderer.shadowMap.enabled   = true;
+renderer.shadowMap.type      = THREE.PCFSoftShadowMap;
+renderer.toneMapping         = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.0;
+
+
+const camera = new THREE.PerspectiveCamera(72, 1, 0.05, 600);
+camera.rotation.order = 'YXZ';
+
+const cameraRig = new THREE.Group();
+cameraRig.rotation.order = 'YXZ';
+cameraRig.position.set(30, 70, 300);
+cameraRig.add(camera);
+scene.add(cameraRig);
+
+// ── Orbit camera (camera 2 — observer view) ──────────────────────────────────
+const orbitCamera = new THREE.PerspectiveCamera(45, 1, 0.05, 1200);
+orbitCamera.position.set(75, 105, 165);
+orbitCamera.lookAt(0, 5, 0);
+
+const orbitControls = new OrbitControls(orbitCamera, document.getElementById('main-canvas'));
+orbitControls.target.set(0, 5, 0);
+orbitControls.enableDamping = true;
+orbitControls.dampingFactor = 0.08;
+orbitControls.enabled = false; // disabled until camera 2 is active
+
+// Active camera: 1 = flight, 2 = orbit
+let activeCamera = 1;
+let activeThreeCamera = camera;
+
+function setActiveCamera(n) {
+  activeCamera = n;
+  activeThreeCamera = (n === 2) ? orbitCamera : camera;
+  orbitControls.enabled = (n === 2);
+  // Show/hide status
+  const camLabel = document.getElementById('cam-label');
+  if (camLabel) camLabel.textContent = n === 2 ? 'ORBIT CAM' : 'FLIGHT CAM';
+
+}
+
+// ── Lighting ─────────────────────────────────────────────
+const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
+scene.add(ambientLight);
+
+const sun = new THREE.DirectionalLight(0xfff7c2, 1.0);
+sun.position.set(70, 90, 70);
+sun.target.position.set(0, 20, 0);
+sun.castShadow                   = true;
+sun.shadow.mapSize.width         = 2048;
+sun.shadow.mapSize.height        = 2048;
+sun.shadow.camera.near           = 10;
+sun.shadow.camera.far            = 250;
+sun.shadow.camera.left           = -60;
+sun.shadow.camera.right          =  60;
+sun.shadow.camera.top            =  60;
+sun.shadow.camera.bottom         = -60;
+sun.shadow.bias                  = -0.001;
+sun.shadow.radius                = 4;
+scene.add(sun);
+scene.add(sun.target);
+
+const fill = new THREE.DirectionalLight(0xdcf8fe, 0.4);
+fill.position.set(-70, 30, -70);
+fill.target.position.set(0, 10, 0);
+scene.add(fill);
+scene.add(fill.target);
+
+const fill2 = new THREE.DirectionalLight(0xdcf8fe, 0.4);
+fill2.position.set(80, 60, -80);
+fill2.target.position.set(0, 10, 0);
+scene.add(fill2);
+scene.add(fill2.target);
+
+// ── Light helpers ────────────────────────────────────────
+const sunHelper   = new THREE.DirectionalLightHelper(sun,   20);
+const fillHelper  = new THREE.DirectionalLightHelper(fill,  20);
+const fill2Helper = new THREE.DirectionalLightHelper(fill2, 20);
+sunHelper.visible = fillHelper.visible = fill2Helper.visible = false;
+scene.add(sunHelper); scene.add(fillHelper); scene.add(fill2Helper);
+
+
+// ── Ground plane (landing pad) ───────────────────────────
+const groundMat = new THREE.MeshStandardMaterial({
+  color:     0x888888,
+  roughness: 0.85,
+  metalness: 0.0,
+});
+const groundPlane = new THREE.Mesh(
+  new THREE.PlaneGeometry(200, 200),
+  groundMat
+);
+groundPlane.rotation.x    = -Math.PI / 2;
+groundPlane.position.y    = 0;
+groundPlane.receiveShadow = true;
+scene.add(groundPlane);
+
+// Grid — rebuilt on colour change
+function buildGrid(hex) {
+  const c = parseInt(hex.replace('#',''), 16);
+  const g = new THREE.GridHelper(200, 200, c, c);
+  g.position.y = 0.005;
+  return g;
+}
+let gridMesh = buildGrid(gridColor);
+scene.add(gridMesh);
+
+// ══════════════════════════════════════════════════════════════════════════════
+//  ASTEROID FIELD
+// ══════════════════════════════════════════════════════════════════════════════
+// Shared cube geometry (1×1×1, scaled per instance)
+const cubeGeo = new THREE.BoxGeometry(1, 1, 1);
+const asteroids = [];
+let starPoints = null;
+
+// Read current panel values, fall back to defaults on first call
+function getAsteroidParams() {
+  const countEl   = document.getElementById('cube-count');
+  const sMinEl    = document.getElementById('cube-size-min');
+  const sMaxEl    = document.getElementById('cube-size-max');
+  const colorEl   = document.getElementById('cube-color');
+  const tolEl     = document.getElementById('cube-tolerance');
+  const hMinEl    = document.getElementById('cube-height-min');
+  const hMaxEl    = document.getElementById('cube-height-max');
+  return {
+    count:     countEl   ? parseInt(countEl.value)          : ASTEROID_COUNT,
+    sizeMin:   sMinEl    ? parseFloat(sMinEl.value)         : 5.0,
+    sizeMax:   sMaxEl    ? parseFloat(sMaxEl.value)         : 10.0,
+    hexColor:  colorEl   ? colorEl.value                    : '#82afd7',
+    tolerance: tolEl     ? parseInt(tolEl.value) / 100      : 0.20,
+    hMin:      hMinEl    ? parseFloat(hMinEl.value)         : ASTEROID_ALT_MIN,
+    hMax:      hMaxEl    ? parseFloat(hMaxEl.value)         : 80,
+  };
+}
+
+function spawnAsteroids() {
+  // Clear existing
+  asteroids.forEach(a => {
+    scene.remove(a.mesh);
+    a.mesh.geometry.dispose();
+    a.mesh.material.dispose();
+  });
+  asteroids.length = 0;
+
+  const { count, sizeMin, sizeMax, hexColor, tolerance, hMin, hMax } = getAsteroidParams();
+
+  const baseR = parseInt(hexColor.slice(1,3), 16);
+  const baseG = parseInt(hexColor.slice(3,5), 16);
+  const baseB = parseInt(hexColor.slice(5,7), 16);
+
+  const safeSMin  = Math.min(sizeMin, sizeMax);
+  const safeSMax  = Math.max(sizeMin, sizeMax);
+  const safeHMin  = Math.min(hMin, hMax);
+  const safeHMax  = Math.max(hMin, hMax);
+
+  const shadowsOn = document.getElementById('btn-shadows')
+                  ? document.getElementById('btn-shadows').checked : true;
+
+  for (let i = 0; i < count; i++) {
+    // Random size — uniform scale applied to shared BoxGeometry
+    const size  = safeSMin + Math.random() * (safeSMax - safeSMin);
+
+    // Colour with tolerance shift
+    const shift = (Math.random() * 2 - 1) * tolerance;
+    const r     = Math.round(Math.max(0, Math.min(255, baseR + shift * 255)));
+    const g     = Math.round(Math.max(0, Math.min(255, baseG + shift * 255)));
+    const b     = Math.round(Math.max(0, Math.min(255, baseB + shift * 255)));
+    const color = (r << 16) | (g << 8) | b;
+
+    const mat  = new THREE.MeshStandardMaterial({ color, roughness: 0.85, metalness: 0.05 });
+    const mesh = new THREE.Mesh(cubeGeo, mat);
+    mesh.scale.setScalar(size);
+    mesh.castShadow    = shadowsOn;
+    mesh.receiveShadow = shadowsOn;
+
+    // Keep clear of origin (player start pad)
+    let px, pz;
+    do {
+      px = (Math.random() - 0.5) * ASTEROID_SPREAD;
+      pz = (Math.random() - 0.5) * ASTEROID_SPREAD;
+    } while (Math.sqrt(px * px + pz * pz) < 25);
+    const py = safeHMin + Math.random() * (safeHMax - safeHMin);
+
+    mesh.position.set(px, py, pz);
+    mesh.userData.rotAxis  = new THREE.Vector3(
+      Math.random() - 0.5, Math.random() - 0.5, Math.random() - 0.5
+    ).normalize();
+    mesh.userData.rotSpeed = 0.002 + Math.random() * 0.008;
+
+    scene.add(mesh);
+    // collisionRadius = half side-length + 10% — sphere tightly enclosing each face, scaled up 10%
+    const collisionRadius = size * 0.5 * 1.1;
+    asteroids.push({ mesh, size, collisionRadius });
+  }
+}
+// Spawn stars and cubes on load using default panel values
+// (deferred via setTimeout so DOM is ready and panel inputs are accessible)
+window.addEventListener('DOMContentLoaded', () => {
+  spawnAsteroids();
+  // Stars
+  const starPos = new Float32Array(700 * 3);
+  for (let i = 0; i < 700; i++) {
+    const dist  = 300 + Math.random() * 200;
+    const theta = Math.random() * Math.PI * 2;
+    const phi   = Math.random() * Math.PI * 0.5;
+    starPos[i*3]   = dist * Math.sin(phi) * Math.cos(theta);
+    starPos[i*3+1] = dist * Math.cos(phi);
+    starPos[i*3+2] = dist * Math.sin(phi) * Math.sin(theta);
+  }
+  const starGeo = new THREE.BufferGeometry();
+  starGeo.setAttribute('position', new THREE.BufferAttribute(starPos, 3));
+  starPoints = new THREE.Points(starGeo, new THREE.PointsMaterial({ color: 0xffffff, size: 2.0 }));
+  scene.add(starPoints);
+  // Target object hidden by default
+  targetObj.visible = false;
+  bboxMesh.visible  = false;
+});
+
+// Asteroids spawned by user via Scene Objects panel (manual button)
+
+// ══════════════════════════════════════════════════════════════════════════════
+//  SPACE MINES
+// ══════════════════════════════════════════════════════════════════════════════
+const mines = []; // { mesh, type:'orange'|'red', radius, triggered:false }
+
+// Mine geometry builder — cube (2,2,2) + 3 bars
+function buildMineMesh(type) {
+  const color     = type === 'orange' ? 0xff8800 : 0xff1100;
+  const barColor  = type === 'orange' ? 0xcc6600 : 0xcc0000;
+  const mat    = new THREE.MeshStandardMaterial({ color, roughness: 0.6, metalness: 0.4 });
+  const barMat = new THREE.MeshStandardMaterial({ color: barColor, roughness: 0.5, metalness: 0.5 });
+
+  const group = new THREE.Group();
+
+  // Core cube 1×1×1
+  const cube = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), mat);
+  cube.castShadow = true;
+  group.add(cube);
+
+  // X bar: 1(cube) + 2*0.5(ext) = 2 total
+  const xBar = new THREE.Mesh(new THREE.BoxGeometry(2, 0.35, 0.35), barMat);
+  xBar.castShadow = true;
+  group.add(xBar);
+
+  // Y bar: 1(cube) + 2*1.0(ext) = 3 total (twice X & Z per spec)
+  const yBar = new THREE.Mesh(new THREE.BoxGeometry(0.35, 3, 0.35), barMat);
+  yBar.castShadow = true;
+  group.add(yBar);
+
+  // Z bar: 1(cube) + 2*0.5(ext) = 2 total
+  const zBar = new THREE.Mesh(new THREE.BoxGeometry(0.35, 0.35, 2), barMat);
+  zBar.castShadow = true;
+  group.add(zBar);
+
+  return group;
+}
+
+function getMineSafeRadius(pos) {
+  // Check against asteroids — don't spawn too close
+  for (const ast of asteroids) {
+    if (pos.distanceTo(ast.mesh.position) < ast.size * 1.5 + 4) return false;
+  }
+  return true;
+}
+
+function spawnMines() {
+  clearMines();
+  const orangeCount  = parseInt(document.getElementById('orange-mine-count').value) || 5;
+  const redCount     = parseInt(document.getElementById('red-mine-count').value) || 5;
+  const orangeActive = document.getElementById('orange-mine-active').checked;
+  const redActive    = document.getElementById('red-mine-active').checked;
+  const orangeRadius = parseFloat(document.getElementById('orange-mine-radius').value) || 10;
+  const redRadius    = parseFloat(document.getElementById('red-mine-radius').value) || 10;
+
+  const half   = bboxHalfW;
+  const height = bboxHeight;
+
+  function spawnType(count, type, radius) {
+    let placed = 0, tries = 0;
+    while (placed < count && tries < count * 30) {
+      tries++;
+      const pos = new THREE.Vector3(
+        (Math.random() - 0.5) * half * 2,
+        2 + Math.random() * (height - 4),
+        (Math.random() - 0.5) * half * 2
+      );
+      if (!getMineSafeRadius(pos)) continue;
+      const mesh = buildMineMesh(type);
+      mesh.position.copy(pos);
+      scene.add(mesh);
+      mines.push({ mesh, type, radius, triggered: false });
+      placed++;
+    }
+  }
+
+  if (orangeActive) spawnType(orangeCount, 'orange', orangeRadius);
+  if (redActive)    spawnType(redCount,    'red',    redRadius);
+}
+
+function clearMines() {
+  mines.forEach(m => {
+    scene.remove(m.mesh);
+    m.mesh.traverse(c => { if (c.isMesh) { c.geometry.dispose(); c.material.dispose(); } });
+  });
+  mines.length = 0;
+}
+
+// ── Camera shake state ────────────────────────────────────────────────────────
+let shakeTimer     = 0;
+let shakeDuration  = 0;
+let shakeAmplitude = 0;
+const _shakeOffset = new THREE.Vector3();
+
+function startCameraShake(duration, amplitude) {
+  shakeTimer    = duration;
+  shakeDuration = duration;
+  shakeAmplitude = amplitude;
+}
+
+function updateCameraShake(dt) {
+  if (shakeTimer <= 0) return;
+  shakeTimer -= dt;
+  const decay = shakeTimer / shakeDuration;
+  _shakeOffset.set(
+    (Math.random() - 0.5) * shakeAmplitude * decay,
+    (Math.random() - 0.5) * shakeAmplitude * decay,
+    (Math.random() - 0.5) * shakeAmplitude * decay
+  );
+  cameraRig.position.add(_shakeOffset);
+}
+
+// ── Mine warning state (orange) ───────────────────────────────────────────────
+let orangeWarnTimer   = 0;
+const ORANGE_WARN_DUR = 5.0;
+
+// ── Red mine fatal sequence state ─────────────────────────────────────────────
+let redMinePhase     = 0;   // 0=none 1=warning+shake 2=countdown 3=fatal explosion
+let redMineTimer     = 0;
+let redCountdownVal  = 5;
+const RED_WARN_DUR   = 5.0;
+const RED_COUNTDOWN  = 5.0;
+
+function triggerOrangeMine() {
+  playerHP = Math.max(0, playerHP - 50);
+  startCameraShake(0.5, 1.2);
+  showHitEffect(true);
+  orangeWarnTimer = ORANGE_WARN_DUR;
+  document.getElementById('mine-warn-overlay').style.display = 'block';
+  document.getElementById('mine-warn-text').style.display    = 'block';
+  document.getElementById('mine-warn-text').textContent      = '⚠ HULL DAMAGE — 50%';
+}
+
+function triggerRedMine() {
+  playerHP   = 0;
+  redMinePhase = 1;
+  redMineTimer = 0;
+  redCountdownVal = 5;
+  startCameraShake(1.2, 3.5);
+  showHitEffect(true);
+  document.getElementById('mine-warn-overlay').style.display = 'block';
+  document.getElementById('mine-warn-text').style.display    = 'block';
+  document.getElementById('mine-warn-text').textContent      = '⚠ CRITICAL HULL FAILURE';
+}
+
+function updateMineEffects(dt) {
+  // Orange warning countdown
+  if (orangeWarnTimer > 0) {
+    orangeWarnTimer -= dt;
+    if (orangeWarnTimer <= 0) {
+      document.getElementById('mine-warn-overlay').style.display = 'none';
+      document.getElementById('mine-warn-text').style.display    = 'none';
+    }
+  }
+
+  // Red mine fatal sequence
+  if (redMinePhase === 1) {
+    redMineTimer += dt;
+    if (redMineTimer >= RED_WARN_DUR) {
+      redMinePhase = 2;
+      redMineTimer = 0;
+      redCountdownVal = 5;
+      document.getElementById('mine-countdown').style.display = 'block';
+    }
+  } else if (redMinePhase === 2) {
+    redMineTimer += dt;
+    const newCount = 5 - Math.floor(redMineTimer);
+    if (newCount !== redCountdownVal) {
+      redCountdownVal = Math.max(newCount, 0);
+      document.getElementById('mine-countdown').textContent = redCountdownVal > 0 ? redCountdownVal : '';
+      if (redCountdownVal <= 0) {
+        // Fatal explosion
+        redMinePhase = 0;
+        document.getElementById('mine-warn-overlay').style.display = 'none';
+        document.getElementById('mine-warn-text').style.display    = 'none';
+        document.getElementById('mine-countdown').style.display    = 'none';
+        startCameraShake(0.8, 5.0);
+        triggerGameOver();
+      }
+    }
+  }
+}
+
+function checkMineCollisions() {
+  if (gameOver) return;
+  const pos = cameraRig.position;
+  for (let i = mines.length - 1; i >= 0; i--) {
+    const m = mines[i];
+    if (m.triggered) continue;
+    if (pos.distanceTo(m.mesh.position) < m.radius + COLLISION_RADIUS) {
+      m.triggered = true;
+      scene.remove(m.mesh);
+      m.mesh.traverse(c => { if (c.isMesh) { c.geometry.dispose(); c.material.dispose(); } });
+      mines.splice(i, 1);
+      if (m.type === 'orange') {
+        triggerOrangeMine();
+      } else {
+        triggerRedMine();
+      }
+      break; // one mine per frame
+    }
+  }
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+//  BOID — tetrahedron quarry (steers toward target_Obj, bounces in bbox)
+// ══════════════════════════════════════════════════════════════════════════════
+
+// ── Tetrahedron Boid geometry (from boids.html, tip along +Z after bake) ──
+const boidGeometry = new THREE.BufferGeometry();
+const boidVertices = new Float32Array([
+  // front face
+   0,    1,    0,
+  -0.5,  0,    0,
+   0.5,  0,    0,
+  // right face
+   0,    1,    0,
+   0.5,  0,    0,
+   0,    0, -0.5,
+  // left face
+   0,    1,    0,
+   0,    0, -0.5,
+  -0.5,  0,    0,
+  // bottom face
+  -0.5,  0,    0,
+   0,    0, -0.5,
+   0.5,  0,    0,
+]);
+boidGeometry.setAttribute('position', new THREE.BufferAttribute(boidVertices, 3));
+boidGeometry.computeVertexNormals();
+
+const boidMat  = new THREE.MeshLambertMaterial({ color: new THREE.Color(1, 0, 0) });
+const boidMesh = new THREE.Mesh(boidGeometry, boidMat);
+boidMesh.name  = 'Boid';
+boidMesh.castShadow = true;
+// Bake rotation (X=90°) + scale (2.5) permanently into geometry vertices
+boidMesh.rotation.x = THREE.MathUtils.degToRad(90);
+boidMesh.scale.set(2.5, 2.5, 2.5);
+boidMesh.updateMatrix();
+boidGeometry.applyMatrix4(boidMesh.matrix);
+boidGeometry.computeVertexNormals();
+// Reset transform to identity — size is now baked in
+boidMesh.rotation.set(0, 0, 0);
+boidMesh.scale.set(1, 1, 1);
+boidMesh.updateMatrix();
+boidMesh.position.set(50, 20, 30);
+scene.add(boidMesh);
+
+// Ring removed. Stub keeps beacon toggle handler from throwing.
+const boidRingMat = { opacity: 0 };
+
+// ══════════════════════════════════════════════════════════════════════════════
+//  PRINCESS — second tetrahedron boid, chases target_Obj, avoids asteroids
+// ══════════════════════════════════════════════════════════════════════════════
+const princessGeometry = new THREE.BufferGeometry();
+const princessVertices = new Float32Array([
+   0,    1,    0,  -0.5,  0,    0,   0.5,  0,    0,
+   0,    1,    0,   0.5,  0,    0,   0,    0, -0.5,
+   0,    1,    0,   0,    0, -0.5,  -0.5,  0,    0,
+  -0.5,  0,    0,   0,    0, -0.5,   0.5,  0,    0,
+]);
+princessGeometry.setAttribute('position', new THREE.BufferAttribute(princessVertices, 3));
+princessGeometry.computeVertexNormals();
+
+const princessMat  = new THREE.MeshLambertMaterial({ color: 0xffff00 });
+const princessMesh = new THREE.Mesh(princessGeometry, princessMat);
+princessMesh.name  = 'Princess';
+princessMesh.castShadow = true;
+// Bake X=90° rotation + scale 2.5 — same as boid
+princessMesh.rotation.x = THREE.MathUtils.degToRad(90);
+princessMesh.scale.set(2.5, 2.5, 2.5);
+princessMesh.updateMatrix();
+princessGeometry.applyMatrix4(princessMesh.matrix);
+princessGeometry.computeVertexNormals();
+princessMesh.rotation.set(0, 0, 0);
+princessMesh.scale.set(1, 1, 1);
+princessMesh.updateMatrix();
+princessMesh.position.set(-80, 30, -50);
+scene.add(princessMesh);
+
+// Princess state — independent of boid
+let princessVelocity = 9.75;
+let princessTurnRate = 0.5;
+
+// Reusable vectors — separate from boid's vectors
+const _pForward    = new THREE.Vector3();
+const _pTargetQuat = new THREE.Quaternion();
+const _pDeltaQuat  = new THREE.Quaternion();
+const _pAvoidDir   = new THREE.Vector3();
+const _pToAst      = new THREE.Vector3();
+const _pAwayAst    = new THREE.Vector3();
+
+function steerPrincess(dt) {
+  if (gameOver) return;
+
+  _pForward.set(0, 0, 1).applyQuaternion(princessMesh.quaternion).normalize();
+
+  // Asteroid avoidance — identical logic to boid
+  const AVOIDANCE_RADIUS_MULT  = 6.0;
+  const AVOIDANCE_TURN_DEG_SEC = 180.0;
+
+  _pAvoidDir.set(0, 0, 0);
+  let avoidWeight = 0;
+
+  for (const ast of asteroids) {
+    const avoidRadius = ast.collisionRadius * AVOIDANCE_RADIUS_MULT;
+    _pToAst.subVectors(princessMesh.position, ast.mesh.position);
+    const d = _pToAst.length();
+    if (d < avoidRadius && d > 0.001) {
+      const w = (avoidRadius - d) / avoidRadius;
+      _pAwayAst.copy(_pToAst).normalize();
+      _pAvoidDir.addScaledVector(_pAwayAst, w);
+      avoidWeight += w;
+    }
+  }
+  // Mine avoidance
+  for (const mine of mines) {
+    const mineAvoidR = mine.radius * AVOIDANCE_RADIUS_MULT;
+    _pToAst.subVectors(princessMesh.position, mine.mesh.position);
+    const d = _pToAst.length();
+    if (d < mineAvoidR && d > 0.001) {
+      const w = (mineAvoidR - d) / mineAvoidR;
+      _pAwayAst.copy(_pToAst).normalize();
+      _pAvoidDir.addScaledVector(_pAwayAst, w);
+      avoidWeight += w;
+    }
+  }
+
+  // Choose steer direction
+  let steerDir      = new THREE.Vector3();
+  let turnDegPerSec = princessTurnRate * 60;
+
+  if (avoidWeight > 0.001) {
+    _pAvoidDir.normalize();
+    const targetDir = new THREE.Vector3()
+      .subVectors(targetObj.position, princessMesh.position)
+      .normalize();
+    const avoidBlend = Math.min(avoidWeight, 1.0);
+    steerDir.addScaledVector(_pAvoidDir,  avoidBlend)
+            .addScaledVector(targetDir,   1.0 - avoidBlend)
+            .normalize();
+    turnDegPerSec = THREE.MathUtils.lerp(princessTurnRate * 60, AVOIDANCE_TURN_DEG_SEC, avoidBlend);
+  } else {
+    steerDir.subVectors(targetObj.position, princessMesh.position);
+    if (steerDir.length() < 0.5) return;
+    steerDir.normalize();
+  }
+
+  // Quaternion slerp
+  const dot = _pForward.dot(steerDir);
+  if (Math.abs(dot) < 0.9999) {
+    _pDeltaQuat.setFromUnitVectors(_pForward, steerDir);
+    _pTargetQuat.copy(_pDeltaQuat).multiply(princessMesh.quaternion);
+    const maxAngle = THREE.MathUtils.degToRad(turnDegPerSec * dt);
+    const angle    = princessMesh.quaternion.angleTo(_pTargetQuat);
+    const t        = angle < 0.0001 ? 1 : Math.min(maxAngle / angle, 1);
+    princessMesh.quaternion.slerp(_pTargetQuat, t);
+    const _pe = new THREE.Euler().setFromQuaternion(princessMesh.quaternion, 'YXZ');
+    _pe.z = 0;
+    princessMesh.quaternion.setFromEuler(_pe);
+  }
+
+  _pForward.set(0, 0, 1).applyQuaternion(princessMesh.quaternion);
+  princessMesh.position.addScaledVector(_pForward, princessVelocity * dt);
+}
+
+// ── target_Obj — red sphere that boid chases, bounces in bbox ──
+const targetObj = new THREE.Mesh(
+  new THREE.SphereGeometry(5.0, 12, 12),
+  new THREE.MeshBasicMaterial({ color: 0xff2200 })
+);
+targetObj.name = 'target_Obj';
+targetObj.position.set(0, 20, 0);
+// Random initial rotation
+const randX = THREE.MathUtils.degToRad((Math.random() * 90) - 45);
+const randY = THREE.MathUtils.degToRad(Math.random() * 360);
+targetObj.rotation.order = 'YXZ';
+targetObj.rotation.set(randX, randY, 0);
+targetObj.visible = true;
+targetObj.scale.set(0.25, 0.25, 0.25);
+scene.add(targetObj);
+
+// ── Bounding box for boid/target — wireframe, user-controlled ──
+let bboxHalfW = 100;  // half-width/depth
+let bboxHeight = 100;
+const bboxMesh = new THREE.Mesh(
+  new THREE.BoxGeometry(bboxHalfW * 2, bboxHeight, bboxHalfW * 2),
+  new THREE.MeshBasicMaterial({ color: 0x4488ff, wireframe: true, transparent: true, opacity: 0.15 })
+);
+bboxMesh.position.set(0, bboxHeight / 2, 0);
+bboxMesh.visible = true;  // visible by default
+scene.add(bboxMesh);
+
+// ── Boid steering state ──
+let boidVelocity  = 8.5;
+let boidTurnRate  = 0.5;
+let targetVelocity = 12.0;
+const TARGET_FPS   = 50;
+
+const _boidForward = new THREE.Vector3();
+const _toTarget    = new THREE.Vector3();
+const _targetQuat  = new THREE.Quaternion();
+const _deltaQuat   = new THREE.Quaternion();
+const _localZ      = new THREE.Vector3();
+const _normal      = new THREE.Vector3();
+
+// Reusable avoidance vectors — declared once, reused each frame
+const _avoidanceDir   = new THREE.Vector3();
+const _toAsteroid     = new THREE.Vector3();
+const _awayFromAst    = new THREE.Vector3();
+
+function steerBoidDt(dt) {
+  if (gameOver || gameWon) return;
+
+  _boidForward.set(0, 0, 1).applyQuaternion(boidMesh.quaternion).normalize();
+
+  // ── Asteroid avoidance ────────────────────────────────────────────────────
+  // Avoidance sphere = collisionRadius * 6 to give plenty of lead time.
+  // The boid uses a FAST dedicated turn rate for avoidance (up to 8°/frame)
+  // independent of the user-facing boidTurnRate slider.
+  const AVOIDANCE_RADIUS_MULT  = 6.0;
+  const AVOIDANCE_TURN_DEG_SEC = 180.0; // degrees/sec — fast enough to actually dodge
+
+  _avoidanceDir.set(0, 0, 0);
+  let avoidanceWeight = 0;
+
+  for (const ast of asteroids) {
+    const avoidRadius = ast.collisionRadius * AVOIDANCE_RADIUS_MULT;
+    _toAsteroid.subVectors(boidMesh.position, ast.mesh.position);
+    const d = _toAsteroid.length();
+    if (d < avoidRadius && d > 0.001) {
+      const w = (avoidRadius - d) / avoidRadius;
+      _awayFromAst.copy(_toAsteroid).normalize();
+      _avoidanceDir.addScaledVector(_awayFromAst, w);
+      avoidanceWeight += w;
+    }
+  }
+  // Mine avoidance — same logic as asteroids
+  for (const mine of mines) {
+    const mineAvoidR = mine.radius * AVOIDANCE_RADIUS_MULT;
+    _toAsteroid.subVectors(boidMesh.position, mine.mesh.position);
+    const d = _toAsteroid.length();
+    if (d < mineAvoidR && d > 0.001) {
+      const w = (mineAvoidR - d) / mineAvoidR;
+      _awayFromAst.copy(_toAsteroid).normalize();
+      _avoidanceDir.addScaledVector(_awayFromAst, w);
+      avoidanceWeight += w;
+    }
+  }
+
+  // ── Choose steer direction ────────────────────────────────────────────────
+  let steerDir       = new THREE.Vector3();
+  let turnDegPerSec  = boidTurnRate * 60; // normal target-seeking rate
+
+  if (avoidanceWeight > 0.001) {
+    _avoidanceDir.normalize();
+    const targetDir = new THREE.Vector3()
+      .subVectors(targetObj.position, boidMesh.position)
+      .normalize();
+    // Avoidance blends in — at weight≥1 fully avoid, below that mix with target
+    const avoidBlend = Math.min(avoidanceWeight, 1.0);
+    steerDir.addScaledVector(_avoidanceDir, avoidBlend)
+            .addScaledVector(targetDir,     1.0 - avoidBlend)
+            .normalize();
+    // Use fast avoidance turn rate, scaled by how urgently we need to dodge
+    turnDegPerSec = THREE.MathUtils.lerp(boidTurnRate * 60, AVOIDANCE_TURN_DEG_SEC, avoidBlend);
+  } else {
+    steerDir.subVectors(targetObj.position, boidMesh.position);
+    if (steerDir.length() < 0.5) return;
+    steerDir.normalize();
+  }
+
+  // ── Quaternion slerp toward steerDir ──────────────────────────────────────
+  const dot = _boidForward.dot(steerDir);
+  if (Math.abs(dot) < 0.9999) {
+    _deltaQuat.setFromUnitVectors(_boidForward, steerDir);
+    _targetQuat.copy(_deltaQuat).multiply(boidMesh.quaternion);
+
+    const maxAngle      = THREE.MathUtils.degToRad(turnDegPerSec * dt);
+    const angleToTarget = boidMesh.quaternion.angleTo(_targetQuat);
+    const t = angleToTarget < 0.0001 ? 1 : Math.min(maxAngle / angleToTarget, 1);
+    boidMesh.quaternion.slerp(_targetQuat, t);
+
+    // Zero local Z roll
+    const _euler = new THREE.Euler().setFromQuaternion(boidMesh.quaternion, 'YXZ');
+    _euler.z = 0;
+    boidMesh.quaternion.setFromEuler(_euler);
+  }
+
+  // Move forward along updated facing direction
+  _boidForward.set(0, 0, 1).applyQuaternion(boidMesh.quaternion);
+  boidMesh.position.addScaledVector(_boidForward, boidVelocity * dt);
+}
+
+function bounceTargetObj() {
+  const half  = bboxHalfW;
+  const floor = 0;
+  const ceil  = bboxHeight;
+  const r     = 0.25;
+  const pos   = targetObj.position;
+  _localZ.set(0, 0, 1).applyQuaternion(targetObj.quaternion);
+  let bounced = false;
+
+  if (pos.x + r > half)  { pos.x = half - r;   _normal.set(-1,0,0); _localZ.reflect(_normal).normalize(); bounced = true; }
+  else if (pos.x - r < -half) { pos.x = -half + r; _normal.set(1,0,0);  _localZ.reflect(_normal).normalize(); bounced = true; }
+  if (pos.z + r > half)  { pos.z = half - r;   _normal.set(0,0,-1); _localZ.reflect(_normal).normalize(); bounced = true; }
+  else if (pos.z - r < -half) { pos.z = -half + r; _normal.set(0,0,1);  _localZ.reflect(_normal).normalize(); bounced = true; }
+  if (pos.y - r < floor) { pos.y = floor + r;  _normal.set(0,1,0);  _localZ.reflect(_normal).normalize(); bounced = true; }
+  if (pos.y + r > ceil)  { pos.y = ceil - r;   _normal.set(0,-1,0); _localZ.reflect(_normal).normalize(); bounced = true; }
+
+  if (bounced) {
+    const up    = new THREE.Vector3(0, 1, 0);
+    const right = new THREE.Vector3().crossVectors(up, _localZ).normalize();
+    if (right.lengthSq() < 0.001) { up.set(1,0,0); right.crossVectors(up, _localZ).normalize(); }
+    const newUp = new THREE.Vector3().crossVectors(_localZ, right).normalize();
+    const m = new THREE.Matrix4().makeBasis(right, newUp, _localZ);
+    targetObj.quaternion.setFromRotationMatrix(m);
+  }
+}
+
+// boidState shim — keeps lock-on, missile hit, radar, and restart code working
+const boidState = {
+  get pos() { return boidMesh.position; }
+};
+
+function updateBoid(dt) {
+  if (gameOver) return;
+
+  if (!gameWon) {
+    // ── Normal: move target and steer boid ──────────────────────────────────
+    _localZ.set(0, 0, 1).applyQuaternion(targetObj.quaternion);
+    targetObj.position.addScaledVector(_localZ, targetVelocity * dt);
+    bounceTargetObj();
+    steerBoidDt(dt);
+    steerPrincess(dt);
+    return;
+  }
+
+  // Princess keeps flying during death sequence
+  steerPrincess(dt);
+
+  // ── Death sequence ────────────────────────────────────────────────────────
+  boidDeathTimer += dt;
+
+  if (boidDeathPhase === 1) {
+    // Scenario 1: particles — updated separately outside gamePaused guard
+
+    if (boidDeathTimer >= BOID_WIN_DELAY && !boidModalShown) {
+      boidModalShown = true;
+      showModal(true, `Direct hit - boid destroyed!\n\nMissiles fired: ${MAX_AMMO - ammo}\nHull integrity: ${playerHP}%`);
+    }
+
+
+
+
+  } else if (boidDeathPhase === 2) {
+    // Scenario 2: nose pitches to ground, trajectory follows current facing direction
+
+    if (boidDeathTimer < BOID_CRASH_DURATION) {
+      const t = Math.min(boidDeathTimer / BOID_CRASH_DURATION, 1.0);
+      // Delay rotation — only start turning nose down in the last 40% of crash duration
+      // so the boid flies forward normally first, then pitches at the end
+      const rotStart = 0.6; // don't start rotating until 60% through
+      const rotT     = Math.max(0, (t - rotStart) / (1.0 - rotStart));
+      const easedT   = rotT * rotT; // ease-in within that window
+      if (easedT > 0) {
+        boidMesh.quaternion.slerpQuaternions(_boidCrashQuat, _boidCrashTargetQuat, easedT);
+      }
+      // Slight out-of-control roll spin — capped at 30°
+      const MAX_CRASH_ROLL = THREE.MathUtils.degToRad(30);
+      const _e2 = new THREE.Euler().setFromQuaternion(boidMesh.quaternion, 'YXZ');
+      if (Math.abs(_e2.z) < MAX_CRASH_ROLL) {
+        const spinQ = new THREE.Quaternion().setFromAxisAngle(
+          new THREE.Vector3(0, 0, 1), 0.002
+        );
+        boidMesh.quaternion.multiply(spinQ);
+      }
+    }
+
+    // Emit smoke cubes continuously until boid reaches y < 5
+    if (boidMesh.visible && boidMesh.position.y >= 5) {
+      smokeTimer += dt;
+      if (smokeTimer >= nextSmokeInterval) {
+        smokeTimer = 0;
+        nextSmokeInterval = 0.08 + Math.random() * 0.09;
+        emitSmokeCube(boidMesh.position.clone());
+      }
+    }
+
+    // Update hit particles and smoke trail each frame
+    updateHitParticles(dt);
+    updateSmokeTrail(dt);
+
+    // Travel direction lerps from original forward → target crash direction over crash duration
+    // This means the boid starts flying in its exact current direction and curves down gradually
+    const travelT   = Math.min(boidDeathTimer / BOID_CRASH_DURATION, 1.0);
+    const easedTrav = travelT * travelT; // ease-in so curve starts slowly
+    const travelDir = new THREE.Vector3()
+      .lerpVectors(_boidCrashForward, _boidCrashTargetDir, easedTrav)
+      .normalize();
+    boidMesh.position.addScaledVector(travelDir, boidVelocity * dt);
+
+    // Detect ground crash
+    if (boidMesh.visible && boidMesh.position.y < 1.0) {
+      boidMesh.visible = false;
+      spawnBoidExplosion(boidMesh.position.clone(), true);
+      playGroundImpact();
+      boidDeathPhase = 3;
+      boidDeathTimer = 0;
+    }
+
+  } else if (boidDeathPhase === 3) {
+    // Ground explosion — continue smoke/hit particle lifecycle after impact
+    updateHitParticles(dt);
+    updateSmokeTrail(dt);
+    if (boidDeathTimer >= BOID_WIN_DELAY && !boidModalShown) {
+      boidModalShown = true;
+      showModal(true, `Critical hit - boid crashes!\n\nMissiles fired: ${MAX_AMMO - ammo}\nHull integrity: ${playerHP}%`);
+    }
+
+
+
+
+  }
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+//  MISSILES
+// ══════════════════════════════════════════════════════════════════════════════
+const missileMat = new THREE.MeshBasicMaterial({ color: 0xf0e060 });
+const missileGeo = new THREE.CylinderGeometry(0.08, 0.08, 0.8, 6);
+
+let _missileSide = 1; // alternates -1 / +1
+
+function fireMissile() {
+  if (ammo <= 0 || gameOver || gameWon) return;
+  ammo--;
+  updateAmmoUI();
+
+  const dir = new THREE.Vector3();
+  cameraRig.getWorldDirection(dir);
+  // Flight model moves with dir.x * -speed, so true forward is -dir
+  const forward = dir.clone().negate();
+
+  // Camera local right axis — cross of world-up and forward
+  const right = new THREE.Vector3().crossVectors(new THREE.Vector3(0,1,0), forward).normalize();
+
+  const mesh = new THREE.Mesh(missileGeo, missileMat);
+  mesh.scale.setScalar(0.5);
+  mesh.position.copy(cameraRig.position)
+    .addScaledVector(forward, 2)
+    .addScaledVector(new THREE.Vector3(0, -1, 0), 0.5)  // Y = -0.5
+    .addScaledVector(right, _missileSide * 0.5);               // X = alternate -0.5 / +0.5
+  mesh.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0), forward);
+  scene.add(mesh);
+
+  _missileSide *= -1; // flip for next shot
+
+  missiles.push({
+    mesh,
+    vel: forward.clone().multiplyScalar(MISSILE_SPEED),
+    life: MISSILE_LIFE,
+    trail: [],
+  });
+}
+
+// Simple trail geo pool
+const trailMat = new THREE.LineBasicMaterial({ color: 0xffcc44, transparent: true, opacity: 0.6 });
+
+// ── Read debris panel settings ───────────────────────────────────────────────
+function getDebrisParams() {
+  return {
+    active:    document.getElementById('btn-debris')       ? document.getElementById('btn-debris').checked         : true,
+    countMin:  document.getElementById('debris-count-min') ? parseInt(document.getElementById('debris-count-min').value)   : 2,
+    countMax:  document.getElementById('debris-count-max') ? parseInt(document.getElementById('debris-count-max').value)   : 6,
+    sizeMin:   document.getElementById('debris-size-min')  ? parseFloat(document.getElementById('debris-size-min').value)  : 0.1,
+    sizeMax:   document.getElementById('debris-size-max')  ? parseFloat(document.getElementById('debris-size-max').value)  : 0.5,
+    lifeMin:   document.getElementById('debris-life-min')  ? parseFloat(document.getElementById('debris-life-min').value)  : 0.5,
+    lifeMax:   document.getElementById('debris-life-max')  ? parseFloat(document.getElementById('debris-life-max').value)  : 5.0,
+    speedMin:  document.getElementById('debris-speed-min') ? parseFloat(document.getElementById('debris-speed-min').value) : 3.0,
+    speedMax:  document.getElementById('debris-speed-max') ? parseFloat(document.getElementById('debris-speed-max').value) : 5.0,
+    dampen:    document.getElementById('debris-dampen')    ? parseFloat(document.getElementById('debris-dampen').value)    : 0.01,
+  };
+}
+
+// ── Spawn debris at impact point, flying away from missile direction ───────────
+function spawnDebris(impactPos, missileDir, asteroidColor) {
+  const p = getDebrisParams();
+  if (!p.active) return;
+
+  const safeCountMin = Math.min(p.countMin, p.countMax);
+  const safeCountMax = Math.max(p.countMin, p.countMax);
+  const count = safeCountMin + Math.floor(Math.random() * (safeCountMax - safeCountMin + 1));
+
+  // Opposite of missile travel direction = impact normal
+  const awayDir = missileDir.clone().negate().normalize();
+
+  for (let i = 0; i < count; i++) {
+    const size = p.sizeMin + Math.random() * (p.sizeMax - p.sizeMin);
+    const mat  = new THREE.MeshStandardMaterial({ color: asteroidColor, roughness: 0.9, metalness: 0.05 });
+    const mesh = new THREE.Mesh(debrisGeo, mat);
+    mesh.scale.setScalar(size);
+    mesh.position.copy(impactPos);
+    // Random rotation
+    mesh.rotation.set(
+      Math.random() * Math.PI * 2,
+      Math.random() * Math.PI * 2,
+      Math.random() * Math.PI * 2
+    );
+
+    // Velocity: cone spread around the away direction (±60°)
+    const speed = p.speedMin + Math.random() * (p.speedMax - p.speedMin);
+    const spread = 1.0; // cone width
+    const vel = new THREE.Vector3(
+      awayDir.x + (Math.random() - 0.5) * spread,
+      awayDir.y + (Math.random() - 0.5) * spread,
+      awayDir.z + (Math.random() - 0.5) * spread
+    ).normalize().multiplyScalar(speed);
+
+    const life = p.lifeMin + Math.random() * (p.lifeMax - p.lifeMin);
+
+    // Spin axes
+    const spinAxis = new THREE.Vector3(Math.random()-0.5, Math.random()-0.5, Math.random()-0.5).normalize();
+    const spinSpeed = 0.05 + Math.random() * 0.15;
+
+    scene.add(mesh);
+    debrisParticles.push({ mesh, vel, life, maxLife: life, spinAxis, spinSpeed, dampen: p.dampen });
+  }
+}
+
+// ── Update debris each frame ──────────────────────────────────────────────────
+function updateDebris(dt) {
+  for (let i = debrisParticles.length - 1; i >= 0; i--) {
+    const d = debrisParticles[i];
+    d.life -= dt;
+    if (d.life <= 0) {
+      scene.remove(d.mesh);
+      d.mesh.material.dispose();
+      debrisParticles.splice(i, 1);
+      continue;
+    }
+    // Move
+    d.mesh.position.addScaledVector(d.vel, dt);
+    // Dampen velocity (0 = no drag, 0.99 = near-instant stop)
+    const drag = 1.0 - d.dampen;
+    d.vel.multiplyScalar(Math.pow(drag, dt * 60));
+    // Spin
+    d.mesh.rotateOnAxis(d.spinAxis, d.spinSpeed);
+  }
+}
+
+function updateMissiles(dt) {
+  for (let i = missiles.length - 1; i >= 0; i--) {
+    const m = missiles[i];
+    m.life -= dt;
+    if (m.life <= 0) {
+      scene.remove(m.mesh);
+      if (m.trailLine) scene.remove(m.trailLine);
+      missiles.splice(i, 1);
+      continue;
+    }
+    m.mesh.position.addScaledVector(m.vel, dt);
+
+    // Check asteroid hit
+    let hitAsteroid = false;
+    for (const ast of asteroids) {
+      const dAst = m.mesh.position.distanceTo(ast.mesh.position);
+      if (dAst < ast.collisionRadius) {
+        // Spawn debris using asteroid colour and missile direction
+        const color = ast.mesh.material.color.getHex();
+        spawnDebris(m.mesh.position.clone(), m.vel.clone().normalize(), color);
+        // Remove missile
+        scene.remove(m.mesh);
+        if (m.trailLine) scene.remove(m.trailLine);
+        missiles.splice(i, 1);
+        hitAsteroid = true;
+        break;
+      }
+    }
+    if (hitAsteroid) continue;
+
+    // Check boid hit
+    const distToBoid = m.mesh.position.distanceTo(boidState.pos);
+    if (distToBoid < 1.0 && !gameWon) {
+      boidHP -= MISSILE_DAMAGE;
+      boidHP  = Math.max(0, boidHP);
+      showHitEffect(false);
+      scene.remove(m.mesh);
+      if (m.trailLine) scene.remove(m.trailLine);
+      missiles.splice(i, 1);
+      if (boidHP <= 0) triggerWin();
+      continue;
+    }
+  }
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+//  COLLISION DETECTION
+// ══════════════════════════════════════════════════════════════════════════════
+function checkPlayerCollisions() {
+  if (damageCooldown > 0 || gameOver || gameWon) return;
+
+  const pos = cameraRig.position;
+
+  for (const ast of asteroids) {
+    const d = pos.distanceTo(ast.mesh.position);
+    // Use the per-cube collisionRadius derived from its actual scale
+    const hitRadius = ast.collisionRadius + COLLISION_RADIUS;
+    if (d < hitRadius) {
+      takeDamage(DAMAGE_ASTEROID);
+      // Separate positions immediately so player isn't inside the asteroid
+      const away = new THREE.Vector3().subVectors(pos, ast.mesh.position).normalize();
+      cameraRig.position.addScaledVector(away, hitRadius - d + 1.0);
+      // Set a bounce impulse — decays over ~0.4s, strong enough to overcome thrust
+      bounceVel.copy(away).multiplyScalar(0.35);
+      break;
+    }
+  }
+}
+
+function takeDamage(amount) {
+  playerHP -= amount;
+  playerHP  = Math.max(0, playerHP);
+  damageCooldown = DAMAGE_COOLDOWN;
+  showHitEffect(true);
+  document.getElementById('warn-overlay').style.display = 'block';
+  setTimeout(() => { document.getElementById('warn-overlay').style.display = 'none'; }, 300);
+  if (playerHP <= 0) triggerGameOver();
+}
+
+function showHitEffect(isPlayer) {
+  if (isPlayer) {
+    const el = document.getElementById('hit-flash');
+    el.style.display = 'block';
+    el.style.animation = 'none';
+    el.offsetHeight; // reflow
+    el.style.animation = 'hitfade 0.35s ease-out forwards';
+    setTimeout(() => el.style.display = 'none', 360);
+  }
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+//  LOCK-ON CHECK
+// ══════════════════════════════════════════════════════════════════════════════
+let lockOn = false;
+let lockDist = Infinity;
+
+function updateLock() {
+  const pos = cameraRig.position;
+  lockDist = pos.distanceTo(boidState.pos);
+  lockOn   = lockDist < LOCK_RANGE;
+
+  // Cone check — boid must be roughly ahead of player
+  // Flight model moves in -getWorldDirection(), so negate to get true forward
+  if (lockOn) {
+    const forward = new THREE.Vector3();
+    cameraRig.getWorldDirection(forward);
+    forward.negate(); // true forward matches flight model: dir * -speed
+    const toBoid = new THREE.Vector3().subVectors(boidState.pos, pos).normalize();
+    lockOn = forward.dot(toBoid) > 0.3; // within ~72° cone ahead
+  }
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+//  WIN / LOSE
+// ══════════════════════════════════════════════════════════════════════════════
+function triggerGameOver() {
+  gameOver = true;
+  showModal(false, `Your craft sustained critical damage.\nHull integrity: 0%\n\nScore: ${MAX_AMMO - ammo} missiles fired.`);
+}
+
+// ── Boid explosion — 8 tetrahedra flying outward ──────────────────────────────
+// ── Scenario 2 hit burst — small red omni particles ─────────────────────────
+function spawnHitParticles(pos) {
+  const count = 3 + Math.floor(Math.random() * 4); // 3-6
+  for (let i = 0; i < count; i++) {
+    const size = 0.08 + Math.random() * 0.12; // 0.08-0.20
+    const geo  = boidGeometry.clone();         // reuse boid tet geometry
+    const mat  = new THREE.MeshLambertMaterial({ color: 0xff1a00 });
+    const mesh = new THREE.Mesh(geo, mat);
+    mesh.scale.setScalar(size);
+    mesh.position.copy(pos);
+    // Omni velocity
+    const speed = 3 + Math.random() * 6;
+    const vel = new THREE.Vector3(
+      Math.random() - 0.5,
+      Math.random() - 0.5,
+      Math.random() - 0.5
+    ).normalize().multiplyScalar(speed);
+    const spinAxis  = new THREE.Vector3(Math.random()-0.5,Math.random()-0.5,Math.random()-0.5).normalize();
+    const spinSpeed = 0.04 + Math.random() * 0.10;
+    const life      = 1.0 + Math.random() * 1.0; // 1-2 seconds
+    scene.add(mesh);
+    hitParticles.push({ mesh, vel, spinAxis, spinSpeed, life });
+  }
+}
+
+function updateHitParticles(dt) {
+  for (let i = hitParticles.length - 1; i >= 0; i--) {
+    const p = hitParticles[i];
+    p.life -= dt;
+    if (p.life <= 0) {
+      scene.remove(p.mesh);
+      p.mesh.material.dispose();
+      p.mesh.geometry.dispose();
+      hitParticles.splice(i, 1);
+      continue;
+    }
+    p.mesh.position.addScaledVector(p.vel, dt);
+    p.mesh.rotateOnAxis(p.spinAxis, p.spinSpeed);
+  }
+}
+
+// ── Smoke trail — grey cubes emitted along crash path ────────────────────────
+const _smokeCubeGeo = new THREE.BoxGeometry(1, 1, 1); // shared geometry
+
+function emitSmokeCube(pos) {
+  // Random grey 125-180
+  const g   = Math.floor(100 + Math.random() * 60);
+  const col = (g << 16) | (g << 8) | g;
+  const mat = new THREE.MeshStandardMaterial({ color: col, roughness: 0.9, metalness: 0.0 });
+  const mesh = new THREE.Mesh(_smokeCubeGeo, mat);
+  mesh.position.copy(pos);
+  // Random slow spin axis
+  const spinAxis  = new THREE.Vector3(Math.random()-0.5,Math.random()-0.5,Math.random()-0.5).normalize();
+  const spinSpeed = 0.005 + Math.random() * 0.015; // slow rotation
+  // Target peak scale 0.5-1.0
+  const peakScale = 0.5 + Math.random() * 0.5;
+  scene.add(mesh);
+  smokeTrail.push({ mesh, spinAxis, spinSpeed, peakScale, age: 0, life: 1.0 });
+}
+
+function updateSmokeTrail(dt) {
+  for (let i = smokeTrail.length - 1; i >= 0; i--) {
+    const s = smokeTrail[i];
+    s.age  += dt;
+    if (s.age >= s.life) {
+      scene.remove(s.mesh);
+      s.mesh.material.dispose();
+      smokeTrail.splice(i, 1);
+      continue;
+    }
+    // Linear scale-up over 1 second then hold at peak until death
+    const scaleFrac = Math.min(s.age / s.life, 1.0);
+    const sc = s.peakScale * scaleFrac;
+    s.mesh.scale.setScalar(sc);
+    s.mesh.rotateOnAxis(s.spinAxis, s.spinSpeed);
+  }
+}
+
+function spawnBoidExplosion(pos, upward = false) {
+  // Clear any previous tet particles
+  boidTetParticles.forEach(p => { scene.remove(p.mesh); p.mesh.material.dispose(); });
+  boidTetParticles.length = 0;
+  hitParticles.forEach(p => { scene.remove(p.mesh); p.mesh.material.dispose(); p.mesh.geometry.dispose(); });
+  hitParticles.length = 0;
+  smokeTrail.forEach(s => { scene.remove(s.mesh); s.mesh.material.dispose(); });
+  smokeTrail.length = 0;
+  smokeTimer = 0;
+
+  for (let i = 0; i < 8; i++) {
+    // Clone baked boid geometry
+    const geo  = boidGeometry.clone();
+    const col  = new THREE.Color().setHSL(0.08 + Math.random() * 0.08, 1.0, 0.5 + Math.random() * 0.2);
+    const mat  = new THREE.MeshLambertMaterial({ color: col });
+    const mesh = new THREE.Mesh(geo, mat);
+    // Random scale 0.15 – 0.45 (smaller than boid)
+    const s = 0.15 + Math.random() * 0.30;
+    mesh.scale.setScalar(s);
+    mesh.position.copy(pos);
+    // Velocity direction
+    const speed = 4 + Math.random() * 8;
+    let vel;
+    if (upward) {
+      // All particles fire upward — random spread in XZ, always +Y
+      vel = new THREE.Vector3(
+        (Math.random() - 0.5) * 0.6,
+        0.4 + Math.random() * 0.6,  // always positive Y
+        (Math.random() - 0.5) * 0.6
+      ).normalize().multiplyScalar(speed);
+    } else {
+      // Omni-directional for mid-air explosion
+      vel = new THREE.Vector3(
+        (Math.random() - 0.5),
+        (Math.random() - 0.5),
+        (Math.random() - 0.5)
+      ).normalize().multiplyScalar(speed);
+    }
+    // Random spin axis and speed
+    const spinAxis  = new THREE.Vector3(Math.random()-0.5, Math.random()-0.5, Math.random()-0.5).normalize();
+    const spinSpeed = 0.04 + Math.random() * 0.12;
+    const life      = 2.0 + Math.random() * 3.0; // 2–5 seconds
+    scene.add(mesh);
+    boidTetParticles.push({ mesh, vel, spinAxis, spinSpeed, life });
+  }
+}
+
+// ── Update boid tet explosion particles each frame ────────────────────────────
+function updateBoidExplosion(dt) {
+  for (let i = boidTetParticles.length - 1; i >= 0; i--) {
+    const p = boidTetParticles[i];
+    p.life -= dt;
+    if (p.life <= 0) {
+      scene.remove(p.mesh);
+      p.mesh.material.dispose();
+      boidTetParticles.splice(i, 1);
+      continue;
+    }
+    p.mesh.position.addScaledVector(p.vel, dt);
+    p.mesh.rotateOnAxis(p.spinAxis, p.spinSpeed);
+  }
+}
+
+function triggerWin() {
+  gameWon = true;
+  boidDeathTimer = 0;
+  // 50/50 scenario selection
+  if (Math.random() < 0.3) {
+    // ── Scenario 1: Instant explosion ──
+    boidDeathPhase = 1;
+    boidMesh.visible = false;
+    spawnBoidExplosion(boidMesh.position.clone());
+    playGroundImpact();
+  } else {
+    // ── Scenario 2: Continue forward then crash ──
+    boidDeathPhase  = 2;
+    boidCrashPitch  = 0;
+    smokeTimer = 0;
+    nextSmokeInterval = 0.08 + Math.random() * 0.09;
+    spawnHitParticles(boidMesh.position.clone());
+    // Capture rotation and world-space forward at moment of death
+    _boidCrashQuat.copy(boidMesh.quaternion);
+    // _boidCrashForward = actual world-space travel direction right now
+    _boidCrashForward.set(0, 0, 1).applyQuaternion(_boidCrashQuat).normalize();
+
+    // Build target travel direction — same horizontal bearing, pitched down 45°-80°
+    const crashPitchDeg = 45 + Math.random() * 35; // 45°-80° below horizontal
+    const crashPitchRad = THREE.MathUtils.degToRad(crashPitchDeg);
+    const hFwd = new THREE.Vector3(_boidCrashForward.x, 0, _boidCrashForward.z).normalize();
+    if (hFwd.lengthSq() < 0.01) hFwd.set(0, 0, -1);
+    // _boidCrashTargetDir stored in _boidCrashForward's clone — reuse existing vector
+    // We need a 4th vector: store target dir in _boidCrashTargetQuat's axis temporarily
+    // Actually store as a plain Vector3 — declare it in state
+    _boidCrashTargetDir.set(
+      hFwd.x * Math.cos(crashPitchRad),
+      -Math.sin(crashPitchRad),
+      hFwd.z * Math.cos(crashPitchRad)
+    ).normalize();
+
+    // Visual rotation target: boid nose points along _boidCrashTargetDir
+    const localFwd = new THREE.Vector3(0, 0, 1).applyQuaternion(_boidCrashQuat).normalize();
+    if (localFwd.distanceTo(_boidCrashTargetDir) > 0.001) {
+      _boidCrashTargetQuat.setFromUnitVectors(localFwd, _boidCrashTargetDir)
+                          .multiply(_boidCrashQuat);
+    } else {
+      _boidCrashTargetQuat.copy(_boidCrashQuat);
+    }
+  }
+}
+
+function showModal(win, msg) {
+  if (!win) {
+    gamePaused = true;
+  } // only pause on game-over, not win (player flies during explosion)
+  const box   = document.getElementById('modal-box');
+  const title = document.getElementById('modal-title');
+  const msgEl = document.getElementById('modal-msg');
+  title.textContent = win ? '✓ Target Destroyed' : '✕ Mission Failed';
+  title.className   = win ? 'win' : '';
+  msgEl.textContent = msg;
+  msgEl.className   = win ? 'win' : '';
+  box.classList.add('active');
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+//  HUD CANVAS  (must be declared before resizeAll so positionHudCanvas works)
+// ══════════════════════════════════════════════════════════════════════════════
+const HUD_SIZE = 400;
+const hudCanvas = document.getElementById('hud-canvas');
+const hudCtx    = hudCanvas.getContext('2d');
+hudCanvas.width  = HUD_SIZE;
+hudCanvas.height = HUD_SIZE;
+
+function positionHudCanvas() {
+  const winW = window.innerWidth;
+  const winH = window.innerHeight;
+  hudCanvas.style.left = (winW / 2 - HUD_SIZE / 2) + 'px';
+  hudCanvas.style.top  = (winH / 2 - HUD_SIZE / 2 - 20) + 'px';
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+//  RESIZE
+// ══════════════════════════════════════════════════════════════════════════════
+const viewportEl = document.getElementById('viewport-area');
+function resizeAll() {
+  const vp = viewportEl.getBoundingClientRect();
+  if (vp.width > 0) {
+    renderer.setSize(vp.width, vp.height);
+    camera.aspect = vp.width / vp.height;
+    camera.updateProjectionMatrix();
+    orbitCamera.aspect = vp.width / vp.height;
+    orbitCamera.updateProjectionMatrix();
+  }
+  positionHudCanvas();
+}
+window.addEventListener('resize', resizeAll);
+resizeAll();
+
+// ══════════════════════════════════════════════════════════════════════════════
+//  INPUT
+// ══════════════════════════════════════════════════════════════════════════════
+viewportEl.addEventListener('mousemove', e => {
+  if (gamePaused || activeCamera !== 1) return;
+  const r = viewportEl.getBoundingClientRect();
+  mouse.x =  ((e.clientX - r.left) / r.width)  * 2 - 1;
+  mouse.y = -((e.clientY - r.top)  / r.height) * 2 + 1;
+});
+
+viewportEl.addEventListener('click', () => {
+  if (gameOver || gameWon) return;
+  if (activeCamera !== 1) return; // orbit cam handles its own mouse
+  if (brakesOn) { brakesOn = false; flightPhase = 1; return; }
+  // Fire missile on left mouse click — only when airborne for at least 5 seconds
+  if (flightPhase === 3 && airborneTime >= 5000) {
+    fireMissile();
+  }
+});
+
+document.addEventListener('keydown', e => {
+  if (e.key === '1') { setActiveCamera(1); e.preventDefault(); }
+  if (e.key === '2') { setActiveCamera(2); e.preventDefault(); }
+  if (e.key === 'e' || e.key === 'E') {
+    document.getElementById('setup-panel').classList.toggle('hidden');
+    setTimeout(resizeAll, 50);
+    e.preventDefault();
+  }
+  if (e.key === 'i' || e.key === 'I') {
+    document.getElementById('control-panel').classList.toggle('hidden');
+    setTimeout(resizeAll, 50);
+    e.preventDefault();
+  }
+  if (!gamePaused) {
+    if (e.key === 'w' || e.key === 'W') { thrust = Math.min(1.0, thrust + 0.05); e.preventDefault(); }
+    if (e.key === 's' || e.key === 'S') { thrust = Math.max(0,   thrust - 0.05); e.preventDefault(); }
+  }
+  if (gameOver || gameWon) return;
+
+  if (e.key === ' ') {
+    if (brakesOn) { brakesOn = false; flightPhase = 1; }
+    else if (flightPhase < 3) { brakesOn = true; speed = 0; thrust = 0; targetSpeed = 0; flightPhase = 0; }
+    e.preventDefault();
+  }
+  if (e.key === 'g' || e.key === 'G') { gearDown = !gearDown; }
+  if (e.key === 'f' || e.key === 'F') { if (!audioReady) initAudio(); boidHP = -1; if (boidHP <= 0) triggerWin(); }
+  if (e.key === 'Escape') {
+    if (gameOver || gameWon) return;
+    gamePaused = !gamePaused;
+    if (gamePaused) { mouse.x = 0; mouse.y = 0; }
+  }
+});
+
+document.getElementById('btn-restart').addEventListener('click', restartGame);
+document.getElementById('modal-restart').addEventListener('click', restartGame);
+document.getElementById('btn-hud').addEventListener('change', e => { hudActive = e.target.checked; });
+document.getElementById('btn-beacon').addEventListener('change', e => { beaconActive = e.target.checked; boidRingMat.opacity = e.target.checked ? 0.35 : 0; });
+
+function restartGame() {
+  // Reset player
+  playerHP = MAX_HP; ammo = MAX_AMMO; boidHP = MAX_HP;
+  thrust = 0.7; targetSpeed = 0.35 * 0.7; speed = targetSpeed;
+  brakesOn = false; gearDown = false; gamePaused = false;
+  gameOver = false; gameWon = false;
+  flightPhase = 3; hasBeenAirborne = true; airborneTime = 5001;
+  damageCooldown = 0;
+  bounceVel.set(0, 0, 0);
+  camYaw.val = 0; camPitch.val = 0; camRoll.val = 0; pitchEasedTarget = 0;
+  cameraRig.position.set(30, 70, 300);
+  cameraRig.rotation.set(0, 0, 0);
+  mouse.x = 0; mouse.y = 0;
+
+  // Reset boid
+  boidHP = MAX_HP;
+  boidDeathPhase = 0; boidDeathTimer = 0; boidCrashPitch = 0; boidModalShown = false;
+  _boidCrashForward.set(0,0,1); _boidCrashTargetDir.set(0,0,1);
+  boidMesh.visible = true;
+  boidMesh.position.set(50, 20, 30);
+  boidMesh.rotation.set(0, 0, 0);
+  // Reset Princess
+  princessMesh.position.set(-80, 30, -50);
+  princessMesh.rotation.set(0, 0, 0);
+  princessMesh.quaternion.identity();
+  const _pc = document.getElementById('princess-color');
+  princessMat.color.set(_pc ? _pc.value : '#ffff00');
+  // Restore boid colour from picker
+  const _bc = document.getElementById('boid-color');
+  boidMat.color.set(_bc ? _bc.value : '#ff0000');
+  // Clear explosion particles
+  boidTetParticles.forEach(p => { scene.remove(p.mesh); p.mesh.material.dispose(); });
+  boidTetParticles.length = 0;
+  // Reset target_Obj
+  targetObj.position.set(0, 20, 0);
+  const rx2 = THREE.MathUtils.degToRad((Math.random() * 90) - 45);
+  const ry2 = THREE.MathUtils.degToRad(Math.random() * 360);
+  targetObj.rotation.set(rx2, ry2, 0);
+
+  // Remove missiles
+  missiles.forEach(m => { scene.remove(m.mesh); if (m.trailLine) scene.remove(m.trailLine); });
+  missiles.length = 0;
+
+  // Clear mines and reset mine state
+  clearMines();
+  redMinePhase = 0; redMineTimer = 0; orangeWarnTimer = 0;
+  shakeTimer = 0;
+  document.getElementById('mine-warn-overlay').style.display = 'none';
+  document.getElementById('mine-warn-text').style.display    = 'none';
+  document.getElementById('mine-countdown').style.display    = 'none';
+
+  // Clear debris
+  debrisParticles.forEach(d => { scene.remove(d.mesh); d.mesh.material.dispose(); });
+  debrisParticles.length = 0;
+
+  // Asteroids not auto-respawned — user respawns via Scene Objects panel
+
+  // Close modal
+  document.getElementById('modal-box').classList.remove('active');
+  document.getElementById('warn-overlay').style.display = 'none';
+}
+
+positionHudCanvas();
+
+// Attitude canvas
+const attCtx = document.getElementById('attitude-canvas').getContext('2d');
+function drawAttitude(pitch, roll) {
+  const w=80,h=80,cx=40,cy=40,r=36;
+  attCtx.clearRect(0,0,w,h);
+  attCtx.save(); attCtx.beginPath(); attCtx.arc(cx,cy,r,0,Math.PI*2); attCtx.clip();
+  attCtx.save(); attCtx.translate(cx,cy); attCtx.rotate(roll);
+  const ho = Math.sin(pitch)*r*1.5;
+  attCtx.fillStyle='#1a3060'; attCtx.fillRect(-r,-r,r*2,r+ho);
+  attCtx.fillStyle='#2a3a1a'; attCtx.fillRect(-r,-r+ho+r,r*2,r*2);
+  attCtx.strokeStyle='rgba(200,240,96,0.6)'; attCtx.lineWidth=1.5;
+  attCtx.beginPath(); attCtx.moveTo(-r,ho); attCtx.lineTo(r,ho); attCtx.stroke();
+  attCtx.restore();
+  attCtx.strokeStyle='rgba(255,255,255,0.12)'; attCtx.lineWidth=1;
+  attCtx.beginPath(); attCtx.arc(cx,cy,r,0,Math.PI*2); attCtx.stroke();
+  attCtx.strokeStyle='rgba(255,255,255,0.65)'; attCtx.lineWidth=1.5;
+  attCtx.beginPath();
+  attCtx.moveTo(cx-18,cy); attCtx.lineTo(cx-7,cy);
+  attCtx.moveTo(cx+7,cy);  attCtx.lineTo(cx+18,cy); attCtx.stroke();
+  attCtx.beginPath(); attCtx.arc(cx,cy,2.5,0,Math.PI*2);
+  attCtx.fillStyle='#c8f060'; attCtx.fill();
+  attCtx.restore();
+}
+
+// Radar canvas
+const radarCanvas = document.getElementById('radar-canvas');
+const radarCtx    = radarCanvas.getContext('2d');
+const RADAR_R     = 92;   // px radius of radar display
+const RADAR_RANGE = 200;  // world units mapped to radar
+function drawRadar(playerPos, heading) {
+  const w = radarCanvas.width, h = radarCanvas.height;
+  const cx = w/2, cy = h/2;
+  radarCtx.clearRect(0,0,w,h);
+
+  // Background
+  radarCtx.fillStyle = 'rgba(0,0,20,0.85)';
+  radarCtx.beginPath(); radarCtx.arc(cx,cy,RADAR_R,0,Math.PI*2); radarCtx.fill();
+
+  // Grid rings
+  radarCtx.strokeStyle = 'rgba(96,200,240,0.12)'; radarCtx.lineWidth = 0.8;
+  [0.33, 0.66, 1].forEach(f => {
+    radarCtx.beginPath(); radarCtx.arc(cx,cy,RADAR_R*f,0,Math.PI*2); radarCtx.stroke();
+  });
+  // Cross
+  radarCtx.beginPath();
+  radarCtx.moveTo(cx-RADAR_R,cy); radarCtx.lineTo(cx+RADAR_R,cy);
+  radarCtx.moveTo(cx,cy-RADAR_R); radarCtx.lineTo(cx,cy+RADAR_R);
+  radarCtx.stroke();
+
+  // Helper to world→radar coords (rotate by heading)
+  const cosH = Math.cos(-heading), sinH = Math.sin(-heading);
+  function worldToRadar(wx, wz) {
+    const dx = wx - playerPos.x, dz = wz - playerPos.z;
+    const rx =  dx * cosH + dz * sinH;
+    const ry = -dx * sinH + dz * cosH;
+    const scale = RADAR_R / RADAR_RANGE;
+    return { x: cx + rx * scale, y: cy + ry * scale };
+  }
+
+  // Asteroids
+  radarCtx.fillStyle = 'rgba(180,120,60,0.7)';
+  asteroids.forEach(ast => {
+    const { x, y } = worldToRadar(ast.mesh.position.x, ast.mesh.position.z);
+    if (Math.hypot(x-cx, y-cy) < RADAR_R) {
+      radarCtx.fillRect(x-1.5, y-1.5, 3, 3);
+    }
+  });
+
+  // Boid
+  const bp = worldToRadar(boidState.pos.x, boidState.pos.z);
+  if (Math.hypot(bp.x-cx, bp.y-cy) < RADAR_R) {
+    radarCtx.fillStyle = lockOn ? '#f08080' : '#60c8f0';
+    radarCtx.beginPath(); radarCtx.arc(bp.x, bp.y, 3.5, 0, Math.PI*2); radarCtx.fill();
+  } else {
+    // Arrow to boid at edge
+    const angle = Math.atan2(bp.y-cy, bp.x-cx);
+    const ex = cx + Math.cos(angle)*(RADAR_R-6), ey = cy + Math.sin(angle)*(RADAR_R-6);
+    radarCtx.fillStyle = '#60c8f0';
+    radarCtx.beginPath(); radarCtx.arc(ex, ey, 2.5, 0, Math.PI*2); radarCtx.fill();
+  }
+
+  // Player dot
+  radarCtx.fillStyle = '#c8f060';
+  radarCtx.beginPath(); radarCtx.arc(cx, cy, 3, 0, Math.PI*2); radarCtx.fill();
+  // North tick
+  radarCtx.strokeStyle = 'rgba(200,240,96,0.4)';
+  radarCtx.lineWidth = 1;
+  radarCtx.beginPath();
+  radarCtx.moveTo(cx, cy);
+  radarCtx.lineTo(cx, cy - RADAR_R * 0.35);
+  radarCtx.stroke();
+
+  // Clip mask
+  radarCtx.save();
+  radarCtx.globalCompositeOperation = 'destination-in';
+  radarCtx.beginPath(); radarCtx.arc(cx,cy,RADAR_R,0,Math.PI*2); radarCtx.fill();
+  radarCtx.restore();
+
+  // Border
+  radarCtx.strokeStyle = 'rgba(96,200,240,0.3)'; radarCtx.lineWidth = 1.5;
+  radarCtx.beginPath(); radarCtx.arc(cx,cy,RADAR_R,0,Math.PI*2); radarCtx.stroke();
+
+  // Heading label
+  radarCtx.fillStyle = 'rgba(96,200,240,0.5)';
+  radarCtx.font = '9px DM Mono, monospace';
+  radarCtx.textAlign = 'center'; radarCtx.textBaseline = 'bottom';
+  radarCtx.fillText('N', cx, cy - RADAR_R + 2);
+}
+
+// ── Main HUD draw ─────────────────────────────────────────
+function drawHUD(pitchDeg, rollRad, yawDeg, speedPct, alt, boidDist, thrust) {
+  hudCtx.clearRect(0, 0, HUD_SIZE, HUD_SIZE);
+  if (!hudActive) return;
+
+  const cx = HUD_SIZE / 2, cy = HUD_SIZE / 2;
+  const c  = hudColor;
+  const cR = '#f08080';
+  hudCtx.strokeStyle = c; hudCtx.fillStyle = c;
+  hudCtx.lineWidth   = 1.5;
+  hudCtx.font        = '11px DM Mono, monospace';
+  hudCtx.textAlign   = 'center';
+  hudCtx.textBaseline = 'middle';
+
+  // ── Heading tape ───────────────────────────────────────
+  const tapeY=107, tapeW=200, tapeX=cx, degPerPx=0.18, pxPerDeg=1/degPerPx;
+  hudCtx.save();
+  hudCtx.beginPath(); hudCtx.rect(tapeX-tapeW/2,0,tapeW,tapeY+12); hudCtx.clip();
+  const visRange = tapeW*degPerPx/2+10;
+  for (let d=Math.floor(yawDeg-visRange); d<=Math.ceil(yawDeg+visRange); d++) {
+    const deg=((d%360)+360)%360;
+    const x = tapeX+(d-yawDeg)*pxPerDeg;
+    if (d%10===0) {
+      hudCtx.lineWidth=1.5; hudCtx.beginPath(); hudCtx.moveTo(x,tapeY-10); hudCtx.lineTo(x,tapeY+2); hudCtx.stroke();
+      hudCtx.font='14px DM Mono,monospace'; hudCtx.textAlign='center'; hudCtx.textBaseline='bottom';
+      hudCtx.fillText(deg,x,tapeY-11);
+    } else if(d%5===0) {
+      hudCtx.lineWidth=1; hudCtx.beginPath(); hudCtx.moveTo(x,tapeY-5); hudCtx.lineTo(x,tapeY+2); hudCtx.stroke();
+    }
+  }
+  hudCtx.restore();
+  // Lubber
+  const lubberY=100, ts=6;
+  hudCtx.lineWidth=1.5;
+  hudCtx.beginPath(); hudCtx.moveTo(tapeX,lubberY+ts*2); hudCtx.lineTo(tapeX-ts,lubberY+ts*2+ts*1.5); hudCtx.lineTo(tapeX+ts,lubberY+ts*2+ts*1.5); hudCtx.closePath(); hudCtx.stroke();
+
+  // ── Boresight reticle ──────────────────────────────────
+  const rr=28, rcx=cx, rcy=230;
+  const reticleColor = lockOn ? cR : c;
+  hudCtx.strokeStyle = reticleColor; hudCtx.fillStyle = reticleColor;
+  hudCtx.lineWidth=1.5;
+  hudCtx.beginPath(); hudCtx.arc(rcx,rcy,rr,0,Math.PI*2); hudCtx.stroke();
+  // Lock corners
+  if (lockOn) {
+    const corners = [[-rr*1.4,-rr*1.4],[rr*1.4,-rr*1.4],[rr*1.4,rr*1.4],[-rr*1.4,rr*1.4]];
+    const cLen = 10;
+    hudCtx.lineWidth=2;
+    corners.forEach(([ox,oy]) => {
+      const sx=rcx+ox, sy=rcy+oy;
+      const signX=Math.sign(ox), signY=Math.sign(oy);
+      hudCtx.beginPath();
+      hudCtx.moveTo(sx, sy); hudCtx.lineTo(sx-signX*cLen, sy);
+      hudCtx.moveTo(sx, sy); hudCtx.lineTo(sx, sy-signY*cLen);
+      hudCtx.stroke();
+    });
+    hudCtx.font='10px DM Mono,monospace';
+    hudCtx.fillStyle=cR; hudCtx.textAlign='center'; hudCtx.textBaseline='top';
+    hudCtx.fillText('LOCK ' + Math.round(boidDist), rcx, rcy+rr+8);
+  }
+  // Arms
+  hudCtx.strokeStyle = reticleColor; hudCtx.lineWidth=1.5;
+  const gap=rr+5, arm=16;
+  hudCtx.beginPath();
+  hudCtx.moveTo(rcx,rcy-gap-arm); hudCtx.lineTo(rcx,rcy-gap);
+  hudCtx.moveTo(rcx,rcy+gap);     hudCtx.lineTo(rcx,rcy+gap+arm);
+  hudCtx.moveTo(rcx-gap-arm,rcy); hudCtx.lineTo(rcx-gap,rcy);
+  hudCtx.moveTo(rcx+gap,rcy);     hudCtx.lineTo(rcx+gap+arm,rcy);
+  hudCtx.stroke();
+  hudCtx.fillStyle=reticleColor;
+  hudCtx.beginPath(); hudCtx.arc(rcx,rcy,2,0,Math.PI*2); hudCtx.fill();
+
+  // ── Pitch ladder ───────────────────────────────────────
+  hudCtx.save();
+  hudCtx.translate(rcx,rcy); hudCtx.rotate(rollRad);
+  hudCtx.beginPath(); hudCtx.rect(-100,-100,200,200); hudCtx.clip();
+  const plPxPerDeg=4.5, plLineW=52;
+  hudCtx.strokeStyle=c; hudCtx.fillStyle=c; hudCtx.lineWidth=1.2;
+  hudCtx.font='10px DM Mono,monospace'; hudCtx.textBaseline='middle';
+  for (let p=-80; p<=80; p+=10) {
+    if (p===0) continue;
+    const y=-pitchDeg*plPxPerDeg+(p*plPxPerDeg);
+    hudCtx.beginPath();
+    hudCtx.moveTo(-plLineW,y); hudCtx.lineTo(-plLineW+8,y);
+    hudCtx.moveTo(-plLineW,y); hudCtx.lineTo(-plLineW,y+(p>0?8:-8));
+    hudCtx.moveTo(plLineW,y);  hudCtx.lineTo(plLineW-8,y);
+    hudCtx.moveTo(plLineW,y);  hudCtx.lineTo(plLineW,y+(p>0?8:-8));
+    hudCtx.stroke();
+    hudCtx.textAlign='center';
+    hudCtx.fillText((p<0?'-':'')+Math.abs(p),0,y+(p>0?8:-8));
+  }
+  hudCtx.restore();
+
+  // ── Speed tape (right) ─────────────────────────────────
+  hudCtx.strokeStyle=c; hudCtx.fillStyle=c;
+  const slX=HUD_SIZE-18, slTickX=HUD_SIZE-68, slCY=cy+30, slH=180, pxPerSpd=16, spdStep=2;
+  const boxW=46,boxH=18,boxX=slTickX;
+  hudCtx.save();
+  hudCtx.beginPath();
+  hudCtx.rect(slTickX-4,slCY-slH/2,slX-slTickX+14,slH/2-boxH/2);
+  hudCtx.rect(slTickX-4,slCY+boxH/2,slX-slTickX+14,slH/2-boxH/2);
+  hudCtx.clip();
+  const spdRangeAll=(slH/2)/pxPerSpd+1;
+  for (let s=Math.floor(speedPct-spdRangeAll); s<=Math.ceil(speedPct+spdRangeAll); s++) {
+    const y=slCY-(s-speedPct)*pxPerSpd;
+    hudCtx.lineWidth=0.75; hudCtx.beginPath(); hudCtx.moveTo(slTickX,y); hudCtx.lineTo(slTickX+4,y); hudCtx.stroke();
+  }
+  for (let s=Math.floor((speedPct-spdRangeAll)/spdStep)*spdStep; s<=speedPct+spdRangeAll; s+=spdStep) {
+    const y=slCY-(s-speedPct)*pxPerSpd;
+    hudCtx.lineWidth=1; hudCtx.beginPath(); hudCtx.moveTo(slTickX,y); hudCtx.lineTo(slTickX+8,y); hudCtx.stroke();
+    hudCtx.font='11px DM Mono,monospace'; hudCtx.textAlign='left'; hudCtx.textBaseline='middle';
+    hudCtx.fillText(s.toFixed(1),slTickX+9,y);
+  }
+  hudCtx.lineWidth=1; hudCtx.beginPath(); hudCtx.moveTo(slTickX,slCY-slH/2); hudCtx.lineTo(slTickX,slCY+slH/2); hudCtx.stroke();
+  hudCtx.restore();
+  hudCtx.lineWidth=1.5; hudCtx.strokeRect(boxX,slCY-boxH/2,boxW,boxH);
+  hudCtx.font='11px DM Mono,monospace'; hudCtx.textAlign='left'; hudCtx.textBaseline='middle';
+  hudCtx.fillText(speedPct.toFixed(1),boxX+6,slCY);
+  // ── Speed ladder arrow indicator ──────────────────────
+  const sArrW=9, sArrH=12;
+  hudCtx.beginPath();
+  hudCtx.moveTo(boxX-13,        slCY-sArrH/2);
+  hudCtx.lineTo(boxX-13,        slCY+sArrH/2);
+  hudCtx.lineTo(boxX-13+sArrW,  slCY);
+  hudCtx.closePath(); hudCtx.fill();
+  // ── Thrust tick — left of speed spine, bottom=0% top=100% ──
+  if (thrust !== undefined) {
+    const thrustY = slCY + slH/2 - (thrust * slH);
+    hudCtx.strokeStyle=c; hudCtx.lineWidth=2;
+    hudCtx.beginPath();
+    hudCtx.moveTo(slTickX-14, thrustY);
+    hudCtx.lineTo(slTickX-4,  thrustY);
+    hudCtx.stroke();
+  }
+
+  // ── Altitude tape (left) ───────────────────────────────
+  const alX=18, alTickX=52, alCY=slCY, alH=slH, altMinorStep=5, altMajorStep=10;
+  const pxPerAlt = pxPerSpd / altMinorStep;
+  hudCtx.save();
+  hudCtx.beginPath();
+  hudCtx.rect(4,alCY-alH/2,alTickX-4+4,alH/2-boxH/2);
+  hudCtx.rect(4,alCY+boxH/2,alTickX-4+4,alH/2-boxH/2);
+  hudCtx.clip();
+  const altRangeAll = (alH/2) / (pxPerSpd) * altMinorStep + altMinorStep;
+  // Minor ticks — every 5 units, no label
+  for (let a=Math.floor((alt-altRangeAll)/altMinorStep)*altMinorStep; a<=alt+altRangeAll; a+=altMinorStep) {
+    if (a % altMajorStep === 0) continue; // major ticks drawn separately
+    const y = alCY - (a - alt) * pxPerAlt;
+    hudCtx.lineWidth=0.75;
+    hudCtx.beginPath(); hudCtx.moveTo(alTickX,y); hudCtx.lineTo(alTickX-4,y); hudCtx.stroke();
+  }
+  // Major ticks — every 10 units, with label
+  for (let a=Math.floor((alt-altRangeAll)/altMajorStep)*altMajorStep; a<=alt+altRangeAll; a+=altMajorStep) {
+    const y = alCY - (a - alt) * pxPerAlt;
+    hudCtx.lineWidth=1;
+    hudCtx.beginPath(); hudCtx.moveTo(alTickX,y); hudCtx.lineTo(alTickX-8,y); hudCtx.stroke();
+    hudCtx.font='10px DM Mono,monospace'; hudCtx.textAlign='right'; hudCtx.textBaseline='middle';
+    hudCtx.fillText(a.toFixed(0),alTickX-9,y);
+  }
+  hudCtx.lineWidth=1; hudCtx.beginPath(); hudCtx.moveTo(alTickX,alCY-alH/2); hudCtx.lineTo(alTickX,alCY+alH/2); hudCtx.stroke();
+  hudCtx.restore();
+  hudCtx.lineWidth=1.5; hudCtx.strokeRect(alX-2,alCY-boxH/2,alTickX-alX+2,boxH);
+  hudCtx.font='11px DM Mono,monospace'; hudCtx.textAlign='left'; hudCtx.textBaseline='middle';
+  hudCtx.fillText(alt.toFixed(0),alX+2,alCY);
+  // ── Altitude ladder arrow indicator ──────────────────────
+  const arrW=9, arrH=12;
+  hudCtx.beginPath();
+  hudCtx.moveTo(alTickX+4,          alCY);           // tip (left)
+  hudCtx.lineTo(alTickX+arrW+4,     alCY-arrH/2);    // top-right
+  hudCtx.lineTo(alTickX+arrW+4,     alCY+arrH/2);    // bottom-right
+  hudCtx.closePath(); hudCtx.fill();
+  // ── Thrust tick — right of altitude spine, bottom=0% top=100% ──
+  if (thrust !== undefined) {
+    const altThrustY = alCY + alH/2 - (thrust * alH);
+    hudCtx.strokeStyle=c; hudCtx.lineWidth=2;
+    hudCtx.beginPath();
+    hudCtx.moveTo(alTickX+4,  altThrustY);
+    hudCtx.lineTo(alTickX+14, altThrustY);
+    hudCtx.stroke();
+  }
+
+  // ── Pause indicator ────────────────────────────────────
+  if (gamePaused) {
+    hudCtx.fillStyle='rgba(200,240,96,0.8)';
+    hudCtx.font='20px DM Mono,monospace';
+    hudCtx.textAlign='center'; hudCtx.textBaseline='middle';
+    hudCtx.fillText('⏸ PAUSED', cx, cy-80);
+  }
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+//  UI UPDATE HELPERS
+// ══════════════════════════════════════════════════════════════════════════════
+function updateAmmoUI() {
+  const pips = document.getElementById('ammo-pips');
+  pips.innerHTML = '';
+  for (let i=0;i<MAX_AMMO;i++) {
+    const d = document.createElement('div');
+    d.className = 'ammo-pip' + (i<ammo ? '' : ' spent');
+    pips.appendChild(d);
+  }
+  document.getElementById('cp-ammo').textContent = ammo + ' / ' + MAX_AMMO;
+  document.getElementById('hud-ammo').textContent = ammo;
+}
+updateAmmoUI();
+
+// ══════════════════════════════════════════════════════════════════════════════
+//  MAIN ANIMATE LOOP
+// ══════════════════════════════════════════════════════════════════════════════
+function animate() {
+  requestAnimationFrame(animate);
+
+  const now = performance.now();
+  const dt  = Math.min((now - lastTime) / 1000, 0.05);
+  lastTime  = now;
+
+  if (damageCooldown > 0) damageCooldown -= dt * 1000;
+
+  // ── Flight model ──────────────────────────────────────
+  targetSpeed = thrust * MAX_SPEED;
+  if (brakesOn) {
+    speed = 0;
+  } else {
+    const lr = speed > targetSpeed ? 0.003 : 0.004;
+    speed += (targetSpeed - speed) * lr;
+  }
+  if (Math.abs(speed - targetSpeed) < 0.0001) speed = targetSpeed;
+
+  const speedPct = Math.abs(speed) / MAX_SPEED * 100;
+  const alt      = cameraRig.position.y;
+
+  if (!gamePaused) {
+    // Phase transitions
+    if (flightPhase < 3) {
+      if (!brakesOn) {
+        if (speedPct > 50)      {
+          flightPhase=3; hasBeenAirborne=true;
+        }
+        else if (speedPct > 15)   flightPhase=2;
+        else                      flightPhase=1;
+      } else { flightPhase=0; }
+    }
+    if (brakesOn && alt > GEAR_HEIGHT+5) brakesOn=false;
+
+    // Steering
+    const speedFactor = 0.5 + (speedPct/100)*0.5;
+    const yawRate     = hasBeenAirborne ? -mouse.x*0.03*speedFactor : 0;
+    const tgtPitch    = flightPhase>=3  ? -mouse.y*Math.PI*0.35  : 0;
+    const tgtRoll     = hasBeenAirborne ?  mouse.x*Math.PI*0.25*speedFactor : 0;
+    camYaw.val += yawRate;
+    if (flightPhase===3) airborneTime += dt*1000; else airborneTime=0;
+
+    const easeT       = Math.min(airborneTime/10000, 1);
+    const pitchEase   = 0.008 + (0.06-0.008)*easeT;
+    pitchEasedTarget += (tgtPitch - pitchEasedTarget)*pitchEase;
+    camPitch.val     += (pitchEasedTarget-camPitch.val)*0.06;
+    camPitch.val      = Math.max(-Math.PI*0.4, Math.min(Math.PI*0.4, camPitch.val));
+    camRoll.val      += (tgtRoll - camRoll.val)*0.05;
+
+    cameraRig.rotation.y = camYaw.val;
+    cameraRig.rotation.x = camPitch.val;
+    cameraRig.rotation.z = -camRoll.val;
+
+    // Movement
+    if (!brakesOn && Math.abs(speed)>0.001) {
+      const dir = new THREE.Vector3();
+      cameraRig.getWorldDirection(dir);
+      cameraRig.position.x += dir.x * -speed * 0.5;
+      cameraRig.position.z += dir.z * -speed * 0.5;
+      if (flightPhase>=3) {
+        vertVelocity = Math.sin(camPitch.val)*speed*0.5;
+        cameraRig.position.y += vertVelocity;
+      } else vertVelocity=0;
+    } else vertVelocity=0;
+
+    // Apply bounce impulse and decay it exponentially
+    if (bounceVel.lengthSq() > 0.00001) {
+      cameraRig.position.addScaledVector(bounceVel, dt * 60);
+      bounceVel.multiplyScalar(0.82); // decay — ~0.4s to fade out
+    } else {
+      bounceVel.set(0, 0, 0);
+    }
+
+    // Ground clamp
+    const groundY = gearDown ? GEAR_HEIGHT : 0;
+    if (cameraRig.position.y < groundY) {
+      cameraRig.position.y = groundY; vertVelocity=0;
+      if (flightPhase===3 && gearDown) {
+        flightPhase = speedPct>15 ? 2 : speedPct>0 ? 1 : 0;
+        pitchEasedTarget=0; airborneTime=0; hasBeenAirborne=false;
+      }
+    }
+
+    vsi = (cameraRig.position.y - prevAlt)*60;
+    prevAlt = cameraRig.position.y;
+
+    // Asteroid rotation
+    asteroids.forEach(ast => {
+      ast.mesh.rotateOnAxis(ast.mesh.userData.rotAxis, ast.mesh.userData.rotSpeed);
+    });
+
+    // Boid
+    updateBoid(dt);
+
+    // Missiles
+    updateMissiles(dt);
+
+    // Debris
+    updateDebris(dt);
+
+    // Camera shake
+    updateCameraShake(dt);
+
+    // Mine collision and effects
+    checkMineCollisions();
+    updateMineEffects(dt);
+
+    // Asteroid Collision
+    checkPlayerCollisions();
+
+    // Lock-on
+    updateLock();
+  }
+
+  // ── Boid explosion particles — always update regardless of pause/gameOver ──
+  if (gameWon && (boidDeathPhase === 1 || boidDeathPhase === 3)) {
+    updateBoidExplosion(dt);
+  }
+
+  // ── Render ────────────────────────────────────────────
+  renderer.setClearColor(bgColorInt);
+  renderer.setScissorTest(false);
+  renderer.setViewport(0,0,viewportEl.clientWidth,viewportEl.clientHeight);
+  if (activeCamera === 2) orbitControls.update();
+  renderer.render(scene, activeThreeCamera);
+  activeThreeCamera.updateMatrixWorld();
+
+  // ── HUD & panel ───────────────────────────────────────
+  const pitchDeg = (camPitch.val*180/Math.PI);
+  const yawDeg   = (((-camYaw.val*180/Math.PI)%360)+360)%360;
+
+  positionHudCanvas();
+  drawHUD(pitchDeg, camRoll.val, yawDeg, speedPct, alt, lockDist, thrust);
+  drawAttitude(camPitch.val, camRoll.val);
+  drawRadar(cameraRig.position, camYaw.val);
+
+  // Header
+  document.getElementById('hud-speed').textContent  = (speedPct*2.5).toFixed(0)+' kt';
+  document.getElementById('hud-alt').textContent    = alt.toFixed(0);
+  document.getElementById('hud-hp').textContent     = playerHP;
+  document.getElementById('hud-hp').className       = 'hud-val' + (playerHP>50 ? ' ok' : playerHP>25 ? '' : ' warn');
+  document.getElementById('hud-ammo').textContent   = ammo;
+  document.getElementById('hud-boid-hp').textContent = boidHP;
+  document.getElementById('hud-lock').textContent   = lockOn ? '⬛ LOCK' : '—';
+  document.getElementById('hud-lock').className     = 'hud-val' + (lockOn ? ' warn' : '');
+  document.getElementById('hud-brakes').textContent = brakesOn ? 'ON' : 'OFF';
+  document.getElementById('hud-brakes').className   = 'hud-val' + (brakesOn ? ' warn' : ' ok');
+
+  // Right panel
+  document.getElementById('cp-speed').textContent  = speedPct.toFixed(0)+'%';
+  document.getElementById('cp-alt').textContent    = alt.toFixed(1);
+  document.getElementById('cp-hdg').textContent    = yawDeg.toFixed(0)+'°';
+  document.getElementById('cp-hp').textContent     = playerHP+'%';
+  document.getElementById('cp-hp').className       = 'stat-value danger';
+  const hpBar = document.getElementById('health-bar');
+  const hpFrac = playerHP/MAX_HP;
+  hpBar.style.width = (hpFrac*100)+'%';
+  hpBar.style.background = hpFrac>0.5 ? 'var(--accent)' : hpFrac>0.25 ? '#f0c040' : 'var(--danger)';
+  document.getElementById('cp-boid-hp').textContent = boidHP+'%';
+  document.getElementById('cp-lock').textContent   = lockOn ? Math.round(lockDist)+' u 🔴' : lockDist<LOCK_RANGE*1.5 ? Math.round(lockDist)+' u' : '—';
+  document.getElementById('cp-asteroids').textContent = asteroids.length;
+
+  // Status box
+  const sb=document.getElementById('status-box');
+  const st=document.getElementById('status-title');
+  const sm=document.getElementById('status-msg');
+  if (gameOver||gameWon) { sb.classList.remove('active'); return; }
+  if (flightPhase===0) {
+    sb.classList.add('active');
+    st.textContent='Brakes On';
+    sm.textContent='SPACE or click to launch • W/S throttle • Left click to fire (5s after takeoff)';
+  } else if (flightPhase===1) {
+    sb.classList.add('active');
+    st.textContent='Taxiing';
+    sm.textContent='Increase speed above 15%';
+  } else if (flightPhase===2) {
+    sb.classList.add('active');
+    st.textContent='Rolling';
+    sm.textContent='Pull back to take off';
+  } else {
+    sb.classList.remove('active');
+  }
+}
+
+// ── ACCORDION ─────────────────────────────────────────────────────────────────
+document.getElementById('setup-panel').addEventListener('click', e => {
+  const header = e.target.closest('.accordion-header');
+  if (!header) return;
+  header.parentElement.classList.toggle('open');
+});
+
+// ── ENVIRONMENT ───────────────────────────────────────────────────────────────
+document.getElementById('bg-color').addEventListener('input', e => {
+  bgColor    = e.target.value;
+  bgColorInt = parseInt(bgColor.replace('#',''), 16);
+  document.getElementById('bg-hex').textContent = bgColor;
+  scene.background.setHex(bgColorInt);
+});
+
+document.getElementById('grid-color').addEventListener('input', e => {
+  gridColor = e.target.value;
+  document.getElementById('grid-hex').textContent = gridColor;
+  scene.remove(gridMesh); gridMesh.geometry.dispose(); gridMesh.material.dispose();
+  gridMesh = buildGrid(gridColor); scene.add(gridMesh);
+});
+
+document.getElementById('btn-grid').addEventListener('change', e => {
+  gridMesh.visible = e.target.checked;
+});
+
+document.getElementById('btn-ground').addEventListener('change', e => {
+  groundPlane.visible = e.target.checked;
+});
+
+document.getElementById('btn-shadows').addEventListener('change', e => {
+  const on = e.target.checked;
+  renderer.shadowMap.enabled = on;
+  sun.castShadow = on;
+  groundPlane.receiveShadow = on;
+  asteroids.forEach(a => { a.mesh.castShadow = on; a.mesh.receiveShadow = on; });
+  if (on) renderer.shadowMap.needsUpdate = true;
+  if (on) renderer.shadowMap.needsUpdate = true;
+  scene.traverse(obj => { if (obj.material) obj.material.needsUpdate = true; });
+});
+
+document.getElementById('btn-light-helpers').addEventListener('change', e => {
+  const v = e.target.checked;
+  sunHelper.visible = fillHelper.visible = fill2Helper.visible = v;
+  sunHelper.update(); fillHelper.update(); fill2Helper.update();
+});
+
+document.getElementById('cam-fov').addEventListener('input', e => {
+  const v = parseInt(e.target.value);
+  camera.fov = v;
+  camera.updateProjectionMatrix();
+  document.getElementById('cam-fov-val').textContent = v + '°';
+});
+
+document.getElementById('ground-color').addEventListener('input', e => {
+  const hex = e.target.value;
+  groundMat.color.set(hex);
+  document.getElementById('ground-color-hex').textContent = hex;
+});
+
+document.getElementById('hud-color').addEventListener('input', e => {
+  hudColor = e.target.value;
+  document.getElementById('hud-color-hex').textContent = e.target.value;
+});
+
+// ── LIGHTS ────────────────────────────────────────────────────────────────────
+document.getElementById('light-exposure').addEventListener('input', e => {
+  const val = parseFloat(e.target.value);
+  renderer.toneMappingExposure = val;
+  document.getElementById('light-exposure-val').textContent = val.toFixed(2);
+});
+
+document.getElementById('light-ambient').addEventListener('input', e => {
+  ambientLight.intensity = parseFloat(e.target.value);
+  document.getElementById('light-ambient-val').textContent = parseFloat(e.target.value).toFixed(2);
+});
+
+document.getElementById('sun-color').addEventListener('input', e => {
+  sun.color.set(e.target.value);
+  document.getElementById('sun-color-hex').textContent = e.target.value;
+  sunHelper.update();
+});
+document.getElementById('sun-intensity').addEventListener('input', e => {
+  sun.intensity = parseFloat(e.target.value);
+  document.getElementById('sun-intensity-val').textContent = parseFloat(e.target.value).toFixed(2);
+});
+['x','y','z'].forEach(axis => {
+  document.getElementById('sun-' + axis).addEventListener('input', e => {
+    sun.position[axis] = parseFloat(e.target.value) || 0;
+    sun.shadow.camera.updateProjectionMatrix();
+    sunHelper.update();
+  });
+});
+
+document.getElementById('fill-color').addEventListener('input', e => {
+  fill.color.set(e.target.value);
+  document.getElementById('fill-color-hex').textContent = e.target.value;
+  fillHelper.update();
+});
+document.getElementById('fill-intensity').addEventListener('input', e => {
+  fill.intensity = parseFloat(e.target.value);
+  document.getElementById('fill-intensity-val').textContent = parseFloat(e.target.value).toFixed(2);
+});
+['x','y','z'].forEach(axis => {
+  document.getElementById('fill-' + axis).addEventListener('input', e => {
+    fill.position[axis] = parseFloat(e.target.value) || 0;
+    fillHelper.update();
+  });
+});
+
+document.getElementById('fill2-color').addEventListener('input', e => {
+  fill2.color.set(e.target.value);
+  document.getElementById('fill2-color-hex').textContent = e.target.value;
+  fill2Helper.update();
+});
+document.getElementById('fill2-intensity').addEventListener('input', e => {
+  fill2.intensity = parseFloat(e.target.value);
+  document.getElementById('fill2-intensity-val').textContent = parseFloat(e.target.value).toFixed(2);
+});
+['x','y','z'].forEach(axis => {
+  document.getElementById('fill2-' + axis).addEventListener('input', e => {
+    fill2.position[axis] = parseFloat(e.target.value) || 0;
+    fill2Helper.update();
+  });
+});
+
+// ── E key toggles setup panel ─────────────────────────────────────────────────
+// (already handled inline — add E key support here)
+
+// ── SCENE OBJECTS ────────────────────────────────────────────────────────────
+document.getElementById('cube-count').addEventListener('input', e => {
+  document.getElementById('cube-count-val').textContent = e.target.value;
+});
+document.getElementById('cube-color').addEventListener('input', e => {
+  document.getElementById('cube-color-hex').textContent = e.target.value;
+});
+document.getElementById('cube-tolerance').addEventListener('input', e => {
+  document.getElementById('cube-tolerance-val').textContent = e.target.value + '%';
+});
+
+document.getElementById('debris-dampen').addEventListener('input', e => {
+  document.getElementById('debris-dampen-val').textContent = parseFloat(e.target.value).toFixed(2);
+});
+
+document.getElementById('btn-spawn-cubes').addEventListener('click', () => {
+  spawnAsteroids();
+});
+
+document.getElementById('btn-clear-cubes').addEventListener('click', () => {
+  asteroids.forEach(a => { scene.remove(a.mesh); a.mesh.geometry.dispose(); a.mesh.material.dispose(); });
+  asteroids.length = 0;
+  if (starPoints) { scene.remove(starPoints); starPoints.geometry.dispose(); starPoints.material.dispose(); starPoints = null; }
+});
+
+document.getElementById('btn-spawn-stars').addEventListener('click', () => {
+  if (starPoints) { scene.remove(starPoints); starPoints.geometry.dispose(); starPoints.material.dispose(); starPoints = null; }
+  const starPos = new Float32Array(700 * 3);
+  for (let i = 0; i < 700; i++) {
+    const dist  = 300 + Math.random() * 200;
+    const theta = Math.random() * Math.PI * 2;
+    const phi   = Math.random() * Math.PI * 0.5;
+    starPos[i*3]   = dist * Math.sin(phi) * Math.cos(theta);
+    starPos[i*3+1] = dist * Math.cos(phi);
+    starPos[i*3+2] = dist * Math.sin(phi) * Math.sin(theta);
+  }
+  const starGeo = new THREE.BufferGeometry();
+  starGeo.setAttribute('position', new THREE.BufferAttribute(starPos, 3));
+  starPoints = new THREE.Points(starGeo, new THREE.PointsMaterial({ color: 0xffffff, size: 2.0 }));
+  scene.add(starPoints);
+});
+
+// ── TARGET OBJ / BOID / ORBIT CAMERA HANDLERS ────────────────────────────────
+document.getElementById('target-visible').addEventListener('change', e => {
+  targetObj.visible = e.target.checked;
+});
+
+document.getElementById('target-velocity').addEventListener('input', e => {
+  targetVelocity = parseFloat(e.target.value);
+  document.getElementById('target-velocity-val').textContent = targetVelocity.toFixed(2);
+});
+
+document.getElementById('bbox-visible').addEventListener('change', e => {
+  bboxMesh.visible = e.target.checked;
+});
+
+document.getElementById('bbox-half').addEventListener('input', e => {
+  bboxHalfW = parseFloat(e.target.value) || 90;
+  bboxMesh.geometry.dispose();
+  bboxMesh.geometry = new THREE.BoxGeometry(bboxHalfW * 2, bboxHeight, bboxHalfW * 2);
+  bboxMesh.position.set(0, bboxHeight / 2, 0);
+});
+
+document.getElementById('bbox-h').addEventListener('input', e => {
+  bboxHeight = parseFloat(e.target.value) || 100;
+  bboxMesh.geometry.dispose();
+  bboxMesh.geometry = new THREE.BoxGeometry(bboxHalfW * 2, bboxHeight, bboxHalfW * 2);
+  bboxMesh.position.set(0, bboxHeight / 2, 0);
+});
+
+document.getElementById('boid-color').addEventListener('input', e => {
+  boidMat.color.set(e.target.value);
+  document.getElementById('boid-color-hex').textContent = e.target.value;
+});
+
+document.getElementById('boid-velocity').addEventListener('input', e => {
+  boidVelocity = parseFloat(e.target.value);
+  document.getElementById('boid-velocity-val').textContent = boidVelocity.toFixed(2);
+});
+
+document.getElementById('boid-turnrate').addEventListener('input', e => {
+  boidTurnRate = parseFloat(e.target.value);
+  document.getElementById('boid-turnrate-val').textContent = boidTurnRate.toFixed(2);
+});
+
+document.getElementById('btn-cam1').addEventListener('click', () => {
+  setActiveCamera(1);
+  document.getElementById('btn-cam1').classList.add('primary');
+  document.getElementById('btn-cam2').classList.remove('primary');
+});
+
+document.getElementById('btn-cam2').addEventListener('click', () => {
+  setActiveCamera(2);
+  document.getElementById('btn-cam2').classList.add('primary');
+  document.getElementById('btn-cam1').classList.remove('primary');
+});
+
+document.getElementById('orbit-fov').addEventListener('input', e => {
+  const v = parseInt(e.target.value);
+  orbitCamera.fov = v;
+  orbitCamera.updateProjectionMatrix();
+  document.getElementById('orbit-fov-val').textContent = v + '°';
+});
+
+document.getElementById('orbit-autorotate').addEventListener('change', e => {
+  orbitControls.autoRotate = e.target.checked;
+});
+
+// ══════════════════════════════════════════════════════════════════════════════
+//  AUDIO ENGINE — explosion sounds only
+// ══════════════════════════════════════════════════════════════════════════════
+let audioCtx   = null;
+let audioReady = false;
+let userVolume = 0.6;
+let audioMuted = false;
+
+function initAudio() {
+  if (audioCtx) return;
+  audioCtx   = new (window.AudioContext || window.webkitAudioContext)();
+  audioReady = true;
+}
+
+// ── Pink noise generator ──────────────────────────────────────────────────────
+function makePinkBuffer(seconds) {
+  const len = Math.floor(audioCtx.sampleRate * seconds);
+  const buf = audioCtx.createBuffer(1, len, audioCtx.sampleRate);
+  const d   = buf.getChannelData(0);
+  let b0=0,b1=0,b2=0,b3=0,b4=0,b5=0,b6=0;
+  for (let i = 0; i < len; i++) {
+    const w = Math.random() * 2 - 1;
+    b0=0.99886*b0+w*0.0555179; b1=0.99332*b1+w*0.0750759;
+    b2=0.96900*b2+w*0.1538520; b3=0.86650*b3+w*0.3104856;
+    b4=0.55000*b4+w*0.5329522; b5=-0.7616*b5-w*0.0168980;
+    d[i] = (b0+b1+b2+b3+b4+b5+b6+w*0.5362)*0.11; b6=w*0.115926;
+  }
+  return buf;
+}
+
+// ── Deep bass boom with echo — used for both scenarios ────────────────────────
+function playGroundImpact() {
+  if (!audioReady || audioMuted) return;
+  const now = audioCtx.currentTime;
+
+  // Echo chain
+  const delay    = audioCtx.createDelay(1.0);
+  const feedback = audioCtx.createGain();
+  const echoOut  = audioCtx.createGain();
+  delay.delayTime.value = 0.28;
+  feedback.gain.value   = 0.35;
+  echoOut.gain.value    = 1.0 * userVolume;
+  delay.connect(feedback); feedback.connect(delay);
+  delay.connect(echoOut); echoOut.connect(audioCtx.destination);
+
+  // Low-pass — nothing above 250Hz
+  const lp = audioCtx.createBiquadFilter();
+  lp.type = 'lowpass'; lp.frequency.value = 250; lp.Q.value = 0.7;
+  lp.connect(audioCtx.destination);
+  lp.connect(delay);
+
+  // Sub sine — 60Hz → 25Hz
+  const sub  = audioCtx.createOscillator();
+  const subG = audioCtx.createGain();
+  sub.type = 'sine';
+  sub.frequency.setValueAtTime(60, now);
+  sub.frequency.exponentialRampToValueAtTime(25, now + 1.8);
+  subG.gain.setValueAtTime(0.0, now);
+  subG.gain.linearRampToValueAtTime(userVolume * 2.0, now + 0.008);
+  subG.gain.exponentialRampToValueAtTime(0.001, now + 1.8);
+  sub.connect(subG); subG.connect(lp);
+  sub.start(now); sub.stop(now + 1.9);
+
+  // Pink noise body
+  const src  = audioCtx.createBufferSource();
+  const srcG = audioCtx.createGain();
+  src.buffer = makePinkBuffer(2.0);
+  srcG.gain.setValueAtTime(0.0, now);
+  srcG.gain.linearRampToValueAtTime(1.8 * userVolume, now + 0.01);
+  srcG.gain.exponentialRampToValueAtTime(0.001, now + 2.0);
+  src.connect(srcG); srcG.connect(lp);
+  src.start(now);
+}
+
+// ── Audio controls ────────────────────────────────────────────────────────────
+document.getElementById('audio-volume').addEventListener('input', e => {
+  userVolume = parseFloat(e.target.value);
+  document.getElementById('audio-volume-val').textContent = userVolume.toFixed(2);
+});
+
+document.getElementById('audio-mute').addEventListener('change', e => {
+  audioMuted = e.target.checked;
+});
+
+
+// ── PRINCESS HANDLERS ─────────────────────────────────────────────────────────
+document.getElementById('princess-color').addEventListener('input', e => {
+  princessMat.color.set(e.target.value);
+  document.getElementById('princess-color-hex').textContent = e.target.value;
+});
+document.getElementById('princess-velocity').addEventListener('input', e => {
+  princessVelocity = parseFloat(e.target.value);
+  document.getElementById('princess-velocity-val').textContent = princessVelocity.toFixed(2);
+});
+document.getElementById('princess-turnrate').addEventListener('input', e => {
+  princessTurnRate = parseFloat(e.target.value);
+  document.getElementById('princess-turnrate-val').textContent = princessTurnRate.toFixed(2);
+});
+
+// ── SPACE MINES HANDLERS ─────────────────────────────────────────────────────
+document.getElementById('btn-spawn-mines').addEventListener('click', spawnMines);
+document.getElementById('btn-clear-mines').addEventListener('click', clearMines);
+
+// Update btn-cam1 to show primary on load
+document.getElementById('btn-cam1').classList.add('primary');
+
+animate();
+</script>
+</body>
+</html>
