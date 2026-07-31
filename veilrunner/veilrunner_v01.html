@@ -3,10 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Asteroid</title>
+<title>Veilrunner Ir 77</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500;700&family=DM+Sans:wght@300;400;500;700&family=Saira+Condensed:wght@700&display=swap" rel="stylesheet">
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -358,6 +358,359 @@ input[type=number]:focus { border-color: rgba(200,240,96,0.35); }
 /* ── Light subsection ────────────────────────────────────── */
 .light-sub { border-top:1px solid var(--border); padding-top:10px; margin-top:4px; }
 .light-sub-title { font-family:'DM Mono',monospace; font-size:9px; letter-spacing:0.12em; color:var(--accent); text-transform:uppercase; margin-bottom:8px; }
+
+/* ══ VEILRUNNER Ir 77 — UI layer ══════════════════════════════════════════ */
+:root {
+  --bg:#0a0603; --panel:rgba(12,9,6,0.94); --border:rgba(255,160,70,0.24);
+  --text:#ffd9a8; --muted:#a28f7c; --accent:#ffb066; --accent-dim:rgba(255,176,102,0.13);
+  --select:#ffd9a8; --danger:#ff5a3c; --danger-dim:rgba(255,90,60,0.10); --radius:0px;
+}
+body { background:#04060a; }
+#header { display:none !important; }
+#main { position:fixed; inset:0; }
+#viewport-area { cursor:crosshair; }
+a { color:#ffb066; } a:hover { color:#ffd9a8; }
+
+.vr-mono { font-family:'DM Mono',monospace; }
+.vr-disp { font-family:'Saira Condensed',sans-serif; font-weight:700; letter-spacing:0.01em; color:#ff5a3c; }
+
+/* ── Screen furniture ───────────────────────────────────────────────────── */
+#vr-scan, #vr-frame {
+  position:fixed; inset:0; pointer-events:none; z-index:26;
+}
+#vr-scan { background:repeating-linear-gradient(180deg,rgba(0,0,0,0.20) 0 1px,transparent 1px 3px); }
+#vr-frame { box-shadow:inset 0 0 0 2px rgba(255,150,60,0.22), inset 0 0 260px rgba(18,7,0,0.55); }
+
+/* ── HUD overlay ────────────────────────────────────────────────────────── */
+#vr-hud { position:fixed; inset:0; pointer-events:none; z-index:25;
+  font-family:'DM Mono',monospace; opacity:1; transition:opacity .25s; }
+#vr-hud.off { opacity:0; }
+#vr-hud .row { display:flex; justify-content:space-between; align-items:center; }
+
+#vr-topbar { position:absolute; top:0; left:0; right:0; height:40px; padding:0 24px;
+  display:flex; align-items:center; justify-content:space-between;
+  background:linear-gradient(180deg,rgba(10,8,6,0.85),transparent);
+  font-size:11px; letter-spacing:0.18em; color:#ffb066; }
+#vr-topbar .mid { color:#a28f7c; }
+
+#vr-botbar { position:absolute; left:0; right:0; bottom:0; height:48px; padding:0 24px;
+  display:flex; align-items:center; justify-content:space-between;
+  background:linear-gradient(0deg,rgba(10,8,6,0.92),transparent);
+  font-size:11px; letter-spacing:0.14em; color:#a28f7c; }
+#vr-botbar .grp { display:flex; gap:20px; white-space:nowrap; }
+#vr-botbar { gap:32px; }
+@media (max-width:1240px) { #vr-botbar .grp:last-child span:nth-child(n+4) { display:none; } }
+@media (max-width:1040px) { #vr-botbar .grp:last-child { display:none; } #vr-topbar .mid { display:none; } }
+#vr-botbar .hot { color:#ffd9a8; }
+
+.vr-rail { position:absolute; top:88px; display:flex; flex-direction:column;
+  gap:20px; min-height:0; pointer-events:none; }
+.vr-rail.left  { left:24px;  bottom:70px;  align-items:flex-start; }
+.vr-rail.right { right:24px; bottom:70px; align-items:flex-end; }
+.vr-box { position:relative; flex:0 0 auto; width:238px; background:rgba(12,9,6,0.68);
+  box-shadow:inset 0 0 0 1px rgba(255,160,70,0.24); padding:13px 15px;
+  display:flex; flex-direction:column; gap:11px; }
+#vr-hostile  { width:222px; box-shadow:inset 0 0 0 1px rgba(255,90,60,0.30); gap:10px; }
+.vr-box .ttl { font-size:10px; letter-spacing:0.2em; color:#ffb066; }
+#vr-hostile .ttl { color:#ff7a5a; }
+.vr-box .kv { display:flex; justify-content:space-between; font-size:11px; color:#a28f7c; }
+.vr-box .kv b { font-weight:400; color:#ffd9a8; }
+.vr-seg { display:flex; gap:3px; }
+.vr-seg i { flex:1; height:9px; background:rgba(255,176,102,0.16); }
+.vr-seg i.on { background:#ffb066; }
+.vr-pips { display:flex; flex-wrap:wrap; gap:3px; }
+.vr-pips i { width:8px; height:8px; background:rgba(255,217,168,0.18); }
+.vr-pips i.on { background:#ffd9a8; }
+.vr-bar { height:9px; background:rgba(255,107,90,0.18); }
+.vr-bar span { display:block; height:100%; background:#ff6b5a; }
+
+/* Edge tapes */
+.vr-tape { position:relative; flex:1 1 auto; min-height:0; display:flex;
+  align-items:center; gap:9px; }
+#vr-throttle { padding-left:36px; }
+#vr-altitude { padding-right:36px; }
+.vr-scale { display:flex; flex-direction:column; justify-content:space-between;
+  gap:0; height:min(210px, 100%); min-height:0; flex:0 1 auto;
+  font-size:12px; line-height:1.35; color:rgba(255,176,102,0.5); }
+.vr-scale.r { align-items:flex-end; }
+.vr-spine { width:1px; height:min(210px, 100%); flex:0 0 auto;
+  background:linear-gradient(180deg,transparent,rgba(255,176,102,0.55) 12%,rgba(255,176,102,0.55) 88%,transparent); }
+.vr-read { display:flex; flex-direction:column; gap:3px; }
+.vr-read.r { align-items:flex-end; }
+.vr-read .n { font-size:26px; color:#ffd9a8; line-height:1; }
+.vr-read .l { font-size:9px; letter-spacing:0.2em; color:rgba(255,176,102,0.55); }
+
+/* Drift plate */
+#vr-plate-wrap { position:relative; flex:0 0 auto;
+  display:flex; flex-direction:column; align-items:flex-end; gap:7px; }
+#vr-plate-wrap .l { font-size:9px; letter-spacing:0.22em; color:rgba(255,176,102,0.5); }
+#radar-canvas { border-radius:0 !important; border:none !important;
+  box-shadow:inset 0 0 0 1px rgba(255,160,70,0.28); background:rgba(12,9,6,0.5); }
+
+/* Proximity */
+#vr-prox { position:absolute; left:50%; bottom:96px; transform:translateX(-50%);
+  display:none; flex-direction:column; align-items:center; gap:7px; }
+#vr-prox.on { display:flex; }
+#vr-prox .t { font-size:12px; letter-spacing:0.28em; color:#ff5a3c; animation:vrbreathe 1s infinite; }
+#vr-prox .u { width:300px; height:2px; background:linear-gradient(90deg,transparent,#ff5a3c,transparent); }
+@keyframes vrbreathe { 0%,100%{opacity:0.9} 50%{opacity:0.3} }
+
+/* Status hint */
+#vr-hint { position:absolute; left:50%; top:130px; transform:translateX(-50%);
+  display:none; padding:8px 18px; background:rgba(12,9,6,0.7);
+  box-shadow:inset 0 0 0 1px rgba(255,160,70,0.28);
+  font-size:11px; letter-spacing:0.16em; color:#ffb066; }
+#vr-hint.on { display:block; }
+
+/* ── Screens ────────────────────────────────────────────────────────────── */
+.vr-screen { position:fixed; inset:0; z-index:60; display:none;
+  font-family:'DM Sans',sans-serif; }
+.vr-screen.on { display:block; }
+.vr-veil { position:absolute; inset:0; }
+.vr-screen .scan { position:absolute; inset:0; pointer-events:none;
+  background:repeating-linear-gradient(180deg,rgba(0,0,0,0.22) 0 1px,transparent 1px 3px); }
+.vr-screen .edge { position:absolute; inset:0; pointer-events:none;
+  box-shadow:inset 0 0 0 2px rgba(255,150,60,0.22); }
+
+.vr-item { display:flex; align-items:center; gap:16px; padding:15px 18px;
+  background:rgba(255,176,102,0.04); box-shadow:inset 0 0 0 1px rgba(255,160,70,0.20);
+  font-family:'DM Mono',monospace; font-size:14px; letter-spacing:0.1em; color:#a28f7c;
+  cursor:pointer; transition:background .15s; }
+.vr-item:hover { background:rgba(255,176,102,0.10); }
+.vr-item.pri { background:rgba(255,176,102,0.12); box-shadow:inset 0 0 0 1px rgba(255,176,102,0.45); color:#ffd9a8; }
+.vr-item.pri:hover { background:rgba(255,176,102,0.20); }
+.vr-item.bad { background:rgba(255,90,60,0.07); box-shadow:inset 0 0 0 1px rgba(255,90,60,0.32); color:#ff9b80; }
+.vr-item.bad:hover { background:rgba(255,90,60,0.15); }
+.vr-item .num { font-size:11px; letter-spacing:0.14em; color:#8a7967; }
+.vr-item.pri .num { color:#ffb066; }
+.vr-item .tail { margin-left:auto; font-size:10px; letter-spacing:0.14em; color:#6e6154; }
+.vr-key { font-size:10px; letter-spacing:0.14em; background:rgba(255,176,102,0.07); padding:3px 8px; color:#8a7967; }
+.vr-item.pri .vr-key { background:rgba(255,176,102,0.16); color:#ffb066; }
+.vr-item.bad .vr-key { background:rgba(255,90,60,0.14); color:#ff8f6a; }
+
+/* Board */
+#vr-board .boardgrid { position:absolute; left:0; right:0; top:56px; bottom:40px;
+  display:flex; align-items:stretch; gap:56px; padding:16px 72px 0 80px; }
+#vr-board .col { flex:1 1 auto; min-width:0; min-height:0;
+  display:flex; flex-direction:column; justify-content:space-between;
+  gap:24px; overflow-y:auto; overflow-x:hidden; scrollbar-width:thin; }
+#vr-board .col::-webkit-scrollbar { width:4px; }
+#vr-board .col::-webkit-scrollbar-thumb { background:rgba(255,176,102,0.3); }
+#vr-board .body, #vr-board .title { max-width:100%; }
+#vr-board .eyebrow { font-family:'DM Mono',monospace; font-size:11px; letter-spacing:0.32em; color:#a28f7c; }
+#vr-board .title { display:flex; align-items:baseline; gap:16px; white-space:nowrap; }
+#vr-board .title span { font-family:'Saira Condensed',sans-serif; font-weight:700;
+  font-size:clamp(38px, 4.6vw, 76px); line-height:1; letter-spacing:0.01em; }
+#vr-board .body { font-family:'Courier New',Courier,monospace; font-size:14px;
+  line-height:1.62; color:#a28f7c; max-width:490px; }
+#vr-board .foot { display:flex; gap:38px; font-family:'DM Mono',monospace;
+  font-size:11px; letter-spacing:0.14em; }
+#vr-board .foot .k { color:#6e6154; } #vr-board .foot .v { color:#a28f7c; }
+#vr-survey { flex:0 0 296px; align-self:center; max-height:100%; overflow-y:auto;
+  display:flex; flex-direction:column; gap:12px; padding:20px;
+  background:rgba(12,9,6,0.72); box-shadow:inset 0 0 0 1px rgba(255,160,70,0.26);
+  font-family:'DM Mono',monospace; font-size:12px; color:#a28f7c; }
+#vr-survey .kv { display:flex; justify-content:space-between; }
+
+/* Modal shell (terms / pause / debrief) */
+.vr-modal { position:absolute; left:50%; top:50%; transform:translate(-50%,-50%);
+  background:rgba(12,9,6,0.94);
+  box-shadow:inset 0 0 0 1px rgba(255,160,70,0.30), 0 30px 90px rgba(0,0,0,0.6);
+  display:flex; flex-direction:column; }
+.vr-mhead { display:flex; align-items:baseline; justify-content:space-between;
+  padding:24px 30px 18px 30px; box-shadow:inset 0 -1px 0 rgba(255,160,70,0.20); }
+.vr-mhead .r { text-align:right; font-family:'DM Mono',monospace; font-size:11px;
+  letter-spacing:0.14em; color:#8a7967; line-height:2; }
+.vr-mfoot { padding:16px 20px 20px 20px; display:flex; flex-direction:column; gap:3px; }
+
+#vr-terms .vr-modal { width:min(860px, calc(100vw - 60px)); height:min(660px, calc(100vh - 48px)); }
+#vr-clauses { flex:1; overflow-y:auto; padding:20px 30px;
+  font-family:'Courier New',Courier,monospace; font-size:14px; line-height:1.62;
+  letter-spacing:0; color:#a28f7c; }
+#vr-clauses > div { display:flex; flex-direction:column; gap:14px; }
+#vr-clauses > div > div { font-family:'Courier New',Courier,monospace; font-size:14px;
+  line-height:1.62; letter-spacing:0; }
+#vr-clauses b { font-weight:400; color:#ffb066; }
+#vr-clauses em { font-style:normal; color:#ffd9a8; }
+#vr-clauses::-webkit-scrollbar { width:4px; }
+#vr-clauses::-webkit-scrollbar-thumb { background:rgba(255,176,102,0.35); }
+#vr-agree { display:flex; align-items:center; gap:13px; cursor:pointer;
+  font-family:'Courier New',Courier,monospace; font-size:13px; color:#a28f7c; }
+#vr-agree .bx { width:20px; height:20px; flex-shrink:0; background:rgba(255,176,102,0.08);
+  box-shadow:inset 0 0 0 1px rgba(255,160,70,0.35); position:relative; }
+#vr-agree.on .bx { background:rgba(255,176,102,0.14); box-shadow:inset 0 0 0 1px rgba(255,176,102,0.5); }
+#vr-agree.on .bx::after { content:''; position:absolute; left:5px; top:3px; width:8px; height:12px;
+  border-right:2px solid #ffd9a8; border-bottom:2px solid #ffd9a8; transform:rotate(42deg); }
+#vr-start { padding:15px 32px; background:rgba(255,176,102,0.05);
+  box-shadow:inset 0 0 0 1px rgba(255,160,70,0.20); font-family:'DM Mono',monospace;
+  font-size:14px; letter-spacing:0.12em; color:#6e6154; cursor:not-allowed; }
+#vr-start.ready { background:rgba(255,176,102,0.14);
+  box-shadow:inset 0 0 0 1px rgba(255,176,102,0.5); color:#ffd9a8; cursor:pointer; }
+#vr-start.ready:hover { background:rgba(255,176,102,0.24); }
+#vr-decline { padding:15px 26px; background:rgba(255,176,102,0.04);
+  box-shadow:inset 0 0 0 1px rgba(255,160,70,0.20); font-family:'DM Mono',monospace;
+  font-size:14px; letter-spacing:0.12em; color:#8a7967; cursor:pointer; }
+
+#vr-pause .vr-modal { width:min(740px, calc(100vw - 60px)); max-height:calc(100vh - 48px); overflow:auto; }
+.vr-mstats { display:flex; padding:22px 32px; gap:36px;
+  box-shadow:inset 0 -1px 0 rgba(255,160,70,0.20); font-family:'DM Mono',monospace; }
+.vr-mstats .c { flex:1; display:flex; flex-direction:column; gap:11px; }
+.vr-mstats .ttl { font-size:10px; letter-spacing:0.2em; color:#ffb066; }
+.vr-mstats .ttl.bad { color:#ff7a5a; }
+.vr-mstats .kv { display:flex; justify-content:space-between; font-size:12px; color:#a28f7c; }
+.vr-mstats .kv b { font-weight:400; color:#ffd9a8; }
+
+#vr-debrief .wrap { position:absolute; left:50%; top:50%; transform:translate(-50%,-50%);
+  width:min(860px, calc(100vw - 80px)); display:flex; flex-direction:column; gap:38px; align-items:center; text-align:center; }
+#vr-debrief .eyebrow { font-family:'DM Mono',monospace; font-size:11px; letter-spacing:0.34em; color:#a28f7c; }
+#vr-debrief .lede { font-size:15px; line-height:1.75; color:#a28f7c; max-width:540px;
+  font-family:'Courier New',Courier,monospace; }
+#vr-debrief .stats { display:flex; width:100%; background:rgba(12,9,6,0.75);
+  box-shadow:inset 0 0 0 1px rgba(255,160,70,0.26); }
+#vr-debrief .stats .c { flex:1; padding:24px 20px; display:flex; flex-direction:column; gap:9px;
+  box-shadow:inset -1px 0 0 rgba(255,160,70,0.20); font-family:'DM Mono',monospace; }
+#vr-debrief .stats .c:last-child { box-shadow:none; }
+#vr-debrief .stats .k { font-size:10px; letter-spacing:0.2em; color:#8a7967; }
+#vr-debrief .stats .v { font-size:30px; color:#ffd9a8; }
+#vr-debrief .acts { display:flex; gap:3px; }
+
+/* Drift editor */
+#vr-editor { z-index:58; background:rgba(10,6,3,0.80); backdrop-filter:blur(2px); }
+#vr-editor .bar { position:absolute; top:0; left:0; right:0; height:40px; padding:0 24px;
+  display:flex; align-items:center; justify-content:space-between;
+  font-family:'DM Mono',monospace; font-size:11px; letter-spacing:0.18em; color:#ffb066; }
+#vr-editor .bar .r { color:#8a7967; }
+#vr-edit-body { position:absolute; left:40px; right:40px; top:64px; bottom:40px; box-sizing:border-box;
+  display:flex; background:rgba(12,9,6,0.86); box-shadow:inset 0 0 0 1px rgba(255,160,70,0.26); }
+#vr-edit-mid { flex:1; display:flex; flex-direction:column; padding:26px 30px; gap:14px; overflow:hidden; }
+#vr-edit-mid h2 { font-family:'Saira Condensed',sans-serif; font-weight:700; font-size:32px;
+  letter-spacing:0.01em; color:#ff5a3c; }
+#vr-edit-mid p { font-size:13px; line-height:1.6; color:#8a7967; max-width:460px; }
+#vr-edit-mid .plate { margin-top:auto; align-self:flex-start; }
+#vr-edit-mid .plate .l { font-family:'Saira Condensed',sans-serif; font-weight:700;
+  font-size:20px; letter-spacing:0.04em; color:#ff5a3c; margin-bottom:8px; }
+#setup-panel, #control-panel { background:transparent; border-color:rgba(255,160,70,0.20); }
+#vr-editor #setup-panel { border-right:1px solid rgba(255,160,70,0.20); }
+#vr-editor #control-panel { border-left:1px solid rgba(255,160,70,0.20); }
+#status-box, #modal-box { display:none !important; }
+/* ── Drift editor — three-pane ───────────────────────────────────────────── */
+#vr-edit-rail { flex:0 0 208px; display:flex; flex-direction:column; padding:14px 0;
+  box-shadow:inset -1px 0 0 rgba(255,160,70,0.20); overflow-y:auto; min-height:0; }
+#vr-edit-rail .grp { padding:14px 18px 6px 18px; font-family:'DM Mono',monospace;
+  font-size:10px; font-weight:700; letter-spacing:0.2em; color:#ffc78a; }
+#vr-edit-rail .cat { padding:11px 18px; font-family:'DM Mono',monospace; font-size:12px;
+  letter-spacing:0.1em; color:#a28f7c; cursor:pointer; transition:background .12s; }
+#vr-edit-rail .cat:hover { background:rgba(255,176,102,0.16); color:#ffd9a8; }
+#vr-edit-rail .cat.on { color:#ffd9a8; background:rgba(255,176,102,0.13);
+  box-shadow:inset 3px 0 0 #ffb066; }
+#vr-edit-rail .preset { margin-top:auto; padding:16px 18px 0 18px;
+  font-family:'DM Mono',monospace; font-size:10px; letter-spacing:0.14em;
+  color:#6e6154; line-height:1.9; }
+#vr-edit-rail .preset b { display:block; font-weight:400; color:#ffb066; }
+
+#vr-edit-mid { flex:1 1 auto; min-width:0; }
+#vr-edit-mid .ehead { display:flex; align-items:flex-start; justify-content:space-between; gap:24px; }
+#vr-edit-mid .etext { display:flex; flex-direction:column; gap:8px; }
+#vr-edit-mid .eacts { display:flex; gap:3px; flex-shrink:0; }
+#vr-edit-mid .ebtn { padding:9px 16px; font-family:'DM Mono',monospace; font-size:11px;
+  letter-spacing:0.1em; color:#a28f7c; box-shadow:inset 0 0 0 1px rgba(255,160,70,0.24);
+  cursor:pointer; transition:background .12s; }
+#vr-edit-mid .ebtn:hover { background:rgba(255,176,102,0.10); }
+#vr-edit-mid .ebtn.pri { color:#ffd9a8; background:rgba(255,176,102,0.13);
+  box-shadow:inset 0 0 0 1px rgba(255,176,102,0.40); }
+#vr-edit-mid .ebtn.pri:hover { background:rgba(255,176,102,0.22); }
+
+#vr-edit-cols { flex:1 1 auto; min-height:0; display:grid;
+  grid-template-columns:minmax(300px, 1fr) minmax(0, 1fr); gap:40px; padding-top:6px; }
+#vr-edit-spare { min-width:0; }
+#vr-edit-panes { min-height:0; min-width:300px; overflow-y:auto; overflow-x:visible; }
+#vr-edit-panes::-webkit-scrollbar { width:4px; }
+#vr-edit-panes::-webkit-scrollbar-thumb { background:rgba(255,176,102,0.3); }
+#vr-edit-panes > .accordion-body { display:none !important; padding:0 !important;
+  grid-template-columns:1fr; gap:20px; }
+#vr-edit-panes > .accordion-body.on { display:grid !important; }
+#vr-edit-panes .light-sub { grid-column:1 / -1; border-top:1px solid rgba(255,160,70,0.20);
+  padding-top:14px; margin-top:2px; display:grid; grid-template-columns:1fr; gap:16px; }
+#vr-edit-panes .light-sub-title { grid-column:1 / -1; font-family:'Saira Condensed',sans-serif;
+  font-weight:700; font-size:16px; letter-spacing:0.04em; color:#ff5a3c !important; margin:0; }
+#vr-edit-panes .btn-row { grid-column:1 / -1; display:flex; gap:3px; }
+#vr-edit-panes .btn-row .btn { flex:1 1 0; min-width:0; width:auto; margin-bottom:0; }
+#vr-edit-panes .toggle-row, #vr-edit-panes .color-row,
+#vr-edit-panes .spinner-row { margin-bottom:0 !important; }
+
+/* Cube-influenced control rows: square handles, label above, track below */
+#vr-edit-panes .control-row { flex-direction:column; align-items:stretch; gap:7px;
+  margin-bottom:0 !important; }
+#vr-edit-panes .control-row .ctrl-label { flex:0 0 auto; order:1; font-family:'DM Mono',monospace;
+  font-size:11px; letter-spacing:0.14em; text-transform:uppercase; color:#a28f7c; }
+#vr-edit-panes .control-row .ctrl-value { order:2; flex:0 0 auto; text-align:right;
+  font-size:12px; color:#ffd9a8; margin-top:-24px; }
+#vr-edit-panes .control-row input[type=range] { order:3; width:100%; flex:none;
+  height:4px; background:rgba(255,176,102,0.16); }
+#vr-edit-panes input[type=range]::-webkit-slider-thumb { width:13px; height:13px;
+  border-radius:0; background:#ffd9a8; }
+#vr-edit-panes input[type=range]::-webkit-slider-thumb:hover { transform:none; background:#fff0d8; }
+#vr-edit-panes .toggle-track { border-radius:0; background:rgba(255,176,102,0.10);
+  box-shadow:inset 0 0 0 1px rgba(255,160,70,0.30); }
+#vr-edit-panes .toggle input:checked + .toggle-track { background:rgba(255,176,102,0.16);
+  box-shadow:inset 0 0 0 1px rgba(255,176,102,0.5); }
+#vr-edit-panes .toggle-thumb { border-radius:0; width:11px; height:11px; background:#6e6154; }
+#vr-edit-panes .toggle input:checked ~ .toggle-thumb { background:#ffd9a8; }
+#vr-edit-panes .toggle-label, #vr-edit-panes .color-label { font-family:'DM Mono',monospace;
+  font-size:11px; letter-spacing:0.12em; text-transform:uppercase; color:#a28f7c; }
+#vr-edit-panes input[type=number], #vr-edit-panes input[type=color] { border-radius:0; }
+#vr-edit-panes .btn { border-radius:0; text-align:center; }
+#vr-edit-panes .spinner-label { font-family:'DM Mono',monospace; letter-spacing:0.1em;
+  text-transform:uppercase; }
+
+#vr-edit-right { flex:0 0 268px; padding:26px 24px; display:flex; flex-direction:column;
+  gap:14px; box-shadow:inset 1px 0 0 rgba(255,160,70,0.20); overflow-y:auto; min-height:0;
+  font-family:'DM Mono',monospace; }
+#vr-edit-right .l { font-family:'Saira Condensed',sans-serif; font-weight:700;
+  font-size:20px; letter-spacing:0.04em; color:#ff5a3c; }
+#vr-edit-right canvas { width:100%; height:auto; aspect-ratio:1;
+  box-shadow:inset 0 0 0 1px rgba(255,160,70,0.22); background:rgba(255,176,102,0.03); }
+#vr-edit-right .kv { display:flex; justify-content:space-between; font-size:11px; color:#8a7967; }
+#vr-edit-right .kv b { font-weight:400; color:#ffd9a8; }
+#vr-edit-right .note { margin-top:auto; font-family:'DM Sans',sans-serif; font-size:12px;
+  line-height:1.6; color:#6e6154; }
+#setup-panel, #control-panel { display:none !important; }
+
+
+#vr-editor .attitude-indicator { border-color:rgba(255,160,70,0.24); background:rgba(12,9,6,0.6); }
+
+/* ── Responsive overrides — must remain the last rules in this stylesheet ── */
+@media (max-width:900px) {
+  #vr-survey { display:none !important; }
+  #vr-board .boardgrid { padding:16px 72px 0 80px; }
+}
+@media (max-width:760px) {
+  #vr-board .boardgrid { padding:16px 32px 0 32px; }
+}
+/* Edge instruments may never compress past their own label text; the drift
+   plate is the element that yields when a rail runs short. */
+#vr-hud .vr-tape { min-height:104px; }
+#vr-hud #vr-plate-wrap { flex:0 1 auto; min-height:0; overflow:hidden; }
+#vr-hud #vr-plate-wrap #radar-canvas { max-height:100%; width:auto; height:auto; }
+@media (max-height:620px) { #vr-hud #vr-plate-wrap { display:none; } }
+
+@media (max-width:1400px) {
+  #vr-edit-body { left:24px; right:24px; }
+  #vr-edit-rail { flex-basis:184px; }
+  #vr-edit-right { flex-basis:236px; padding:22px 18px; }
+  #vr-edit-mid { padding:22px 22px; }
+}
+@media (max-width:1120px) {
+  #vr-edit-cols { grid-template-columns:minmax(300px, 1fr); }
+  #vr-edit-spare { display:none; }
+  #vr-edit-mid .ehead { flex-wrap:wrap; }
+  #vr-edit-rail { flex-basis:168px; }
+  #vr-edit-right { flex-basis:212px; }
+}
+@media (max-width:900px) {
+  #vr-edit-right { display:none; }
+}
+
 </style>
 </head>
 <body>
@@ -941,6 +1294,245 @@ input[type=number]:focus { border-color: rgba(200,240,96,0.35); }
 </div>
 
 </div><!-- #main -->
+
+
+<!-- ══ VEILRUNNER Ir 77 — UI layer ═══════════════════════════════════════ -->
+<div id="vr-scan"></div>
+<div id="vr-frame"></div>
+
+<div id="vr-hud" class="off">
+  <div id="vr-topbar">
+    <span>SV-04 KESTREL · LT. VOSS</span>
+    <span class="mid">IRIDIUM VEIL K-9 · CONTRACT 77-C</span>
+    <span id="vr-clock">T+ 00:00</span>
+  </div>
+
+  <div class="vr-rail left">
+  <div class="vr-box" id="vr-airframe">
+    <div class="ttl">AIRFRAME</div>
+    <div style="display:flex;flex-direction:column;gap:5px">
+      <div class="kv"><span>HULL</span><b id="vr-hull">100</b></div>
+      <div class="vr-seg" id="vr-hullseg"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i></div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:5px">
+      <div class="kv"><span>ORDNANCE</span><b id="vr-ord">100 / 100</b></div>
+      <div class="vr-pips" id="vr-ordpips"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i></div>
+    </div>
+  </div>
+
+  <div class="vr-tape" id="vr-throttle">
+    <div class="vr-scale r"><span>0.9</span><span>0.8</span><span>0.7</span><span>0.6</span><span>0.5</span></div>
+    <div class="vr-spine"></div>
+    <div class="vr-read"><div class="n" id="vr-thr">0.00</div><div class="l">THROTTLE</div></div>
+  </div>
+  </div>
+
+  <div class="vr-rail right">
+  <div class="vr-box" id="vr-hostile">
+    <div class="ttl">HOSTILE · BOID</div>
+    <div style="display:flex;flex-direction:column;gap:5px">
+      <div class="kv"><span>INTEGRITY</span><b id="vr-bhp" style="color:#ff9b80">100</b></div>
+      <div class="vr-bar"><span id="vr-bbar" style="width:100%"></span></div>
+    </div>
+    <div class="kv"><span>RANGE</span><b id="vr-brange">—</b></div>
+    <div class="kv"><span>ASPECT</span><b id="vr-baspect">—</b></div>
+  </div>
+  <div class="vr-tape" id="vr-altitude">
+    <div class="vr-read r"><div class="n" id="vr-alt">000</div><div class="l" id="vr-vs">ALT · VS +0</div></div>
+    <div class="vr-spine"></div>
+    <div class="vr-scale"><span>100</span><span>090</span><span>080</span><span>070</span><span>060</span></div>
+  </div>
+  <div id="vr-plate-wrap">
+    <div class="l">DRIFT PLATE</div>
+  </div>
+  </div>
+
+  <div id="vr-prox"><div class="t">▲ ROCK 00u ▲</div><div class="u"></div></div>
+  <div id="vr-hint"></div>
+
+  <div id="vr-botbar">
+    <div class="grp">
+      <span class="hot" id="vr-gun">GUN · READY</span>
+      <span id="vr-msl">MSL · 100</span>
+      <span id="vr-brk">BRK · OFF</span>
+      <span id="vr-cam">CAM · FLIGHT</span>
+    </div>
+    <div class="grp">
+      <span>W/S THROTTLE</span><span>MOUSE STEER</span><span>LMB FIRE</span><span>TAB EDITOR</span><span>ESC HOLD</span>
+    </div>
+  </div>
+</div>
+
+<!-- ── Contract board ──────────────────────────────────────────────────── -->
+<div class="vr-screen on" id="vr-board">
+  <div class="vr-veil" style="background:linear-gradient(90deg,rgba(10,6,3,0.95) 0%,rgba(10,6,3,0.88) 44%,rgba(10,6,3,0.20) 80%,transparent 100%)"></div>
+  <div class="scan"></div><div class="edge"></div>
+  <div style="position:absolute;top:0;left:0;right:0;height:40px;padding:0 24px;display:flex;align-items:center;justify-content:space-between;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:0.18em;color:#ffb066">
+    <span>OUTER DRIFT SALVAGE AUTHORITY</span><span style="color:#a28f7c">TERMINAL 04 · STANDBY</span>
+  </div>
+  <div class="boardgrid">
+  <div class="col">
+    <div style="display:flex;flex-direction:column;gap:20px">
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div class="eyebrow">CONTRACT 77-C · IRIDIUM VEIL K-9</div>
+        <div class="title"><span style="color:#ff5a3c">VEILRUNNER</span><span style="color:#e8d24a">Ir 77</span></div>
+        <div style="width:130px;height:2px;background:rgba(255,176,102,0.5);margin-top:6px"></div>
+      </div>
+      <p class="body" style="max-width:490px">The Veil is an orbiting belt of iridium — element 77, denser than gold and worth more by the gram. Company rigs mine it out here, unescorted, and the pirates know it: they take the ship, not the rock.<br><br>You patrol K-9. Fifty unlogged rocks, no beacons, no traffic control. A pirate Boid is shadowing the ore hauler <span style="color:#e8d24a">Princess</span> and will not break off while you are in the field. Kill the Boid. Bring the Princess home.</p>
+      <div style="display:flex;flex-direction:column;gap:3px;width:100%;max-width:430px">
+        <div class="vr-item pri" id="vr-accept"><span class="num">01</span><span>ACCEPT CONTRACT 77-C</span><span class="tail" style="color:rgba(255,176,102,0.6)">↵</span></div>
+        <div class="vr-item" id="vr-training"><span class="num">02</span><span>FLIGHT TRAINING</span><span class="tail">NO HOSTILES</span></div>
+        <div class="vr-item" id="vr-board-editor"><span class="num">03</span><span>DRIFT EDITOR</span><span class="tail">TAB</span></div>
+      </div>
+    </div>
+    <div class="foot">
+      <div style="display:flex;flex-direction:column;gap:5px"><span class="k">PILOT</span><span class="v">LT. A. VOSS</span></div>
+      <div style="display:flex;flex-direction:column;gap:5px"><span class="k">AIRFRAME</span><span class="v">SV-04 KESTREL</span></div>
+      <div style="display:flex;flex-direction:column;gap:5px"><span class="k">CLEARED</span><span class="v" id="vr-cleared">00</span></div>
+    </div>
+  </div>
+  <div id="vr-survey">
+    <div style="font-size:10px;letter-spacing:0.22em;color:#ffb066">DRIFT SURVEY</div>
+    <div class="kv"><span>ROCKS</span><span style="color:#ffd9a8" id="vr-sv-rocks">50</span></div>
+    <div class="kv"><span>MINES · ORANGE</span><span style="color:#ffb066" id="vr-sv-orange">05</span></div>
+    <div class="kv"><span>MINES · RED</span><span style="color:#ff5a3c" id="vr-sv-red">05</span></div>
+    <div class="kv"><span>HOSTILES</span><span style="color:#ffd9a8">01 + ESCORT</span></div>
+    <div style="height:1px;background:rgba(255,160,70,0.2);margin:4px 0"></div>
+    <div style="font-family:'DM Sans',sans-serif;font-size:13px;line-height:1.6;color:#8a7967">Debris density high. Recommend gear up, brakes off, throttle under 80% inside the cluster.</div>
+  </div>
+  </div>
+</div>
+
+<!-- ── Terms ───────────────────────────────────────────────────────────── -->
+<div class="vr-screen" id="vr-terms">
+  <div class="vr-veil" style="background:rgba(10,6,3,0.86);backdrop-filter:blur(3px)"></div>
+  <div class="scan"></div><div class="edge"></div>
+  <div class="vr-modal">
+    <div class="vr-mhead">
+      <div style="display:flex;flex-direction:column;gap:7px">
+        <div style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.28em;color:#ffb066">OUTER DRIFT SALVAGE AUTHORITY · FORM 77-C/L</div>
+        <div class="vr-disp" style="font-size:34px">Liability Waiver &amp; Deed of Release</div>
+      </div>
+      <div class="r"><div>REV. 41</div><div>NON-NEGOTIABLE</div></div>
+    </div>
+    <div id="vr-clauses">
+      <div>
+        <div><b>1. GENERAL.</b> The Authority contracts independent Veilrunners on a strictly per-carcass basis. The Authority is not your employer, your guardian, your next of kin, or, in any jurisdiction recognised by the Authority, your friend.</div>
+        <div><b>2. AIRFRAME.</b> The SV-04 Kestrel is supplied as-is, where-is, and — following contact with iridium at velocity — as-scattered. The Authority accepts no liability for loss of hull, loss of canopy, loss of the pilot contained within said canopy, or the administrative burden this creates.</div>
+        <div><b>3. PIRACY.</b> The Authority does not negotiate with Veil pirates and will not be held responsible for boarding, seizure, ransom, sustained torture, novelty torture, torture the Authority has not previously catalogued and would frankly like to hear about, or the pilot's subsequent voluntary enlistment with the boarding party.</div>
+        <div><b>4. BIOLOGICAL.</b> The Veil is not sterile. The Authority disclaims all responsibility for pathogens, prions, spores, unclassified rotifers, and any organism that elects to gestate within the contractor. Where a host relationship is established, the resulting entity is deemed <em>salvage</em> and remains property of the Authority.</div>
+        <div><b>5. RADIOLOGICAL.</b> Prolonged proximity to unshielded iridium (Ir, 77) may produce, without limitation: haemorrhage of the lower bowel; tongue rot; progressive liquefaction of the skeleton; retrograde memory loss; hallucination of persons known and unknown; hallucination of persons who then file grievances; and the sudden, permanent, medically untreatable addiction to the recorded works of <em>Taylor Swift</em>.</div>
+        <div><b>6. PSYCHIATRIC.</b> Veil psychosis is a recognised occupational outcome and is therefore not a recognised occupational injury.</div>
+        <div><b>7. THE PRINCESS.</b> The ore hauler <em style="color:#e8d24a">Princess</em> is insured. You are not.</div>
+        <div><b>8. DEATH.</b> Death does not void this agreement, terminate the contract, or entitle the estate to the balance owed.</div>
+      </div>
+    </div>
+    <div style="padding:18px 30px 22px 30px;display:flex;flex-direction:column;gap:16px;box-shadow:inset 0 1px 0 rgba(255,160,70,0.20)">
+      <div id="vr-agree"><div class="bx"></div><span>I have read the above in full and elect to proceed regardless.</span></div>
+      <div style="display:flex;align-items:center;gap:3px">
+        <div id="vr-start">START CONTRACT</div>
+        <div id="vr-decline">DECLINE</div>
+        <div style="margin-left:auto;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.16em;color:#6e6154">SIGNATORY · LT. A. VOSS</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Pause ───────────────────────────────────────────────────────────── -->
+<div class="vr-screen" id="vr-pause">
+  <div class="vr-veil" style="background:rgba(10,6,3,0.75);backdrop-filter:blur(3px)"></div>
+  <div class="scan"></div><div class="edge"></div>
+  <div class="vr-modal">
+    <div class="vr-mhead">
+      <div style="display:flex;flex-direction:column;gap:7px">
+        <div style="font-family:'DM Mono',monospace;font-size:11px;letter-spacing:0.3em;color:#ffb066">SYSTEMS HOLD</div>
+        <div class="vr-disp" style="font-size:42px">Engines Idle</div>
+      </div>
+      <div class="r"><div>CONTRACT 77-C</div><div id="vr-pclock">T+ 00:00</div></div>
+    </div>
+    <div class="vr-mstats">
+      <div class="c">
+        <div class="ttl">AIRFRAME</div>
+        <div style="display:flex;flex-direction:column;gap:5px">
+          <div class="kv"><span>HULL</span><b id="vr-p-hull">100</b></div>
+          <div class="vr-seg" id="vr-p-hullseg"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i></div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:5px">
+          <div class="kv"><span>ORDNANCE</span><b id="vr-p-ord">100 / 100</b></div>
+          <div class="vr-bar" style="background:rgba(255,217,168,0.16)"><span id="vr-p-ordbar" style="width:100%;background:#ffd9a8"></span></div>
+        </div>
+      </div>
+      <div class="c">
+        <div class="ttl bad">DRIFT</div>
+        <div class="kv"><span>BOID INTEGRITY</span><b id="vr-p-bhp" style="color:#ff9b80">100%</b></div>
+        <div class="kv"><span>SHOTS FIRED</span><b id="vr-p-shots">0</b></div>
+        <div class="kv"><span>ROCKS IN FIELD</span><b id="vr-p-rocks">50</b></div>
+      </div>
+    </div>
+    <div class="vr-mfoot">
+      <div class="vr-item pri" id="vr-resume"><span class="vr-key">ESC</span><span>RESUME FLIGHT</span></div>
+      <div class="vr-item" id="vr-pause-editor"><span class="vr-key">TAB</span><span>DRIFT EDITOR</span></div>
+      <div class="vr-item" id="vr-pause-restart"><span class="vr-key">R</span><span>RESTART CONTRACT</span></div>
+      <div class="vr-item bad" id="vr-abandon"><span class="vr-key">Q</span><span>ABANDON · RETURN TO BOARD</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Debrief ─────────────────────────────────────────────────────────── -->
+<div class="vr-screen" id="vr-debrief">
+  <div class="vr-veil" style="background:linear-gradient(180deg,rgba(10,6,3,0.5),rgba(10,6,3,0.94))"></div>
+  <div class="scan"></div><div class="edge"></div>
+  <div class="wrap">
+    <div style="display:flex;flex-direction:column;gap:16px;align-items:center">
+      <div class="eyebrow" id="vr-d-eyebrow">CONTRACT 77-C · CLOSED</div>
+      <div class="vr-disp" style="font-size:80px" id="vr-d-title">BOID DOWN</div>
+      <p class="lede" id="vr-d-lede"></p>
+    </div>
+    <div class="stats">
+      <div class="c"><span class="k">TIME ON STATION</span><span class="v" id="vr-d-time">00:00</span></div>
+      <div class="c"><span class="k">MISSILES SPENT</span><span class="v" id="vr-d-msl">0</span></div>
+      <div class="c"><span class="k">ACCURACY</span><span class="v" id="vr-d-acc">0%</span></div>
+      <div class="c"><span class="k">HULL REMAINING</span><span class="v" id="vr-d-hull" style="color:#ffb066">0%</span></div>
+    </div>
+    <div class="acts">
+      <div class="vr-item pri" id="vr-again">FLY IT AGAIN</div>
+      <div class="vr-item" id="vr-harder">HARDER DRIFT · 120 ROCKS</div>
+      <div class="vr-item" id="vr-toboard">CONTRACT BOARD</div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Drift editor ────────────────────────────────────────────────────── -->
+<div class="vr-screen" id="vr-editor">
+  <div class="bar"><span>DRIFT EDITOR · SIM PARAMETERS</span><span class="r">TAB TO RETURN</span></div>
+  <div id="vr-edit-body">
+    <div id="vr-edit-rail"></div>
+    <div id="vr-edit-mid">
+      <div class="ehead">
+        <div class="etext">
+          <h2 id="vr-edit-title">Asteroid Debris</h2>
+          <p id="vr-edit-desc"></p>
+        </div>
+        <div class="eacts">
+          <div class="ebtn" id="vr-edit-reset">RESET</div>
+          <div class="ebtn pri" id="vr-edit-rebuild">REBUILD DRIFT</div>
+        </div>
+      </div>
+      <div id="vr-edit-cols">
+        <div id="vr-edit-panes"></div>
+        <div id="vr-edit-spare"></div>
+      </div>
+    </div>
+    <div id="vr-edit-right">
+      <div class="l">LIVE PREVIEW</div>
+      <canvas id="vr-edit-plate" width="252" height="252"></canvas>
+      <div class="kv"><span>ROCKS</span><b id="vr-ed-rocks">0</b></div>
+      <div class="kv"><span>DRAW CALLS</span><b id="vr-ed-calls">0</b></div>
+      <div class="kv"><span>EST. FPS</span><b id="vr-ed-fps">60</b></div>
+      <div class="note">Changes apply live. Rebuild Drift respawns the field and resets the contract clock.</div>
+    </div>
+  </div>
+</div>
 
 <script type="importmap">
 {
@@ -1680,6 +2272,7 @@ const _awayFromAst    = new THREE.Vector3();
 
 function steerBoidDt(dt) {
   if (gameOver || gameWon) return;
+  if (typeof vrTraining !== 'undefined' && vrTraining) return;
 
   _boidForward.set(0, 0, 1).applyQuaternion(boidMesh.quaternion).normalize();
 
@@ -2050,7 +2643,7 @@ function updateMissiles(dt) {
 
     // Check boid hit
     const distToBoid = m.mesh.position.distanceTo(boidState.pos);
-    if (distToBoid < 1.0 && !gameWon) {
+    if (distToBoid < 1.0 && !gameWon && !(typeof vrTraining !== 'undefined' && vrTraining)) {
       boidHP -= MISSILE_DAMAGE;
       boidHP  = Math.max(0, boidHP);
       showHitEffect(false);
@@ -2115,6 +2708,7 @@ let lockOn = false;
 let lockDist = Infinity;
 
 function updateLock() {
+  if (typeof vrTraining !== 'undefined' && vrTraining) { lockOn = false; lockDist = Infinity; return; }
   const pos = cameraRig.position;
   lockDist = pos.distanceTo(boidState.pos);
   lockOn   = lockDist < LOCK_RANGE;
@@ -2328,33 +2922,27 @@ function triggerWin() {
 }
 
 function showModal(win, msg) {
-  if (!win) {
-    gamePaused = true;
-  } // only pause on game-over, not win (player flies during explosion)
-  const box   = document.getElementById('modal-box');
-  const title = document.getElementById('modal-title');
-  const msgEl = document.getElementById('modal-msg');
-  title.textContent = win ? '✓ Target Destroyed' : '✕ Mission Failed';
-  title.className   = win ? 'win' : '';
-  msgEl.textContent = msg;
-  msgEl.className   = win ? 'win' : '';
-  box.classList.add('active');
+  if (!win) gamePaused = true;
+  vrDebrief(win);
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
 //  HUD CANVAS  (must be declared before resizeAll so positionHudCanvas works)
 // ══════════════════════════════════════════════════════════════════════════════
-const HUD_SIZE = 400;
 const hudCanvas = document.getElementById('hud-canvas');
 const hudCtx    = hudCanvas.getContext('2d');
-hudCanvas.width  = HUD_SIZE;
-hudCanvas.height = HUD_SIZE;
+let HUD_W = 1, HUD_H = 1;
 
 function positionHudCanvas() {
-  const winW = window.innerWidth;
-  const winH = window.innerHeight;
-  hudCanvas.style.left = (winW / 2 - HUD_SIZE / 2) + 'px';
-  hudCanvas.style.top  = (winH / 2 - HUD_SIZE / 2 - 20) + 'px';
+  const w = window.innerWidth, h = window.innerHeight;
+  if (hudCanvas.width !== w || hudCanvas.height !== h) {
+    hudCanvas.width = w; hudCanvas.height = h;
+  }
+  HUD_W = w; HUD_H = h;
+  hudCanvas.style.left = '0px';
+  hudCanvas.style.top  = '0px';
+  hudCanvas.style.width  = w + 'px';
+  hudCanvas.style.height = h + 'px';
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
@@ -2398,16 +2986,12 @@ viewportEl.addEventListener('click', () => {
 document.addEventListener('keydown', e => {
   if (e.key === '1') { setActiveCamera(1); e.preventDefault(); }
   if (e.key === '2') { setActiveCamera(2); e.preventDefault(); }
-  if (e.key === 'e' || e.key === 'E') {
-    document.getElementById('setup-panel').classList.toggle('hidden');
-    setTimeout(resizeAll, 50);
-    e.preventDefault();
+  if (e.key === 'Tab') { vrToggleEditor(); e.preventDefault(); return; }
+  if (vrScreen === 'pause') {
+    if (e.key === 'r' || e.key === 'R') { vrRestartContract(); e.preventDefault(); return; }
+    if (e.key === 'q' || e.key === 'Q') { vrGoBoard(); e.preventDefault(); return; }
   }
-  if (e.key === 'i' || e.key === 'I') {
-    document.getElementById('control-panel').classList.toggle('hidden');
-    setTimeout(resizeAll, 50);
-    e.preventDefault();
-  }
+  if (vrScreen === 'board' && (e.key === 'Enter')) { vrGoTerms(); e.preventDefault(); return; }
   if (!gamePaused) {
     if (e.key === 'w' || e.key === 'W') { thrust = Math.min(1.0, thrust + 0.05); e.preventDefault(); }
     if (e.key === 's' || e.key === 'S') { thrust = Math.max(0,   thrust - 0.05); e.preventDefault(); }
@@ -2421,11 +3005,7 @@ document.addEventListener('keydown', e => {
   }
   if (e.key === 'g' || e.key === 'G') { gearDown = !gearDown; }
   if (e.key === 'f' || e.key === 'F') { if (!audioReady) initAudio(); boidHP = -1; if (boidHP <= 0) triggerWin(); }
-  if (e.key === 'Escape') {
-    if (gameOver || gameWon) return;
-    gamePaused = !gamePaused;
-    if (gamePaused) { mouse.x = 0; mouse.y = 0; }
-  }
+  if (e.key === 'Escape') { vrEscape(); e.preventDefault(); }
 });
 
 document.getElementById('btn-restart').addEventListener('click', restartGame);
@@ -2521,277 +3101,230 @@ function drawAttitude(pitch, roll) {
   attCtx.restore();
 }
 
-// Radar canvas
+// ── Drift plate (top-down grid) ───────────────────────────────────────────
 const radarCanvas = document.getElementById('radar-canvas');
 const radarCtx    = radarCanvas.getContext('2d');
-const RADAR_R     = 92;   // px radius of radar display
-const RADAR_RANGE = 200;  // world units mapped to radar
-function drawRadar(playerPos, heading) {
-  const w = radarCanvas.width, h = radarCanvas.height;
-  const cx = w/2, cy = h/2;
-  radarCtx.clearRect(0,0,w,h);
+radarCanvas.width = 136; radarCanvas.height = 136;
+const RADAR_RANGE = 220;  // world units across the plate
 
-  // Background
-  radarCtx.fillStyle = 'rgba(0,0,20,0.85)';
-  radarCtx.beginPath(); radarCtx.arc(cx,cy,RADAR_R,0,Math.PI*2); radarCtx.fill();
+function drawPlate(ctx, size, playerPos, heading) {
+  const cx = size / 2, cy = size / 2;
+  ctx.clearRect(0, 0, size, size);
+  ctx.fillStyle = 'rgba(12,9,6,0.5)';
+  ctx.fillRect(0, 0, size, size);
 
-  // Grid rings
-  radarCtx.strokeStyle = 'rgba(96,200,240,0.12)'; radarCtx.lineWidth = 0.8;
-  [0.33, 0.66, 1].forEach(f => {
-    radarCtx.beginPath(); radarCtx.arc(cx,cy,RADAR_R*f,0,Math.PI*2); radarCtx.stroke();
-  });
-  // Cross
-  radarCtx.beginPath();
-  radarCtx.moveTo(cx-RADAR_R,cy); radarCtx.lineTo(cx+RADAR_R,cy);
-  radarCtx.moveTo(cx,cy-RADAR_R); radarCtx.lineTo(cx,cy+RADAR_R);
-  radarCtx.stroke();
+  // Grid
+  ctx.strokeStyle = 'rgba(255,176,102,0.22)';
+  ctx.lineWidth = 1;
+  const step = size / 6;
+  for (let i = 1; i < 6; i++) {
+    ctx.beginPath(); ctx.moveTo(i * step, 0); ctx.lineTo(i * step, size); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(0, i * step); ctx.lineTo(size, i * step); ctx.stroke();
+  }
 
-  // Helper to world→radar coords (rotate by heading)
   const cosH = Math.cos(-heading), sinH = Math.sin(-heading);
-  function worldToRadar(wx, wz) {
+  const scale = (size / 2) / RADAR_RANGE;
+  function toPlate(wx, wz) {
     const dx = wx - playerPos.x, dz = wz - playerPos.z;
-    const rx =  dx * cosH + dz * sinH;
-    const ry = -dx * sinH + dz * cosH;
-    const scale = RADAR_R / RADAR_RANGE;
-    return { x: cx + rx * scale, y: cy + ry * scale };
+    return { x: cx + (dx * cosH + dz * sinH) * scale,
+             y: cy + (-dx * sinH + dz * cosH) * scale };
   }
+  const inside = p => p.x > 2 && p.x < size - 2 && p.y > 2 && p.y < size - 2;
 
-  // Asteroids
-  radarCtx.fillStyle = 'rgba(180,120,60,0.7)';
+  // Rocks
+  ctx.fillStyle = 'rgba(255,200,150,0.35)';
   asteroids.forEach(ast => {
-    const { x, y } = worldToRadar(ast.mesh.position.x, ast.mesh.position.z);
-    if (Math.hypot(x-cx, y-cy) < RADAR_R) {
-      radarCtx.fillRect(x-1.5, y-1.5, 3, 3);
-    }
+    const p = toPlate(ast.mesh.position.x, ast.mesh.position.z);
+    if (inside(p)) ctx.fillRect(p.x - 2, p.y - 2, 4, 4);
   });
 
-  // Boid
-  const bp = worldToRadar(boidState.pos.x, boidState.pos.z);
-  if (Math.hypot(bp.x-cx, bp.y-cy) < RADAR_R) {
-    radarCtx.fillStyle = lockOn ? '#f08080' : '#60c8f0';
-    radarCtx.beginPath(); radarCtx.arc(bp.x, bp.y, 3.5, 0, Math.PI*2); radarCtx.fill();
-  } else {
-    // Arrow to boid at edge
-    const angle = Math.atan2(bp.y-cy, bp.x-cx);
-    const ex = cx + Math.cos(angle)*(RADAR_R-6), ey = cy + Math.sin(angle)*(RADAR_R-6);
-    radarCtx.fillStyle = '#60c8f0';
-    radarCtx.beginPath(); radarCtx.arc(ex, ey, 2.5, 0, Math.PI*2); radarCtx.fill();
+  // Mines
+  mines.forEach(m => {
+    const p = toPlate(m.mesh.position.x, m.mesh.position.z);
+    if (!inside(p)) return;
+    ctx.fillStyle = m.type === 'orange' ? '#ffb066' : '#ff5a3c';
+    ctx.fillRect(p.x - 2, p.y - 2, 4, 4);
+  });
+
+  // Princess — yellow rotated square
+  if (typeof princessMesh !== 'undefined') {
+    const p = toPlate(princessMesh.position.x, princessMesh.position.z);
+    if (inside(p)) {
+      ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(Math.PI / 4);
+      ctx.fillStyle = '#e8d24a'; ctx.fillRect(-3, -3, 6, 6); ctx.restore();
+    }
   }
 
-  // Player dot
-  radarCtx.fillStyle = '#c8f060';
-  radarCtx.beginPath(); radarCtx.arc(cx, cy, 3, 0, Math.PI*2); radarCtx.fill();
-  // North tick
-  radarCtx.strokeStyle = 'rgba(200,240,96,0.4)';
-  radarCtx.lineWidth = 1;
-  radarCtx.beginPath();
-  radarCtx.moveTo(cx, cy);
-  radarCtx.lineTo(cx, cy - RADAR_R * 0.35);
-  radarCtx.stroke();
+  // Boid — red square, or edge marker if off-plate
+  if (typeof vrTraining !== 'undefined' && vrTraining) { ctx.strokeStyle = '#ffd9a8'; ctx.lineWidth = 1;
+    ctx.strokeRect(cx - 3, cy - 3, 6, 6);
+    ctx.beginPath(); ctx.moveTo(cx, cy - 3); ctx.lineTo(cx, cy - 14); ctx.stroke(); return; }
+  const bp = toPlate(boidState.pos.x, boidState.pos.z);
+  ctx.fillStyle = '#ff5a3c';
+  if (inside(bp)) {
+    ctx.fillRect(bp.x - 3.5, bp.y - 3.5, 7, 7);
+  } else {
+    const a = Math.atan2(bp.y - cy, bp.x - cx);
+    const ex = cx + Math.cos(a) * (size / 2 - 6), ey = cy + Math.sin(a) * (size / 2 - 6);
+    ctx.fillRect(ex - 2.5, ey - 2.5, 5, 5);
+  }
 
-  // Clip mask
-  radarCtx.save();
-  radarCtx.globalCompositeOperation = 'destination-in';
-  radarCtx.beginPath(); radarCtx.arc(cx,cy,RADAR_R,0,Math.PI*2); radarCtx.fill();
-  radarCtx.restore();
-
-  // Border
-  radarCtx.strokeStyle = 'rgba(96,200,240,0.3)'; radarCtx.lineWidth = 1.5;
-  radarCtx.beginPath(); radarCtx.arc(cx,cy,RADAR_R,0,Math.PI*2); radarCtx.stroke();
-
-  // Heading label
-  radarCtx.fillStyle = 'rgba(96,200,240,0.5)';
-  radarCtx.font = '9px DM Mono, monospace';
-  radarCtx.textAlign = 'center'; radarCtx.textBaseline = 'bottom';
-  radarCtx.fillText('N', cx, cy - RADAR_R + 2);
+  // Player + nose tick
+  ctx.strokeStyle = '#ffd9a8'; ctx.lineWidth = 1;
+  ctx.strokeRect(cx - 3, cy - 3, 6, 6);
+  ctx.beginPath(); ctx.moveTo(cx, cy - 3); ctx.lineTo(cx, cy - 14); ctx.stroke();
 }
 
-// ── Main HUD draw ─────────────────────────────────────────
-function drawHUD(pitchDeg, rollRad, yawDeg, speedPct, alt, boidDist, thrust) {
-  hudCtx.clearRect(0, 0, HUD_SIZE, HUD_SIZE);
-  if (!hudActive) return;
+function drawRadar(playerPos, heading) {
+  drawPlate(radarCtx, radarCanvas.width, playerPos, heading);
+  const ep = document.getElementById('vr-edit-plate');
+  if (ep && document.getElementById('vr-editor').classList.contains('on')) {
+    drawPlate(ep.getContext('2d'), ep.width, playerPos, heading);
+  }
+}
 
-  const cx = HUD_SIZE / 2, cy = HUD_SIZE / 2;
-  const c  = hudColor;
-  const cR = '#f08080';
-  hudCtx.strokeStyle = c; hudCtx.fillStyle = c;
-  hudCtx.lineWidth   = 1.5;
-  hudCtx.font        = '11px DM Mono, monospace';
-  hudCtx.textAlign   = 'center';
+// ── Main HUD draw — Veilrunner Ir 77 ──────────────────────────────────────
+const AMB       = '#ffb066';
+const AMB_BRIGHT= '#ffd9a8';
+const AMB_DIM   = 'rgba(255,176,102,0.5)';
+const HOSTILE   = '#ff5a3c';
+const ESCORT    = '#e8d24a';
+const _vrProj   = new THREE.Vector3();
+
+function vrProject(pos) {
+  _vrProj.copy(pos).project(activeThreeCamera);
+  if (_vrProj.z > 1) return null;
+  return { x: (_vrProj.x * 0.5 + 0.5) * HUD_W, y: (-_vrProj.y * 0.5 + 0.5) * HUD_H };
+}
+
+function drawHUD(pitchDeg, rollRad, yawDeg, speedPct, alt, boidDist, thrust) {
+  hudCtx.clearRect(0, 0, HUD_W, HUD_H);
+  if (!hudActive || vrScreen !== 'flight') return;
+
+  const cx = HUD_W / 2, cy = HUD_H / 2;
+  hudCtx.lineWidth = 1.5;
+  hudCtx.textAlign = 'center';
   hudCtx.textBaseline = 'middle';
 
-  // ── Heading tape ───────────────────────────────────────
-  const tapeY=107, tapeW=200, tapeX=cx, degPerPx=0.18, pxPerDeg=1/degPerPx;
+  // ── Heading tape (top centre) ────────────────────────────────────────────
+  const tapeY = 78, tapeW = 480, degPerPx = 0.18, pxPerDeg = 1 / degPerPx;
   hudCtx.save();
-  hudCtx.beginPath(); hudCtx.rect(tapeX-tapeW/2,0,tapeW,tapeY+12); hudCtx.clip();
-  const visRange = tapeW*degPerPx/2+10;
-  for (let d=Math.floor(yawDeg-visRange); d<=Math.ceil(yawDeg+visRange); d++) {
-    const deg=((d%360)+360)%360;
-    const x = tapeX+(d-yawDeg)*pxPerDeg;
-    if (d%10===0) {
-      hudCtx.lineWidth=1.5; hudCtx.beginPath(); hudCtx.moveTo(x,tapeY-10); hudCtx.lineTo(x,tapeY+2); hudCtx.stroke();
-      hudCtx.font='14px DM Mono,monospace'; hudCtx.textAlign='center'; hudCtx.textBaseline='bottom';
-      hudCtx.fillText(deg,x,tapeY-11);
-    } else if(d%5===0) {
-      hudCtx.lineWidth=1; hudCtx.beginPath(); hudCtx.moveTo(x,tapeY-5); hudCtx.lineTo(x,tapeY+2); hudCtx.stroke();
+  hudCtx.beginPath(); hudCtx.rect(cx - tapeW / 2, 40, tapeW, tapeY + 20); hudCtx.clip();
+  const visRange = tapeW * degPerPx / 2 + 10;
+  for (let d = Math.floor(yawDeg - visRange); d <= Math.ceil(yawDeg + visRange); d++) {
+    const deg = ((d % 360) + 360) % 360;
+    const x = cx + (d - yawDeg) * pxPerDeg;
+    if (d % 10 === 0) {
+      hudCtx.strokeStyle = 'rgba(255,176,102,0.65)'; hudCtx.lineWidth = 1.5;
+      hudCtx.beginPath(); hudCtx.moveTo(x, tapeY - 10); hudCtx.lineTo(x, tapeY + 2); hudCtx.stroke();
+      hudCtx.fillStyle = AMB_DIM;
+      hudCtx.font = '13px DM Mono, monospace'; hudCtx.textBaseline = 'bottom';
+      hudCtx.fillText(String(deg).padStart(3, '0'), x, tapeY - 12);
+      hudCtx.textBaseline = 'middle';
+    } else if (d % 5 === 0) {
+      hudCtx.strokeStyle = 'rgba(255,176,102,0.45)'; hudCtx.lineWidth = 1;
+      hudCtx.beginPath(); hudCtx.moveTo(x, tapeY - 5); hudCtx.lineTo(x, tapeY + 2); hudCtx.stroke();
     }
   }
   hudCtx.restore();
-  // Lubber
-  const lubberY=100, ts=6;
-  hudCtx.lineWidth=1.5;
-  hudCtx.beginPath(); hudCtx.moveTo(tapeX,lubberY+ts*2); hudCtx.lineTo(tapeX-ts,lubberY+ts*2+ts*1.5); hudCtx.lineTo(tapeX+ts,lubberY+ts*2+ts*1.5); hudCtx.closePath(); hudCtx.stroke();
-
-  // ── Boresight reticle ──────────────────────────────────
-  const rr=28, rcx=cx, rcy=230;
-  const reticleColor = lockOn ? cR : c;
-  hudCtx.strokeStyle = reticleColor; hudCtx.fillStyle = reticleColor;
-  hudCtx.lineWidth=1.5;
-  hudCtx.beginPath(); hudCtx.arc(rcx,rcy,rr,0,Math.PI*2); hudCtx.stroke();
-  // Lock corners
-  if (lockOn) {
-    const corners = [[-rr*1.4,-rr*1.4],[rr*1.4,-rr*1.4],[rr*1.4,rr*1.4],[-rr*1.4,rr*1.4]];
-    const cLen = 10;
-    hudCtx.lineWidth=2;
-    corners.forEach(([ox,oy]) => {
-      const sx=rcx+ox, sy=rcy+oy;
-      const signX=Math.sign(ox), signY=Math.sign(oy);
-      hudCtx.beginPath();
-      hudCtx.moveTo(sx, sy); hudCtx.lineTo(sx-signX*cLen, sy);
-      hudCtx.moveTo(sx, sy); hudCtx.lineTo(sx, sy-signY*cLen);
-      hudCtx.stroke();
-    });
-    hudCtx.font='10px DM Mono,monospace';
-    hudCtx.fillStyle=cR; hudCtx.textAlign='center'; hudCtx.textBaseline='top';
-    hudCtx.fillText('LOCK ' + Math.round(boidDist), rcx, rcy+rr+8);
-  }
-  // Arms
-  hudCtx.strokeStyle = reticleColor; hudCtx.lineWidth=1.5;
-  const gap=rr+5, arm=16;
+  // Lubber triangle
+  hudCtx.fillStyle = AMB_BRIGHT;
   hudCtx.beginPath();
-  hudCtx.moveTo(rcx,rcy-gap-arm); hudCtx.lineTo(rcx,rcy-gap);
-  hudCtx.moveTo(rcx,rcy+gap);     hudCtx.lineTo(rcx,rcy+gap+arm);
-  hudCtx.moveTo(rcx-gap-arm,rcy); hudCtx.lineTo(rcx-gap,rcy);
-  hudCtx.moveTo(rcx+gap,rcy);     hudCtx.lineTo(rcx+gap+arm,rcy);
+  hudCtx.moveTo(cx, tapeY + 14); hudCtx.lineTo(cx - 7, tapeY + 4); hudCtx.lineTo(cx + 7, tapeY + 4);
+  hudCtx.closePath(); hudCtx.fill();
+
+  // ── Pitch ladder + centre reticle ────────────────────────────────────────
+  hudCtx.save();
+  hudCtx.translate(cx, cy); hudCtx.rotate(rollRad);
+  hudCtx.beginPath(); hudCtx.rect(-190, -120, 380, 240); hudCtx.clip();
+  const plPxPerDeg = 5.4, plLineW = 175;
+  hudCtx.font = '10px DM Mono, monospace';
+  for (let p = -80; p <= 80; p += 10) {
+    if (p === 0) continue;
+    const y = -pitchDeg * plPxPerDeg + (p * plPxPerDeg);
+    const up = p > 0;
+    hudCtx.strokeStyle = up ? 'rgba(255,176,102,0.6)' : 'rgba(255,176,102,0.32)';
+    hudCtx.fillStyle   = up ? 'rgba(255,176,102,0.6)' : 'rgba(255,176,102,0.42)';
+    hudCtx.lineWidth = 1.2;
+    hudCtx.beginPath();
+    hudCtx.moveTo(-plLineW, y); hudCtx.lineTo(-plLineW + 52, y);
+    hudCtx.moveTo(plLineW, y);  hudCtx.lineTo(plLineW - 52, y);
+    hudCtx.stroke();
+    hudCtx.textAlign = 'right';
+    hudCtx.fillText((up ? '+' : '\u2212') + Math.abs(p), -plLineW - 6, y);
+    hudCtx.textAlign = 'left';
+    hudCtx.fillText((up ? '+' : '\u2212') + Math.abs(p), plLineW + 6, y);
+    hudCtx.textAlign = 'center';
+  }
+  hudCtx.restore();
+
+  // Centre circle + ticks
+  hudCtx.strokeStyle = 'rgba(255,176,102,0.85)'; hudCtx.lineWidth = 1.5;
+  hudCtx.beginPath(); hudCtx.arc(cx, cy, 32, 0, Math.PI * 2); hudCtx.stroke();
+  hudCtx.beginPath();
+  hudCtx.moveTo(cx, cy - 54); hudCtx.lineTo(cx, cy - 40);
+  hudCtx.moveTo(cx, cy + 40); hudCtx.lineTo(cx, cy + 54);
+  hudCtx.moveTo(cx - 54, cy); hudCtx.lineTo(cx - 40, cy);
+  hudCtx.moveTo(cx + 40, cy); hudCtx.lineTo(cx + 54, cy);
   hudCtx.stroke();
-  hudCtx.fillStyle=reticleColor;
-  hudCtx.beginPath(); hudCtx.arc(rcx,rcy,2,0,Math.PI*2); hudCtx.fill();
+  hudCtx.fillStyle = AMB_BRIGHT;
+  hudCtx.beginPath(); hudCtx.arc(cx, cy, 2, 0, Math.PI * 2); hudCtx.fill();
 
-  // ── Pitch ladder ───────────────────────────────────────
-  hudCtx.save();
-  hudCtx.translate(rcx,rcy); hudCtx.rotate(rollRad);
-  hudCtx.beginPath(); hudCtx.rect(-100,-100,200,200); hudCtx.clip();
-  const plPxPerDeg=4.5, plLineW=52;
-  hudCtx.strokeStyle=c; hudCtx.fillStyle=c; hudCtx.lineWidth=1.2;
-  hudCtx.font='10px DM Mono,monospace'; hudCtx.textBaseline='middle';
-  for (let p=-80; p<=80; p+=10) {
-    if (p===0) continue;
-    const y=-pitchDeg*plPxPerDeg+(p*plPxPerDeg);
-    hudCtx.beginPath();
-    hudCtx.moveTo(-plLineW,y); hudCtx.lineTo(-plLineW+8,y);
-    hudCtx.moveTo(-plLineW,y); hudCtx.lineTo(-plLineW,y+(p>0?8:-8));
-    hudCtx.moveTo(plLineW,y);  hudCtx.lineTo(plLineW-8,y);
-    hudCtx.moveTo(plLineW,y);  hudCtx.lineTo(plLineW,y+(p>0?8:-8));
-    hudCtx.stroke();
-    hudCtx.textAlign='center';
-    hudCtx.fillText((p<0?'-':'')+Math.abs(p),0,y+(p>0?8:-8));
-  }
-  hudCtx.restore();
-
-  // ── Speed tape (right) ─────────────────────────────────
-  hudCtx.strokeStyle=c; hudCtx.fillStyle=c;
-  const slX=HUD_SIZE-18, slTickX=HUD_SIZE-68, slCY=cy+30, slH=180, pxPerSpd=16, spdStep=2;
-  const boxW=46,boxH=18,boxX=slTickX;
-  hudCtx.save();
-  hudCtx.beginPath();
-  hudCtx.rect(slTickX-4,slCY-slH/2,slX-slTickX+14,slH/2-boxH/2);
-  hudCtx.rect(slTickX-4,slCY+boxH/2,slX-slTickX+14,slH/2-boxH/2);
-  hudCtx.clip();
-  const spdRangeAll=(slH/2)/pxPerSpd+1;
-  for (let s=Math.floor(speedPct-spdRangeAll); s<=Math.ceil(speedPct+spdRangeAll); s++) {
-    const y=slCY-(s-speedPct)*pxPerSpd;
-    hudCtx.lineWidth=0.75; hudCtx.beginPath(); hudCtx.moveTo(slTickX,y); hudCtx.lineTo(slTickX+4,y); hudCtx.stroke();
-  }
-  for (let s=Math.floor((speedPct-spdRangeAll)/spdStep)*spdStep; s<=speedPct+spdRangeAll; s+=spdStep) {
-    const y=slCY-(s-speedPct)*pxPerSpd;
-    hudCtx.lineWidth=1; hudCtx.beginPath(); hudCtx.moveTo(slTickX,y); hudCtx.lineTo(slTickX+8,y); hudCtx.stroke();
-    hudCtx.font='11px DM Mono,monospace'; hudCtx.textAlign='left'; hudCtx.textBaseline='middle';
-    hudCtx.fillText(s.toFixed(1),slTickX+9,y);
-  }
-  hudCtx.lineWidth=1; hudCtx.beginPath(); hudCtx.moveTo(slTickX,slCY-slH/2); hudCtx.lineTo(slTickX,slCY+slH/2); hudCtx.stroke();
-  hudCtx.restore();
-  hudCtx.lineWidth=1.5; hudCtx.strokeRect(boxX,slCY-boxH/2,boxW,boxH);
-  hudCtx.font='11px DM Mono,monospace'; hudCtx.textAlign='left'; hudCtx.textBaseline='middle';
-  hudCtx.fillText(speedPct.toFixed(1),boxX+6,slCY);
-  // ── Speed ladder arrow indicator ──────────────────────
-  const sArrW=9, sArrH=12;
-  hudCtx.beginPath();
-  hudCtx.moveTo(boxX-13,        slCY-sArrH/2);
-  hudCtx.lineTo(boxX-13,        slCY+sArrH/2);
-  hudCtx.lineTo(boxX-13+sArrW,  slCY);
-  hudCtx.closePath(); hudCtx.fill();
-  // ── Thrust tick — left of speed spine, bottom=0% top=100% ──
-  if (thrust !== undefined) {
-    const thrustY = slCY + slH/2 - (thrust * slH);
-    hudCtx.strokeStyle=c; hudCtx.lineWidth=2;
-    hudCtx.beginPath();
-    hudCtx.moveTo(slTickX-14, thrustY);
-    hudCtx.lineTo(slTickX-4,  thrustY);
-    hudCtx.stroke();
+  // ── Boid target bracket ──────────────────────────────────────────────────
+  if (!gameWon && boidMesh.visible) {
+    const bp = vrProject(boidState.pos);
+    if (bp) {
+      const near = Math.max(28, Math.min(120, 2400 / Math.max(boidDist, 8)));
+      const hw = near * 0.5, hh = near * 0.44;
+      const arm = Math.max(10, near * 0.2);
+      const flash = lockOn ? (0.45 + 0.55 * Math.abs(Math.sin(performance.now() / 190))) : 1;
+      hudCtx.globalAlpha = flash;
+      hudCtx.strokeStyle = HOSTILE; hudCtx.lineWidth = lockOn ? 3 : 1.5;
+      const L = bp.x - hw, R = bp.x + hw, T = bp.y - hh, B = bp.y + hh;
+      hudCtx.beginPath();
+      hudCtx.moveTo(L, T + arm); hudCtx.lineTo(L, T); hudCtx.lineTo(L + arm, T);
+      hudCtx.moveTo(R - arm, T); hudCtx.lineTo(R, T); hudCtx.lineTo(R, T + arm);
+      hudCtx.moveTo(L, B - arm); hudCtx.lineTo(L, B); hudCtx.lineTo(L + arm, B);
+      hudCtx.moveTo(R - arm, B); hudCtx.lineTo(R, B); hudCtx.lineTo(R, B + 0);
+      hudCtx.moveTo(R, B - arm); hudCtx.lineTo(R, B);
+      hudCtx.stroke();
+      hudCtx.globalAlpha = 1;
+      hudCtx.fillStyle = '#ff8f6a';
+      hudCtx.font = '11px DM Mono, monospace';
+      hudCtx.textBaseline = 'top';
+      hudCtx.fillText('BOID · ' + Math.round(boidDist) + 'u', bp.x, B + 9);
+      if (lockOn) hudCtx.fillText('IN RANGE', bp.x, B + 25);
+      hudCtx.textBaseline = 'middle';
+    } else {
+      // Off-screen chevron toward the boid
+      const fwd = new THREE.Vector3(); activeThreeCamera.getWorldDirection(fwd);
+      const to  = new THREE.Vector3().subVectors(boidState.pos, activeThreeCamera.getWorldPosition(new THREE.Vector3()));
+      const right = new THREE.Vector3().crossVectors(fwd, new THREE.Vector3(0,1,0)).normalize();
+      const side  = Math.sign(right.dot(to)) || 1;
+      const ex = cx + side * (HUD_W * 0.32);
+      hudCtx.fillStyle = HOSTILE;
+      hudCtx.beginPath();
+      hudCtx.moveTo(ex + side * 14, cy); hudCtx.lineTo(ex, cy - 11); hudCtx.lineTo(ex, cy + 11);
+      hudCtx.closePath(); hudCtx.fill();
+      hudCtx.font = '10px DM Mono, monospace';
+      hudCtx.fillText(Math.round(boidDist) + 'u', ex, cy + 26);
+    }
   }
 
-  // ── Altitude tape (left) ───────────────────────────────
-  const alX=18, alTickX=52, alCY=slCY, alH=slH, altMinorStep=5, altMajorStep=10;
-  const pxPerAlt = pxPerSpd / altMinorStep;
-  hudCtx.save();
-  hudCtx.beginPath();
-  hudCtx.rect(4,alCY-alH/2,alTickX-4+4,alH/2-boxH/2);
-  hudCtx.rect(4,alCY+boxH/2,alTickX-4+4,alH/2-boxH/2);
-  hudCtx.clip();
-  const altRangeAll = (alH/2) / (pxPerSpd) * altMinorStep + altMinorStep;
-  // Minor ticks — every 5 units, no label
-  for (let a=Math.floor((alt-altRangeAll)/altMinorStep)*altMinorStep; a<=alt+altRangeAll; a+=altMinorStep) {
-    if (a % altMajorStep === 0) continue; // major ticks drawn separately
-    const y = alCY - (a - alt) * pxPerAlt;
-    hudCtx.lineWidth=0.75;
-    hudCtx.beginPath(); hudCtx.moveTo(alTickX,y); hudCtx.lineTo(alTickX-4,y); hudCtx.stroke();
-  }
-  // Major ticks — every 10 units, with label
-  for (let a=Math.floor((alt-altRangeAll)/altMajorStep)*altMajorStep; a<=alt+altRangeAll; a+=altMajorStep) {
-    const y = alCY - (a - alt) * pxPerAlt;
-    hudCtx.lineWidth=1;
-    hudCtx.beginPath(); hudCtx.moveTo(alTickX,y); hudCtx.lineTo(alTickX-8,y); hudCtx.stroke();
-    hudCtx.font='10px DM Mono,monospace'; hudCtx.textAlign='right'; hudCtx.textBaseline='middle';
-    hudCtx.fillText(a.toFixed(0),alTickX-9,y);
-  }
-  hudCtx.lineWidth=1; hudCtx.beginPath(); hudCtx.moveTo(alTickX,alCY-alH/2); hudCtx.lineTo(alTickX,alCY+alH/2); hudCtx.stroke();
-  hudCtx.restore();
-  hudCtx.lineWidth=1.5; hudCtx.strokeRect(alX-2,alCY-boxH/2,alTickX-alX+2,boxH);
-  hudCtx.font='11px DM Mono,monospace'; hudCtx.textAlign='left'; hudCtx.textBaseline='middle';
-  hudCtx.fillText(alt.toFixed(0),alX+2,alCY);
-  // ── Altitude ladder arrow indicator ──────────────────────
-  const arrW=9, arrH=12;
-  hudCtx.beginPath();
-  hudCtx.moveTo(alTickX+4,          alCY);           // tip (left)
-  hudCtx.lineTo(alTickX+arrW+4,     alCY-arrH/2);    // top-right
-  hudCtx.lineTo(alTickX+arrW+4,     alCY+arrH/2);    // bottom-right
-  hudCtx.closePath(); hudCtx.fill();
-  // ── Thrust tick — right of altitude spine, bottom=0% top=100% ──
-  if (thrust !== undefined) {
-    const altThrustY = alCY + alH/2 - (thrust * alH);
-    hudCtx.strokeStyle=c; hudCtx.lineWidth=2;
-    hudCtx.beginPath();
-    hudCtx.moveTo(alTickX+4,  altThrustY);
-    hudCtx.lineTo(alTickX+14, altThrustY);
-    hudCtx.stroke();
-  }
-
-  // ── Pause indicator ────────────────────────────────────
-  if (gamePaused) {
-    hudCtx.fillStyle='rgba(200,240,96,0.8)';
-    hudCtx.font='20px DM Mono,monospace';
-    hudCtx.textAlign='center'; hudCtx.textBaseline='middle';
-    hudCtx.fillText('⏸ PAUSED', cx, cy-80);
+  // ── Princess escort diamond ──────────────────────────────────────────────
+  if (typeof princessMesh !== 'undefined') {
+    const pp = vrProject(princessMesh.position);
+    if (pp) {
+      const pd = cameraRig.position.distanceTo(princessMesh.position);
+      hudCtx.strokeStyle = 'rgba(232,210,74,0.9)'; hudCtx.lineWidth = 1.5;
+      hudCtx.save(); hudCtx.translate(pp.x, pp.y); hudCtx.rotate(Math.PI / 4);
+      hudCtx.strokeRect(-8, -8, 16, 16); hudCtx.restore();
+      hudCtx.fillStyle = 'rgba(232,210,74,0.9)';
+      hudCtx.font = '11px DM Mono, monospace';
+      hudCtx.textAlign = 'left'; 
+      hudCtx.fillText('PRINCESS · ' + Math.round(pd) + 'u', pp.x + 16, pp.y);
+      hudCtx.textAlign = 'center';
+    }
   }
 }
 
@@ -2976,6 +3509,31 @@ function animate() {
   document.getElementById('cp-boid-hp').textContent = boidHP+'%';
   document.getElementById('cp-lock').textContent   = lockOn ? Math.round(lockDist)+' u 🔴' : lockDist<LOCK_RANGE*1.5 ? Math.round(lockDist)+' u' : '—';
   document.getElementById('cp-asteroids').textContent = asteroids.length;
+
+  // ── Veilrunner state bridge ──────────────────────────────────────────────
+  let _near = Infinity;
+  for (const ast of asteroids) {
+    const d = cameraRig.position.distanceTo(ast.mesh.position) - ast.collisionRadius - COLLISION_RADIUS;
+    if (d < _near) _near = d;
+  }
+  vrState.prox      = _near;
+  vrState.thrust    = thrust;
+  vrState.speedPct  = speedPct;
+  vrState.alt       = alt;
+  vrState.vsi       = vsi;
+  vrState.hdg       = yawDeg;
+  vrState.hull      = playerHP;
+  vrState.ammo      = ammo;
+  vrState.boidHP    = boidHP;
+  vrState.lockOn    = lockOn;
+  vrState.lockDist  = lockDist;
+  vrState.brakes    = brakesOn;
+  vrState.cam       = activeCamera;
+  vrState.rocks     = asteroids.length;
+  vrState.flightPhase = flightPhase;
+  vrState.airborneMs  = airborneTime;
+  vrRenderHUD();
+  vrLastDt = dt;
 
   // Status box
   const sb=document.getElementById('status-box');
@@ -3341,6 +3899,393 @@ document.getElementById('btn-clear-mines').addEventListener('click', clearMines)
 
 // Update btn-cam1 to show primary on load
 document.getElementById('btn-cam1').classList.add('primary');
+
+
+// ══════════════════════════════════════════════════════════════════════════════
+//  VEILRUNNER Ir 77 — SCREEN FLOW, HUD BINDING
+// ══════════════════════════════════════════════════════════════════════════════
+const vrState = { prox:Infinity, thrust:0, speedPct:0, alt:0, vsi:0, hdg:0,
+  hull:MAX_HP, ammo:MAX_AMMO, boidHP:MAX_HP, lockOn:false, lockDist:Infinity,
+  brakes:false, cam:1, rocks:0, flightPhase:3, airborneMs:0 };
+
+let vrScreen      = 'board';   // board | terms | flight | pause | debrief | editor
+let vrPrevScreen  = 'board';
+let vrStartedAt   = 0;
+let vrElapsed     = 0;
+let vrShotsFired  = 0;
+let vrCleared     = 0;
+let vrPrevAmmo    = MAX_AMMO;
+let vrLastDt      = 1/60;
+
+const $ = id => document.getElementById(id);
+const vrScreens = ['vr-board','vr-terms','vr-pause','vr-debrief','vr-editor'];
+
+function vrShow(name) {
+  vrScreens.forEach(id => $(id).classList.remove('on'));
+  const map = { board:'vr-board', terms:'vr-terms', pause:'vr-pause',
+                debrief:'vr-debrief', editor:'vr-editor' };
+  if (map[name]) $(map[name]).classList.add('on');
+  $('vr-hud').classList.toggle('off', name !== 'flight');
+  vrScreen = name;
+}
+
+// ── Ambient camera: slow orbit through the belt while menus are up ──────────
+function vrAmbientCam(on) {
+  if (on) {
+    setActiveCamera(2);
+    orbitControls.autoRotate = true;
+    orbitControls.autoRotateSpeed = 0.33;   // ≈2°/sec
+    orbitControls.enabled = false;          // no user grab on the menus
+  } else {
+    orbitControls.autoRotate = false;
+    setActiveCamera(1);
+    orbitControls.enabled = false;
+  }
+}
+
+function vrGoBoard() {
+  gamePaused = true;
+  vrAmbientCam(true);
+  $('vr-sv-rocks').textContent  = String(asteroids.length || parseInt($('cube-count').value) || 50).padStart(2,'0');
+  $('vr-sv-orange').textContent = String($('orange-mine-count').value).padStart(2,'0');
+  $('vr-sv-red').textContent    = String($('red-mine-count').value).padStart(2,'0');
+  $('vr-cleared').textContent   = String(vrCleared).padStart(2,'0');
+  vrShow('board');
+}
+
+function vrGoTerms() {
+  vrTraining = false;
+  $('vr-agree').classList.remove('on');
+  $('vr-start').classList.remove('ready');
+  $('vr-clauses').scrollTop = 0;
+  vrTermsRead = false;
+  $('vr-agree').style.opacity = '0.55';
+  vrShow('terms');
+  requestAnimationFrame(vrCheckTermsRead);
+}
+
+let vrTraining = false;
+
+function vrLaunch() {
+  restartGame();               // resets HP / ammo / boid / position, unpauses
+  boidMesh.visible = !vrTraining;   // applied AFTER the reset re-shows it
+  vrAmbientCam(false);
+  vrStartedAt  = performance.now();
+  vrElapsed    = 0;
+  vrShotsFired = 0;
+  vrPrevAmmo   = MAX_AMMO;
+  vrShow('flight');
+}
+
+function vrRestartContract() {
+  vrLaunch();
+}
+
+function vrEscape() {
+  if (vrScreen === 'flight') {
+    gamePaused = true;
+    mouse.x = 0; mouse.y = 0;
+    vrPause();
+  } else if (vrScreen === 'pause') {
+    gamePaused = false;
+    vrShow('flight');
+  } else if (vrScreen === 'editor') {
+    vrToggleEditor();
+  } else if (vrScreen === 'terms') {
+    vrGoBoard();
+  }
+}
+
+function vrPause() {
+  $('vr-pclock').textContent = 'T+ ' + vrClock(vrElapsed);
+  $('vr-p-hull').textContent = playerHP;
+  vrSeg($('vr-p-hullseg'), playerHP / MAX_HP, 10);
+  $('vr-p-ord').textContent  = ammo + ' / ' + MAX_AMMO;
+  $('vr-p-ordbar').style.width = (ammo / MAX_AMMO * 100) + '%';
+  $('vr-p-bhp').textContent  = Math.max(0, boidHP) + '%';
+  $('vr-p-shots').textContent = vrShotsFired;
+  $('vr-p-rocks').textContent = asteroids.length;
+  vrShow('pause');
+}
+
+function vrToggleEditor() {
+  if (vrScreen === 'editor') {
+    vrShow(vrPrevScreen === 'flight' ? 'flight' : vrPrevScreen);
+    if (vrPrevScreen === 'flight') gamePaused = false;
+  } else {
+    vrPrevScreen = vrScreen;
+    if (vrScreen === 'flight') gamePaused = true;
+    vrShow('editor');
+  }
+}
+
+function vrClock(sec) {
+  const m = Math.floor(sec / 60), s = Math.floor(sec % 60);
+  return String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
+}
+
+function vrSeg(el, frac, n) {
+  if (el.childElementCount !== n) {
+    el.innerHTML = '';
+    for (let i = 0; i < n; i++) el.appendChild(document.createElement('i'));
+  }
+  const lit = Math.round(frac * n);
+  [...el.children].forEach((c, i) => c.classList.toggle('on', i < lit));
+}
+
+function vrPips(el, value, max, per) {
+  const n = Math.ceil(max / per);
+  if (el.childElementCount !== n) {
+    el.innerHTML = '';
+    for (let i = 0; i < n; i++) el.appendChild(document.createElement('i'));
+  }
+  const lit = Math.ceil(value / per);
+  [...el.children].forEach((c, i) => c.classList.toggle('on', i < lit));
+}
+
+// ── Debrief ─────────────────────────────────────────────────────────────────
+function vrDebrief(win) {
+  const fired = MAX_AMMO - ammo;
+  const acc   = fired > 0 ? Math.round((MAX_HP / MISSILE_DAMAGE) / fired * 100) : 0;
+  if (win) vrCleared++;
+  $('vr-d-eyebrow').textContent = win ? 'CONTRACT 77-C · CLOSED' : 'CONTRACT 77-C · FAILED';
+  $('vr-d-title').textContent   = win ? 'BOID DOWN' : 'KESTREL LOST';
+  $('vr-d-lede').textContent    = win
+    ? 'Direct hit at ' + Math.round(vrState.lockDist) + ' units. It went into the rocks trailing debris and the Princess broke escort within nine seconds. The Veil is quiet again.'
+    : 'The Kestrel came apart in the belt. Salvage will log the wreck against your bond. The Princess is still out there, and the Boid is still shadowing her.';
+  $('vr-d-time').textContent = vrClock(vrElapsed);
+  $('vr-d-msl').textContent  = fired;
+  $('vr-d-acc').textContent  = Math.min(acc, 100) + '%';
+  $('vr-d-hull').textContent = playerHP + '%';
+  $('vr-d-hull').style.color = win ? '#ffb066' : '#ff5a3c';
+  $('vr-again').textContent  = win ? 'FLY IT AGAIN' : 'TRY AGAIN';
+  vrShow('debrief');
+}
+
+// ── Per-frame DOM HUD binding ───────────────────────────────────────────────
+function vrRenderHUD() {
+  if (vrScreen === 'flight' && !gamePaused) vrElapsed = (performance.now() - vrStartedAt) / 1000;
+  if (ammo < vrPrevAmmo) vrShotsFired += (vrPrevAmmo - ammo);
+  vrPrevAmmo = ammo;
+  if (vrScreen !== 'flight') return;
+
+  $('vr-clock').textContent = 'T+ ' + vrClock(vrElapsed);
+
+  // Airframe
+  $('vr-hull').textContent = vrState.hull;
+  vrSeg($('vr-hullseg'), vrState.hull / MAX_HP, 10);
+  $('vr-ord').textContent  = vrState.ammo + ' / ' + MAX_AMMO;
+  vrPips($('vr-ordpips'), vrState.ammo, MAX_AMMO, 5);
+
+  // Hostile
+  const bhp = Math.max(0, vrState.boidHP);
+  $('vr-bhp').textContent   = bhp;
+  $('vr-bbar').style.width  = (bhp / MAX_HP * 100) + '%';
+  $('vr-brange').textContent = isFinite(vrState.lockDist) ? Math.round(vrState.lockDist) + 'u' : '—';
+  $('vr-baspect').textContent = vrTraining ? 'NO CONTACT'
+    : gameWon ? 'DESTROYED' : vrState.lockOn ? 'IN RANGE' : 'TRACKING';
+  $('vr-hostile').style.opacity = vrTraining ? '0.35' : '1';
+
+  // Tapes
+  $('vr-thr').textContent = vrState.thrust.toFixed(2);
+  $('vr-alt').textContent = String(Math.max(0, Math.round(vrState.alt))).padStart(3,'0');
+  const vs = vrState.vsi;
+  $('vr-vs').textContent  = 'ALT · VS ' + (vs >= 0 ? '+' : '') + vs.toFixed(1);
+
+  // Bottom bar
+  const canFire = vrState.flightPhase === 3 && vrState.airborneMs >= 5000 && vrState.ammo > 0;
+  $('vr-gun').textContent = canFire ? 'GUN · READY' : vrState.ammo <= 0 ? 'GUN · DRY' : 'GUN · SAFE';
+  $('vr-gun').style.color = canFire ? '#ffd9a8' : '#8a7967';
+  $('vr-msl').textContent = 'MSL · ' + vrState.ammo;
+  $('vr-brk').textContent = 'BRK · ' + (vrState.brakes ? 'ON' : 'OFF');
+  $('vr-cam').textContent = 'CAM · ' + (vrState.cam === 2 ? 'ORBIT' : 'FLIGHT');
+
+  // Proximity
+  const prox = vrState.prox;
+  const warn = isFinite(prox) && prox < 14;
+  $('vr-prox').classList.toggle('on', warn);
+  if (warn) $('vr-prox').firstElementChild.textContent =
+    '▲ ROCK ' + String(Math.max(0, Math.round(prox))).padStart(2,'0') + 'u ▲';
+
+  // Flight hint
+  const hint = $('vr-hint');
+  if (vrState.flightPhase === 0)      { hint.classList.add('on'); hint.textContent = 'BRAKES ON · SPACE OR CLICK TO LAUNCH'; }
+  else if (vrState.flightPhase === 1) { hint.classList.add('on'); hint.textContent = 'TAXIING · INCREASE THROTTLE'; }
+  else if (vrState.flightPhase === 2) { hint.classList.add('on'); hint.textContent = 'ROLLING · PULL BACK TO TAKE OFF'; }
+  else if (vrState.airborneMs < 5000) { hint.classList.add('on'); hint.textContent = 'WEAPONS ARMING · ' + Math.ceil((5000 - vrState.airborneMs)/1000) + 's'; }
+  else hint.classList.remove('on');
+}
+
+// ── Wiring ──────────────────────────────────────────────────────────────────
+$('vr-accept').addEventListener('click', vrGoTerms);
+$('vr-training').addEventListener('click', () => {
+  vrTraining = true;
+  vrLaunch();
+});
+$('vr-board-editor').addEventListener('click', vrToggleEditor);
+$('vr-pause-editor').addEventListener('click', vrToggleEditor);
+$('vr-decline').addEventListener('click', vrGoBoard);
+$('vr-resume').addEventListener('click', () => { gamePaused = false; vrShow('flight'); });
+$('vr-pause-restart').addEventListener('click', vrRestartContract);
+$('vr-abandon').addEventListener('click', vrGoBoard);
+$('vr-again').addEventListener('click', vrLaunch);
+$('vr-toboard').addEventListener('click', vrGoBoard);
+$('vr-harder').addEventListener('click', () => {
+  const c = $('cube-count');
+  c.value = 120;
+  $('cube-count-val').textContent = '120';
+  spawnAsteroids();
+  vrLaunch();
+});
+
+$('vr-agree').addEventListener('click', () => {
+  const on = !$('vr-agree').classList.contains('on');
+  $('vr-agree').classList.toggle('on', on);
+  $('vr-start').classList.toggle('ready', on);
+});
+
+let vrTermsRead = false;
+function vrCheckTermsRead() {
+  const el = $('vr-clauses');
+  if (el.scrollHeight <= el.clientHeight + 4 ||
+      el.scrollTop + el.clientHeight >= el.scrollHeight - 12) {
+    vrTermsRead = true;
+    $('vr-agree').style.opacity = '1';
+  }
+}
+$('vr-clauses').addEventListener('scroll', vrCheckTermsRead);
+setInterval(() => { if (vrScreen === 'terms' && !vrTermsRead) vrCheckTermsRead(); }, 250);
+$('vr-agree').style.opacity = '0.55';
+
+$('vr-start').addEventListener('click', () => {
+  if ($('vr-start').classList.contains('ready')) vrLaunch();
+});
+
+// ── Drift Editor: rail + panes, built from the existing control groups ─────
+const VR_GROUPS = [
+  { label:'WORLD',    cats:['Environment','Lights','Asteroid Debris','Space Mines'] },
+  { label:'CONTACTS', cats:['Boid','Princess','Target Object'] },
+  { label:'RIG',      cats:['Scene Objects','Orbit Camera','Audio'] },
+];
+const VR_META = {
+  'Environment':     ['Environment',     'Background, grid, ground and shadow state, plus the flight camera field of view.'],
+  'Lights':          ['Lighting',        'Exposure, ambient level and the three directional lights that model the belt.'],
+  'Scene Objects':   ['Scene Objects',   'The rock field itself — count, size range, colour spread and altitude band.'],
+  'Asteroid Debris': ['Asteroid Debris', 'Impact debris: piece count, size, lifetime, speed and drag.'],
+  'Target Object':   ['Target Object',   'The waypoint the Boid and Princess chase, and the box it bounces inside.'],
+  'Boid':            ['Boid',            'The pirate interceptor. Colour, cruise speed and how hard it can turn.'],
+  'Princess':        ['Princess',        'The ore hauler under escort. She avoids rocks and mines on her own.'],
+  'Space Mines':     ['Space Mines',     'Orange mines cost you half your hull. Red mines are fatal — five second countdown.'],
+  'Orbit Camera':    ['Orbit Camera',    'The observer view on key 2, its field of view and auto-rotate.'],
+  'Audio':           ['Audio',           'Master volume and mute for the impact engine.'],
+};
+
+let vrEditActive = null;
+const vrEditPanes = {};
+const vrEditDefaults = new Map();
+
+(function vrBuildEditor() {
+  const rail  = $('vr-edit-rail');
+  const panes = $('vr-edit-panes');
+
+  // Harvest each accordion group: title → body element
+  const found = {};
+  document.querySelectorAll('#setup-panel .accordion-item').forEach(item => {
+    const t = item.querySelector('.accordion-title');
+    const b = item.querySelector('.accordion-body');
+    if (t && b) found[t.textContent.trim()] = b;
+  });
+
+  // Remember every control's initial value so RESET can restore the pane
+  document.querySelectorAll('#setup-panel input, #control-panel input').forEach(el => {
+    vrEditDefaults.set(el, el.type === 'checkbox' ? el.checked : el.value);
+  });
+
+  VR_GROUPS.forEach(g => {
+    const gh = document.createElement('div');
+    gh.className = 'grp'; gh.textContent = g.label;
+    rail.appendChild(gh);
+    g.cats.forEach(name => {
+      const body = found[name];
+      if (!body) return;
+      panes.appendChild(body);                 // move, listeners intact
+      vrEditPanes[name] = body;
+      const cat = document.createElement('div');
+      cat.className = 'cat';
+      cat.textContent = (VR_META[name] ? VR_META[name][0] : name).toUpperCase();
+      cat.addEventListener('click', () => vrEditSelect(name));
+      cat.dataset.cat = name;
+      rail.appendChild(cat);
+    });
+  });
+
+  // Options + Mission from the old right panel become one more category
+  const extras = document.createElement('div');
+  extras.className = 'accordion-body';
+  [...document.querySelectorAll('#control-panel .panel-section')].forEach(sec => {
+    const t = sec.querySelector('.section-title');
+    if (t && (t.textContent.trim() === 'Options' || t.textContent.trim() === 'Mission')) {
+      sec.style.gridColumn = '1 / -1';
+      extras.appendChild(sec);
+    }
+  });
+  panes.appendChild(extras);
+  vrEditPanes['Options'] = extras;
+  VR_META['Options'] = ['Options', 'HUD visibility, target beacon and mission restart.'];
+  const oc = document.createElement('div');
+  oc.className = 'cat'; oc.textContent = 'OPTIONS'; oc.dataset.cat = 'Options';
+  oc.addEventListener('click', () => vrEditSelect('Options'));
+  rail.appendChild(oc);
+
+  const preset = document.createElement('div');
+  preset.className = 'preset';
+  preset.innerHTML = 'PRESET · IRIDIUM VEIL K-9<b>UNSAVED CHANGES</b>';
+  rail.appendChild(preset);
+
+  vrEditSelect('Asteroid Debris');
+})();
+
+function vrEditSelect(name) {
+  vrEditActive = name;
+  Object.entries(vrEditPanes).forEach(([k, el]) => el.classList.toggle('on', k === name));
+  document.querySelectorAll('#vr-edit-rail .cat').forEach(c =>
+    c.classList.toggle('on', c.dataset.cat === name));
+  const meta = VR_META[name] || [name, ''];
+  $('vr-edit-title').textContent = meta[0];
+  $('vr-edit-desc').textContent  = meta[1];
+}
+
+$('vr-edit-reset').addEventListener('click', () => {
+  const pane = vrEditPanes[vrEditActive];
+  if (!pane) return;
+  pane.querySelectorAll('input').forEach(el => {
+    if (!vrEditDefaults.has(el)) return;
+    const d = vrEditDefaults.get(el);
+    if (el.type === 'checkbox') { el.checked = d; el.dispatchEvent(new Event('change', {bubbles:true})); }
+    else { el.value = d; el.dispatchEvent(new Event('input', {bubbles:true})); }
+  });
+});
+
+$('vr-edit-rebuild').addEventListener('click', () => {
+  const hadMines = mines.length > 0;
+  spawnAsteroids();
+  if (hadMines) spawnMines();
+  vrStartedAt = performance.now();
+  vrElapsed = 0;
+});
+
+// Live-preview stats
+setInterval(() => {
+  if (vrScreen !== 'editor') return;
+  $('vr-ed-rocks').textContent = asteroids.length;
+  $('vr-ed-calls').textContent = renderer.info.render.calls;
+  $('vr-ed-fps').textContent   = Math.min(60, Math.round(1 / Math.max(0.001, vrLastDt)));
+}, 400);
+
+// Move the radar canvas into the HUD drift plate
+$('vr-plate-wrap').appendChild(radarCanvas);
+
+vrGoBoard();
 
 animate();
 </script>

@@ -373,7 +373,7 @@
     },
     {
       "id": 13,
-      "name": "Asteroids",
+      "name": "Veil Runner v.01",
       "tier": "4",
       "categories": [
         "Three.js",
@@ -387,23 +387,23 @@
       "resourceLink": "",
       "gallery": [
         {
-          "img": "",
+          "img": "images/veilrunner01.jpg",
           "caption": ""
         },
         {
-          "img": "",
+          "img": "images/veilrunner02.jpg",
           "caption": ""
         },
         {
-          "img": "",
+          "img": "images/veilrunner03.jpg",
           "caption": ""
         },
         {
-          "img": "",
+          "img": "images/veilrunner04.jpg",
           "caption": ""
         },
         {
-          "img": "",
+          "img": "images/veilrunner05.jpg",
           "caption": ""
         },
         {
@@ -411,10 +411,10 @@
           "caption": ""
         }
       ],
-      "carousel": false,
-      "link": "./asteroids/asteroid.html",
+      "carousel": true,
+      "link": "./veilrunner/veilunner_v01.html",
       "tags": [],
-      "thumb": "",
+      "thumb": "images/veilrunner01.jpg",
       "youtube": ""
     },
     {
