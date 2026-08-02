@@ -378,9 +378,10 @@
       "categories": [
         "Three.js",
         "Game",
-        "Fly-Thru"
+        "Fly-Thru",
+        "Simulation"
       ],
-      "date": "2026-07-07",
+      "date": "2026-08-02",
       "desc": "Asteroids is a browser-based 3D space combat simulatio. A single self-contained HTML file in which the player pilots a spacecraft to intercept and destroy an autonomous boid navigating a procedurally generated asteroid field.",
       "fullDesc": "Asteroid is a browser-based interactive 3D simulation built entirely in a single self-contained HTML file. It runs in Chrome without a build process, importing Three.js r158 and OrbitControls as ES modules from a CDN, with no external dependencies, servers, or frameworks required.\n   \nThe simulation places the user inside a procedurally generated asteroid field — a field of rotating, tumbling cubes scattered across a defined volume — and tasks them with piloting a first-person spacecraft to intercept and destroy an autonomous target called the Boid. A second autonomous agent, Princess, chases the same target object independently, creating emergent triangular dynamics between the player, the quarry, and the observer. Both agents use quaternion-based steering with asteroid avoidance built from weighted repulsion vectors, giving them naturalistic flight behaviour without scripted paths.\n   \nThe environment supports two camera modes: a first-person flight camera with inertial mouse controls and a full six-degree flight model, and an orbital observer camera that allows detached viewing of the scene. Space mines of two types — orange (non-fatal) and red (fatal) — add tactical hazard, with full collision detection, camera shake, and escalating warning sequences. Missile combat uses alternating twin-gun emitters, a lock-on detection cone, and a proximity-based HUD reticle. Death events trigger one of two cinematic destruction scenarios driven by real-time quaternion interpolation, particle systems, and procedural audio.\n   \nThe project has direct application in immersive media research and education as a platform for exploring autonomous agent behaviour, spatial reasoning, multi-agent interaction, and real-time 3D interface design — all in a lightweight, portable format that runs in any modern browser without installation.",
       "resourceLabel": "",
@@ -412,7 +413,7 @@
         }
       ],
       "carousel": true,
-      "link": "./veilrunner/veilrunner_v04.html",
+      "link": "./veilrunner/veilrunner_v05.html",
       "tags": [],
       "thumb": "images/veilrunner01.jpg",
       "youtube": ""
