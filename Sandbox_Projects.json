@@ -1063,8 +1063,8 @@
         "Fly-Thru"
       ],
       "date": "2026-08-09",
-      "desc": "",
-      "fullDesc": "",
+      "desc": "Sky Atlas is an interactive browser-based flight experience built with Google Photorealistic 3D Tiles and Three.js. Users select global destinations, fly through detailed city environments, adjust weather and sky conditions, monitor altitude and bearing, and explore through intuitive mouse controls.",
+      "fullDesc": "Sky Atlas began as a simple question: could Google’s photorealistic mapping data become an engaging browser-based flight experience rather than a conventional map? The prototype lets visitors choose destinations worldwide and fly over detailed cities and landscapes. Mouse movement controls pitch, heading and banking, while the wheel adjusts speed. Bearing and altitude instruments, selectable detail, procedural skies and weather effects create a lightweight exploratory simulation.\n      \nThree.js provides the 3D scene, camera and rendering system. Google Photorealistic 3D Tiles stream through the Map Tiles API and a specialist tiles renderer. The camera sits inside separate yaw, pitch and bank groups, producing smooth joystick-style control. Custom loading logic waits for useful local detail before activating flight, while terrain checks establish a safer starting altitude. The interface adds responsive controls, navigation instruments, weather modes and flight-dependent panels that disappear when they are no longer needed.\n       \nThis was my first project using an API key, and it introduced an unexpected layer of learning. Billing had to be enabled, the correct Google service selected, and the key restricted to the Map Tiles API. Website-referrer rules were added for localhost and the production domain. Although a browser must ultimately send a usable key to Google, the production key is stored as a Cloudflare secret and delivered only after authentication. A Cloudflare Worker serves the compiled application, protects it behind a branded password screen and creates a signed, secure, eight-hour session cookie. Development continues locally, while a repeatable build-and-deploy process publishes approved changes.\n    \nCodex made the project possible, but its value went beyond generating code. It guided me through unfamiliar dashboards, security settings, billing controls, local development and deployment one decision at a time. Whenever I asked what something meant, why it was necessary or how to proceed, Codex explained it in practical detail. It also helped me compare multiple approaches before implementation, allowing the project to evolve through testing, screenshots and direct feedback rather than requiring a complete technical plan from the outset.\n     \nSky Atlas demonstrates the potential for immersive tourism, education and storytelling, while future usability work can improve accessibility, navigation, performance and device support.",
       "resourceLabel": "",
       "resourceLink": "",
       "gallery": [
@@ -1095,7 +1095,15 @@
       ],
       "carousel": true,
       "link": "https://sky-atlas.immersive-sandbox.workers.dev",
-      "tags": [],
+      "tags": [
+        "Google Photorealistic 3D Tiles",
+        "Three.js",
+        "Immersive Flight",
+        "Geospatial Exploration",
+        "API security",
+        "Cloudflare Workers",
+        "Codex Development"
+      ],
       "thumb": "images/Sky_Atlas08.jpg",
       "youtube": ""
     }
