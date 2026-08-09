@@ -1059,8 +1059,8 @@
       "tier": "5",
       "categories": [
         "Animation Tool",
-        "Three.js",
-        "Fly-Thru"
+        "Fly-Thru",
+        "Three.js"
       ],
       "date": "2026-08-09",
       "desc": "Sky Atlas is an interactive browser-based flight experience built with Google Photorealistic 3D Tiles and Three.js. Users select global destinations, fly through detailed city environments, adjust weather and sky conditions, monitor altitude and bearing, and explore through intuitive mouse controls.",
@@ -1091,6 +1091,18 @@
         {
           "img": "images/Sky_Atlas07.jpg",
           "caption": "Sydney"
+        },
+        {
+          "img": "images/Sky_Atlas06.jpg",
+          "caption": "London"
+        },
+        {
+          "img": "images/Sky_Atlas03.jpg",
+          "caption": "Zermatt"
+        },
+        {
+          "img": "",
+          "caption": ""
         }
       ],
       "carousel": true,
