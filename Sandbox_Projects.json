@@ -1018,7 +1018,7 @@
       "categories": [],
       "date": "2026-07-17",
       "desc": "The Sandbox compact technical UI style guide for web tools, with panels, accordions, blue accents, buttons, sliders, inputs, lists, and readouts.",
-      "fullDesc": "This style guide defines a compact, technical interface system for building professional web-based tools, viewers, editors, and research applications. It is designed for interfaces where users need clear controls, dense information, and repeatable workflows rather than decorative presentation or marketing-style layouts.\n       \nThe visual language is built around a dark charcoal workspace, fixed menu panels, low-contrast borders, compact spacing, and a bright blue accent colour for active, selected, hover, and focus states. Typography is precise and functional, using small uppercase monospace labels for headings, controls, readouts, and technical values, with off-white primary text and muted grey secondary text.\n      \nThe guide includes reusable patterns for top headers, branded icons, sidebar panels, accordion menus, buttons, sliders, checkboxes, text inputs, dropdowns, numeric fields, data readouts, list items, thumbnails, notes, and destructive actions. Accordion menus organise controls into clear sections while keeping the interface compact. Buttons use restrained dark styling by default, with white rollover text and stronger blue or red states for active and delete actions.\n    \nThis style is especially suited to creative technical software such as 3D viewers, image tools, simulation controls, annotation interfaces, media tools, spatial research platforms, and experimental prototypes. The overall feel should be clean, precise, focused, and professional, like a tool palette or control surface. The attached HTML/CSS example acts as a reusable reference for applying the same interface language consistently across future projects.",
+      "fullDesc": "This style guide defines a compact, technical interface system for building professional web-based tools, viewers, editors, and research applications. It is designed for interfaces where users need clear controls, dense information, and repeatable workflows rather than decorative presentation or marketing-style layouts.\n       \nThe visual language is built around a dark charcoal workspace, fixed menu panels, low-contrast borders, compact spacing, and a bright blue accent colour for active, selected, hover, and focus states. Typography is precise and functional, using small uppercase monospace labels for headings, controls, readouts, and technical values, with off-white primary text and muted grey secondary text.\n      \nThe guide includes reusable patterns for top headers, branded icons, sidebar panels, accordion menus, buttons, sliders, checkboxes, text inputs, dropdowns, numeric fields, data readouts, list items, thumbnails, notes, and destructive actions. Accordion menus organise controls into clear sections while keeping the interface compact. Buttons use restrained dark styling by default, with white rollover text and stronger blue or red states for active and delete actions.\n    \nThis style is especially suited to creative technical software such as 3D viewers, image tools, simulation controls, annotation interfaces, media tools, spatial research platforms, and experimental prototypes. The overall feel should be clean, precise, focused, and professional, like a tool palette or control surface. The attached HTML/CSS example acts as a reusable reference for applying the same interface language consistently across future projects.\n\nAccent Blue #378ADD",
       "resourceLabel": "Download Style Guide",
       "resourceLink": "./style_guide/Sandbox_Style_Guide.7z",
       "gallery": [
@@ -1052,9 +1052,55 @@
       "tags": [],
       "thumb": "images/sandbox_style_guide03.jpg",
       "youtube": ""
+    },
+    {
+      "id": 30,
+      "name": "Sky Atlas",
+      "tier": "5",
+      "categories": [
+        "Animation Tool",
+        "Three.js",
+        "Fly-Thru"
+      ],
+      "date": "2026-08-09",
+      "desc": "",
+      "fullDesc": "",
+      "resourceLabel": "",
+      "resourceLink": "",
+      "gallery": [
+        {
+          "img": "images/Sky_Atlas01.jpg",
+          "caption": ""
+        },
+        {
+          "img": "images/Sky_Atlas02.jpg",
+          "caption": ""
+        },
+        {
+          "img": "images/Sky_Atlas08.jpg",
+          "caption": ""
+        },
+        {
+          "img": "images/Sky_Atlas05.jpg",
+          "caption": ""
+        },
+        {
+          "img": "images/Sky_Atlas09.jpg",
+          "caption": ""
+        },
+        {
+          "img": "images/Sky_Atlas07.jpg",
+          "caption": ""
+        }
+      ],
+      "carousel": true,
+      "link": "https://sky-atlas.immersive-sandbox.workers.dev",
+      "tags": [],
+      "thumb": "images/Sky_Atlas08.jpg",
+      "youtube": ""
     }
   ],
-  "nextId": 30,
+  "nextId": 31,
   "sortMode": "tier",
   "site": {
     "eyebrow": "Browser-based creative exploration : Chris Shaw",
