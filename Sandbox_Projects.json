@@ -1070,27 +1070,27 @@
       "gallery": [
         {
           "img": "images/Sky_Atlas01.jpg",
-          "caption": ""
+          "caption": "Login Screen"
         },
         {
           "img": "images/Sky_Atlas02.jpg",
-          "caption": ""
+          "caption": "Loading City Screen"
         },
         {
           "img": "images/Sky_Atlas08.jpg",
-          "caption": ""
+          "caption": "Singapore"
         },
         {
           "img": "images/Sky_Atlas05.jpg",
-          "caption": ""
+          "caption": "Hong Kong"
         },
         {
           "img": "images/Sky_Atlas09.jpg",
-          "caption": ""
+          "caption": "Osaka"
         },
         {
           "img": "images/Sky_Atlas07.jpg",
-          "caption": ""
+          "caption": "Sydney"
         }
       ],
       "carousel": true,
