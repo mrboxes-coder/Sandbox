@@ -239,11 +239,11 @@ body.visitor-mode .exit-preview-btn{display:flex;}
   <div class="left-panel">
 
     <div class="panel-section">
-      <div class="section-header" onclick="toggleSection(this)">
+      <div class="section-header collapsed" onclick="toggleSection(this)">
         <div class="section-label">Site Settings</div>
         <svg class="section-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
       </div>
-      <div class="section-body">
+      <div class="section-body hidden">
         <div class="field"><label class="field-label">Eyebrow text</label><input type="text" id="siteEyebrow" value="Browser-based creative tools : Chris Shaw" oninput="renderPreview();saveSession()"></div>
         <div class="field"><label class="field-label">Title</label><input type="text" id="siteTitle" value="Immersive Lab" oninput="renderPreview();saveSession()"></div>
         <div class="field"><label class="field-label">Title accent word</label><input type="text" id="siteTitleAccent" value="Sandbox" oninput="renderPreview();saveSession()"></div>
@@ -273,71 +273,71 @@ Potential rarely arrives fully formed. It surfaces through experimentation - thr
     </div>
 
     <div class="panel-section">
-      <div class="section-header" onclick="toggleSection(this)">
+      <div class="section-header collapsed" onclick="toggleSection(this)">
         <div class="section-label">No Tier <span class="tier-count" id="countNone"></span></div>
         <svg class="section-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
       </div>
-      <div class="section-body" style="padding:0;">
+      <div class="section-body hidden" style="padding:0;">
         <div class="project-list" id="projectListNone"></div>
       </div>
     </div>
 
     <div class="panel-section">
-      <div class="section-header" onclick="toggleSection(this)">
+      <div class="section-header collapsed" onclick="toggleSection(this)">
         <div class="section-label">Tier 1 <span class="tier-count" id="count1"></span></div>
         <svg class="section-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
       </div>
-      <div class="section-body" style="padding:0;">
+      <div class="section-body hidden" style="padding:0;">
         <div class="project-list" id="projectList1"></div>
       </div>
     </div>
 
     <div class="panel-section">
-      <div class="section-header" onclick="toggleSection(this)">
+      <div class="section-header collapsed" onclick="toggleSection(this)">
         <div class="section-label">Tier 2 <span class="tier-count" id="count2"></span></div>
         <svg class="section-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
       </div>
-      <div class="section-body" style="padding:0;">
+      <div class="section-body hidden" style="padding:0;">
         <div class="project-list" id="projectList2"></div>
       </div>
     </div>
 
     <div class="panel-section">
-      <div class="section-header" onclick="toggleSection(this)">
+      <div class="section-header collapsed" onclick="toggleSection(this)">
         <div class="section-label">Tier 3 <span class="tier-count" id="count3"></span></div>
         <svg class="section-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
       </div>
-      <div class="section-body" style="padding:0;">
+      <div class="section-body hidden" style="padding:0;">
         <div class="project-list" id="projectList3"></div>
       </div>
     </div>
 
     <div class="panel-section">
-      <div class="section-header" onclick="toggleSection(this)">
+      <div class="section-header collapsed" onclick="toggleSection(this)">
         <div class="section-label">Tier 4 <span class="tier-count" id="count4"></span></div>
         <svg class="section-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
       </div>
-      <div class="section-body" style="padding:0;">
+      <div class="section-body hidden" style="padding:0;">
         <div class="project-list" id="projectList4"></div>
       </div>
     </div>
 
     <div class="panel-section">
-      <div class="section-header" onclick="toggleSection(this)">
+      <div class="section-header collapsed" onclick="toggleSection(this)">
         <div class="section-label">Tier 5 <span class="tier-count" id="count5"></span></div>
         <svg class="section-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
       </div>
-      <div class="section-body" style="padding:0;">
+      <div class="section-body hidden" style="padding:0;">
         <div class="project-list" id="projectList5"></div>
       </div>
     </div>
 
     <div class="panel-section">
-      <div class="section-header" onclick="toggleSection(this)">
+      <div class="section-header collapsed" onclick="toggleSection(this)">
         <div class="section-label">Stats</div>
         <svg class="section-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
       </div>
-      <div class="section-body">
+      <div class="section-body hidden">
         <div class="info-row"><span class="info-label">Total projects</span><span class="info-val" id="statTotal">0</span></div>
         <div class="info-row"><span class="info-label">With thumbnails</span><span class="info-val" id="statThumbs">0</span></div>
         <div class="info-row"><span class="info-label">With links</span><span class="info-val" id="statLinks">0</span></div>
@@ -407,7 +407,7 @@ Potential rarely arrives fully formed. It surfaces through experimentation - thr
         </div>
       </div>
       <div class="field">
-        <label class="field-label">Additional Images (3 x 2) - place images in images/ folder, then select</label>
+        <label class="field-label">Additional Images (3 x 3) - place images in images/ folder, then select</label>
         <div class="gal-grid" id="galleryGrid"></div>
         <input type="file" id="galleryFileInput" accept="image/*" style="display:none" onchange="handleGallerySelect(event)">
       </div>
@@ -452,7 +452,7 @@ function b64DecodeUtf8(b64){
   return new TextDecoder('utf-8').decode(bytes);
 }
 
-var CATEGORIES=['Canvas','MediaPipe Hands','MediaPipe Face','MediaPipe Body','Animation Tool','Editing Tool','Audio','Three.js','Gaussian Splat','Game','Image Editor','Fly-Thru','Simulation','Behaviour','Flock/Schools/Herds','Video Editing'];
+var CATEGORIES=['Animation Tool','API','Audio','Behaviour','Canvas','Cloudflare','Editing Tool','Flock/Schools/Herds','Fly-Thru','Game','Gaussian Splat','Google','Google Photorealistic 3D Tiles','Image Editor','MediaPipe Body','MediaPipe Face','MediaPipe Hands','Simulation','Three.js','Video Editing'];
 var IMAGES_FOLDER='images/';
 var sortMode='date';
 var projects=[
@@ -992,7 +992,7 @@ function clearThumb(){
 }
 
 /* Gallery - 3x3 additional images */
-var GALLERY_SIZE=6;
+var GALLERY_SIZE=9;
 var editGallery=[];
 var editGalleryURLs=[];
 var galleryIndex=-1;
