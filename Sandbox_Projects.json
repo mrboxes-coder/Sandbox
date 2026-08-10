@@ -196,33 +196,45 @@
       "tier": "4",
       "categories": [
         "Animation Tool",
-        "Gaussian Splat",
-        "Fly-Thru"
+        "Fly-Thru",
+        "Gaussian Splat"
       ],
       "date": "2026-07-07",
       "desc": "Gaussian FlyThru is a browser-based Gaussian splat viewer for flying through 3D captures, adding bookmarks, hotspots, camera defaults, bounds, screenshots, recordings, and workspace exports.",
       "fullDesc": "Gaussian FlyThru is a browser-based Gaussian splat / Luma .ply viewer designed for inspecting, navigating, annotating, and recording immersive 3D captures.\n\nIt loads LUMA-style Gaussian splat .ply files directly in the browser, so a user can explore a captured real-world scene without needing a heavy desktop 3D package. The viewer supports multiple navigation modes: Orbit for inspecting the scene from outside, Walk for grounded movement, Look for mouse-based first-person viewing, and Flight Sim for flying through the capture with velocity control, mouse steering, a central reticle, and optional bounding-box containment.\n\nThe project includes tools for setting a camera movement boundary, aligning the bounding box across X/Y/Z rotations, adjusting splat size, showing an axis gizmo, saving camera defaults, and reading precise camera position and rotation data. Users can create editable viewpoint bookmarks, add notes, generate flythrough tours from saved viewpoints, scrub a timeline, set tour duration, adjust look-ahead and aim smoothing, and record tours as MP4/WebM where supported.\n\nIt also supports hotspots: labeled markers placed inside the 3D scene with editable text, position, color, and short labels. These are useful for identifying scene features, research observations, design issues, or spatial points of interest.\n\nThe app exports and imports workspace JSON files. These save viewer state such as scene alignment, bounds, camera defaults, current camera, bookmarks, tour settings, hotspots, splat size, axis visibility, screenshot/recording settings, and navigation settings. The actual .ply capture remains separate and must be loaded again before importing the workspace.\n\nFor immersive practice and research, Gaussian FlyThru could be used to study spatial experience, document captured environments, rehearse movement paths, create guided walkthroughs, compare viewpoints, annotate field observations, and generate video material from 3D scans. It is especially relevant for architecture, exhibition design, virtual production, site analysis, heritage documentation, urban research, performance spaces, training simulations, and any workflow where moving through a captured environment matters as much as viewing it.",
-      "resourceLabel": "Download .ply Files",
+      "resourceLabel": "Resources",
       "resourceLink": "https://drive.google.com/drive/folders/1a5ASsxRHDinJqEJMK8g6htgLH3UfrCPG?usp=drive_link",
       "gallery": [
         {
           "img": "images/gaussian05.jpg",
-          "caption": ""
+          "caption": "Control Panel & Viewport"
         },
         {
           "img": "images/gaussian04.jpg",
-          "caption": ""
+          "caption": "Hotspots"
         },
         {
           "img": "images/gaussian01.jpg",
-          "caption": ""
+          "caption": "UI Controls"
         },
         {
           "img": "images/gaussian03.jpg",
-          "caption": ""
+          "caption": "Hotspots"
         },
         {
           "img": "images/gaussian02.jpg",
+          "caption": "Hotspots"
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
           "caption": ""
         },
         {
@@ -234,7 +246,72 @@
       "link": "https://mrboxes-coder.github.io/Sandbox/gaussian_splat/luma-ply-viewer.html",
       "tags": [],
       "thumb": "images/gaussian05.jpg",
-      "youtube": "https://youtu.be/UhSvGwNIezs"
+      "youtube": "https://youtu.be/UhSvGwNIezs",
+      "videoCaption": "Behind the Scenes",
+      "videoRuntime": "05 : 14",
+      "tunableParams": [
+        "Bounding Box Center X",
+        "Bounding Box Center Y",
+        "Bounding Box Center Z",
+        "Bounding Box Width",
+        "Bounding Box Height",
+        "Bounding Box Depth",
+        "Fly Threshold",
+        "Bounding Box Rotation X",
+        "Bounding Box Rotation Y",
+        "Bounding Box Rotation Z",
+        "Walk Speed",
+        "Flight Thrust",
+        "Flight Max Speed",
+        "Flight Movement Scale",
+        "Pitch Limit",
+        "Yaw Rate",
+        "Bank Amount",
+        "Splat Size",
+        "Tour Duration",
+        "Aim Smooth",
+        "Look Ahead",
+        "Timeline Position",
+        "Screenshot Resolution",
+        "Recording Resolution",
+        "Hotspot Position X",
+        "Hotspot Position Y",
+        "Hotspot Position Z",
+        "Axis Gizmo Visibility",
+        "Hotspot Visibility",
+        "Camera Default Position",
+        "Camera Default Rotation"
+      ],
+      "specSheet": [
+        {
+          "label": "Engine",
+          "value": "Three.js scene, camera and WebGL rendering, with Gaussian splat rendering through specialist splat viewer libraries and native SOG support via PlayCanvas GSplat loading."
+        },
+        {
+          "label": "Data",
+          "value": "Local .ply Gaussian splat files, .sog compressed Gaussian splat files, workspace .json files, saved camera viewpoints, thumbnails, annotations, hotspots, bounds and camera defaults."
+        },
+        {
+          "label": "Controls",
+          "value": "Orbit, Walk, Look and Flight Sim navigation modes. Mouse steering, W/S thrust control, space/Esc exit controls, bounding-box flight limits, camera reset, screenshot capture and viewpoint timeline playback."
+        },
+        {
+          "label": "Instruments",
+          "value": "Live camera position and rotation readout, walk speed, splat size, axis gizmo, flight reticle, bounding box display, timeline scrubber, hotspot labels, annotation panels and recording status."
+        },
+        {
+          "label": "Deploy",
+          "value": "Single browser-based HTML application served locally from a lightweight development server. Can be hosted as a static web app if external dependencies and file-access behaviour are supported."
+        },
+        {
+          "label": "Access",
+          "value": "Desktop browser-based viewer. Local files stay on the user’s machine. No login required for local development. File loading happens through browser file picker or drag-and-drop."
+        },
+        {
+          "label": "Built With",
+          "value": "Codex-assisted iterative development, Three.js, GaussianSplats3D, PlayCanvas GSplat, HTML, CSS, JavaScript, browser File API, MediaRecorder, canvas screenshots and workspace JSON import/export."
+        }
+      ]
     },
     {
       "id": 9,
@@ -274,13 +351,77 @@
         {
           "img": "",
           "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
         }
       ],
       "carousel": false,
       "link": "",
       "tags": [],
       "thumb": "",
-      "youtube": ""
+      "youtube": "",
+      "videoCaption": "Behind the Scenes",
+      "videoRuntime": "",
+      "tunableParams": [
+        "Brush size",
+        "brush opacity",
+        "fill tolerance",
+        "line width/colour",
+        "fill colour/opacity",
+        "canvas size",
+        "export format",
+        "recording quality",
+        "capture resolution",
+        "time-lapse recording",
+        "zoom level",
+        "pan",
+        "crop bounds",
+        "selection bounds",
+        "layers",
+        "text edit",
+        "shape rotation",
+        "gallery limit"
+      ],
+      "specSheet": [
+        {
+          "label": "Engine",
+          "value": "Browser-native HTML5, Canvas 2D, MediaRecorder API and Screen Capture API — layered image editing, live capture preview, screen/video recording and export."
+        },
+        {
+          "label": "Data",
+          "value": "Screen captures, webcam streams, imported images, canvas pixel layers, vector-like shape layers, text layers, gallery thumbnails, recorded video blobs and time-lapse frame sequences."
+        },
+        {
+          "label": "Controls",
+          "value": "Mode tabs — Screenshot, Record, Paint. Tool accordions, layer controls, crop/selection handles, zoom slider, pan/navigation controls, palette selection, recording type selector and time-lapse calculator."
+        },
+        {
+          "label": "Instruments",
+          "value": "Live recording timer, REC badge, zoom percentage, active-tool strip, canvas instructions, layer stack, gallery thumbnails, capture-rate readout, frame-count estimate and export settings."
+        },
+        {
+          "label": "Deploy",
+          "value": "Single self-contained HTML file — no build step required. Can run locally from file, or be hosted as a static web page."
+        },
+        {
+          "label": "Access",
+          "value": "Browser based — works in modern desktop browsers with permission prompts for screen, camera and microphone access. No login required by default."
+        },
+        {
+          "label": "Built With",
+          "value": "Codex — iterative feature design, debugging, UI refinement, browser API exploration, capture workflow testing and practical user-led development."
+        }
+      ]
     },
     {
       "id": 10,
@@ -319,13 +460,77 @@
         {
           "img": "",
           "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
         }
       ],
       "carousel": false,
       "link": "./stop_motion_studio/stopmotion.html",
       "tags": [],
       "thumb": "",
-      "youtube": ""
+      "youtube": "",
+      "videoCaption": "Behind the Scenes",
+      "videoRuntime": "",
+      "tunableParams": [
+        "Frame rate",
+        "Capture resolution",
+        "Onion skin opacity",
+        "Onion skin frame count",
+        "Camera brightness",
+        "Camera contrast",
+        "Camera saturation",
+        "Camera sharpen",
+        "Camera blur",
+        "Roto pen size",
+        "Roto eraser size",
+        "Export quality",
+        "Auto-save reminder interval",
+        "Timeline zoom",
+        "IN point",
+        "OUT point",
+        "Audio volume",
+        "Playback loop"
+      ],
+      "specSheet": [
+        {
+          "label": "Engine",
+          "value": "Browser-native Canvas 2D API · WebCodecs VideoEncoder/AudioEncoder · no framework, no dependencies."
+        },
+        {
+          "label": "Data",
+          "value": "Live webcam feed via MediaDevices API · imported image sequences · imported MP3/WAV audio scratch track."
+        },
+        {
+          "label": "Controls",
+          "value": "Wacom tablet + Pointer Events API for pressure-sensitive drawing · mouse for timeline scrubbing and frame extension · keyboard shortcuts for undo and playback."
+        },
+        {
+          "label": "Instruments",
+          "value": "Frame counter, FPS display, IN/OUT range markers, timecode ruler, zoom slider, export progress indicator."
+        },
+        {
+          "label": "Deploy",
+          "value": "Single self-contained HTML file · runs from local file:// in Chrome or Edge · no server, no build step, no internet required."
+        },
+        {
+          "label": "Access",
+          "value": "Open directly in browser · no login, no API key, no installation."
+        },
+        {
+          "label": "Built With",
+          "value": "Claude — iterative, screenshot-led development · surgical str_replace edits · Node.js syntax validation at each step."
+        }
+      ]
     },
     {
       "id": 11,
@@ -363,23 +568,68 @@
         {
           "img": "",
           "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
         }
       ],
       "carousel": false,
       "link": "",
       "tags": [],
       "thumb": "",
-      "youtube": ""
+      "youtube": "",
+      "videoCaption": "Behind the Scenes",
+      "videoRuntime": "",
+      "tunableParams": [],
+      "specSheet": [
+        {
+          "label": "Engine",
+          "value": ""
+        },
+        {
+          "label": "Data",
+          "value": ""
+        },
+        {
+          "label": "Controls",
+          "value": ""
+        },
+        {
+          "label": "Instruments",
+          "value": ""
+        },
+        {
+          "label": "Deploy",
+          "value": ""
+        },
+        {
+          "label": "Access",
+          "value": ""
+        },
+        {
+          "label": "Built With",
+          "value": ""
+        }
+      ]
     },
     {
       "id": 13,
       "name": "Veil Runner v.01",
       "tier": "4",
       "categories": [
-        "Three.js",
-        "Game",
         "Fly-Thru",
-        "Simulation"
+        "Game",
+        "Simulation",
+        "Three.js"
       ],
       "date": "2026-08-02",
       "desc": "Asteroids is a browser-based 3D space combat simulatio. A single self-contained HTML file in which the player pilots a spacecraft to intercept and destroy an autonomous boid navigating a procedurally generated asteroid field.",
@@ -410,13 +660,58 @@
         {
           "img": "",
           "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
         }
       ],
       "carousel": true,
       "link": "./veilrunner/veilrunner_v05.html",
       "tags": [],
       "thumb": "images/veilrunner01.jpg",
-      "youtube": ""
+      "youtube": "",
+      "videoCaption": "Behind the Scenes",
+      "videoRuntime": "",
+      "tunableParams": [],
+      "specSheet": [
+        {
+          "label": "Engine",
+          "value": ""
+        },
+        {
+          "label": "Data",
+          "value": ""
+        },
+        {
+          "label": "Controls",
+          "value": ""
+        },
+        {
+          "label": "Instruments",
+          "value": ""
+        },
+        {
+          "label": "Deploy",
+          "value": ""
+        },
+        {
+          "label": "Access",
+          "value": ""
+        },
+        {
+          "label": "Built With",
+          "value": ""
+        }
+      ]
     },
     {
       "id": 14,
@@ -433,14 +728,26 @@
       "gallery": [
         {
           "img": "images/space_invaders01.jpg",
-          "caption": ""
+          "caption": "Intro Screen"
         },
         {
           "img": "images/space_invaders02.jpg",
-          "caption": ""
+          "caption": "Game Play"
         },
         {
           "img": "images/space_invaders03.jpg",
+          "caption": "Game Ply"
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
           "caption": ""
         },
         {
@@ -460,7 +767,56 @@
       "link": "./space_invaders/space_invaders.html",
       "tags": [],
       "thumb": "images/space_invaders02.jpg",
-      "youtube": "https://youtu.be/NC-fQi74lTI?si=Do7l9-FPasNJidZJ"
+      "youtube": "https://youtu.be/NC-fQi74lTI?si=Do7l9-FPasNJidZJ",
+      "videoCaption": "Game Preview",
+      "videoRuntime": "01 : 21",
+      "tunableParams": [
+        "ALIEN SPEED",
+        "FIRE RATE",
+        "MAX ALIEN SHOTS",
+        "PLAYER SPEED",
+        "SHOT SPEED",
+        "STEP SIZE",
+        "DROP AMOUNT",
+        "UFO FREQUENCY",
+        "SHIELD RESILIENCE",
+        "BONUS LIFE THRESHOLD",
+        "WAVE SPEED MULTIPLIER",
+        "MARCH TEMPO",
+        "FORMATION ROWS",
+        "FORMATION COLUMNS",
+        "ALIEN SHOT TYPES"
+      ],
+      "specSheet": [
+        {
+          "label": "ENGINE",
+          "value": "Canvas 2D API — pixel-accurate bitmap rendering, requestAnimationFrame game loop, Web Audio API for real-time sound synthesis."
+        },
+        {
+          "label": "DATA",
+          "value": "Hardcoded sprite bitmaps (2D arrays of 0s and 1s) for all alien types, cannon, shields and projectiles. Alien formation state tracked as a flat object array. Shield integrity stored as Uint8Array per bunker. High score persisted to localStorage."
+        },
+        {
+          "label": "CONTROLS",
+          "value": "Keyboard — left/right arrow or A/D to move, Space or Z to fire, P to pause. Touch — on-screen virtual buttons rendered as translucent overlays for mobile play."
+        },
+        {
+          "label": "INSTRUMENTS",
+          "value": "Live score display · hi-score panel · lives counter with cannon icons · wave indicator · credit display."
+        },
+        {
+          "label": "DEPLOY",
+          "value": "Single self-contained HTML file · no build tools · no server · no dependencies · runs via file:// or any static host."
+        },
+        {
+          "label": "ACCESS",
+          "value": "Browser-based · open in any modern desktop or mobile browser · no installation · no login · no API key required."
+        },
+        {
+          "label": "BUILT WITH",
+          "value": "Claude — specification written as a structured prompt, game generated in a single pass, then iteratively refined through visual feedback, bug fixes and targeted modifications across multiple sessions."
+        }
+      ]
     },
     {
       "id": 15,
@@ -499,22 +855,86 @@
         {
           "img": "",
           "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
         }
       ],
       "carousel": true,
       "link": "./glb_viewer/glb-slideshow.html",
       "tags": [],
       "thumb": "images/glb_slideshow02.jpg",
-      "youtube": ""
+      "youtube": "",
+      "videoCaption": "Behind the Scenes",
+      "videoRuntime": "",
+      "tunableParams": [
+        "EXPOSURE",
+        "AMBIENT INTENSITY",
+        "KEY LIGHT",
+        "FILL LIGHT",
+        "RIM LIGHT",
+        "FIELD OF VIEW",
+        "ROTATE SPEED",
+        "GRID BRIGHTNESS",
+        "BACKGROUND OPACITY",
+        "BACKGROUND BRIGHTNESS",
+        "AUTO-PLAY DURATION",
+        "TONE MAPPING",
+        "SHADOW QUALITY",
+        "CAMERA DAMPING",
+        "OVERLAY STYLE",
+        "THUMBNAIL CROP",
+        "SLIDE COUNT",
+        "METADATA DEPTH"
+      ],
+      "specSheet": [
+        {
+          "label": "Engine",
+          "value": "Three.js r160 — scene, camera, PBR lighting and WebGL2 rendering. Custom single-mesh grid via BufferGeometry with per-vertex colour attributes. Axis orientation gizmo rendered via scissor/viewport splitting on the main renderer. Off-screen thumbnail compositing via 2D canvas — no additional WebGL contexts."
+        },
+        {
+          "label": "Data",
+          "value": "User-supplied GLB/GLTF binary files — mesh geometry, PBR materials and embedded JPEG/PNG textures read directly via the FileReader API. Scene metadata, authoring information and per-card slideshow state serialised as JSON and embedded within the GLB asset.extras block. Slideshow playlists exported as portable JSON — filenames, base64 thumbnails and per-card scene settings."
+        },
+        {
+          "label": "Controls",
+          "value": "Sliders — exposure, ambient, key, fill and rim lighting · FOV · auto-rotate speed · grid brightness · background image brightness and opacity · auto-play duration · toggles — auto-rotate, damping, shadows, grid visibility, axis gizmo, metadata overlay, slideshow mode, auto-play, presentation lock · buttons — lighting presets, greyscale and custom background swatches, solid/wireframe, camera fit/reset, screenshot, PNG alpha export, save GLB, set slideshow card · seven collapsible accordion sections."
+        },
+        {
+          "label": "Instruments",
+          "value": "Real-time FPS counter · XYZ axis orientation gizmo with colour-coded arrows · model statistics — vertex count, triangle count, material count, mesh count · GLB load progress bar · auto-play progress bar per filmstrip card · metadata overlay with Minimal, Card and Cinematic display modes · version history log with timestamps."
+        },
+        {
+          "label": "Deploy",
+          "value": "Single self-contained HTML file · no build tools · no server · no framework · Three.js r160 loaded via ES module importmap from CDN · logo and favicon embedded as base64 data URIs · all scene state and metadata stored within the GLB binary."
+        },
+        {
+          "label": "Access",
+          "value": "Browser-based · open in any modern desktop browser supporting WebGL2 · no installation · no login required · optional password-protected Presentation mode for public-facing display · works from local filesystem or any static hosting environment."
+        },
+        {
+          "label": "Built With",
+          "value": "Claude — iterative, Vibe Coding-led development across a structured multi-session build. First Vibe Coding project, used as a practical foundation for understanding file I/O, 3D environments, UI control systems, scene state management and browser-based web application development in the Sandbox."
+        }
+      ]
     },
     {
       "id": 16,
       "name": "Flight Simulator",
       "tier": "3",
       "categories": [
-        "Three.js",
+        "Fly-Thru",
         "Game",
-        "Fly-Thru"
+        "Three.js"
       ],
       "date": "2026-07-07",
       "desc": "Flight Simulator — A browser-based 3D flight simulator built as a single HTML file using Three.js. Features a fully functional flight model, HUD overlays, cockpit skin, instrumentation panels, and realistic thrust/speed/pitch mechanics.",
@@ -545,13 +965,58 @@
         {
           "img": "",
           "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
         }
       ],
       "carousel": false,
       "link": "",
       "tags": [],
       "thumb": "",
-      "youtube": ""
+      "youtube": "",
+      "videoCaption": "Behind the Scenes",
+      "videoRuntime": "",
+      "tunableParams": [],
+      "specSheet": [
+        {
+          "label": "Engine",
+          "value": ""
+        },
+        {
+          "label": "Data",
+          "value": ""
+        },
+        {
+          "label": "Controls",
+          "value": ""
+        },
+        {
+          "label": "Instruments",
+          "value": ""
+        },
+        {
+          "label": "Deploy",
+          "value": ""
+        },
+        {
+          "label": "Access",
+          "value": ""
+        },
+        {
+          "label": "Built With",
+          "value": ""
+        }
+      ]
     },
     {
       "id": 17,
@@ -559,10 +1024,10 @@
       "tier": "2",
       "categories": [
         "Animation Tool",
-        "Three.js",
-        "Simulation",
         "Behaviour",
-        "Flock/Schools/Herds"
+        "Flock/Schools/Herds",
+        "Simulation",
+        "Three.js"
       ],
       "date": "2026-07-07",
       "desc": "Boids 01 is a Three.js 3D simulation where a single agent (Boid) seeks and follows a bouncing target within a bounded space, using velocity and turn-rate limited steering to create realistic, gradual movement.",
@@ -593,13 +1058,74 @@
         {
           "img": "",
           "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
         }
       ],
       "carousel": true,
       "link": "./boid_projects/boids01.html",
       "tags": [],
       "thumb": "images/boids01_04.jpg",
-      "youtube": "https://youtu.be/nZ5UuhMgteg"
+      "youtube": "https://youtu.be/nZ5UuhMgteg",
+      "videoCaption": "Behind the Scenes",
+      "videoRuntime": "01 : 00",
+      "tunableParams": [
+        "TARGET VELOCITY",
+        "BOID VELOCITY",
+        "TURN RATE",
+        "BOUNDING BOX HEIGHT",
+        "BOUNDING BOX VISIBLE",
+        "AMBIENT INTENSITY",
+        "KEY LIGHT INTENSITY",
+        "FILL LIGHT INTENSITY",
+        "EXPOSURE",
+        "CAMERA FOV",
+        "AUTO ROTATE SPEED",
+        "BACKGROUND COLOUR",
+        "AXIS GIZMOS",
+        "SHADOW TOGGLE",
+        "GRID VISIBLE"
+      ],
+      "specSheet": [
+        {
+          "label": "Engine",
+          "value": "Three.js r160 — scene, camera, lighting, shadow mapping and WebGL rendering."
+        },
+        {
+          "label": "Data",
+          "value": "Craig Reynolds' Boids algorithm (1987) — single-agent seek steering using quaternion-based orientation, slerp-limited turn rate and local-axis forward translation."
+        },
+        {
+          "label": "Controls",
+          "value": "Sliders — target velocity, boid velocity, turn rate, bounding box height · toggles — bounding box, target object, shadows, grid, axis gizmos, solid/wire mode · orbit camera — drag, zoom, pan · camera reset and fit."
+        },
+        {
+          "label": "Instruments",
+          "value": "Live camera position HUD (X, Y, Z) · FPS counter · axis orientation gizmo · bounding box containment with real-time bounce · local axis helpers on boid and target object."
+        },
+        {
+          "label": "Deploy",
+          "value": "Single self-contained HTML file · no build tools · no server · CDN-only dependencies · embedded logo and favicon as base64.  ACCESS Browser-based · open in any modern desktop browser · no installation · no login required.  BUILT WITH Claude — iterative, prompt-led development across a structured single-session build.  TUNABLE PARAMETERS  TARGET VELOCITY, BOID VELOCITY, TURN RATE, BOUNDING BOX HEIGHT, BOUNDING BOX VISIBLE, AMBIENT INTENSITY, KEY LIGHT INTENSITY, FILL LIGHT INTENSITY, EXPOSURE, CAMERA FOV, AUTO ROTATE SPEED, BACKGROUND COLOUR, AXIS GIZMOS, SHADOW TOGGLE, GRID VISIBLE"
+        },
+        {
+          "label": "Access",
+          "value": "Browser-based · open in any modern desktop browser · no installation · no login required."
+        },
+        {
+          "label": "Built With",
+          "value": "Claude — iterative, prompt-led development across a structured single-session build."
+        }
+      ]
     },
     {
       "id": 18,
@@ -607,10 +1133,10 @@
       "tier": "3",
       "categories": [
         "Animation Tool",
-        "Three.js",
-        "Simulation",
         "Behaviour",
-        "Flock/Schools/Herds"
+        "Flock/Schools/Herds",
+        "Simulation",
+        "Three.js"
       ],
       "date": "2026-07-07",
       "desc": "A real-time 3D flocking simulation built with Three.js. Multiple agents fly together using Reynolds' three rules — separation, alignment, and cohesion — producing emergent flock behaviour controlled via an interactive panel.",
@@ -641,13 +1167,58 @@
         {
           "img": "images/boids02_06.jpg",
           "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
         }
       ],
       "carousel": true,
       "link": "./boid_projects/boids02.html",
       "tags": [],
       "thumb": "images/boids02_03.jpg",
-      "youtube": "https://youtu.be/iVa8rVC-qls"
+      "youtube": "https://youtu.be/iVa8rVC-qls",
+      "videoCaption": "Behind the Scenes",
+      "videoRuntime": "",
+      "tunableParams": [],
+      "specSheet": [
+        {
+          "label": "Engine",
+          "value": ""
+        },
+        {
+          "label": "Data",
+          "value": ""
+        },
+        {
+          "label": "Controls",
+          "value": ""
+        },
+        {
+          "label": "Instruments",
+          "value": ""
+        },
+        {
+          "label": "Deploy",
+          "value": ""
+        },
+        {
+          "label": "Access",
+          "value": ""
+        },
+        {
+          "label": "Built With",
+          "value": ""
+        }
+      ]
     },
     {
       "id": 23,
@@ -655,10 +1226,10 @@
       "tier": "3",
       "categories": [
         "Animation Tool",
-        "Three.js",
-        "Simulation",
         "Behaviour",
-        "Flock/Schools/Herds"
+        "Flock/Schools/Herds",
+        "Simulation",
+        "Three.js"
       ],
       "date": "2026-06-05",
       "desc": "A real-time 3D flocking simulation built with Three.js, implementing Craig Reynolds' Boids algorithm. A flock of tetrahedra exhibit emergent flocking behaviour — cohesion, separation, alignment — while navigating cylindrical obstacles and floor avoidance within a bounded space.",
@@ -689,13 +1260,75 @@
         {
           "img": "images/boids03_07.jpg",
           "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
         }
       ],
       "carousel": true,
       "link": "./boid_projects/boids03.html",
       "tags": [],
       "thumb": "images/boids03_06.jpg",
-      "youtube": "https://youtu.be/iekzg-VLfqQ"
+      "youtube": "https://youtu.be/iekzg-VLfqQ",
+      "videoCaption": "Behind the Scenes",
+      "videoRuntime": "04:37",
+      "tunableParams": [
+        "FLOCK COUNT",
+        "MIN SPEED",
+        "MAX SPEED",
+        "TURN RATE",
+        "PERCEPTION RADIUS",
+        "SEPARATION",
+        "ALIGNMENT",
+        "COHESION",
+        "TARGET SEEK",
+        "LOOK-AHEAD",
+        "AVOID WEIGHT",
+        "DETECT RADIUS",
+        "GEO RADIUS",
+        "OBSTACLE HEIGHT",
+        "FLOOR MIN",
+        "FLOOR MAX"
+      ],
+      "specSheet": [
+        {
+          "label": "Engine",
+          "value": "Three.js — scene, camera, lighting and WebGL rendering."
+        },
+        {
+          "label": "Data",
+          "value": "Craig Reynolds' Boids algorithm (1987) — cohesion, separation, alignment."
+        },
+        {
+          "label": "Controls",
+          "value": "Sliders — perception, speed, turn rate, steering weights · toggles — model, constraints, avoidance · transform gizmos — obstacle positioning."
+        },
+        {
+          "label": "Instruments",
+          "value": "Live camera position HUD · FPS counter · real-time flock count · axis orientation gizmo · selected obstacle readout."
+        },
+        {
+          "label": "Deploy",
+          "value": "Single self-contained HTML file · no build tools · no server · CDN-only dependencies."
+        },
+        {
+          "label": "Access",
+          "value": "Browser-based · open in any modern desktop browser · no installation · no login required."
+        },
+        {
+          "label": "Built With",
+          "value": "Claude — iterative, prompt-led development across a structured multi-session build."
+        }
+      ]
     },
     {
       "id": 19,
@@ -733,13 +1366,58 @@
         {
           "img": "",
           "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
         }
       ],
       "carousel": false,
       "link": "",
       "tags": [],
       "thumb": "",
-      "youtube": ""
+      "youtube": "",
+      "videoCaption": "Behind the Scenes",
+      "videoRuntime": "",
+      "tunableParams": [],
+      "specSheet": [
+        {
+          "label": "Engine",
+          "value": ""
+        },
+        {
+          "label": "Data",
+          "value": ""
+        },
+        {
+          "label": "Controls",
+          "value": ""
+        },
+        {
+          "label": "Instruments",
+          "value": ""
+        },
+        {
+          "label": "Deploy",
+          "value": ""
+        },
+        {
+          "label": "Access",
+          "value": ""
+        },
+        {
+          "label": "Built With",
+          "value": ""
+        }
+      ]
     },
     {
       "id": 26,
@@ -777,13 +1455,58 @@
         {
           "img": "",
           "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
         }
       ],
       "carousel": false,
       "link": "",
       "tags": [],
       "thumb": "",
-      "youtube": ""
+      "youtube": "",
+      "videoCaption": "Behind the Scenes",
+      "videoRuntime": "",
+      "tunableParams": [],
+      "specSheet": [
+        {
+          "label": "Engine",
+          "value": ""
+        },
+        {
+          "label": "Data",
+          "value": ""
+        },
+        {
+          "label": "Controls",
+          "value": ""
+        },
+        {
+          "label": "Instruments",
+          "value": ""
+        },
+        {
+          "label": "Deploy",
+          "value": ""
+        },
+        {
+          "label": "Access",
+          "value": ""
+        },
+        {
+          "label": "Built With",
+          "value": ""
+        }
+      ]
     },
     {
       "id": 20,
@@ -796,7 +1519,7 @@
       ],
       "date": "2026-04-18",
       "desc": "MeshMorph is a self-contained browser-based image morphing tool. Users place correspondence nodes on two images to guide a mesh warp, exporting a smooth H.264 MP4 transition video. Runs locally from file:// with zero dependencies.",
-      "fullDesc": "Welcome to the Image Mesh Morph project, part of a series of exploratory projects into AI-assisted coding. This is a sandbox environment where curiosity leads, and outcomes follow.\n\nSo, what is this project about? MeshMorph is a browser-based image morphing tool, a single HTML file that runs locally, no server, no installation, no internet connection needed. The user imports two images, places a set of correspondence nodes on the images, and the tool smoothly warps one image into the other, exporting the result as an MP4 video.\n\nThis project started as a fairly simple question, can we load two images, manipulate their pixels, and produce a video transition entirely in the browser? What emerged was much richer than that.\n\nThe nodes you place act as anchors, telling the tool which point in the start image corresponds to which point in the end image. From there, a mesh warp algorithm handles the rest, interpolating every pixel from the start image to the end image. The project provides three warping methods to choose from, 'Delaunay triangulation', 'Thin Plate Spline', and 'Moving Least Squares', each producing a different quality of deformation. The user is provided with five 'easing' curves to control the timing of the transition.\n\nAs the project developed, features were added sequentially through exploration, a 'live preview with a scrubber', a 'customisable title screen', the ability to 'hold the first or last frame', and the option to 'burn the animated mesh overlay' directly into the exported video. There's also a 'save' and 'load function', so the user can export and import node positions, together with the project settings as a JSON file.\n\nThe entire MP4 export happens inside the browser using the WebCodecs API, no external libraries, no dependencies whatsoever. Just a file the user can open and run.\n\nFor immersive practice and research, this kind of tool opens up interesting territory, 'morphing portraits', 'spaces', 'anatomical forms', or 'environmental states' to produce material for projection, VR pipelines, or live performance contexts where transformation itself carries meaning.\n\nAll of this was developed collaboratively with Claude, not just the code, but the architecture, the debugging, the feature decisions, and the UI, which evolved organically as the project emerged and found its own shape.",
+      "fullDesc": "Image Mesh Morph, or MeshMorph, is part of an ongoing series of exploratory projects investigating AI-assisted coding as a creative practice. These projects begin with curiosity rather than a fixed product specification. Questions lead to experiments, and the resulting software gradually finds its own form.\n\nMeshMorph began with a simple question:\n\nCan we import two images, manipulate and interpolate their pixels over a timeline, and export the resulting transition as an MP4—all within a web browser?\n\nThe result is a self-contained image-morphing application held within a single HTML file. It runs locally without a server, installation, specialist software, or external processing service. Its core image manipulation and video-generation processes take place directly on the user’s computer.\n\nFrom Nodes to Moving Pixels\n\nThe user imports a start image and an end image, then places correspondence nodes across both. Each node identifies how a point in the first image relates to a destination in the second. As the timeline progresses, these nodes move between their starting and ending positions. A deformation algorithm uses the changing geometry to determine how the surrounding pixels should move. The result is more than a dissolve. The spatial structure of the images changes over time: facial features can move, architectural forms can bend, anatomical structures can transform, and environmental states can reorganise themselves.\n\n MeshMorph offers three deformation methods:\n> Delaunay Triangulation divides the image into connected triangles and transforms each section through the transition.\n> Thin Plate Spline creates a smooth deformation surface influenced by the control nodes.\n> Moving Least Squares uses weighted transformations to control how deformation spreads around each node.\n\nFive easing curves control the timing of the morph, including linear, ease-in, ease-out, ease-in/out, and bounce. The same node arrangement can therefore produce different results depending on how movement unfolds through time.\n\nTimeline, Preview, and Export\n\nAlthough MeshMorph began as a pixel-processing experiment, it gradually developed into a small timeline-based production tool. A live preview and scrubber allow the user to inspect any point in the transformation before export. The sequence can include a customisable title screen and optional holds on the opening and closing images.\n\nThe animated mesh can also be displayed and, if desired, burned into the exported video. This allows the computational structure responsible for the transformation to become part of the visual composition.\n\nProject data can be saved as a JSON session file containing the nodes and relevant settings. A composition can therefore be reopened, revised, and exported later without embedding the source images in the session file.\n\nFor each point on the timeline, MeshMorph calculates the interpolated node geometry, reconstructs the pixel transformation, blends the warped images, and produces a complete video frame. These frames are encoded through the browser’s WebCodecs API and assembled into an MP4.\n\nDevelopment Through Different AI Environments\n\nThe project began in a Claude-based coding environment, where its initial architecture, morphing methods, features, and interface emerged through collaborative experimentation. As the application became more complex, difficulties developed around interface design, processing time, and rendering stability. The project was subsequently migrated to OpenAI Codex, where development focused on reviewing and strengthening these areas.\n\nCodex was used to inspect the existing application, identify fragile mathematical conditions, and improve the rendering system. This included stabilising Thin Plate Spline and Moving Least Squares when too few suitable nodes were present, preventing Delaunay topology changes from producing flicker, and removing visible seams between rendered triangles. The final Delaunay renderer assigns output pixels to the mesh and calculates their source positions using barycentric coordinates. Instead of constructing frames from separately composited triangles—which could leave visible lines—it writes a continuous pixel buffer for each frame. This produces smoother, more stable transitions, although it requires more intensive computation.\n\nThe migration became part of the project’s research story. Different AI systems supported different stages: initial conception and feature exploration in one environment, followed by technical review, optimisation, interface refinement, and rendering stabilisation in another.\n\nAI-assisted Coding as Creative Inquiry\n\nMeshMorph was not built from a complete specification. Its capabilities emerged sequentially through testing and reflection.The preview suggested the need for timing controls. Timing led to easing curves and hold frames. Export requirements introduced title cards and WebCodecs. Visualising the transformation led to animated mesh overlays. Continued testing exposed geometric and rasterisation problems, which prompted new rendering strategies.\n\nThe project therefore documents more than the creation of a tool. It records a process of AI-assisted computational inquiry in which architecture, debugging, interface design, feature decisions, and visual outcomes developed together. Human authorship remained responsible for the questions, aesthetic judgement, testing, and direction. AI shortened the distance between proposing an idea and producing a working experiment. When one approach failed, alternatives could be investigated quickly.\n\nCreative Potential\n\nMeshMorph can explore transformations between portraits, bodies, anatomical structures, architectural spaces, natural environments, material conditions, and abstract forms.\n\nThe resulting sequences may contribute to projection design, installation, virtual reality, spatial media, and live performance. In these contexts, the morph is not merely a transition between images. It can represent change, correspondence, instability, memory, mutation, or becoming.\n\nMeshMorph ultimately operates as a practical creative tool, a browser-based pixel experiment, a research artefact, and a case study in collaborative AI-assisted software development. It began with a question about importing images, manipulating pixels through time, and exporting a video. What emerged was a broader exploration of how bespoke creative software can be discovered through making.",
       "resourceLabel": "",
       "resourceLink": "",
       "gallery": [
@@ -823,27 +1546,103 @@
         {
           "img": "",
           "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
         }
       ],
       "carousel": true,
       "link": "./image_meshmorph/morpher.html",
       "tags": [],
       "thumb": "images/mesh_morph02.jpg",
-      "youtube": ""
+      "youtube": "",
+      "videoCaption": "Behind the Scenes",
+      "videoRuntime": "",
+      "tunableParams": [
+        "MORPH METHOD",
+        "CORRESPONDENCE NODES",
+        "NODE POSITIONS",
+        "EASING CURVE",
+        "MORPH DURATION",
+        "MLS ALPHA",
+        "PREVIEW RESOLUTION",
+        "EXPORT RESOLUTION",
+        "START FRAME HOLD",
+        "END FRAME HOLD",
+        "TITLE SCREEN",
+        "TITLE TEXT",
+        "TITLE BACKGROUND",
+        "TITLE COLOUR",
+        "MESH OVERLAY",
+        "OVERLAY BRIGHTNESS",
+        "REFERENCE GRID",
+        "GRID COLOUR"
+      ],
+      "specSheet": [
+        {
+          "label": "Engine",
+          "value": "HTML5 Canvas 2D — custom Delaunay, Thin Plate Spline and Moving Least Squares deformation — barycentric pixel rasterisation — WebCodecs H.264 encoding — custom MP4 assembly."
+        },
+        {
+          "label": "Data",
+          "value": "Two locally imported raster images — normalised start/end correspondence-node coordinates — timeline and morph settings — portable JSON session files."
+        },
+        {
+          "label": "Controls",
+          "value": "Drag-and-drop image loading — add, move and delete nodes — copy node positions between frames — scroll to zoom — Shift-drag to pan — timeline scrubber — morph-method and easing selection."
+        },
+        {
+          "label": "Instruments",
+          "value": "Live morph preview — start/end image status — node count — reference grid — animated mesh overlay — resolution indicator — duration and frame count — export progress display."
+        },
+        {
+          "label": "Deploy",
+          "value": "Single portable HTML file — no build process — no server required — no installation — no external rendering service — local browser-based image processing and MP4 generation."
+        },
+        {
+          "label": "Access",
+          "value": "Runs locally in a modern Chromium-based desktop browser — images remain on the user’s computer — no account or login required — WebCodecs support required for MP4 export."
+        },
+        {
+          "label": "Built With",
+          "value": "Claude and OpenAI Codex — iterative, prompt-led development across architecture, interface design, mathematical deformation, debugging, performance optimisation and rendering stability."
+        }
+      ]
     },
     {
       "id": 21,
-      "name": "GLB Editor",
+      "name": "3D Editor",
       "tier": "3",
       "categories": [
         "Three.js"
       ],
       "date": "2026-06-05",
       "desc": "A self-contained, single-file browser-based 3D editor built on Three.js. Supports loading, creating, transforming, grouping and exporting GLB scenes. Designed as a reusable template component for projects requiring interactive 3D object editing.",
-      "fullDesc": "GLB Editor is a fully self-contained, browser-based 3D scene editor built on Three.js r160, packaged as a single HTML file with no build tools or server requirements. It runs entirely in the browser, making it immediately deployable across platforms without installation.\n      \nThe editor loads GLB and GLTF files via drag-and-drop or file picker, normalises them into a navigable 3D viewport with orbit, zoom and pan controls. Once loaded, scenes can be decomposed — grouped objects can be exploded into individually selectable meshes, each inheriting their correct world-space transforms. Objects can then be selected individually or as multi-object selections, transformed (translate in world space, rotate and scale in local space) via on-screen gizmos or precise numeric inputs, duplicated, grouped, deleted, or have their normals reversed. All structural changes support five-level undo. New geometry can be created directly in the editor — boxes, spheres, cones and cylinders — with configurable parameters, choice of material type (Wireframe, Basic, Lambert, Phong, Standard), and editable colour. Transforms can be baked into geometry, aligning local axes to world axes. The scene exports as a single GLB file.\n      \nFor immersive practice and research, the editor functions as a lightweight spatial prototyping tool — enabling rapid construction, modification and export of 3D scenes without dependency on commercial software like Blender or Maya. It is particularly suited to preparing assets for WebXR experiences, AR/VR pipelines, and real-time rendering contexts where GLB is the standard delivery format. Its single-file architecture makes it embeddable as a template component within larger research platforms, curatorial tools, or interactive documentary and spatial storytelling projects.",
+      "fullDesc": "3D Editor is a fully self-contained, browser-based 3D scene editor built on Three.js r160, packaged as a single HTML file with no build tools or server requirements. It runs entirely in the browser, making it immediately deployable across platforms without installation.\n      \nThe editor loads GLB and GLTF files via drag-and-drop or file picker, normalises them into a navigable 3D viewport with orbit, zoom and pan controls. Once loaded, scenes can be decomposed — grouped objects can be exploded into individually selectable meshes, each inheriting their correct world-space transforms. Objects can then be selected individually or as multi-object selections, transformed (translate in world space, rotate and scale in local space) via on-screen gizmos or precise numeric inputs, duplicated, grouped, deleted, or have their normals reversed. All structural changes support five-level undo. New geometry can be created directly in the editor — boxes, spheres, cones and cylinders — with configurable parameters, choice of material type (Wireframe, Basic, Lambert, Phong, Standard), and editable colour. Transforms can be baked into geometry, aligning local axes to world axes. The scene exports as a single GLB file.\n      \nFor immersive practice and research, the editor functions as a lightweight spatial prototyping tool — enabling rapid construction, modification and export of 3D scenes without dependency on commercial software like Blender or Maya. It is particularly suited to preparing assets for WebXR experiences, AR/VR pipelines, and real-time rendering contexts where GLB is the standard delivery format. Its single-file architecture makes it embeddable as a template component within larger research platforms, curatorial tools, or interactive documentary and spatial storytelling projects.",
       "resourceLabel": "",
       "resourceLink": "",
       "gallery": [
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
         {
           "img": "",
           "caption": ""
@@ -873,7 +1672,63 @@
       "link": "",
       "tags": [],
       "thumb": "",
-      "youtube": ""
+      "youtube": "",
+      "videoCaption": "Behind the Scenes",
+      "videoRuntime": "",
+      "tunableParams": [
+        "VERTEX WELD",
+        "CAMERA FOV 20–100°",
+        "CAMERA AUTO-ROTATE",
+        "EXPOSURE",
+        "AMBIENT",
+        "KEY-LIGHT",
+        "FILL-LIGHT",
+        "RIM-LIGHT",
+        "LIGHT COLOUR",
+        "LIGHT POSITION",
+        "OBJECT POSTION/ROTATION/SCALE",
+        "MATERIAL COLOUR",
+        "EMISSIVE INTENSITY",
+        "METALNESS",
+        "ROUGHNESS",
+        "SHININESS",
+        "SPECULAR COLOUR",
+        "OPACITY",
+        "WIREFRAME",
+        "PRIMITIVE DIMENSIONS/SEGMENTS",
+        "UNDO LIMIT",
+        "MATERIAL PRESETS"
+      ],
+      "specSheet": [
+        {
+          "label": "Engine",
+          "value": "Three.js r160 — WebGL2 scene rendering, perspective camera, OrbitControls, TransformControls, lighting, shadows and material previews."
+        },
+        {
+          "label": "Data",
+          "value": "GLB/GLTF, OBJ/MTL and FBX import · GLB and OBJ export · scene-settings JSON · separate-model ZIP export · Draco-compressed geometry support."
+        },
+        {
+          "label": "Controls",
+          "value": "Object selection and multi-selection · translate, rotate and scale gizmos · numeric XYZ transforms · duplicate, group, explode, delete and frame selection · keyboard shortcuts · undo history."
+        },
+        {
+          "label": "Instruments",
+          "value": "Objects panel · vertex, triangle, material and mesh counts · FPS display · selection bounding boxes · world/local axis indicators · mesh-cleanup progress · light gizmos · export status and save history."
+        },
+        {
+          "label": "Deploy",
+          "value": "Single self-contained HTML application · ES modules loaded from a CDN · no build tools · no server · no installation · optional static web hosting."
+        },
+        {
+          "label": "Access",
+          "value": "Browser-based desktop editor · local file import and export · native save dialogue where supported · standard-download fallback · no account, login or API key required."
+        },
+        {
+          "label": "Built With",
+          "value": "Codex — iterative development, architectural review, interface design, Three.js debugging, geometry processing, import/export repair and test-driven refinement."
+        }
+      ]
     },
     {
       "id": 24,
@@ -881,8 +1736,8 @@
       "tier": "2",
       "categories": [
         "Animation Tool",
-        "Three.js",
-        "Game"
+        "Game",
+        "Three.js"
       ],
       "date": "2026-06-07",
       "desc": "A web-based 3D environment with camera and light controls. Built on Three.js r160, featuring orbit/zoom/pan, FOV, auto-rotate, custom grid, directional lighting with shadows, and an XYZ gizmo.",
@@ -913,13 +1768,58 @@
         {
           "img": "",
           "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
         }
       ],
       "carousel": true,
       "link": "./templates/3d_environment.html",
       "tags": [],
       "thumb": "images/3D_environment_template01.jpg",
-      "youtube": ""
+      "youtube": "",
+      "videoCaption": "Behind the Scenes",
+      "videoRuntime": "",
+      "tunableParams": [],
+      "specSheet": [
+        {
+          "label": "Engine",
+          "value": ""
+        },
+        {
+          "label": "Data",
+          "value": ""
+        },
+        {
+          "label": "Controls",
+          "value": ""
+        },
+        {
+          "label": "Instruments",
+          "value": ""
+        },
+        {
+          "label": "Deploy",
+          "value": ""
+        },
+        {
+          "label": "Access",
+          "value": ""
+        },
+        {
+          "label": "Built With",
+          "value": ""
+        }
+      ]
     },
     {
       "id": 27,
@@ -936,14 +1836,26 @@
       "gallery": [
         {
           "img": "images/frame_extractor01.jpg",
-          "caption": ""
+          "caption": "Import Video"
         },
         {
           "img": "images/frame_extractor02.jpg",
-          "caption": ""
+          "caption": "Video Preview"
         },
         {
           "img": "images/frame_extractor04.jpg",
+          "caption": "Export Frames"
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
           "caption": ""
         },
         {
@@ -962,8 +1874,54 @@
       "carousel": true,
       "link": "./utilities/start_end_frame_extractor.html",
       "tags": [],
-      "thumb": "images/frame_extractor03.jpg",
-      "youtube": ""
+      "thumb": "images/frame_extractor02.jpg",
+      "youtube": "",
+      "videoCaption": "",
+      "videoRuntime": "",
+      "tunableParams": [
+        "EXPORT FORMAT",
+        "JPEG QUALITY",
+        "WEBP QUALITY",
+        "FIRST FRAME OFFSET",
+        "LAST FRAME OFFSET",
+        "PREVIEW MAX HEIGHT",
+        "OUTPUT SCALE",
+        "FILENAME PREFIX",
+        "SEEK PRECISION",
+        "IMAGE SMOOTHING",
+        "BATCH DOWNLOAD DELAY",
+        "CANVAS COLOUR SPACE"
+      ],
+      "specSheet": [
+        {
+          "label": "ENGINE",
+          "value": "Canvas 2D API — frame capture and pixel rendering. HTMLVideoElement — video decoding, playback and precision seeking. Object URL API — local file handling with no upload."
+        },
+        {
+          "label": "DATA",
+          "value": "Video files (MP4, MOV, WebM) loaded entirely client-side. Frame data extracted as raw ImageData from a 2D canvas context and encoded to a chosen image format via toDataURL. Output files retain the source video's native pixel dimensions."
+        },
+        {
+          "label": "CONTROLS",
+          "value": "Drag-and-drop or file picker for video ingestion · format selector — PNG, JPG, WebP, BMP · quality slider for lossy formats (50–100%) · per-frame or combined download trigger."
+        },
+        {
+          "label": "INSTRUMENTS",
+          "value": "Dual frame preview — first and last rendered side-by-side · timestamp badge per frame showing HH:MM:SS.mmm · pixel dimension readout · file info bar — filename, duration, resolution, estimated FPS · status bar confirming export on download."
+        },
+        {
+          "label": "DEPLOY",
+          "value": "Single self-contained HTML file — no build tools · no server · no external dependencies · runs from file:// in any modern desktop browser · all assets including the logo baked in as base64."
+        },
+        {
+          "label": "ACCESS",
+          "value": "Browser-based · open locally without installation · no login · no upload · no data leaves the machine · works offline."
+        },
+        {
+          "label": "BUILT WITH",
+          "value": "Claude — iterative, prompt-led development with targeted surgical edits across a single-session build."
+        }
+      ]
     },
     {
       "id": 28,
@@ -1003,13 +1961,58 @@
         {
           "img": "",
           "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
         }
       ],
       "carousel": false,
       "link": "",
       "tags": [],
       "thumb": "",
-      "youtube": ""
+      "youtube": "",
+      "videoCaption": "Behind the Scenes",
+      "videoRuntime": "",
+      "tunableParams": [],
+      "specSheet": [
+        {
+          "label": "Engine",
+          "value": ""
+        },
+        {
+          "label": "Data",
+          "value": ""
+        },
+        {
+          "label": "Controls",
+          "value": ""
+        },
+        {
+          "label": "Instruments",
+          "value": ""
+        },
+        {
+          "label": "Deploy",
+          "value": ""
+        },
+        {
+          "label": "Access",
+          "value": ""
+        },
+        {
+          "label": "Built With",
+          "value": ""
+        }
+      ]
     },
     {
       "id": 29,
@@ -1093,16 +2096,16 @@
           "caption": "Sydney"
         },
         {
-          "img": "images/Sky_Atlas06.jpg",
-          "caption": "London"
-        },
-        {
           "img": "images/Sky_Atlas03.jpg",
           "caption": "Zermatt"
         },
         {
-          "img": "",
-          "caption": ""
+          "img": "images/Sky_Atlas06.jpg",
+          "caption": "London"
+        },
+        {
+          "img": "images/Sky_Atlas04.jpg",
+          "caption": "Zermatt"
         }
       ],
       "carousel": true,
@@ -1117,7 +2120,52 @@
         "Codex Development"
       ],
       "thumb": "images/Sky_Atlas08.jpg",
-      "youtube": ""
+      "youtube": "",
+      "videoCaption": "Behind the Scenes",
+      "videoRuntime": "",
+      "tunableParams": [
+        "SINGAPORE",
+        "HONG KONG",
+        "OSAKA",
+        "SYDNEY",
+        "ZERMATT",
+        "LONDON",
+        "MELBOURNE",
+        "PARIS",
+        "BERLIN",
+        "NEW YORK",
+        "ROME"
+      ],
+      "specSheet": [
+        {
+          "label": "Engine",
+          "value": "Three.js — scene, camera, rendering"
+        },
+        {
+          "label": "Data",
+          "value": "Google Photorealistic 3D Tiles via Map Tiles API"
+        },
+        {
+          "label": "Controls",
+          "value": "Mouse pitch, heading and bank · wheel spee"
+        },
+        {
+          "label": "Instruments",
+          "value": "Bearing, altitude, selectable detail, weather modes"
+        },
+        {
+          "label": "Deploy",
+          "value": "Cloudflare Worker, key held as a secret"
+        },
+        {
+          "label": "Access",
+          "value": "Password screen · signed 8-hour session cookie"
+        },
+        {
+          "label": "Built With",
+          "value": "Codex — iterative, screenshot-led development"
+        }
+      ]
     }
   ],
   "nextId": 31,

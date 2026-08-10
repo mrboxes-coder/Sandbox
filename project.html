@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Project Profile</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%232F81F7' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolygon points='13 2 3 14 12 14 11 22 21 10 12 10 13 2'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  *,*::before,*::after{box-sizing:border-box;}
+  body { margin: 0; background: #070A0E; font-family:'Helvetica Neue',Helvetica,Arial,sans-serif; }
+  a { color: #2F81F7; text-decoration: none; }
+  a:hover { color: #6FB0FF; }
+  .mono{font-family:'IBM Plex Mono',monospace;}
+
+  .hv0:hover{background:#5BA0FF !important}
+  .hv1:hover{border-color:#2F81F7 !important}
+  .hv2:hover{background:rgba(255,255,255,.09) !important;color:#fff !important;}
+
+  .btn-disabled{opacity:.35;pointer-events:none;}
+
+  .gal { cursor: zoom-in; }
+  .lb { position: fixed; inset: 0; z-index: 200; display: none; align-items: center; justify-content: center;
+        padding: 40px; overflow: auto; background: rgba(4,7,10,.82); backdrop-filter: blur(3px); }
+  .lb.open { display: flex; }
+  .lb-shell { width: min(1200px, 94vw, calc((100vh - 205px) * 1.7778)); background: #2b2b2b;
+              border: .5px solid rgba(0,0,0,.6); border-radius: 8px; overflow: hidden;
+              box-shadow: 0 40px 120px rgba(0,0,0,.6); display: flex; flex-direction: column; }
+  .lb-bar { display: flex; align-items: center; justify-content: space-between; height: 42px;
+            padding: 0 18px; background: #333; border-bottom: 1px solid #1a1a1a; }
+  .lb-title { font: 600 13px/1 'Segoe UI', system-ui, sans-serif; color: #ccc; }
+  .lb-x { width: 26px; height: 26px; border: 0; border-radius: 5px; background: transparent; cursor: pointer;
+          font: 400 15px/1 'Segoe UI', system-ui, sans-serif; color: #9AA5B1; }
+  .lb-x:hover { background: rgba(255,255,255,.10); color: #fff; }
+  .lb-img { width: 100%; aspect-ratio: 1200/675; background: #2b2b2b center / contain no-repeat; }
+  .lb-foot { display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+             padding: 20px 18px 18px; background: #2b2b2b; border-top: .5px solid rgba(255,255,255,.06); }
+  .lb-btn { width: 175px; flex: 0 0 175px; box-sizing: border-box; text-align: center; cursor: pointer;
+            padding: 10px 14px; border-radius: 6px; background: rgba(255,255,255,.04);
+            border: .5px solid rgba(255,255,255,.15); transition: background .15s;
+            font: 600 11px/1.2 'IBM Plex Mono', monospace; letter-spacing: .16em; color: #C6D0DA; }
+  .lb-btn:hover { background: rgba(255,255,255,.09); color: #fff; }
+  .lb-label { flex: 1; min-width: 120px; text-align: center;
+              font: 600 11px/1.2 'IBM Plex Mono', monospace; letter-spacing: .18em; color: #E8EDF2; }
+
+  .video-empty{width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:repeating-conic-gradient(#0F151C 0% 25%,#0B0F14 0% 50%);background-size:18px 18px;color:#3a4652;font:600 11px/1 'IBM Plex Mono',monospace;letter-spacing:.16em;text-transform:uppercase;}
+
+  #loadingNote{position:fixed;inset:0;z-index:500;display:flex;align-items:center;justify-content:center;background:#070A0E;color:#5D6B7A;font:400 11px/1 'IBM Plex Mono',monospace;letter-spacing:.16em;text-transform:uppercase;}
+  #loadingNote.hidden{display:none;}
+</style>
+</head>
+<body>
+
+<div id="loadingNote">Loading Project&hellip;</div>
+
+<section style="padding:0; background:#070A0E">
+  <div id="page" style="width:1440px; margin:0 auto; visibility:hidden;">
+
+    <div style="position:relative; background:#0B0F14; overflow:hidden; border:1px solid rgba(255,255,255,.08); border-top:none">
+
+      <!-- photographic hero -->
+      <div style="position:relative; height:900px; overflow:hidden; border-bottom:2px solid #2F81F7">
+        <div id="heroBg" style="position:absolute; inset:0; background-size:cover; background-position:center; filter:saturate(.55) contrast(1.05)"></div>
+        <div style="position:absolute; inset:0; background:linear-gradient(90deg,rgba(7,11,16,.97) 0%,rgba(7,11,16,.88) 34%,rgba(7,11,16,.62) 62%,rgba(7,11,16,.72) 100%)"></div>
+        <div style="position:absolute; inset:0; background:linear-gradient(180deg,rgba(7,11,16,.9) 0%,rgba(7,11,16,.15) 40%,rgba(7,11,16,.55) 78%,rgba(7,11,16,.95) 100%)"></div>
+        <div style="position:absolute; inset:0; background:radial-gradient(circle at 72% 40%,rgba(47,129,247,.16),transparent 58%)"></div>
+
+        <div style="position:absolute; left:56px; right:-320px; top:230px; height:1px; background:rgba(255,255,255,.10)"></div>
+        <div style="position:absolute; right:230px; top:0; bottom:0; width:1px; background:rgba(255,255,255,.10)"></div>
+        <div style="position:absolute; left:280px; top:-380px; width:1000px; height:1000px; border:1px solid rgba(255,255,255,.12); border-radius:50%"></div>
+        <div style="position:absolute; right:36px; top:0; bottom:0; width:180px; display:flex; flex-direction:column; justify-content:center; align-items:flex-end; font:600 13px/1 'IBM Plex Mono',monospace; letter-spacing:.16em; color:rgba(255,255,255,.22)">
+            <div style="display:flex; align-items:center; gap:10px; justify-content:flex-end">
+              <div style="width:14px; height:1px; background:rgba(255,255,255,.28)"></div>
+              <span style="width:34px; text-align:right; color:inherit">110</span>
+              <div style="width:8px"></div>
+            </div>
+            <div style="display:flex; align-items:center; gap:10px; justify-content:flex-end; height:44px"><div style="width:7px; height:1px; background:rgba(255,255,255,.16)"></div><div style="width:34px"></div><div style="width:8px"></div></div>
+            <div style="display:flex; align-items:center; gap:10px; justify-content:flex-end">
+              <div style="width:14px; height:1px; background:rgba(255,255,255,.28)"></div>
+              <span style="width:34px; text-align:right; color:inherit">100</span>
+              <div style="width:8px"></div>
+            </div>
+            <div style="display:flex; align-items:center; gap:10px; justify-content:flex-end; height:44px"><div style="width:7px; height:1px; background:rgba(255,255,255,.16)"></div><div style="width:34px"></div><div style="width:8px"></div></div>
+            <div style="display:flex; align-items:center; gap:10px; justify-content:flex-end">
+              <div style="width:14px; height:1px; background:rgba(255,255,255,.28)"></div>
+              <span style="width:34px; text-align:right; color:inherit">090</span>
+              <div style="width:8px"></div>
+            </div>
+            <div style="display:flex; align-items:center; gap:10px; justify-content:flex-end; height:44px"><div style="width:7px; height:1px; background:rgba(255,255,255,.16)"></div><div style="width:34px"></div><div style="width:8px"></div></div>
+            <div style="display:flex; align-items:center; gap:10px; justify-content:flex-end">
+              <div style="width:26px; height:1px; background:#2F81F7"></div>
+              <span style="width:34px; text-align:right; color:#2F81F7">080</span>
+              <div style="width:0; height:0; border-right:8px solid #2F81F7; border-top:5px solid transparent; border-bottom:5px solid transparent"></div>
+            </div>
+            <div style="display:flex; align-items:center; gap:10px; justify-content:flex-end; height:44px"><div style="width:7px; height:1px; background:rgba(255,255,255,.16)"></div><div style="width:34px"></div><div style="width:8px"></div></div>
+            <div style="display:flex; align-items:center; gap:10px; justify-content:flex-end">
+              <div style="width:14px; height:1px; background:rgba(255,255,255,.28)"></div>
+              <span style="width:34px; text-align:right; color:inherit">070</span>
+              <div style="width:8px"></div>
+            </div>
+            <div style="display:flex; align-items:center; gap:10px; justify-content:flex-end; height:44px"><div style="width:7px; height:1px; background:rgba(255,255,255,.16)"></div><div style="width:34px"></div><div style="width:8px"></div></div>
+            <div style="display:flex; align-items:center; gap:10px; justify-content:flex-end">
+              <div style="width:14px; height:1px; background:rgba(255,255,255,.28)"></div>
+              <span style="width:34px; text-align:right; color:inherit">060</span>
+              <div style="width:8px"></div>
+            </div>
+        </div>
+        <div style="position:absolute; left:0; right:0; top:56px; display:flex; justify-content:center; align-items:flex-start; gap:0; font:600 13px/1 'IBM Plex Mono',monospace; letter-spacing:.14em; color:rgba(255,255,255,.20)">
+            <div style="display:flex; flex-direction:column; align-items:center; gap:8px; width:56px">
+              <span style="color:inherit">330&deg;</span>
+              <div style="width:1px; height:9px; background:rgba(255,255,255,.26)"></div>
+            </div>
+            <div style="width:28px; display:flex; flex-direction:column; align-items:center; gap:8px"><span style="visibility:hidden">0</span><div style="width:1px; height:5px; background:rgba(255,255,255,.14)"></div></div>
+            <div style="display:flex; flex-direction:column; align-items:center; gap:8px; width:56px">
+              <span style="color:inherit">340&deg;</span>
+              <div style="width:1px; height:9px; background:rgba(255,255,255,.26)"></div>
+            </div>
+            <div style="width:28px; display:flex; flex-direction:column; align-items:center; gap:8px"><span style="visibility:hidden">0</span><div style="width:1px; height:5px; background:rgba(255,255,255,.14)"></div></div>
+            <div style="display:flex; flex-direction:column; align-items:center; gap:8px; width:56px">
+              <span style="color:inherit">350&deg;</span>
+              <div style="width:1px; height:9px; background:rgba(255,255,255,.26)"></div>
+            </div>
+            <div style="width:28px; display:flex; flex-direction:column; align-items:center; gap:8px"><span style="visibility:hidden">0</span><div style="width:1px; height:5px; background:rgba(255,255,255,.14)"></div></div>
+            <div style="display:flex; flex-direction:column; align-items:center; gap:8px; width:56px">
+              <span style="color:#2F81F7">N</span>
+              <div style="width:1px; height:16px; background:#2F81F7"></div>
+              <div style="width:0; height:0; border-bottom:8px solid #2F81F7; border-left:5px solid transparent; border-right:5px solid transparent"></div>
+            </div>
+            <div style="width:28px; display:flex; flex-direction:column; align-items:center; gap:8px"><span style="visibility:hidden">0</span><div style="width:1px; height:5px; background:rgba(255,255,255,.14)"></div></div>
+            <div style="display:flex; flex-direction:column; align-items:center; gap:8px; width:56px">
+              <span style="color:inherit">10&deg;</span>
+              <div style="width:1px; height:9px; background:rgba(255,255,255,.26)"></div>
+            </div>
+            <div style="width:28px; display:flex; flex-direction:column; align-items:center; gap:8px"><span style="visibility:hidden">0</span><div style="width:1px; height:5px; background:rgba(255,255,255,.14)"></div></div>
+            <div style="display:flex; flex-direction:column; align-items:center; gap:8px; width:56px">
+              <span style="color:inherit">20&deg;</span>
+              <div style="width:1px; height:9px; background:rgba(255,255,255,.26)"></div>
+            </div>
+            <div style="width:28px; display:flex; flex-direction:column; align-items:center; gap:8px"><span style="visibility:hidden">0</span><div style="width:1px; height:5px; background:rgba(255,255,255,.14)"></div></div>
+            <div style="display:flex; flex-direction:column; align-items:center; gap:8px; width:56px">
+              <span style="color:inherit">30&deg;</span>
+              <div style="width:1px; height:9px; background:rgba(255,255,255,.26)"></div>
+            </div>
+        </div>
+
+        <div style="position:relative; height:100%; box-sizing:border-box; padding:56px; display:flex; flex-direction:column; justify-content:flex-end">
+          <div style="display:flex; align-items:center; gap:16px; margin-bottom:24px">
+            <div style="width:44px; height:1px; background:#8A97A6"></div>
+            <div id="eyebrowText" style="font:400 12px/1 'IBM Plex Mono',monospace; letter-spacing:.26em; color:#2F81F7"></div>
+          </div>
+          <h1 id="titleText" style="margin:0; font:700 150px/0.85 'Helvetica Neue',Helvetica,Arial,sans-serif; letter-spacing:-.045em; color:#F4F7FA"></h1>
+          <p id="subtitleText" style="margin:30px 0 0; max-width:540px; font:400 17px/1.6 'Helvetica Neue',Helvetica,Arial,sans-serif; color:#B4BFCA"></p>
+        </div>
+      </div>
+
+      <!-- topics -->
+      <div id="topicsBar" style="display:flex; border-bottom:1px solid rgba(255,255,255,.10)">
+        <div style="padding:20px 56px; font:400 10px/1 'IBM Plex Mono',monospace; letter-spacing:.24em; color:#5D6B7A; border-right:1px solid rgba(255,255,255,.10)">TOPICS</div>
+        <div id="topicsCells" style="display:flex; flex:1; font:400 11px/1 'IBM Plex Mono',monospace; letter-spacing:.16em; color:#C6D0DA"></div>
+        <div id="topicsDate" style="padding:20px 32px; font:400 11px/1 'IBM Plex Mono',monospace; letter-spacing:.16em; color:#8A97A6; border-left:1px solid rgba(255,255,255,.10)"></div>
+      </div>
+
+      <!-- video + text -->
+      <div style="display:grid; grid-template-columns:1fr 1fr; align-items:start">
+        <div style="min-width:0; border-right:1px solid rgba(255,255,255,.10); display:flex; flex-direction:column">
+          <div id="videoArea" style="position:relative; aspect-ratio:16/10; background:#0B0F14;"></div>
+          <div id="videoCaptionRow" style="display:flex; justify-content:space-between; padding:22px 64px 20px; border-bottom:1px solid rgba(255,255,255,.10); font:400 10px/1 'IBM Plex Mono',monospace; letter-spacing:.24em; color:#5D6B7A">
+            <span id="videoCaptionText"></span><span id="videoRuntimeText"></span>
+          </div>
+
+          <div id="specPanel" style="min-width:0; padding:28px 64px 56px; display:flex; flex-direction:column">
+            <div style="display:flex; justify-content:space-between; align-items:baseline; padding-bottom:18px; border-bottom:2px solid #2F81F7">
+              <div style="font:400 10px/1 'IBM Plex Mono',monospace; letter-spacing:.24em; color:#5D6B7A">SPECIFICATION</div>
+              <div id="specTierBadge" style="font:400 10px/1 'IBM Plex Mono',monospace; letter-spacing:.24em; color:#2F81F7"></div>
+            </div>
+            <div id="specRows" style="display:grid; grid-template-columns:150px 1fr; align-items:baseline; gap:0 24px; font:400 14px/1.5 'Helvetica Neue',Helvetica,Arial,sans-serif"></div>
+            <div id="tunableParamsSection" style="margin-top:28px">
+              <div style="font:400 10px/1 'IBM Plex Mono',monospace; letter-spacing:.2em; color:#5D6B7A; margin-bottom:14px">TUNABLE PARAMETERS</div>
+              <div id="tunableParamsChips" style="display:flex; flex-wrap:wrap; gap:6px; font:400 11px/1 'IBM Plex Mono',monospace; letter-spacing:.12em; color:#C6D0DA"></div>
+            </div>
+          </div>
+        </div>
+
+        <div style="min-width:0; padding:56px 64px 72px; display:flex; flex-direction:column; gap:22px; font:400 17px/1.62 'Helvetica Neue',Helvetica,Arial,sans-serif; color:#98A4B0;">
+          <div style="font:400 10px/1 'IBM Plex Mono',monospace; letter-spacing:.24em; color:#5D6B7A">02 &mdash; OVERVIEW</div>
+          <div id="overviewParagraphs" style="display:flex;flex-direction:column;gap:22px;"></div>
+          <div style="display:flex; gap:12px; margin-top:12px">
+            <a id="btnOpenSite" href="#" target="_blank" rel="noopener" style="background:#2F81F7; color:#08111F; padding:18px 34px; font:500 12px/1 'IBM Plex Mono',monospace; letter-spacing:.2em" class="hv0">OPEN SITE &rarr;</a>
+            <a id="btnResources" href="#" target="_blank" rel="noopener" style="border:1px solid rgba(255,255,255,.2); color:#C6D0DA; padding:18px 34px; font:500 12px/1 'IBM Plex Mono',monospace; letter-spacing:.2em" class="hv1">PROJECT RESOURCES &#8599;</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- gallery -->
+      <div id="galleryWrap" style="border-top:1px solid rgba(255,255,255,.10); padding:56px 56px 88px">
+        <div style="display:flex; justify-content:space-between; align-items:baseline; padding-bottom:20px; border-bottom:2px solid #2F81F7">
+          <div style="font:400 10px/1 'IBM Plex Mono',monospace; letter-spacing:.24em; color:#5D6B7A">03 &mdash; GALLERY</div>
+          <div id="galleryCount" style="font:400 10px/1 'IBM Plex Mono',monospace; letter-spacing:.24em; color:#5D6B7A"></div>
+        </div>
+        <div id="galleryGrid" style="margin-top:24px; display:grid; grid-template-columns:repeat(3,1fr); grid-auto-rows:243px; gap:16px"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div id="lb" class="lb" aria-hidden="true">
+  <div class="lb-shell">
+    <div class="lb-bar">
+      <div class="lb-title" id="lbTitle"></div>
+      <button class="lb-x" type="button" aria-label="Close">&#10005;</button>
+    </div>
+    <div class="lb-img" id="lb-img"></div>
+    <div class="lb-foot">
+      <button class="lb-btn hv2" type="button" id="lb-prev">&#8592; PREV</button>
+      <div class="lb-label" id="lb-label"></div>
+      <button class="lb-btn hv2" type="button" id="lb-next">NEXT &#8594;</button>
+    </div>
+  </div>
+</div>
+
+<script>
+function ytVideoId(url){
+  if(!url)return'';
+  var s=url.trim();var m;
+  m=s.match(/[?&]v=([A-Za-z0-9_-]{6,})/);if(m)return m[1];
+  m=s.match(/youtu\.be\/([A-Za-z0-9_-]{6,})/);if(m)return m[1];
+  m=s.match(/embed\/([A-Za-z0-9_-]{6,})/);if(m)return m[1];
+  m=s.match(/shorts\/([A-Za-z0-9_-]{6,})/);if(m)return m[1];
+  m=s.match(/\/v\/([A-Za-z0-9_-]{6,})/);if(m)return m[1];
+  m=s.match(/\/live\/([A-Za-z0-9_-]{6,})/);if(m)return m[1];
+  if(/^[A-Za-z0-9_-]{6,15}$/.test(s))return s;
+  return'';
+}
+function fmtDate(iso){
+  if(!iso)return'';
+  var p=iso.split('-');return p[2]+'/'+p[1]+'/'+p[0].slice(2);
+}
+function esc(s){
+  return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+var DEMO_PROJECT={
+  id:1,name:'Motion Trail Painter',tier:'1',date:'2026-05-14',
+  categories:['Canvas','MediaPipe Hands','Animation Tool'],
+  desc:'Move your hands and leave glowing colour trails on an infinite canvas.',
+  fullDesc:'Motion Trail Painter tracks both hands in real time using MediaPipe and turns fingertip movement into glowing, decaying trails of colour across an infinite canvas.\nAdjust brush size, glow intensity, and decay rate live while you paint with nothing but empty air.\nBuilt as an exploration of gesture as a creative input method — no mouse, no stylus, just motion.',
+  thumb:'',
+  gallery:[
+    {img:'',caption:'Trail decay at low intensity'},
+    {img:'',caption:'Two-hand simultaneous painting'},
+    {img:'',caption:'High glow / long decay setting'}
+  ],
+  link:'./motion-trail-painter/',
+  resourceLabel:'GitHub Repository',
+  resourceLink:'https://github.com',
+  youtube:'',
+  videoCaption:'MAKING OF',
+  videoRuntime:'',
+  specSheet:[
+    {label:'ENGINE',value:'Canvas 2D API, MediaPipe Hands'},
+    {label:'PERFORMANCE',value:'60fps target'}
+  ],
+  tunableParams:['BRUSH SIZE','GLOW INTENSITY','DECAY RATE']
+};
+
+function renderProject(p, projectNumber){
+  document.title=(p.name||'Project')+' \u2014 Project Page';
+
+  var numStr=String(projectNumber||1).padStart(3,'0');
+  var eyebrowParts=['PROJECT '+numStr];
+  if(p.tier)eyebrowParts.push('TIER '+p.tier);
+  if(p.categories&&p.categories.length)eyebrowParts.push(p.categories[0].toUpperCase());
+  document.getElementById('eyebrowText').textContent=eyebrowParts.join(' / ');
+
+  document.getElementById('titleText').textContent=p.name||'Untitled';
+  document.getElementById('subtitleText').textContent=p.desc||'';
+
+  var heroBg=document.getElementById('heroBg');
+  if(p.thumb){heroBg.style.backgroundImage="url('"+p.thumb+"')";}
+
+  /* Topics bar - auto-flex, hidden entirely if no categories */
+  var topicsBar=document.getElementById('topicsBar');
+  var cats=p.categories||[];
+  if(!cats.length){
+    topicsBar.style.display='none';
+  } else {
+    topicsBar.style.display='flex';
+    var cellsWrap=document.getElementById('topicsCells');
+    cellsWrap.innerHTML=cats.map(function(c,i){
+      var borderStyle=(i<cats.length-1)?'border-right:1px solid rgba(255,255,255,.10);':'';
+      return'<div style="flex:1; padding:20px 24px; '+borderStyle+'">'+esc(c.toUpperCase())+'</div>';
+    }).join('');
+    var dateCell=document.getElementById('topicsDate');
+    if(p.date){dateCell.textContent=fmtDate(p.date);dateCell.style.display='block';}
+    else{dateCell.style.display='none';}
+  }
+
+  /* Video area - real embed if YouTube link present, else static thumb, else placeholder */
+  var videoArea=document.getElementById('videoArea');
+  var ytId=ytVideoId(p.youtube);
+  if(ytId){
+    videoArea.innerHTML='<iframe src="https://www.youtube-nocookie.com/embed/'+ytId+'" title="'+esc(p.name||'')+'" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen style="position:absolute;inset:0;width:100%;height:100%;border:0;"></iframe>';
+  } else if(p.thumb){
+    videoArea.innerHTML='<img src="'+esc(p.thumb)+'" alt="'+esc(p.name||'')+'" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;">';
+  } else {
+    videoArea.innerHTML='<div class="video-empty" style="position:absolute;inset:0;">No Preview</div>';
+  }
+
+  /* Video caption row - hidden if both empty */
+  var capRow=document.getElementById('videoCaptionRow');
+  if(p.videoCaption||p.videoRuntime){
+    capRow.style.display='flex';
+    document.getElementById('videoCaptionText').textContent=p.videoCaption||'';
+    document.getElementById('videoRuntimeText').textContent=p.videoRuntime||'';
+  } else {
+    capRow.style.display='none';
+  }
+
+  /* Specification panel - hidden if no rows */
+  var specPanel=document.getElementById('specPanel');
+  var specRows=p.specSheet||[];
+  if(!specRows.length){
+    specPanel.style.display='none';
+  } else {
+    specPanel.style.display='flex';
+    document.getElementById('specTierBadge').textContent=p.tier?('TIER '+p.tier):'';
+    var rowsHTML=specRows.map(function(r){
+      return'<div style="padding:16px 0; border-bottom:1px solid rgba(255,255,255,.08); font:400 10px/1 \'IBM Plex Mono\',monospace; letter-spacing:.18em; color:#5D6B7A">'+esc((r.label||'').toUpperCase())+'</div>'
+        +'<div style="padding:16px 0; border-bottom:1px solid rgba(255,255,255,.08); color:#E8EDF2">'+esc(r.value||'')+'</div>';
+    }).join('');
+    document.getElementById('specRows').innerHTML=rowsHTML;
+
+    var tunSection=document.getElementById('tunableParamsSection');
+    var tun=p.tunableParams||[];
+    if(!tun.length){
+      tunSection.style.display='none';
+    } else {
+      tunSection.style.display='block';
+      document.getElementById('tunableParamsChips').innerHTML=tun.map(function(t){
+        return'<div style="border:1px solid rgba(255,255,255,.14); padding:9px 11px">'+esc(t.toUpperCase())+'</div>';
+      }).join('');
+    }
+  }
+
+  /* Overview paragraphs - lead paragraph larger, rest standard */
+  var text=p.fullDesc||p.desc||'';
+  var paras=text.split('\n').map(function(s){return s.trim();}).filter(Boolean);
+  var overviewWrap=document.getElementById('overviewParagraphs');
+  overviewWrap.innerHTML=paras.map(function(para,i){
+    if(i===0)return'<p style="margin:0; font-size:21px; line-height:1.5; color:#E8EDF2">'+esc(para)+'</p>';
+    return'<p style="margin:0">'+esc(para)+'</p>';
+  }).join('');
+
+  /* Buttons - disabled/greyed if link missing */
+  var openBtn=document.getElementById('btnOpenSite');
+  if(p.link){openBtn.href=p.link;openBtn.classList.remove('btn-disabled');}
+  else{openBtn.removeAttribute('href');openBtn.classList.add('btn-disabled');}
+
+  var resBtn=document.getElementById('btnResources');
+  resBtn.innerHTML=esc((p.resourceLabel||'Project Resources').toUpperCase())+' &#8599;';
+  if(p.resourceLink){resBtn.href=p.resourceLink;resBtn.classList.remove('btn-disabled');}
+  else{resBtn.removeAttribute('href');resBtn.classList.add('btn-disabled');}
+
+  /* Gallery - only populated items, uniform reflowing grid, hidden entirely if empty */
+  var galleryWrap=document.getElementById('galleryWrap');
+  var items=(p.gallery||[]).filter(function(g){return g&&g.img;});
+  if(!items.length){
+    galleryWrap.style.display='none';
+  } else {
+    galleryWrap.style.display='block';
+    document.getElementById('galleryCount').textContent=items.length+' ITEM'+(items.length!==1?'S':'');
+    var grid=document.getElementById('galleryGrid');
+    grid.innerHTML=items.map(function(g,i){
+      var num=String(i+1).padStart(2,'0');
+      var label=g.caption?(num+' / '+g.caption.toUpperCase()):(num+' / ITEM');
+      var bigSpan=(i%6===0)?'grid-column:span 2; grid-row:span 2; ':'';
+      return'<div class="gal hv1" data-index="'+i+'" data-src="'+esc(g.img)+'" data-label="'+esc(label)+'" style="cursor:zoom-in; min-width:0; '+bigSpan+'border:1px solid rgba(255,255,255,.09); background-image:url(&quot;'+esc(g.img)+'&quot;); background-size:cover; background-position:center; display:flex; align-items:flex-end; padding:14px; font:600 10px/1 \'IBM Plex Mono\',monospace; letter-spacing:.16em; color:#E8EDF2; text-shadow:0 1px 6px rgba(0,0,0,.6)">'+esc(label)+'</div>';
+    }).join('');
+    initLightbox(p.name||'Project');
+  }
+
+  document.getElementById('page').style.visibility='visible';
+  document.getElementById('loadingNote').classList.add('hidden');
+}
+
+function initLightbox(projectName){
+  var tiles=[].slice.call(document.querySelectorAll('.gal'));
+  var lb=document.getElementById('lb');
+  var img=document.getElementById('lb-img');
+  var label=document.getElementById('lb-label');
+  document.getElementById('lbTitle').textContent=projectName;
+  var i=0;
+
+  function show(n){
+    i=(n+tiles.length)%tiles.length;
+    var t=tiles[i];
+    var src=t.getAttribute('data-src');
+    img.style.backgroundImage=src?"url('"+src+"')":'repeating-linear-gradient(135deg,rgba(255,255,255,.05) 0 2px,transparent 2px 12px)';
+    label.textContent=t.getAttribute('data-label')||'';
+  }
+  function openLB(n){show(n);lb.classList.add('open');lb.setAttribute('aria-hidden','false');}
+  function closeLB(){lb.classList.remove('open');lb.setAttribute('aria-hidden','true');}
+
+  tiles.forEach(function(t,n){t.addEventListener('click',function(){openLB(n);});});
+  lb.addEventListener('click',function(e){if(e.target===lb)closeLB();});
+  document.querySelector('.lb-x').addEventListener('click',closeLB);
+  document.getElementById('lb-prev').addEventListener('click',function(){show(i-1);});
+  document.getElementById('lb-next').addEventListener('click',function(){show(i+1);});
+  document.addEventListener('keydown',function(e){
+    if(!lb.classList.contains('open'))return;
+    if(e.key==='Escape')closeLB();
+    if(e.key==='ArrowRight')show(i+1);
+    if(e.key==='ArrowLeft')show(i-1);
+  });
+}
+
+function loadData(){
+  var params=new URLSearchParams(location.search);
+  var wantId=params.get('id');
+
+  fetch('Sandbox_Projects.json')
+    .then(function(r){if(!r.ok)throw 0;return r.json();})
+    .then(function(d){
+      var list=d.projects||[];
+      var p=null,idx=-1;
+      if(wantId){
+        for(var i=0;i<list.length;i++){if(String(list[i].id)===wantId){p=list[i];idx=i;break;}}
+      }
+      if(!p&&list.length){p=list[0];idx=0;}
+      if(!p)throw 0;
+      renderProject(p,idx+1);
+    })
+    .catch(function(){
+      renderProject(DEMO_PROJECT,1);
+    });
+}
+loadData();
+</script>
+</body>
+</html>
