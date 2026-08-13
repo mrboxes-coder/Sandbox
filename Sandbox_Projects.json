@@ -1733,7 +1733,7 @@
     {
       "id": 24,
       "name": "Generic 3D Environment Setup",
-      "tier": "1",
+      "tier": "2",
       "categories": [
         "Animation Tool",
         "Game",
@@ -2166,9 +2166,117 @@
           "value": "Codex — iterative, screenshot-led development"
         }
       ]
+    },
+    {
+      "id": 32,
+      "name": "Geometry Formation Builder",
+      "tier": "2",
+      "categories": [
+        "Animation Tool",
+        "Three.js"
+      ],
+      "date": "2026-08-01",
+      "desc": "A browser-based Three.js scene builder that arranges user-defined cube arrays into mathematical formations, helix, sphere, torus, grid and random scatter with adjustable size, jitter, and color. Cubes can tumble individually while the whole formation spins globally, all controlled through a live parameter panel.",
+      "fullDesc": "Welcome to Geometry Formation Builder, a browser-based tool for generating and animating procedural geometry in three dimensions, built entirely on Three.js.\n\nAt its core, the idea is simple: take an array of cubes and arrange them according to a mathematical formula. Users select a shape from the panel — a helix, a sphere, a torus, a grid, a double helix, or a random scatter — and simply press Build. Each cube's position is calculated by the selected formula. A helix wraps cubes around a rising spiral. A sphere distributes them evenly across a curved surface using a golden-angle formula, the same principle nature uses to arrange seeds in a sunflower head. A torus wraps a grid of cubes around a donut-shaped surface. Every shape is generated live with no external renderer or plug-in required.\n\nHowever, a perfect mathematical shape can look sterile — too clean, too artificial and unnatural. So the tool includes a randomness control: a single slider that introduces imperfection. It nudges each cube slightly off its calculated position, giving it a small random tilt, and varies its size within a threshold. The result is something that reads as more organic and hand-placed, even though every position started from a precise equation. It's the same tension you find in good procedural design — structure and noise, working together.\n\nThen there's motion. Two independent layers of rotation run at once. The first rotates the entire formation as a single rigid body, around one axis, at a speed you define — imagine an asteroid field slowly turning in space over the course of several minutes. The second layer is per-cube: every individual cube tumbles on its own randomly assigned axis, at its own slightly different speed, independent of the group. Layer them together, and you get a formation that reads as one coherent object from a distance, while revealing constant, restless micro-motion up close.\n\nAll of this is driven through a live control panel containing sliders and toggles for count, size, shape parameters, randomness, and both rotation systems. The result is a formation that can be sculpted in real time, without the need to code.\n\nSo what's this actually for? It's a rapid prototyping tool for exploring generative form before committing to a more complex, bespoke build. But the more interesting territory is immersive and spatial work. A formation like this could seed a planetarium-dome piece, or the backdrop of a VR environment, where an audience isn't just watching geometr, but standing inside it, watching it breathe and turn around them. It could anchor an interactive gallery installation, where a viewer's movement or gesture becomes a new input into the shape parameters, and the formation responds live. And because everything here is grounded in real mathematics — spirals, spheres, toroidal surfaces — it lends itself naturally to education: making abstract geometry tangible, visible, and something a student can turn, break apart, and rebuild with their own hands.\n\nIn summary, this is a small, self-contained tool for exploring the space between order and imperfection, between rigid mathematics and organic motion. And that space is exactly where a lot of the most interesting immersive and installation work tends to live.",
+      "resourceLabel": "",
+      "resourceLink": "",
+      "gallery": [
+        {
+          "img": "images/formation_builder0_01.jpg",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        }
+      ],
+      "carousel": true,
+      "link": "./Geometry_Field.html",
+      "tags": [],
+      "thumb": "images/formation_builder0_01.jpg",
+      "youtube": "",
+      "videoCaption": "Behind the Scenes",
+      "videoRuntime": "",
+      "specSheet": [
+        {
+          "label": "ENGINE",
+          "value": "Three.js- scene, camera, rendering, shadow-mapped lighting, custom grid and XYZ orientation gizmo"
+        },
+        {
+          "label": "DATA",
+          "value": "None external - geometry is fully procedural. Cube positions are computed live from parametric shape formulas (helix, double helix, golden-angle sphere, toroidal grid, cubic lattice, random scatter)"
+        },
+        {
+          "label": "CONTROLS",
+          "value": "OrbitControls - mouse orbit, pan, zoom · live parameter panel with sliders and toggles for count, size range, shape, randomness, rotation"
+        },
+        {
+          "label": "INSTRUMENTS",
+          "value": "FPS counter · XYZ orientation gizmo · shape-specific parameter rows that show and hide contextually · accordion panel sections"
+        },
+        {
+          "label": "DEPLOY",
+          "value": "Single self-contained HTML file - no build step, server, or API key required; runs directly in any modern browser"
+        },
+        {
+          "label": "ACCESS",
+          "value": "Open - no authentication, no session layer; local file or static host"
+        },
+        {
+          "label": "BUILT WITH",
+          "value": "Claude - conversational natural language, iterative development directly into a single HTML file; features added and refined turn by turn through description and feedback rather than a fixed spec"
+        }
+      ],
+      "tunableParams": [
+        "Cube Count",
+        "Size",
+        "Shape Type",
+        "Randomness Factor",
+        "Static Rotate X/Y/Z",
+        "Formation Spin Axis",
+        "Formation Spin Period",
+        "Formation Spin Enabled",
+        "Cube Tumble Speed",
+        "Cube Tumble Enabled",
+        "Helix Radius",
+        "Helix Height",
+        "Helix Turns",
+        "Torus Radius",
+        "Torus Tube Radius",
+        "Grid Spacing",
+        "Random Spread"
+      ]
     }
   ],
-  "nextId": 31,
+  "nextId": 33,
   "sortMode": "tier",
   "site": {
     "eyebrow": "Browser-based creative exploration : Chris Shaw",
