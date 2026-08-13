@@ -1,0 +1,1749 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>3D Project</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:         #0e0e0f;
+    --panel:      #161618;
+    --border:     rgba(255,255,255,0.07);
+    --text:       #e8e8e6;
+    --muted:      #9b9b97;
+    --accent:     #378ADD;
+    --accent-dim: rgba(55,138,221,0.12);
+    --panel-w:    280px;
+  }
+
+  html, body {
+    width: 100%; height: 100%;
+    overflow: hidden;
+    background: var(--bg);
+    font-family: 'DM Sans', sans-serif;
+    color: var(--text);
+  }
+
+  /* ── TITLE BAR ── */
+  #titleBar {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    height: 68px;
+    background: var(--panel);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 14px;
+    padding-left: 24px;
+    z-index: 200;
+    flex-shrink: 0;
+  }
+  #titleBar img.logo {
+    width: 36px;
+    height: 36px;
+    display: block;
+    flex-shrink: 0;
+  }
+  #titleBar h1 {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    font-weight: 700;
+    font-size: 42px;
+    letter-spacing: -0.03em;
+    line-height: 1.05;
+    color: #f0ede6;
+    display: flex;
+    align-items: baseline;
+    gap: 0.22em;
+  }
+  #titleBar h1 span {
+    color: #378ADD;
+  }
+
+  /* ── APP SHELL ── */
+  #app {
+    position: fixed;
+    top: 68px; left: 0; right: 0; bottom: 0;
+    display: flex;
+  }
+
+  /* ── VIEWPORT ── */
+  #viewport {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+  }
+  #threeCanvas {
+    display: block;
+    width: 100%; height: 100%;
+  }
+  #instructions {
+    position: absolute;
+    bottom: 14px; left: 16px;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    font-weight: 300;
+    color: #000000;
+    letter-spacing: 0.06em;
+    pointer-events: none;
+    user-select: none;
+  }
+  #fpsCounter {
+    position: absolute;
+    bottom: 14px; right: 16px;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    font-weight: 300;
+    color: rgba(255,255,255,0.22);
+    letter-spacing: 0.06em;
+    pointer-events: none;
+    user-select: none;
+  }
+
+  /* ── PANEL ── */
+  #panel {
+    width: var(--panel-w);
+    height: 100%;
+    background: var(--panel);
+    border-left: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+  #panelScroll {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 18px 0 32px;
+  }
+  #panelScroll::-webkit-scrollbar { width: 3px; }
+  #panelScroll::-webkit-scrollbar-track { background: transparent; }
+  #panelScroll::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+  /* ── SECTION / ACCORDION ── */
+  .section {
+    margin: 0 14px 6px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    overflow: hidden;
+  }
+  .section-header {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    font-weight: 400;
+    letter-spacing: 0.12em;
+    color: #ffffff;
+    text-transform: uppercase;
+    padding: 11px 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    user-select: none;
+    background: rgba(255,255,255,0.03);
+    transition: background 0.15s;
+  }
+  .section-header:hover { background: rgba(255,255,255,0.06); }
+  .section-chevron {
+    width: 14px; height: 14px;
+    flex-shrink: 0;
+    opacity: 0.4;
+    transition: transform 0.22s ease;
+  }
+  .section.open .section-chevron { transform: rotate(180deg); }
+  .section-body {
+    overflow: hidden;
+    max-height: 0;
+    transition: max-height 0.28s ease;
+  }
+  .section.open .section-body { max-height: 800px; }
+  .section-inner {
+    padding: 4px 14px 10px;
+  }
+
+  /* ── ROW ── */
+  .row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+    gap: 10px;
+    min-height: 38px;
+  }
+  .row:last-child { border-bottom: none; }
+  .row-label {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    font-weight: 400;
+    color: var(--muted);
+    white-space: nowrap;
+    flex-shrink: 0;
+    min-width: 78px;
+  }
+
+  /* ── CTA / RESET BUTTON ── */
+  .btn-reset {
+    display: block;
+    width: 100%;
+    margin: 10px 0 4px;
+    padding: 9px 0;
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.18);
+    border-radius: 6px;
+    color: #ffffff;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    font-weight: 400;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s;
+  }
+  .btn-reset:hover {
+    background: rgba(255,255,255,0.08);
+    border-color: rgba(255,255,255,0.32);
+  }
+  .btn-reset:active {
+    background: rgba(255,255,255,0.12);
+  }
+
+  /* ── SLIDER ── */
+  .slider-wrap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 1;
+    min-width: 0;
+  }
+  input[type=range] {
+    -webkit-appearance: none;
+    appearance: none;
+    flex: 1;
+    min-width: 0;
+    height: 2px;
+    background: #9b9b97;
+    border-radius: 2px;
+    outline: none;
+    cursor: pointer;
+  }
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--accent);
+    cursor: pointer;
+    transition: transform 0.12s;
+  }
+  input[type=range]::-webkit-slider-thumb:hover {
+    transform: scale(1.3);
+  }
+  input[type=range]::-moz-range-thumb {
+    width: 12px; height: 12px;
+    border-radius: 50%;
+    background: var(--accent);
+    border: none;
+    cursor: pointer;
+  }
+  .val {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    font-weight: 300;
+    color: var(--muted);
+    min-width: 36px;
+    text-align: right;
+    flex-shrink: 0;
+  }
+
+  /* ── TOGGLE SWITCH ── */
+  .switch-wrap {
+    display: inline-flex;
+    align-items: center;
+    cursor: pointer;
+    flex-shrink: 0;
+    position: relative;
+  }
+  .switch-wrap input[type=checkbox] {
+    position: absolute;
+    opacity: 0;
+    width: 0; height: 0;
+    pointer-events: none;
+  }
+  .switch-track {
+    width: 34px;
+    height: 18px;
+    border-radius: 18px;
+    background: var(--border);
+    border: 1px solid rgba(255,255,255,0.08);
+    position: relative;
+    transition: background 0.2s, border-color 0.2s;
+    flex-shrink: 0;
+  }
+  .switch-thumb {
+    position: absolute;
+    top: 3px; left: 3px;
+    width: 12px; height: 12px;
+    border-radius: 50%;
+    background: var(--muted);
+    transition: transform 0.2s, background 0.2s;
+    pointer-events: none;
+  }
+  .switch-wrap input:checked ~ .switch-track {
+    background: rgba(55,138,221,0.35);
+    border-color: rgba(55,138,221,0.2);
+  }
+  .switch-wrap input:checked ~ .switch-track .switch-thumb {
+    background: var(--accent);
+    transform: translateX(16px);
+  }
+
+  /* ── SELECT ── */
+  select.formation-select {
+    flex: 1;
+    min-width: 0;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.14);
+    border-radius: 4px;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    padding: 5px 8px;
+    outline: none;
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 14 14'><path d='M2 4.5L7 9.5L12 4.5' stroke='%239b9b97' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/></svg>");
+    background-repeat: no-repeat;
+    background-position: right 8px center;
+    padding-right: 24px;
+  }
+  select.formation-select:hover { border-color: rgba(255,255,255,0.3); }
+  select.formation-select option { background: var(--panel); color: var(--text); }
+
+  /* ── BUILD BUTTON ── */
+  .btn-build {
+    display: block;
+    width: 100%;
+    margin: 12px 0 4px;
+    padding: 10px 0;
+    background: var(--accent);
+    border: 1px solid var(--accent);
+    border-radius: 6px;
+    color: #ffffff;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    font-weight: 400;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.08s;
+  }
+  .btn-build:hover  { background: #4a98e6; }
+  .btn-build:active { transform: scale(0.98); }
+
+  .formation-param { display: none; }
+  .formation-param.visible { display: flex; }
+
+  /* ── COLOR SWATCH ── */
+  input.color-swatch {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 32px;
+    height: 22px;
+    padding: 0;
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 4px;
+    background: transparent;
+    cursor: pointer;
+  }
+  input.color-swatch::-webkit-color-swatch-wrapper { padding: 2px; }
+  input.color-swatch::-webkit-color-swatch { border: none; border-radius: 2px; }
+</style>
+</head>
+<body>
+
+<!-- TITLE -->
+<div id="titleBar">
+  <img class="logo" src="data:image/png;base64,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" alt="logo">
+  <h1>Geometry <span>Formation Field</span></h1>
+</div>
+
+<div id="app">
+
+  <!-- VIEWPORT -->
+  <div id="viewport">
+    <canvas id="threeCanvas"></canvas>
+    <div id="instructions">Drag to orbit &nbsp;·&nbsp; Scroll to zoom &nbsp;·&nbsp; Right-drag to pan</div>
+    <div id="fpsCounter">-- fps</div>
+  </div>
+
+  <!-- CONTROL PANEL -->
+  <div id="panel">
+    <div id="panelScroll">
+
+      <!-- CAMERA -->
+      <div class="section" id="sectionCamera">
+        <div class="section-header" data-target="sectionCamera">
+          Camera
+          <svg class="section-chevron" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M2 4.5L7 9.5L12 4.5" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="section-body">
+          <div class="section-inner">
+
+        <div class="row">
+          <span class="row-label">FOV</span>
+          <div class="slider-wrap">
+            <input type="range" id="sliderFOV" min="20" max="100" step="1" value="45">
+            <span class="val" id="valFOV">45°</span>
+          </div>
+        </div>
+
+        <div class="row">
+          <span class="row-label">Auto-Rotate</span>
+          <label class="switch-wrap">
+            <input type="checkbox" id="chkAutoRotate">
+            <div class="switch-track"><div class="switch-thumb"></div></div>
+          </label>
+        </div>
+
+        <div class="row">
+          <span class="row-label">Speed</span>
+          <div class="slider-wrap">
+            <input type="range" id="sliderSpeed" min="0.1" max="10" step="0.1" value="1.0">
+            <span class="val" id="valSpeed">1.0</span>
+          </div>
+        </div>
+
+        <div class="row">
+          <span class="row-label">Damping</span>
+          <label class="switch-wrap">
+            <input type="checkbox" id="chkDamping" checked>
+            <div class="switch-track"><div class="switch-thumb"></div></div>
+          </label>
+        </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- LIGHTS -->
+      <div class="section" id="sectionLights">
+        <div class="section-header" data-target="sectionLights">
+          Lights
+          <svg class="section-chevron" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M2 4.5L7 9.5L12 4.5" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="section-body">
+          <div class="section-inner">
+
+        <div class="row">
+          <span class="row-label">Exposure</span>
+          <div class="slider-wrap">
+            <input type="range" id="sliderExposure" min="0.1" max="3.0" step="0.05" value="1.0">
+            <span class="val" id="valExposure">1.00</span>
+          </div>
+        </div>
+
+        <div class="row">
+          <span class="row-label">Ambient</span>
+          <div class="slider-wrap">
+            <input type="range" id="sliderAmbient" min="0" max="2" step="0.05" value="0.4">
+            <span class="val" id="valAmbient">0.40</span>
+          </div>
+          <label class="switch-wrap">
+            <input type="checkbox" id="chkAmbient" checked>
+            <div class="switch-track"><div class="switch-thumb"></div></div>
+          </label>
+        </div>
+
+        <div class="row">
+          <span class="row-label">Key Light</span>
+          <div class="slider-wrap">
+            <input type="range" id="sliderKey" min="0" max="5" step="0.1" value="1.5">
+            <span class="val" id="valKey">1.50</span>
+          </div>
+          <label class="switch-wrap">
+            <input type="checkbox" id="chkKey" checked>
+            <div class="switch-track"><div class="switch-thumb"></div></div>
+          </label>
+        </div>
+
+        <div class="row">
+          <span class="row-label">Fill Light</span>
+          <div class="slider-wrap">
+            <input type="range" id="sliderFill" min="0" max="3" step="0.05" value="0.6">
+            <span class="val" id="valFill">0.60</span>
+          </div>
+          <label class="switch-wrap">
+            <input type="checkbox" id="chkFill" checked>
+            <div class="switch-track"><div class="switch-thumb"></div></div>
+          </label>
+        </div>
+
+        <div class="row">
+          <span class="row-label">Light Display</span>
+          <label class="switch-wrap">
+            <input type="checkbox" id="chkLightDisplay">
+            <div class="switch-track"><div class="switch-thumb"></div></div>
+          </label>
+        </div>
+
+        <div class="row">
+          <span class="row-label">Shadows</span>
+          <label class="switch-wrap">
+            <input type="checkbox" id="chkShadows" checked>
+            <div class="switch-track"><div class="switch-thumb"></div></div>
+          </label>
+        </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- FORMATION -->
+      <div class="section" id="sectionFormation">
+        <div class="section-header" data-target="sectionFormation">
+          Geometry Formation
+          <svg class="section-chevron" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M2 4.5L7 9.5L12 4.5" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="section-body">
+          <div class="section-inner">
+
+        <div class="row">
+          <span class="row-label">Geometry</span>
+          <select class="formation-select" id="selectSeedGeometry">
+            <option value="box" selected>Box</option>
+            <option value="sphereLowRes">Sphere (LowRes)</option>
+            <option value="sphereHiRes">Sphere (HiRes)</option>
+            <option value="cone">Cone</option>
+            <option value="cylinder">Cylinder</option>
+            <option value="octahedron">Octahedron</option>
+            <option value="icosahedron">Icosahedron</option>
+            <option value="tetrahedron">Tetrahedron</option>
+          </select>
+        </div>
+
+        <div class="row">
+          <span class="row-label">Geo Count</span>
+          <div class="slider-wrap">
+            <input type="range" id="sliderCubeCount" min="1" max="200" step="1" value="60">
+            <span class="val" id="valCubeCount">60</span>
+          </div>
+        </div>
+
+        <div class="row">
+          <span class="row-label">Min Size</span>
+          <div class="slider-wrap">
+            <input type="range" id="sliderSizeMin" min="0.05" max="1.5" step="0.05" value="0.25">
+            <span class="val" id="valSizeMin">0.25</span>
+          </div>
+        </div>
+
+        <div class="row">
+          <span class="row-label">Max Size</span>
+          <div class="slider-wrap">
+            <input type="range" id="sliderSizeMax" min="0.05" max="1.5" step="0.05" value="0.45">
+            <span class="val" id="valSizeMax">0.45</span>
+          </div>
+        </div>
+
+        <div class="row">
+          <span class="row-label">Shape</span>
+          <select class="formation-select" id="selectShape">
+            <option value="helix">Helix / Spiral</option>
+            <option value="doubleHelix">Double Helix</option>
+            <option value="sphere">Sphere</option>
+            <option value="torus">Torus</option>
+            <option value="grid">Grid / Lattice</option>
+            <option value="random">Random Scatter</option>
+          </select>
+        </div>
+
+        <div class="row formation-param" data-shapes="helix,doubleHelix,sphere,torus">
+          <span class="row-label">Radius</span>
+          <div class="slider-wrap">
+            <input type="range" id="sliderRadius" min="0.5" max="8" step="0.1" value="3">
+            <span class="val" id="valRadius">3.0</span>
+          </div>
+        </div>
+
+        <div class="row formation-param" data-shapes="helix,doubleHelix">
+          <span class="row-label">Height</span>
+          <div class="slider-wrap">
+            <input type="range" id="sliderHeight" min="1" max="15" step="0.1" value="6">
+            <span class="val" id="valHeight">6.0</span>
+          </div>
+        </div>
+
+        <div class="row formation-param" data-shapes="helix,doubleHelix">
+          <span class="row-label">Turns</span>
+          <div class="slider-wrap">
+            <input type="range" id="sliderTurns" min="0.5" max="10" step="0.1" value="3">
+            <span class="val" id="valTurns">3.0</span>
+          </div>
+        </div>
+
+        <div class="row formation-param" data-shapes="torus">
+          <span class="row-label">Tube Radius</span>
+          <div class="slider-wrap">
+            <input type="range" id="sliderTube" min="0.1" max="4" step="0.05" value="1">
+            <span class="val" id="valTube">1.00</span>
+          </div>
+        </div>
+
+        <div class="row formation-param" data-shapes="grid">
+          <span class="row-label">Spacing</span>
+          <div class="slider-wrap">
+            <input type="range" id="sliderSpacing" min="0.2" max="3" step="0.05" value="1">
+            <span class="val" id="valSpacing">1.00</span>
+          </div>
+        </div>
+
+        <div class="row formation-param" data-shapes="random">
+          <span class="row-label">Spread</span>
+          <div class="slider-wrap">
+            <input type="range" id="sliderSpread" min="1" max="15" step="0.1" value="6">
+            <span class="val" id="valSpread">6.0</span>
+          </div>
+        </div>
+
+        <div class="row">
+          <span class="row-label">Randomness</span>
+          <div class="slider-wrap">
+            <input type="range" id="sliderRandomness" min="0" max="1" step="0.01" value="0.15">
+            <span class="val" id="valRandomness">0.15</span>
+          </div>
+        </div>
+
+        <div class="row">
+          <span class="row-label">Animate</span>
+          <label class="switch-wrap">
+            <input type="checkbox" id="chkFormationAnimate" checked>
+            <div class="switch-track"><div class="switch-thumb"></div></div>
+          </label>
+        </div>
+
+        <button class="btn-build" id="btnBuild">⬡ &nbsp; Build</button>
+
+        <div class="row" style="margin-top:10px; border-top: 1px solid var(--border); padding-top:10px;">
+          <span class="row-label" style="font-family:'DM Mono',monospace; font-size:9px; letter-spacing:0.1em; text-transform:uppercase; opacity:0.55; min-width:auto;">Static Offset (shape setup)</span>
+        </div>
+
+        <div class="row">
+          <span class="row-label">Rotate X</span>
+          <div class="slider-wrap">
+            <input type="range" id="sliderRotX" min="0" max="360" step="1" value="0">
+            <span class="val" id="valRotX">0°</span>
+          </div>
+        </div>
+
+        <div class="row">
+          <span class="row-label">Rotate Y</span>
+          <div class="slider-wrap">
+            <input type="range" id="sliderRotY" min="0" max="360" step="1" value="0">
+            <span class="val" id="valRotY">0°</span>
+          </div>
+        </div>
+
+        <div class="row">
+          <span class="row-label">Rotate Z</span>
+          <div class="slider-wrap">
+            <input type="range" id="sliderRotZ" min="0" max="360" step="1" value="0">
+            <span class="val" id="valRotZ">0°</span>
+          </div>
+        </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- ROTATION ANIMATION -->
+      <div class="section" id="sectionSpin">
+        <div class="section-header" data-target="sectionSpin">
+          Geometry Animation
+          <svg class="section-chevron" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M2 4.5L7 9.5L12 4.5" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="section-body">
+          <div class="section-inner">
+
+        <div class="row">
+          <span class="row-label" style="font-family:'DM Mono',monospace; font-size:9px; letter-spacing:0.1em; text-transform:uppercase; opacity:0.55; min-width:auto;">Formation Spin (whole group)</span>
+        </div>
+
+        <div class="row">
+          <span class="row-label">Spin Axis</span>
+          <select class="formation-select" id="selectSpinAxis">
+            <option value="x">X</option>
+            <option value="y" selected>Y</option>
+            <option value="z">Z</option>
+          </select>
+        </div>
+
+        <div class="row">
+          <span class="row-label">Full Turn</span>
+          <div class="slider-wrap">
+            <input type="range" id="sliderSpinPeriod" min="2" max="300" step="1" value="60">
+            <span class="val" id="valSpinPeriod">60s</span>
+          </div>
+        </div>
+
+        <div class="row">
+          <span class="row-label">Animate Spin</span>
+          <label class="switch-wrap">
+            <input type="checkbox" id="chkSpinEnable">
+            <div class="switch-track"><div class="switch-thumb"></div></div>
+          </label>
+        </div>
+
+        <div class="row" style="margin-top:8px; border-top: 1px solid var(--border); padding-top:10px;">
+          <span class="row-label" style="font-family:'DM Mono',monospace; font-size:9px; letter-spacing:0.1em; text-transform:uppercase; opacity:0.55; min-width:auto;">Cube Self-Rotation (per cube)</span>
+        </div>
+
+        <div class="row">
+          <span class="row-label">Tumble Speed</span>
+          <div class="slider-wrap">
+            <input type="range" id="sliderCubeSpinSpeed" min="0" max="360" step="5" value="60">
+            <span class="val" id="valCubeSpinSpeed">60°/s</span>
+          </div>
+        </div>
+
+        <div class="row">
+          <span class="row-label">Animate Tumble</span>
+          <label class="switch-wrap">
+            <input type="checkbox" id="chkCubeSpinEnable">
+            <div class="switch-track"><div class="switch-thumb"></div></div>
+          </label>
+        </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- SYSTEM SETTINGS -->
+      <div class="section" id="sectionSystem">
+        <div class="section-header" data-target="sectionSystem">
+          System Settings
+          <svg class="section-chevron" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M2 4.5L7 9.5L12 4.5" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="section-body">
+          <div class="section-inner">
+            <button class="btn-reset" id="btnReset">↺ &nbsp; Reset Camera</button>
+            <button class="btn-reset" id="btnResetLights">↺ &nbsp; Reset Lights</button>
+
+            <div class="row">
+              <span class="row-label">Grid</span>
+              <label class="switch-wrap">
+                <input type="checkbox" id="chkGrid" checked>
+                <div class="switch-track"><div class="switch-thumb"></div></div>
+              </label>
+            </div>
+
+            <div class="row">
+              <span class="row-label">Axis Gizmo</span>
+              <label class="switch-wrap">
+                <input type="checkbox" id="chkGizmo" checked>
+                <div class="switch-track"><div class="switch-thumb"></div></div>
+              </label>
+            </div>
+
+            <div class="row">
+              <span class="row-label">Grid Colour</span>
+              <div class="slider-wrap" style="justify-content:flex-end;">
+                <input type="color" id="colorGrid" value="#555555" class="color-swatch">
+              </div>
+            </div>
+            <button class="btn-reset" id="btnExport">↓ &nbsp; Export Prompt</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+  }
+}
+</script>
+
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+// ── CUSTOM GRID ───────────────────────────────────────────
+function makeGrid(size, divisions, colorMain, colorDiv) {
+  const step = size / divisions;
+  const half = size / 2;
+  const positions = [];
+  const colors    = [];
+
+  const cMain = new THREE.Color(colorMain);
+  const cDiv  = new THREE.Color(colorDiv);
+
+  for (let i = 0, k = -half; i <= divisions; i++, k += step) {
+    const isCenter = (i === divisions / 2);
+    const col = isCenter ? cMain : cDiv;
+    positions.push(-half, 0, k,  half, 0, k);
+    positions.push(k, 0, -half,  k, 0,  half);
+    for (let j = 0; j < 4; j++) { colors.push(col.r, col.g, col.b); }
+  }
+
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+  geo.setAttribute('color',    new THREE.Float32BufferAttribute(colors,    3));
+  const mat = new THREE.LineBasicMaterial({ vertexColors: true });
+  return new THREE.LineSegments(geo, mat);
+}
+
+// ── RENDERER ─────────────────────────────────────────────
+const canvas   = document.getElementById('threeCanvas');
+const viewport = document.getElementById('viewport');
+
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.shadowMap.enabled   = true;
+renderer.shadowMap.type      = THREE.PCFSoftShadowMap;
+renderer.toneMapping         = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.0;
+renderer.autoClear           = false;
+
+// ── MAIN SCENE ───────────────────────────────────────────
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x808080);
+
+// ── CAMERA ───────────────────────────────────────────────
+const DEFAULT_FOV    = 45;
+const DEFAULT_POS    = new THREE.Vector3(6, 4, 8);
+const DEFAULT_TARGET = new THREE.Vector3(0, 0, 0);
+
+// ── LIGHTS (defaults, for Reset Lights) ───────────────────
+const LIGHT_DEFAULTS = {
+  exposure: 1.0,
+  ambient:  0.4,  ambientOn: true,
+  key:      1.5,  keyOn:     true,
+  fill:     0.6,  fillOn:    true,
+  display:  false,
+  shadows:  true,
+};
+
+const camera = new THREE.PerspectiveCamera(DEFAULT_FOV, 1, 0.01, 1000);
+camera.position.copy(DEFAULT_POS);
+
+// ── ORBIT CONTROLS ───────────────────────────────────────
+const controls = new OrbitControls(camera, canvas);
+controls.enableDamping   = true;
+controls.dampingFactor   = 0.08;
+controls.autoRotate      = false;
+controls.autoRotateSpeed = 1.0;
+controls.mouseButtons    = {
+  LEFT:   THREE.MOUSE.ROTATE,
+  MIDDLE: THREE.MOUSE.DOLLY,
+  RIGHT:  THREE.MOUSE.PAN,
+};
+controls.target.copy(DEFAULT_TARGET);
+controls.update();
+
+// ── GRID ─────────────────────────────────────────────────
+let grid = makeGrid(20, 40, 0x555555, 0x383838);
+scene.add(grid);
+
+// Rebuilds the grid with a new main color. The division-line color is
+// derived from it (same hue, lower lightness) so the center-line highlight
+// effect is preserved rather than picking an unrelated fixed color.
+function rebuildGrid(hexColor) {
+  scene.remove(grid);
+  grid.geometry.dispose();
+  grid.material.dispose();
+
+  const main = new THREE.Color(hexColor);
+  const hsl  = {};
+  main.getHSL(hsl);
+  const div = new THREE.Color().setHSL(hsl.h, hsl.s, Math.max(0, hsl.l * 0.55));
+
+  grid = makeGrid(20, 40, main, div);
+  scene.add(grid);
+}
+
+// ── GROUND ───────────────────────────────────────────────
+const ground = new THREE.Mesh(
+  new THREE.PlaneGeometry(40, 40),
+  new THREE.ShadowMaterial({ opacity: 0.35 })
+);
+ground.rotation.x    = -Math.PI / 2;
+ground.receiveShadow = true;
+scene.add(ground);
+
+// ── LIGHTS ───────────────────────────────────────────────
+const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
+scene.add(ambientLight);
+
+// Key Light — (15, 24, 1)
+const keyLight = new THREE.DirectionalLight(0xfff5e0, 1.5);
+keyLight.position.set(15, 24, 1);
+keyLight.castShadow = true;
+keyLight.shadow.mapSize.set(2048, 2048);
+keyLight.shadow.camera.near   = 0.1;
+keyLight.shadow.camera.far    = 80;
+keyLight.shadow.camera.left   = -20;
+keyLight.shadow.camera.right  =  20;
+keyLight.shadow.camera.top    =  20;
+keyLight.shadow.camera.bottom = -20;
+keyLight.shadow.bias          = -0.001;
+scene.add(keyLight);
+
+// Fill Light — (-15, 7, -15)
+const fillLight = new THREE.DirectionalLight(0xd0e8ff, 0.6);
+fillLight.position.set(-15, 7, -15);
+scene.add(fillLight);
+
+// Light helpers — hidden by default
+const keyHelper  = new THREE.DirectionalLightHelper(keyLight,  1.2, 0xffff00);
+const fillHelper = new THREE.DirectionalLightHelper(fillLight, 1.2, 0x88aaff);
+keyHelper.visible  = false;
+fillHelper.visible = false;
+scene.add(keyHelper);
+scene.add(fillHelper);
+
+// ── FORMATION: CUBE ARRAY ────────────────────────────────
+// spinGroup   — outer wrapper, continuously animated over time around ONE axis
+// cubeGroup   — inner group, holds the static X/Y/Z "shape setup" offset + the cube meshes
+const spinGroup = new THREE.Group();
+scene.add(spinGroup);
+
+const cubeGroup = new THREE.Group();
+spinGroup.add(cubeGroup);
+
+// Spin animation state — whole-formation rotation
+let spinEnabled   = false;
+let spinAxis      = 'y';
+let spinPeriod    = 60;   // seconds for a full 360° revolution
+let lastSpinFrame = null; // performance.now() timestamp of last frame, shared by both spin systems
+
+// Cube self-rotation (tumble) state — each cube spins on its own randomized axis
+let cubeSpinEnabled  = false;
+let cubeSpinSpeedDeg = 60; // degrees/second, scaled per-cube below
+
+let cubeRecords   = [];   // { mesh, start: Vector3, target: Vector3 }
+const FORMATION_DURATION = 1100; // ms
+let formationAnimStart   = 0;
+let formationAnimating   = false;
+
+const GOLDEN_ANGLE = Math.PI * (3 - Math.sqrt(5));
+
+// Per-cube "seed" geometry — the actual mesh shape placed at each formation
+// point. Radii/heights are scaled relative to `size` so switching geometry
+// types keeps a roughly consistent visual footprint. Cone and Cylinder use
+// deliberately low radial segments (per spec) so they read as faceted rather
+// than smooth — cheaper too, at up to 200 instances.
+function createSeedGeometry(type, size) {
+  switch (type) {
+    case 'sphereLowRes':
+      return new THREE.SphereGeometry(size * 0.55, 5, 3);
+    case 'sphereHiRes':
+      return new THREE.SphereGeometry(size * 0.55, 12, 8);
+    case 'cone':
+      return new THREE.ConeGeometry(size * 0.55, size * 1.3, 6);
+    case 'cylinder':
+      return new THREE.CylinderGeometry(size * 0.5, size * 0.5, size * 1.1, 8);
+    case 'octahedron':
+      return new THREE.OctahedronGeometry(size * 0.7, 0);
+    case 'icosahedron':
+      return new THREE.IcosahedronGeometry(size * 0.65, 0);
+    case 'tetrahedron':
+      return new THREE.TetrahedronGeometry(size * 0.75, 0);
+    case 'box':
+    default:
+      return new THREE.BoxGeometry(size, size, size);
+  }
+}
+
+const SHAPE_FN = {
+  helix(i, n, p) {
+    const t = n <= 1 ? 0 : i / (n - 1);
+    const angle = t * p.turns * Math.PI * 2;
+    const y = (t - 0.5) * p.height;
+    return new THREE.Vector3(Math.cos(angle) * p.radius, y, Math.sin(angle) * p.radius);
+  },
+  doubleHelix(i, n, p) {
+    const strand = i % 2;
+    const idx = Math.floor(i / 2);
+    const strandCount = Math.max(1, Math.ceil(n / 2));
+    const t = strandCount <= 1 ? 0 : idx / (strandCount - 1);
+    let angle = t * p.turns * Math.PI * 2;
+    if (strand === 1) angle += Math.PI;
+    const y = (t - 0.5) * p.height;
+    return new THREE.Vector3(Math.cos(angle) * p.radius, y, Math.sin(angle) * p.radius);
+  },
+  sphere(i, n, p) {
+    const offset = 2 / n;
+    const y = (i * offset - 1) + offset / 2;
+    const r = Math.sqrt(Math.max(0, 1 - y * y));
+    const phi = i * GOLDEN_ANGLE;
+    return new THREE.Vector3(Math.cos(phi) * r * p.radius, y * p.radius, Math.sin(phi) * r * p.radius);
+  },
+  torus(i, n, p) {
+    const cols = Math.max(1, Math.round(Math.sqrt(n)));
+    const rows = Math.max(1, Math.ceil(n / cols));
+    const col = i % cols;
+    const row = Math.floor(i / cols);
+    const majorAngle = (col / cols) * Math.PI * 2;
+    const minorAngle = (row / rows) * Math.PI * 2;
+    const x = (p.radius + p.tube * Math.cos(minorAngle)) * Math.cos(majorAngle);
+    const y = p.tube * Math.sin(minorAngle);
+    const z = (p.radius + p.tube * Math.cos(minorAngle)) * Math.sin(majorAngle);
+    return new THREE.Vector3(x, y, z);
+  },
+  grid(i, n, p) {
+    const side = Math.max(1, Math.ceil(Math.cbrt(n)));
+    const x = i % side;
+    const y = Math.floor(i / side) % side;
+    const z = Math.floor(i / (side * side));
+    const half = (side - 1) / 2;
+    return new THREE.Vector3((x - half) * p.spacing, (y - half) * p.spacing + half * p.spacing, (z - half) * p.spacing);
+  },
+  random(i, n, p) {
+    return new THREE.Vector3(
+      (Math.random() * 2 - 1) * p.spread,
+      Math.random() * p.spread + 0.2,
+      (Math.random() * 2 - 1) * p.spread
+    );
+  },
+};
+
+function easeInOutCubic(t) {
+  return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+}
+
+function readFormationParams() {
+  const sizeMinRaw = parseFloat(document.getElementById('sliderSizeMin').value);
+  const sizeMaxRaw = parseFloat(document.getElementById('sliderSizeMax').value);
+  return {
+    count:        parseInt(document.getElementById('sliderCubeCount').value, 10),
+    geometryType: document.getElementById('selectSeedGeometry').value,
+    sizeMin:    Math.min(sizeMinRaw, sizeMaxRaw),
+    sizeMax:    Math.max(sizeMinRaw, sizeMaxRaw),
+    shape:      document.getElementById('selectShape').value,
+    animate:    document.getElementById('chkFormationAnimate').checked,
+    randomness: parseFloat(document.getElementById('sliderRandomness').value),
+    radius:     parseFloat(document.getElementById('sliderRadius').value),
+    height:     parseFloat(document.getElementById('sliderHeight').value),
+    turns:      parseFloat(document.getElementById('sliderTurns').value),
+    tube:       parseFloat(document.getElementById('sliderTube').value),
+    spacing:    parseFloat(document.getElementById('sliderSpacing').value),
+    spread:     parseFloat(document.getElementById('sliderSpread').value),
+  };
+}
+
+function buildFormation() {
+  const p = readFormationParams();
+  const fn = SHAPE_FN[p.shape] || SHAPE_FN.helix;
+
+  // Clear previous cubes — each cube now owns its own geometry (sizes vary)
+  for (const rec of cubeRecords) {
+    cubeGroup.remove(rec.mesh);
+    rec.mesh.geometry.dispose();
+    rec.mesh.material.dispose();
+  }
+  cubeRecords = [];
+
+  // Jitter amount scales with the randomness factor (0–1) and the cube
+  // size range, so "imperfect placement" reads proportionally at any scale.
+  const jitterAmount = p.randomness * (p.sizeMin + p.sizeMax) * 1.6;
+
+  for (let i = 0; i < p.count; i++) {
+    const size = THREE.MathUtils.lerp(p.sizeMin, p.sizeMax, Math.random());
+    const geo  = createSeedGeometry(p.geometryType, size);
+
+    const hue = p.count <= 1 ? 0.55 : (i / p.count) * 0.75 + 0.55;
+    const color = new THREE.Color().setHSL(hue % 1, 0.55, 0.55);
+    const mat = new THREE.MeshLambertMaterial({ color });
+    const mesh = new THREE.Mesh(geo, mat);
+    mesh.castShadow = true;
+    mesh.receiveShadow = true;
+
+    // Base target from the shape formula, plus jittered offset for natural variation
+    const target = fn(i, p.count, p);
+    target.x += (Math.random() * 2 - 1) * jitterAmount;
+    target.y += (Math.random() * 2 - 1) * jitterAmount;
+    target.z += (Math.random() * 2 - 1) * jitterAmount;
+
+    // Small random tilt per cube — reinforces the "hand-placed" look at higher randomness
+    mesh.rotation.set(
+      (Math.random() * 2 - 1) * p.randomness * 0.6,
+      (Math.random() * 2 - 1) * p.randomness * 0.6,
+      (Math.random() * 2 - 1) * p.randomness * 0.6
+    );
+
+    let start;
+    if (p.animate) {
+      // Spawn scattered — flies into formation on build
+      start = new THREE.Vector3(
+        (Math.random() * 2 - 1) * 9,
+        Math.random() * 6 + 0.5,
+        (Math.random() * 2 - 1) * 9
+      );
+      mesh.position.copy(start);
+    } else {
+      start = target.clone();
+      mesh.position.copy(target);
+    }
+
+    // Each cube tumbles on its own randomized local axis at a slightly
+    // different rate — this is what gives the self-rotation an organic,
+    // non-synchronized feel rather than every cube spinning identically.
+    const tumbleAxis = new THREE.Vector3(
+      Math.random() * 2 - 1,
+      Math.random() * 2 - 1,
+      Math.random() * 2 - 1
+    ).normalize();
+    const tumbleSpeedMul = 0.5 + Math.random(); // 0.5x – 1.5x of the global tumble speed
+
+    cubeGroup.add(mesh);
+    cubeRecords.push({ mesh, start, target, tumbleAxis, tumbleSpeedMul });
+  }
+
+  if (p.animate) {
+    formationAnimStart = performance.now();
+    formationAnimating = true;
+  } else {
+    formationAnimating = false;
+  }
+}
+
+function updateFormationAnimation(now) {
+  if (!formationAnimating) return;
+  const elapsed = now - formationAnimStart;
+  const t = Math.min(1, elapsed / FORMATION_DURATION);
+  const e = easeInOutCubic(t);
+  for (const rec of cubeRecords) {
+    rec.mesh.position.lerpVectors(rec.start, rec.target, e);
+  }
+  if (t >= 1) formationAnimating = false;
+}
+
+// Continuous rotation animations — computes ONE shared frame delta, then
+// applies it to (a) the whole-formation spin (spinGroup, single global axis)
+// and (b) each cube's individual tumble on its own randomized local axis.
+// Both run independently and simultaneously.
+function updateRotationAnimations(now) {
+  if (lastSpinFrame === null) lastSpinFrame = now;
+  const deltaMs = Math.min(now - lastSpinFrame, 100); // clamp to avoid jumps after tab-inactive
+  lastSpinFrame = now;
+  const deltaSec = deltaMs / 1000;
+
+  // (a) Whole-formation spin
+  if (spinEnabled && spinPeriod > 0) {
+    const deltaAngle = deltaSec * (Math.PI * 2 / spinPeriod);
+    spinGroup.rotation[spinAxis] += deltaAngle;
+  }
+
+  // (b) Per-cube self-rotation (tumble)
+  if (cubeSpinEnabled && cubeSpinSpeedDeg > 0) {
+    for (const rec of cubeRecords) {
+      const angle = THREE.MathUtils.degToRad(cubeSpinSpeedDeg) * rec.tumbleSpeedMul * deltaSec;
+      rec.mesh.rotateOnAxis(rec.tumbleAxis, angle);
+    }
+  }
+}
+
+function updateFormationParamVisibility() {
+  const shape = document.getElementById('selectShape').value;
+  document.querySelectorAll('.formation-param').forEach(row => {
+    const shapes = row.dataset.shapes.split(',');
+    row.classList.toggle('visible', shapes.includes(shape));
+  });
+}
+
+// ── GIZMO SCENE ──────────────────────────────────────────
+const gizmoScene  = new THREE.Scene();
+const GIZMO_SIZE  = 88;
+const gizmoCamera = new THREE.PerspectiveCamera(50, 1, 0.1, 100);
+gizmoCamera.position.set(0, 0, 3);
+
+const AXES = [
+  { dir: new THREE.Vector3(1, 0, 0), color: 0xff3333, label: 'X', lc: '#000000' },
+  { dir: new THREE.Vector3(0, 1, 0), color: 0x33dd55, label: 'Y', lc: '#000000' },
+  { dir: new THREE.Vector3(0, 0, 1), color: 0x3366ff, label: 'Z', lc: '#000000' },
+];
+
+AXES.forEach(({ dir, color, label, lc }) => {
+  const mat = new THREE.MeshBasicMaterial({ color, depthTest: false });
+  const up  = new THREE.Vector3(0, 1, 0);
+
+  const shaft = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, 0.72, 8), mat);
+  shaft.position.copy(dir.clone().multiplyScalar(0.40));
+  shaft.quaternion.setFromUnitVectors(up, dir);
+  shaft.renderOrder = 999;
+  gizmoScene.add(shaft);
+
+  const cone = new THREE.Mesh(new THREE.ConeGeometry(0.10, 0.22, 12), mat);
+  cone.position.copy(dir.clone().multiplyScalar(0.84));
+  cone.quaternion.setFromUnitVectors(up, dir);
+  cone.renderOrder = 999;
+  gizmoScene.add(cone);
+
+  const cv  = document.createElement('canvas');
+  cv.width  = 128; cv.height = 128;
+  const ctx = cv.getContext('2d');
+  ctx.font         = 'bold 72px DM Mono, monospace';
+  ctx.fillStyle    = lc;
+  ctx.textAlign    = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(label, 64, 64);
+  const sprite = new THREE.Sprite(
+    new THREE.SpriteMaterial({
+      map: new THREE.CanvasTexture(cv),
+      depthTest: false,
+      transparent: true
+    })
+  );
+  sprite.scale.set(0.36, 0.36, 0.36);
+  sprite.position.copy(dir.clone().multiplyScalar(1.18));
+  sprite.renderOrder = 1000;
+  gizmoScene.add(sprite);
+});
+
+// ── RESIZE ───────────────────────────────────────────────
+function onResize() {
+  const w = viewport.clientWidth;
+  const h = viewport.clientHeight;
+  renderer.setSize(w, h);
+  camera.aspect = w / h;
+  camera.updateProjectionMatrix();
+}
+window.addEventListener('resize', onResize);
+onResize();
+
+// ── FPS ──────────────────────────────────────────────────
+const fpsEl   = document.getElementById('fpsCounter');
+let fpsFrames = 0;
+let fpsLast   = performance.now();
+let showGizmo = true;
+
+// ── RENDER LOOP ──────────────────────────────────────────
+function animate() {
+  requestAnimationFrame(animate);
+  controls.update();
+  updateFormationAnimation(performance.now());
+  updateRotationAnimations(performance.now());
+
+  // Sync gizmo camera to main camera orientation
+  gizmoCamera.position
+    .copy(camera.position)
+    .sub(controls.target)
+    .normalize()
+    .multiplyScalar(3);
+  gizmoCamera.lookAt(0, 0, 0);
+  gizmoCamera.up.copy(camera.up);
+
+  keyHelper.update();
+  fillHelper.update();
+
+  const vw = viewport.clientWidth;
+  const vh = viewport.clientHeight;
+
+  // Main scene
+  renderer.setViewport(0, 0, vw, vh);
+  renderer.setScissor(0, 0, vw, vh);
+  renderer.setScissorTest(true);
+  renderer.clear();
+  renderer.render(scene, camera);
+
+  // Gizmo — top-right corner
+  // WebGL origin is bottom-left, so top-right = (vw - size - m, vh - size - m)
+  if (showGizmo) {
+    const m  = 14;
+    const gx = vw - GIZMO_SIZE - m;
+    const gy = vh - GIZMO_SIZE - m;
+    renderer.setViewport(gx, gy, GIZMO_SIZE, GIZMO_SIZE);
+    renderer.setScissor(gx, gy, GIZMO_SIZE, GIZMO_SIZE);
+    renderer.clearDepth();
+    renderer.render(gizmoScene, gizmoCamera);
+  }
+
+  // FPS
+  fpsFrames++;
+  const now = performance.now();
+  if (now - fpsLast >= 500) {
+    fpsEl.textContent = Math.round(fpsFrames * 1000 / (now - fpsLast)) + ' fps';
+    fpsFrames = 0;
+    fpsLast   = now;
+  }
+}
+animate();
+
+// ── UI HELPERS ───────────────────────────────────────────
+function bindSlider(id, valId, decimals, suffix, cb) {
+  const sl = document.getElementById(id);
+  const vl = document.getElementById(valId);
+  sl.addEventListener('input', () => {
+    const v = parseFloat(sl.value);
+    vl.textContent = v.toFixed(decimals) + (suffix || '');
+    cb(v);
+  });
+}
+
+function bindToggle(id, cb) {
+  const el = document.getElementById(id);
+  el.addEventListener('change', () => cb(el.checked));
+}
+
+// ── CAMERA UI ────────────────────────────────────────────
+document.getElementById('btnReset').addEventListener('click', () => {
+  camera.fov = DEFAULT_FOV;
+  camera.updateProjectionMatrix();
+  document.getElementById('sliderFOV').value    = DEFAULT_FOV;
+  document.getElementById('valFOV').textContent = DEFAULT_FOV + '°';
+  camera.position.copy(DEFAULT_POS);
+  controls.target.copy(DEFAULT_TARGET);
+  controls.update();
+});
+
+bindSlider('sliderFOV', 'valFOV', 0, '°', v => {
+  camera.fov = v;
+  camera.updateProjectionMatrix();
+});
+
+bindToggle('chkAutoRotate', v => { controls.autoRotate = v; });
+
+bindSlider('sliderSpeed', 'valSpeed', 1, '', v => { controls.autoRotateSpeed = v; });
+
+bindToggle('chkGrid', v => { grid.visible = v; });
+bindToggle('chkGizmo', v => { showGizmo = v; });
+
+bindToggle('chkDamping', v => {
+  controls.enableDamping = v;
+  controls.dampingFactor = v ? 0.08 : 1.0;
+});
+
+// ── LIGHTS UI ────────────────────────────────────────────
+bindSlider('sliderExposure', 'valExposure', 2, '', v => {
+  renderer.toneMappingExposure = v;
+});
+
+bindSlider('sliderAmbient', 'valAmbient', 2, '', v => { ambientLight.intensity = v; });
+bindToggle('chkAmbient', v => { ambientLight.visible = v; });
+
+bindSlider('sliderKey', 'valKey', 2, '', v => { keyLight.intensity = v; });
+bindToggle('chkKey',    v => { keyLight.visible = v; });
+
+bindSlider('sliderFill', 'valFill', 2, '', v => { fillLight.intensity = v; });
+bindToggle('chkFill',   v => { fillLight.visible = v; });
+
+bindToggle('chkLightDisplay', v => {
+  keyHelper.visible  = v;
+  fillHelper.visible = v;
+});
+
+bindToggle('chkShadows', v => {
+  renderer.shadowMap.enabled  = v;
+  ground.receiveShadow        = v;
+  ground.material.needsUpdate = true;
+});
+
+// ── RESET LIGHTS ─────────────────────────────────────────
+// Small helper: sets a range input's value + its adjacent .val label together,
+// mirroring the same decimals/suffix formatting bindSlider uses elsewhere.
+function setSliderDisplay(sliderId, valId, value, decimals, suffix) {
+  document.getElementById(sliderId).value = value;
+  document.getElementById(valId).textContent = value.toFixed(decimals) + suffix;
+}
+
+document.getElementById('btnResetLights').addEventListener('click', () => {
+  const d = LIGHT_DEFAULTS;
+
+  renderer.toneMappingExposure = d.exposure;
+  setSliderDisplay('sliderExposure', 'valExposure', d.exposure, 2, '');
+
+  ambientLight.intensity = d.ambient;
+  ambientLight.visible   = d.ambientOn;
+  setSliderDisplay('sliderAmbient', 'valAmbient', d.ambient, 2, '');
+  document.getElementById('chkAmbient').checked = d.ambientOn;
+
+  keyLight.intensity = d.key;
+  keyLight.visible    = d.keyOn;
+  setSliderDisplay('sliderKey', 'valKey', d.key, 2, '');
+  document.getElementById('chkKey').checked = d.keyOn;
+
+  fillLight.intensity = d.fill;
+  fillLight.visible    = d.fillOn;
+  setSliderDisplay('sliderFill', 'valFill', d.fill, 2, '');
+  document.getElementById('chkFill').checked = d.fillOn;
+
+  keyHelper.visible  = d.display;
+  fillHelper.visible = d.display;
+  document.getElementById('chkLightDisplay').checked = d.display;
+
+  renderer.shadowMap.enabled  = d.shadows;
+  ground.receiveShadow        = d.shadows;
+  ground.material.needsUpdate = true;
+  document.getElementById('chkShadows').checked = d.shadows;
+});
+
+// ── EXPORT PROMPT ────────────────────────────────────────
+// ── GRID COLOUR ────────────────────────────────────────────
+document.getElementById('colorGrid').addEventListener('input', function () {
+  rebuildGrid(this.value);
+});
+
+document.getElementById('btnExport').addEventListener('click', () => {
+  const exportDate = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+
+  const prompt = `# Geometry Formation Field — Reconstruction Prompt
+
+Author: Chris Shaw
+Organisation: LASALLE College of the Arts | University of the Arts Singapore
+Date: ${exportDate}
+Built With: Claude (Anthropic)
+
+Create a single self-contained HTML file with a 3D viewport using Three.js (r160 from CDN). The layout has a left 3D viewport and a right control panel. Please feel free to ask any questions or make suggestions.
+
+---
+
+## PAGE STRUCTURE
+
+- Title "Geometry Formation Field" at the top of the page in a fixed title bar, left-aligned (justify-content: flex-start, ~24px left padding — not centered), styled as a system UI font stack (-apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui), 42px, font-weight 700, letter-spacing -0.03em, line-height 1.05. "Geometry" in warm off-white (#f0ede6), "Formation Field" in blue (#378ADD) via a <span>.
+- A small logo image (lightning bolt icon) sits to the left of the heading in the title bar.
+- Bottom-left of viewport: static instruction text — "Drag to orbit · Scroll to zoom · Right-drag to pan" — in black.
+- Bottom-right of viewport: live FPS counter.
+- Left: 3D viewport fills the remaining screen space.
+- Right: fixed-width control panel (~280px), dark-styled, scrollable.
+
+---
+
+## DESIGN TOKENS
+
+Use the following CSS custom properties throughout:
+
+\`\`\`css
+--bg:         #0e0e0f;
+--panel:      #161618;
+--border:     rgba(255,255,255,0.07);
+--text:       #e8e8e6;
+--muted:      #9b9b97;
+--accent:     #378ADD;
+--accent-dim: rgba(55,138,221,0.12);
+\`\`\`
+
+---
+
+## TYPOGRAPHY
+
+- Import from Google Fonts: DM Mono (weights 300, 400, 700) and DM Sans (weights 300, 400, 500).
+- UI labels, values, monospace text: DM Mono.
+- Body and control text: DM Sans.
+- Section headings: 10px, DM Mono, uppercase, letter-spacing 0.12em, colour #ffffff.
+- Control labels: 12px, DM Sans, colour var(--muted) #9b9b97.
+- Value readouts: 11px, DM Mono, colour var(--muted) #9b9b97.
+
+---
+
+## 3D VIEWPORT
+
+- Three.js r160 via CDN ES module importmap.
+- Background colour: mid-grey 0x808080.
+- Grid: 20 units, 40 divisions, built using the custom makeGrid function below — do NOT use THREE.GridHelper. Rebuildable at runtime via a colour picker (see SYSTEM SETTINGS below); the division-line colour is auto-derived from the picked main colour (same hue/saturation, ~55% lightness) so the center cross-line highlight is preserved.
+- XYZ axis gizmo rendered in the top-right corner of the viewport using a secondary scene + setViewport. X=red, Y=green, Z=blue. Axis labels X/Y/Z in black text. Use autoClear = false and a dedicated gizmo camera.
+- Camera: PerspectiveCamera, FOV 45° default.
+- Mouse controls via OrbitControls: left-drag to orbit, scroll to zoom, right-drag to pan.
+- Damping enabled by default (dampingFactor 0.08).
+- A ground plane (PlaneGeometry 40x40) using ShadowMaterial, receiveShadow = true.
+
+---
+
+## CUSTOM GRID FUNCTION
+
+Use this exact function — do not use THREE.GridHelper:
+
+\`\`\`javascript
+function makeGrid(size, divisions, colorMain, colorDiv) {
+  const step = size / divisions;
+  const half = size / 2;
+  const positions = [];
+  const colors = [];
+  const cMain = new THREE.Color(colorMain);
+  const cDiv  = new THREE.Color(colorDiv);
+  for (let i = 0, k = -half; i <= divisions; i++, k += step) {
+    const isCenter = (i === divisions / 2);
+    const col = isCenter ? cMain : cDiv;
+    positions.push(-half, 0, k,  half, 0, k);
+    positions.push(k, 0, -half,  k, 0,  half);
+    for (let j = 0; j < 4; j++) { colors.push(col.r, col.g, col.b); }
+  }
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+  geo.setAttribute('color',    new THREE.Float32BufferAttribute(colors, 3));
+  const mat = new THREE.LineBasicMaterial({ vertexColors: true });
+  return new THREE.LineSegments(geo, mat);
+}
+\`\`\`
+
+Instantiate as: let grid = makeGrid(20, 40, 0x555555, 0x383838); — must be reassignable (let, not const) since the Grid Colour picker disposes and rebuilds it at runtime.
+
+---
+
+## LIGHTS
+
+- AmbientLight: 0xffffff, intensity 0.4.
+- Key Light (DirectionalLight): 0xfff5e0, intensity 1.5, position (15, 24, 1). castShadow = true, shadow.mapSize 2048x2048, shadow.camera.near 0.1, shadow.camera.far 80, shadow frustum left/right/top/bottom ±20, shadow.bias -0.001.
+- Fill Light (DirectionalLight): 0xd0e8ff, intensity 0.6, position (-15, 7, -15).
+- DirectionalLightHelper for each light, hidden by default.
+- Renderer: ACESFilmicToneMapping, toneMappingExposure 1.0, PCFSoftShadowMap.
+
+---
+
+## FORMATION OBJECTS — GEOMETRY, MATERIAL, GROUPS
+
+- Up to 200 individual mesh objects (NOT InstancedMesh — count is low enough that per-object geometry/material is simpler and still performant).
+- Each object uses **MeshLambertMaterial** (diffuse-only, no roughness/metalness — those are Standard/Physical-only properties). Colour is per-object HSL gradient: hue = (index / count) * 0.75 + 0.55, saturation 0.55, lightness 0.55.
+- castShadow = true, receiveShadow = true on every mesh.
+
+### Seed geometry (per-object shape, selectable)
+A factory function \`createSeedGeometry(type, size)\` returns one of:
+- **box** (default): BoxGeometry(size, size, size)
+- **sphereLowRes**: SphereGeometry(size*0.55, 5, 3) — deliberately near the minimum segment count Three.js allows, for a faceted low-poly look
+- **sphereHiRes**: SphereGeometry(size*0.55, 12, 8)
+- **cone**: ConeGeometry(size*0.55, size*1.3, 6) — low radial segments, faceted not smooth
+- **cylinder**: CylinderGeometry(size*0.5, size*0.5, size*1.1, 8) — low radial segments
+- **octahedron**: OctahedronGeometry(size*0.7, 0)
+- **icosahedron**: IcosahedronGeometry(size*0.65, 0)
+- **tetrahedron**: TetrahedronGeometry(size*0.75, 0)
+
+### Group hierarchy (for layered rotation — important, order matters)
+\`\`\`
+scene
+  └─ spinGroup      (continuous time-based rotation, ONE axis at a time — "Formation Spin")
+       └─ cubeGroup  (static X/Y/Z "shape setup" offset rotation — applied first/innermost)
+            └─ individual object meshes
+\`\`\`
+Rotations don't commute, so nesting order matters: the static offset is baked in first (innermost group), and the continuous spin wraps around the already-offset formation.
+
+---
+
+## FORMATION SHAPE MATH
+
+A \`SHAPE_FN\` object maps a shape key to a function \`(i, n, params) => THREE.Vector3\` giving each object's target position:
+
+- **helix**: t = i/(n-1); angle = t * turns * 2π; y = (t-0.5) * height; x = cos(angle)*radius, z = sin(angle)*radius.
+- **doubleHelix**: same as helix but split objects into two interleaved strands by index parity (i % 2), second strand offset by +π.
+- **sphere**: Fibonacci/golden-angle distribution (golden angle = π*(3-√5)) for even coverage — avoids pole-bunching that a naive lat/long grid produces.
+- **torus**: objects mapped onto a √n × √n grid, wrapped via major angle (columns) and minor angle (rows) around torus radius + tube radius.
+- **grid**: cube-root-sized 3D lattice (side = ceil(n^(1/3))), spaced evenly on X/Y/Z, resting on y=0 (not vertically centered — sits on the ground plane).
+- **random**: uniform random position within a cubic bounding volume defined by "spread".
+
+### Jitter / "Randomness" (0–1 slider)
+After the shape formula computes a target, each axis gets: \`(Math.random()*2-1) * jitterAmount\`, where \`jitterAmount = randomness * (sizeMin + sizeMax) * 1.6\`. Each object also gets a small random static tilt on creation: \`(Math.random()*2-1) * randomness * 0.6\` radians per axis. This is what gives higher randomness values an organic, "hand-placed" look instead of perfect mathematical regularity.
+
+### Per-object size
+Each object samples its own size uniformly between Min Size and Max Size sliders: \`THREE.MathUtils.lerp(sizeMin, sizeMax, Math.random())\`. Because size varies per object, each gets its OWN geometry instance (not a shared/instanced one) — dispose all old geometries and materials on every Build click to avoid leaks.
+
+### Build animation ("Animate" toggle)
+When ON, objects spawn at random scattered positions (within a ~9-unit radius, y from 0.5–6.5) and tween to their target position over 1100ms using an ease-in-out-cubic curve. When OFF, objects snap directly to target with no animation.
+
+---
+
+## ROTATION ANIMATION (two independent, simultaneous systems)
+
+Both share ONE frame-delta calculation per render-loop tick (clamped to 100ms max, to avoid a large jump if the tab was backgrounded and regains focus).
+
+### 1. Formation Spin (whole group, rigid)
+- Select ONE axis (X, Y, or Z) from a dropdown.
+- "Full Turn" slider: seconds for one complete 360° revolution (range 2–300s, default 60s).
+- Animate Spin toggle (default OFF). Pausing freezes rotation in place; resuming continues smoothly (no jump).
+- Switching axis resets spinGroup's rotation to (0,0,0) first, so rotation never compounds across multiple axes — always exactly one active axis.
+- Applied via: \`spinGroup.rotation[axis] += deltaSeconds * (2π / periodSeconds)\`.
+
+### 2. Cube Self-Rotation ("tumble", per object, independent of position)
+- Each object is assigned, at Build time, a random normalized 3D axis and a random speed multiplier (0.5×–1.5×) — stored per-object so tumbling looks organic, not synchronized.
+- "Tumble Speed" slider: degrees/second base rate (range 0–360, default 60).
+- Animate Tumble toggle (default OFF).
+- Applied via \`mesh.rotateOnAxis(objectAxis, degToRad(speed) * speedMultiplier * deltaSeconds)\` — rotates in local space, compounds correctly on top of the initial random tilt from the Randomness jitter.
+
+---
+
+## CONTROL PANEL — ACCORDION SECTIONS
+
+Five sections, in this order: **Camera**, **Lights**, **Geometry Formation**, **Geometry Animation**, **System Settings**.
+- A clickable header bar (10px DM Mono, uppercase, white, letter-spacing 0.12em) with a chevron SVG arrow that rotates 180° when collapsed.
+- A section-body that animates open/closed using max-height transition (0.28s ease).
+- **All sections CLOSED by default on page load** (not open).
+- Section body rows use a thin border-bottom: 1px solid var(--border) between each row.
+
+### CAMERA SECTION
+1. FOV slider (range 20–100, default 45°) — updates camera.fov and calls camera.updateProjectionMatrix() on input.
+2. Auto-Rotate toggle (default OFF) — controls controls.autoRotate.
+3. Speed slider (0.1–10, step 0.1, default 1.0) — controls controls.autoRotateSpeed.
+4. Damping toggle (default ON) — controls controls.enableDamping.
+
+### LIGHTS SECTION
+1. Exposure slider (0.1–3.0, default 1.0) — controls renderer.toneMappingExposure.
+2. Ambient — intensity slider (0–2, default 0.4) + ON/OFF toggle.
+3. Key Light — intensity slider (0–5, default 1.5) + ON/OFF toggle.
+4. Fill Light — intensity slider (0–3, default 0.6) + ON/OFF toggle.
+5. Light Display toggle (default OFF) — shows/hides DirectionalLightHelper objects.
+6. Shadows toggle (default ON) — enables/disables renderer.shadowMap.enabled and ground.receiveShadow.
+
+### GEOMETRY FORMATION SECTION
+1. Geometry dropdown — seed shape, see list above (default Box).
+2. Geo Count slider (1–200, default 60).
+3. Min Size slider (0.05–1.5, default 0.25) and Max Size slider (0.05–1.5, default 0.45) — self-clamping: dragging Min past Max nudges Max up and vice versa, so the range is always valid.
+4. Shape dropdown — formation macro-shape: Helix / Spiral, Double Helix, Sphere, Torus, Grid / Lattice, Random Scatter.
+5. Shape-specific parameter rows that show/hide based on the selected Shape (Radius for helix/doubleHelix/sphere/torus; Height and Turns for helix/doubleHelix; Tube Radius for torus; Spacing for grid; Spread for random).
+6. Randomness slider (0–1, default 0.15) — see jitter formula above.
+7. Animate toggle (default ON) — controls the Build-tween-in behaviour.
+8. Build button — regenerates all objects from current parameters.
+9. Static Offset sub-section (labelled "Static Offset (shape setup)"): Rotate X, Rotate Y, Rotate Z sliders (0–360°, default 0) — apply live to cubeGroup.rotation, no rebuild needed.
+
+### GEOMETRY ANIMATION SECTION
+1. "Formation Spin (whole group)" sub-heading, then: Spin Axis dropdown (X/Y/Z, default Y), Full Turn slider (2–300s, default 60s), Animate Spin toggle (default OFF).
+2. "Cube Self-Rotation (per cube)" sub-heading, then: Tumble Speed slider (0–360°/s, default 60), Animate Tumble toggle (default OFF).
+
+### SYSTEM SETTINGS SECTION
+1. Reset Camera button — restores camera to default position (6, 4, 8), target (0,0,0), and FOV 45°.
+2. Reset Lights button — restores Exposure, Ambient/Key/Fill intensities + on/off toggles, Light Display, and Shadows to their startup defaults, driven by a single defaults object (not hardcoded inline) so the "default" state is easy to adjust later.
+3. Grid toggle (default ON) — sets grid.visible.
+4. Axis Gizmo toggle (default ON) — shows/hides the XYZ gizmo render pass.
+5. Grid Colour picker (native <input type="color">, default #555555) — rebuilds the grid geometry on change (dispose old geometry/material first), deriving the division-line colour automatically from the picked colour.
+6. Export Prompt button — downloads a .txt file containing this full reconstruction prompt.
+
+---
+
+## UI COMPONENT SPECS
+
+### Sliders
+- Track: 2px height, background #9b9b97, border-radius 2px, -webkit-appearance: none.
+- Thumb: 12px circle, background var(--accent) #378ADD, scales to 1.3x on hover.
+- Value readout to the right, 11px DM Mono, colour var(--muted), fixed width, right-aligned.
+
+### Toggle switches
+- Hidden checkbox input with a styled track div and thumb div as siblings.
+- Track: 34x18px, border-radius 18px, background var(--border) when OFF, rgba(55,138,221,0.35) when ON.
+- Thumb: 12px circle, top/left 3px, background var(--muted) when OFF, var(--accent) when ON, transitions with transform: translateX(16px).
+
+### Select dropdowns
+- Custom-styled native <select>: dark background rgba(255,255,255,0.04), 1px border rgba(255,255,255,0.14), 4px border-radius, DM Sans 12px, custom chevron SVG background-image (no native OS arrow).
+
+### Color swatch input
+- Native <input type="color"> styled via ::-webkit-color-swatch-wrapper / ::-webkit-color-swatch: 32×22px, 1px border, 4px border-radius, transparent background so only the picked colour shows through.
+
+### Buttons (Reset Camera, Reset Lights, Export Prompt, Build)
+- Reset/Export buttons: background transparent, border 1px solid rgba(255,255,255,0.18), border-radius 6px, colour #ffffff, font DM Mono 10px uppercase letter-spacing 0.08em. Hover: background rgba(255,255,255,0.08), border-color rgba(255,255,255,0.32).
+- Build button: filled with var(--accent) background, white text, same font treatment, slightly bolder — visually distinct as the primary action in its section.
+
+---
+
+## GENERAL NOTES
+
+- Single self-contained HTML file, no build step.
+- Three.js and OrbitControls loaded as ES modules via importmap from cdn.jsdelivr.net.
+- renderer.autoClear = false to allow the gizmo secondary render pass.
+- FPS counter updates every 500ms.
+- On window resize, update renderer size and camera aspect ratio.
+- Both rotation-animation systems and the build-in tween share a single \`performance.now()\`-based delta per frame — don't run separate independent timers for each, to keep them in sync and avoid drift.
+`;
+
+  const blob = new Blob([prompt], { type: 'text/plain' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href     = url;
+  a.download = '3d-environment-prompt.txt';
+  a.click();
+  URL.revokeObjectURL(url);
+});
+
+// ── ACCORDION ────────────────────────────────────────────
+document.querySelectorAll('.section-header').forEach(header => {
+  header.addEventListener('click', () => {
+    const section = document.getElementById(header.dataset.target);
+    section.classList.toggle('open');
+  });
+});
+
+// ── FORMATION UI ─────────────────────────────────────────
+bindSlider('sliderCubeCount',  'valCubeCount',  0, '', () => {});
+bindSlider('sliderSizeMin',    'valSizeMin',    2, '', () => {});
+bindSlider('sliderSizeMax',    'valSizeMax',    2, '', () => {});
+bindSlider('sliderRandomness', 'valRandomness', 2, '', () => {});
+bindSlider('sliderRadius',     'valRadius',     1, '', () => {});
+bindSlider('sliderHeight',     'valHeight',     1, '', () => {});
+bindSlider('sliderTurns',      'valTurns',      1, '', () => {});
+bindSlider('sliderTube',       'valTube',       2, '', () => {});
+bindSlider('sliderSpacing',    'valSpacing',    2, '', () => {});
+bindSlider('sliderSpread',     'valSpread',     1, '', () => {});
+
+// Keep Min Size <= Max Size at all times (nudge the other handle rather than block input)
+document.getElementById('sliderSizeMin').addEventListener('input', function () {
+  const maxEl = document.getElementById('sliderSizeMax');
+  if (parseFloat(this.value) > parseFloat(maxEl.value)) {
+    maxEl.value = this.value;
+    maxEl.dispatchEvent(new Event('input'));
+  }
+});
+document.getElementById('sliderSizeMax').addEventListener('input', function () {
+  const minEl = document.getElementById('sliderSizeMin');
+  if (parseFloat(this.value) < parseFloat(minEl.value)) {
+    minEl.value = this.value;
+    minEl.dispatchEvent(new Event('input'));
+  }
+});
+
+document.getElementById('selectShape').addEventListener('change', updateFormationParamVisibility);
+updateFormationParamVisibility();
+
+document.getElementById('btnBuild').addEventListener('click', buildFormation);
+
+// ── GLOBAL GROUP ROTATION (live, no rebuild needed) ───────
+bindSlider('sliderRotX', 'valRotX', 0, '°', v => { cubeGroup.rotation.x = THREE.MathUtils.degToRad(v); });
+bindSlider('sliderRotY', 'valRotY', 0, '°', v => { cubeGroup.rotation.y = THREE.MathUtils.degToRad(v); });
+bindSlider('sliderRotZ', 'valRotZ', 0, '°', v => { cubeGroup.rotation.z = THREE.MathUtils.degToRad(v); });
+
+// ── ROTATION ANIMATION (continuous spin, one axis at a time) ──
+document.getElementById('selectSpinAxis').addEventListener('change', function () {
+  // Switching axis resets the spin to 0 on the new axis, so rotation
+  // never ends up compounding across multiple axes at once.
+  spinGroup.rotation.set(0, 0, 0);
+  spinAxis = this.value;
+});
+
+bindSlider('sliderSpinPeriod', 'valSpinPeriod', 0, 's', v => { spinPeriod = v; });
+
+document.getElementById('chkSpinEnable').addEventListener('change', function () {
+  spinEnabled = this.checked;
+  lastSpinFrame = null; // avoid a large delta jump on resume
+});
+
+// ── CUBE SELF-ROTATION (tumble, per cube) ─────────────────
+bindSlider('sliderCubeSpinSpeed', 'valCubeSpinSpeed', 0, '°/s', v => { cubeSpinSpeedDeg = v; });
+
+document.getElementById('chkCubeSpinEnable').addEventListener('change', function () {
+  cubeSpinEnabled = this.checked;
+  lastSpinFrame = null; // shared timestamp — avoid a jump on resume
+});
+
+// Initial formation on load
+buildFormation();
+
+</script>
+</body>
+</html>
