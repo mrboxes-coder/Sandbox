@@ -320,9 +320,10 @@
       "categories": [
         "Canvas",
         "Editing Tool",
-        "Image Editor"
+        "Image Editor",
+        "Video Editing"
       ],
-      "date": "",
+      "date": "2026-05-02",
       "desc": "CaptureLab is a browser tool for capturing screens, recording video, sketching, layering, annotating, cropping, selecting, and exporting visual research material for immersive practice and documentation.",
       "fullDesc": "CaptureLab is a browser-based capture, recording, and visual annotation workspace designed for documenting screen-based activity and developing visual research material.\n   \nIt has three modes. Screenshot mode lets the user select a screen or window, capture still images, store them in a temporary gallery, and edit each capture with its own layer stack. Record mode records screen video, with options for audio, quality, resolution, format, and saved output. Paint mode provides a blank or imported-image canvas for sketching, diagramming, annotation, and visual development.\n   \nThe project includes drawing tools such as pen, eraser, fill, colour picker, text, crop, rectangular selection, lasso selection, and transform/select. Shape tools include rectangles, ellipses, lines, arrows, stars, speech bubbles, and thought bubbles, with editable line/fill styling, opacity, palettes, and layer controls. Layers can be named, hidden, reordered, merged, deleted, selected, moved, scaled, rotated, and edited after creation.\n  \nIt imports screen captures and image files, and exports still images as PNG or JPG at different scales. Recording exports video formats such as MP4 or WebM, depending on browser support.\n  \nFor immersive practice and research, CaptureLab can be used to document interaction flows, analyse software or virtual environments, annotate spatial/visual experiences, create research diaries, capture usability observations, sketch interface ideas, and produce visual evidence from screen-based practice. It is especially useful where screenshots, notes, mark-up, layered interpretation, and short recordings need to stay close together in one lightweight working space.",
       "resourceLabel": "",
@@ -366,7 +367,7 @@
         }
       ],
       "carousel": false,
-      "link": "",
+      "link": "./capture/capturelab.html",
       "tags": [],
       "thumb": "",
       "youtube": "",
