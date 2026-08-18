@@ -629,6 +629,14 @@
         </div>
 
         <div class="row">
+          <span class="row-label">Colour Saturation</span>
+          <div class="slider-wrap">
+            <input type="range" id="sliderSaturation" min="0" max="1" step="0.01" value="0.75">
+            <span class="val" id="valSaturation">0.75</span>
+          </div>
+        </div>
+
+        <div class="row">
           <span class="row-label">Animate</span>
           <label class="switch-wrap">
             <input type="checkbox" id="chkFormationAnimate" checked>
@@ -1046,6 +1054,7 @@ function readFormationParams() {
     shape:      document.getElementById('selectShape').value,
     animate:    document.getElementById('chkFormationAnimate').checked,
     randomness: parseFloat(document.getElementById('sliderRandomness').value),
+    saturation: parseFloat(document.getElementById('sliderSaturation').value),
     radius:     parseFloat(document.getElementById('sliderRadius').value),
     height:     parseFloat(document.getElementById('sliderHeight').value),
     turns:      parseFloat(document.getElementById('sliderTurns').value),
@@ -1076,7 +1085,7 @@ function buildFormation() {
     const geo  = createSeedGeometry(p.geometryType, size);
 
     const hue = p.count <= 1 ? 0.55 : (i / p.count) * 0.75 + 0.55;
-    const color = new THREE.Color().setHSL(hue % 1, 0.55, 0.55);
+    const color = new THREE.Color().setHSL(hue % 1, p.saturation, 0.52);
     const mat = new THREE.MeshLambertMaterial({ color });
     const mesh = new THREE.Mesh(geo, mat);
     mesh.castShadow = true;
@@ -1516,7 +1525,7 @@ Instantiate as: let grid = makeGrid(20, 40, 0x555555, 0x383838); — must be rea
 ## FORMATION OBJECTS — GEOMETRY, MATERIAL, GROUPS
 
 - Up to 200 individual mesh objects (NOT InstancedMesh — count is low enough that per-object geometry/material is simpler and still performant).
-- Each object uses **MeshLambertMaterial** (diffuse-only, no roughness/metalness — those are Standard/Physical-only properties). Colour is per-object HSL gradient: hue = (index / count) * 0.75 + 0.55, saturation 0.55, lightness 0.55.
+- Each object uses **MeshLambertMaterial** (diffuse-only, no roughness/metalness — those are Standard/Physical-only properties). Colour is per-object HSL gradient: hue = (index / count) * 0.75 + 0.55, saturation controlled live by the Colour Saturation slider (0–1, default 0.75), lightness fixed at 0.52 (near-peak-vibrancy point for any hue).
 - castShadow = true, receiveShadow = true on every mesh.
 
 ### Seed geometry (per-object shape, selectable)
@@ -1611,9 +1620,10 @@ Five sections, in this order: **Camera**, **Lights**, **Geometry Formation**, **
 4. Shape dropdown — formation macro-shape: Helix / Spiral, Double Helix, Sphere, Torus, Grid / Lattice, Random Scatter.
 5. Shape-specific parameter rows that show/hide based on the selected Shape (Radius for helix/doubleHelix/sphere/torus; Height and Turns for helix/doubleHelix; Tube Radius for torus; Spacing for grid; Spread for random).
 6. Randomness slider (0–1, default 0.15) — see jitter formula above.
-7. Animate toggle (default ON) — controls the Build-tween-in behaviour.
-8. Build button — regenerates all objects from current parameters.
-9. Static Offset sub-section (labelled "Static Offset (shape setup)"): Rotate X, Rotate Y, Rotate Z sliders (0–360°, default 0) — apply live to cubeGroup.rotation, no rebuild needed.
+7. Colour Saturation slider (0–1, default 0.75) — read live by readFormationParams() at Build time, drives the saturation channel of each object's HSL color.
+8. Animate toggle (default ON) — controls the Build-tween-in behaviour.
+9. Build button — regenerates all objects from current parameters.
+10. Static Offset sub-section (labelled "Static Offset (shape setup)"): Rotate X, Rotate Y, Rotate Z sliders (0–360°, default 0) — apply live to cubeGroup.rotation, no rebuild needed.
 
 ### GEOMETRY ANIMATION SECTION
 1. "Formation Spin (whole group)" sub-heading, then: Spin Axis dropdown (X/Y/Z, default Y), Full Turn slider (2–300s, default 60s), Animate Spin toggle (default OFF).
@@ -1685,6 +1695,7 @@ bindSlider('sliderCubeCount',  'valCubeCount',  0, '', () => {});
 bindSlider('sliderSizeMin',    'valSizeMin',    2, '', () => {});
 bindSlider('sliderSizeMax',    'valSizeMax',    2, '', () => {});
 bindSlider('sliderRandomness', 'valRandomness', 2, '', () => {});
+bindSlider('sliderSaturation', 'valSaturation', 2, '', () => {});
 bindSlider('sliderRadius',     'valRadius',     1, '', () => {});
 bindSlider('sliderHeight',     'valHeight',     1, '', () => {});
 bindSlider('sliderTurns',      'valTurns',      1, '', () => {});
