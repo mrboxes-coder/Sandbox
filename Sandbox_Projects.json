@@ -1029,35 +1029,51 @@
       "youtube": "",
       "videoCaption": "Behind the Scenes",
       "videoRuntime": "",
-      "tunableParams": [],
+      "tunableParams": [
+        "Thrust lerp rate",
+        "Ground roll rate",
+        "Takeoff speed threshold",
+        "Pitch ease duration",
+        "Climb rate multiplier",
+        "Roll cap angle",
+        "Speed-to-control factor",
+        "Radar sweep speed",
+        "HUD colour",
+        "Atmosphere fog density",
+        "Cockpit skin overlay",
+        "Scene cube count",
+        "Star field density",
+        "Sun intensity",
+        "Ambient light level"
+      ],
       "specSheet": [
         {
           "label": "Engine",
-          "value": ""
+          "value": "Three.js r128 — scene, camera, physics, rendering"
         },
         {
           "label": "Data",
-          "value": ""
+          "value": "Procedural cube scatter, GLB/GLTF model import, PNG cockpit skin overlay"
         },
         {
           "label": "Controls",
-          "value": ""
+          "value": "Mouse pitch, roll and yaw · W/S thrust · Space brakes · G landing gear"
         },
         {
           "label": "Instruments",
-          "value": ""
+          "value": "IAS (knots), altitude, VSI, heading, thrust, gear status, attitude gyro, sweep radar"
         },
         {
           "label": "Deploy",
-          "value": ""
+          "value": "Single HTML file, runs locally in Chrome, no server or build tools required"
         },
         {
           "label": "Access",
-          "value": ""
+          "value": "Open file directly in browser, all settings persistent within session"
         },
         {
           "label": "Built With",
-          "value": ""
+          "value": "Claude — iterative, feedback-led development"
         }
       ]
     },
@@ -1158,7 +1174,7 @@
         },
         {
           "label": "Deploy",
-          "value": "Single self-contained HTML file · no build tools · no server · CDN-only dependencies · embedded logo and favicon as base64.  ACCESS Browser-based · open in any modern desktop browser · no installation · no login required.  BUILT WITH Claude — iterative, prompt-led development across a structured single-session build.  TUNABLE PARAMETERS  TARGET VELOCITY, BOID VELOCITY, TURN RATE, BOUNDING BOX HEIGHT, BOUNDING BOX VISIBLE, AMBIENT INTENSITY, KEY LIGHT INTENSITY, FILL LIGHT INTENSITY, EXPOSURE, CAMERA FOV, AUTO ROTATE SPEED, BACKGROUND COLOUR, AXIS GIZMOS, SHADOW TOGGLE, GRID VISIBLE"
+          "value": "Single self-contained HTML file · no build tools · no server · CDN-only dependencies · embedded logo and favicon as base64."
         },
         {
           "label": "Access",
