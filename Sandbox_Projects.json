@@ -590,35 +590,51 @@
       "youtube": "",
       "videoCaption": "Behind the Scenes",
       "videoRuntime": "",
-      "tunableParams": [],
+      "tunableParams": [
+        "Max Speed",
+        "Acceleration Time",
+        "Turn Speed",
+        "Turn Damping",
+        "Turret Speed",
+        "Armour Rating",
+        "Hit Points",
+        "Fuel Capacity",
+        "Shell Life",
+        "Shell Radius",
+        "Fire Rate",
+        "Recoil Snap",
+        "Recoil Recovery",
+        "Explosion Velocity",
+        "Shrapnel Count"
+      ],
       "specSheet": [
         {
           "label": "Engine",
-          "value": ""
+          "value": "Three.js r160 — scene, camera, shadow mapping, GLB load/export."
         },
         {
           "label": "Data",
-          "value": ""
+          "value": "User-supplied GLB tank models · GLTF extras for combat config · normal maps and terrain textures loaded locally."
         },
         {
           "label": "Controls",
-          "value": ""
+          "value": "Mouse turret aim · WASD drive · arrow keys camera orbit · mouse drone pitch and heading · scroll-free shell switching."
         },
         {
           "label": "Instruments",
-          "value": ""
+          "value": "Speed bar, active camera label, shell type indicator, mesh role badges, scene stats (vertices, triangles, materials, meshes)."
         },
         {
           "label": "Deploy",
-          "value": ""
+          "value": "Single self-contained HTML file · no server required · runs from local filesystem or any static host."
         },
         {
           "label": "Access",
-          "value": ""
+          "value": "Open file in browser · no login · no dependencies · fully offline capable."
         },
         {
           "label": "Built With",
-          "value": ""
+          "value": "Claude — iterative, screenshot-led development · Three.js r160 · GLTFExporter · DRACO compression support."
         }
       ]
     },
@@ -682,35 +698,61 @@
       "youtube": "",
       "videoCaption": "Behind the Scenes",
       "videoRuntime": "",
-      "tunableParams": [],
+      "tunableParams": [
+        "Boid Velocity",
+        "Boid Turn Rate",
+        "Princess Velocity",
+        "Target Velocity",
+        "Asteroid Count",
+        "Asteroid Size Min",
+        "Asteroid Size Max",
+        "Asteroid Height Range",
+        "Missile Speed",
+        "Missile Life",
+        "Lock-on Range",
+        "Hull Damage Per Hit",
+        "Invincibility Cooldown",
+        "Debris Count",
+        "Debris Velocity",
+        "Debris Dampening",
+        "Camera FOV",
+        "Orange Mine Count",
+        "Red Mine Count",
+        "Mine Collision Radius",
+        "Crash Rotation Duration",
+        "Scenario Ratio",
+        "Boid Colour",
+        "Princess Colour",
+        "HUD Colour"
+      ],
       "specSheet": [
         {
           "label": "Engine",
-          "value": ""
+          "value": "Three.js r158 ES modules — scene, autonomous agents, real-time rendering"
         },
         {
           "label": "Data",
-          "value": ""
+          "value": "Procedural geometry — parametric asteroid fields, boid steering vectors, particle systems"
         },
         {
           "label": "Controls",
-          "value": ""
+          "value": "Mouse pitch, heading and bank · W/S throttle · left-click missile fire"
         },
         {
           "label": "Instruments",
-          "value": ""
+          "value": "Speed, altitude, heading tape, lock-on range, hull integrity, ammo count"
         },
         {
           "label": "Deploy",
-          "value": ""
+          "value": "Single self-contained HTML file, runs locally in Chrome, no server required"
         },
         {
           "label": "Access",
-          "value": ""
+          "value": "Open file in browser · Esc to pause · F-key debug mode"
         },
         {
           "label": "Built With",
-          "value": ""
+          "value": "Claude Sonnet 4.6 — iterative, conversational development"
         }
       ]
     },
@@ -1189,35 +1231,58 @@
       "youtube": "https://youtu.be/iVa8rVC-qls",
       "videoCaption": "Behind the Scenes",
       "videoRuntime": "",
-      "tunableParams": [],
+      "tunableParams": [
+        "Boid count",
+        "Min speed",
+        "Max speed",
+        "Turn rate",
+        "Perception radius",
+        "Separation weight",
+        "Alignment weight",
+        "Cohesion weight",
+        "Target seek weight",
+        "Constrain to boundary",
+        "Target velocity",
+        "Boundary height",
+        "Camera FOV",
+        "Auto-rotate speed",
+        "Ambient intensity",
+        "Key light intensity",
+        "Fill light intensity",
+        "Exposure",
+        "Background colour",
+        "Wireframe mode",
+        "Shadows",
+        "Axis gizmos"
+      ],
       "specSheet": [
         {
           "label": "Engine",
-          "value": ""
+          "value": "Three.js r158 — scene, camera, shadows, WebGL rendering"
         },
         {
           "label": "Data",
-          "value": ""
+          "value": "Generative · no external APIs · Reynolds' flocking algorithm computed locally at 50 fps"
         },
         {
           "label": "Controls",
-          "value": ""
+          "value": "Orbit, zoom, pan via OrbitControls · accordion panel · sliders, toggles, colour swatches · auto-rotate"
         },
         {
           "label": "Instruments",
-          "value": ""
+          "value": "Live mesh, vertex, triangle and material counts · XYZ camera position HUD · world-axis orientation gizmo"
         },
         {
           "label": "Deploy",
-          "value": ""
+          "value": "Single self-contained HTML file · no build step · no server · runs in any modern browser"
         },
         {
           "label": "Access",
-          "value": ""
+          "value": "Open · no authentication · no login · CDN import only"
         },
         {
           "label": "Built With",
-          "value": ""
+          "value": "Claude (Anthropic) — iterative, prompt-led development with live feedback, incremental builds and real-time debugging"
         }
       ]
     },
@@ -1790,35 +1855,51 @@
       "youtube": "",
       "videoCaption": "Behind the Scenes",
       "videoRuntime": "",
-      "tunableParams": [],
+      "tunableParams": [
+        "FOV",
+        "Exposure",
+        "Ambient Intensity",
+        "Key Light Intensity",
+        "Fill Light Intensity",
+        "Auto-Rotate Speed",
+        "Shadow Bias",
+        "Shadow Map Size",
+        "Key Light Position",
+        "Fill Light Position",
+        "Grid Divisions",
+        "Grid Size",
+        "Camera Position",
+        "Damping Factor",
+        "Tone Mapping Exposure"
+      ],
       "specSheet": [
         {
           "label": "Engine",
-          "value": ""
+          "value": "Three.js r160 — scene, camera, directional lighting, shadow mapping, and WebGL rendering via a single-pass render loop with a secondary gizmo scene."
         },
         {
           "label": "Data",
-          "value": ""
+          "value": "Static scene geometry — ground plane, custom grid via vertex-coloured LineSegments. No external data sources or runtime data pipelines."
         },
         {
           "label": "Controls",
-          "value": ""
+          "value": "Sliders — FOV, exposure, ambient intensity, key light intensity, fill light intensity, auto-rotate speed · Toggles — grid, axis gizmo, auto-rotate, damping, ambient, key light, fill light, light display, shadows · Button — reset camera to default."
         },
         {
           "label": "Instruments",
-          "value": ""
+          "value": "Live FPS counter · XYZ axis orientation gizmo (top-right viewport corner) · Real-time FOV readout · Per-light intensity readouts."
         },
         {
           "label": "Deploy",
-          "value": ""
+          "value": "Single self-contained HTML file · no build tools · no server · CDN-only dependencies (Three.js r160 via jsDelivr) · opens directly in any modern desktop browser."
         },
         {
           "label": "Access",
-          "value": ""
+          "value": "Browser-based · open in any modern desktop browser · no installation · no login required · no backend."
         },
         {
           "label": "Built With",
-          "value": ""
+          "value": "Claude — iterative, prompt-led development across a structured multi-session build."
         }
       ]
     },
@@ -1983,35 +2064,56 @@
       "youtube": "",
       "videoCaption": "Behind the Scenes",
       "videoRuntime": "",
-      "tunableParams": [],
+      "tunableParams": [
+        "Diff Threshold",
+        "Resolution",
+        "Min Velocity",
+        "Max Velocity",
+        "Random Factor",
+        "Duration (s)",
+        "Gravity",
+        "Dampening",
+        "Weight",
+        "Min Lifespan",
+        "Max Lifespan",
+        "Max Offset",
+        "Brightness Delay",
+        "Brush Size",
+        "Hold Duration",
+        "Direction Up",
+        "Direction Down",
+        "Direction Left",
+        "Direction Right",
+        "Render in Reverse"
+      ],
       "specSheet": [
         {
           "label": "Engine",
-          "value": ""
+          "value": "Canvas 2D · WebCodecs VideoEncoder · Pure-JS MP4 muxer"
         },
         {
           "label": "Data",
-          "value": ""
+          "value": "Two user-supplied images (PNG / JPG) · Per-pixel RGBA arrays · Uint8Array diff mask"
         },
         {
           "label": "Controls",
-          "value": ""
+          "value": "Mouse drag — paintbrush mask editing · Drag handles — Fuse Wire start / end · Sliders — velocity, lifespan, gravity, dampening · Wacom tablet compatible"
         },
         {
           "label": "Instruments",
-          "value": ""
+          "value": "Diff mask preview · Selected pixel count · Frame progress bar · File size readout · Per-mode parameter groups"
         },
         {
           "label": "Deploy",
-          "value": ""
+          "value": "Single self-contained HTML file · Runs locally from file:// · No server, no dependencies, no build step"
         },
         {
           "label": "Access",
-          "value": ""
+          "value": "Open in Chrome or Edge 94+ · WebCodecs required for MP4 export · No login or install"
         },
         {
           "label": "Built With",
-          "value": ""
+          "value": "Claude — iterative, screenshot-led development"
         }
       ]
     },
