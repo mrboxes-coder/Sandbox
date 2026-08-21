@@ -1,0 +1,2127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pixel Dust — Export</title>
+<style>
+:root {
+  color-scheme: dark;
+  --bg:           #101014;
+  --topbar:       #1d1d22;
+  --panel:        #1a1a20;
+  --surface:      #26272f;
+  --surface-mid:  #2c2d35;
+  --border:       #343642;
+  --text:         #f2f3f7;
+  --muted:        #a5abc0;
+  --sub:          #b4bad0;
+  --accent:       #3b97ee;
+  --accent-light: #71baff;
+  --accent-fill:  #163452;
+  --danger:       #ff3838;
+  --mono: "IBM Plex Mono","Cascadia Mono",Consolas,monospace;
+  --sans: Inter,ui-sans-serif,system-ui,-apple-system,sans-serif;
+  --lbl: 11px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { width: 100%; min-height: 100%; background: var(--bg); color: var(--text); font-family: var(--sans); }
+body { display: grid; grid-template-rows: auto 1fr; }
+
+/* ── Topbar ── */
+.topbar {
+  display: flex; align-items: flex-start; justify-content: space-between; gap: 16px;
+  padding: 14px 18px 12px;
+  border-bottom: 1px solid var(--border); background: var(--topbar);
+}
+.brand { display: flex; align-items: flex-start; gap: 12px; }
+.brand-icon { width: 36px; height: 36px; flex: 0 0 auto; margin-top: 2px; }
+h1 { font-size: 26px; font-weight: 700; color: var(--text); white-space: nowrap; letter-spacing: -0.01em; line-height: 1.15; }
+h1 span { color: var(--accent); }
+.subtitle { font-size: 13px; color: var(--muted); margin-top: 4px; line-height: 1.4; max-width: 340px; }
+
+/* ── Layout ── */
+main { display: grid; grid-template-columns: 270px minmax(0,1fr); min-height: 0; }
+.tool-panel {
+  height: calc(100vh - 104px); overflow-y: auto;
+  border-right: 1px solid var(--border); background: var(--panel);
+  scrollbar-width: thin; scrollbar-color: var(--accent) var(--bg);
+}
+.workspace {
+  min-height: calc(100vh - 104px);
+  background: linear-gradient(rgba(255,255,255,.018) 1px,transparent 1px),
+              linear-gradient(90deg,rgba(255,255,255,.018) 1px,transparent 1px), #0d0d11;
+  background-size: 28px 28px;
+  padding: 16px; display: flex; flex-direction: column; gap: 12px; overflow-y: auto;
+}
+
+/* ── Accordion ── */
+.accordion { border-top: 1px solid var(--border); }
+.accordion:last-child { border-bottom: 1px solid var(--border); }
+.accordion-heading {
+  width: 100%; min-height: 38px;
+  display: flex; align-items: center; justify-content: space-between;
+  background: var(--surface-mid); color: var(--text); border: none;
+  padding: 0 12px; font-family: var(--mono); font-size: var(--lbl); font-weight: 800;
+  letter-spacing: 0.14em; text-transform: uppercase; cursor: pointer;
+}
+.accordion-heading:hover { color: #fff; background: #313240; }
+.accordion-heading::after { content: "+"; color: var(--accent); font-size: 16px; font-weight: 400; line-height: 1; flex-shrink: 0; }
+.accordion.open .accordion-heading::after { content: "−"; }
+.accordion-body { display: none; padding: 12px; gap: 8px; flex-direction: column; border-top: 1px solid var(--border); }
+.accordion.open .accordion-body { display: flex; }
+
+/* ── Buttons ── */
+.button, .btn, .icon-button {
+  border: 1px solid var(--border); background: var(--surface); color: var(--sub);
+  font-family: var(--mono); font-size: var(--lbl); font-weight: 700;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  min-height: 30px; padding: 0 10px;
+  display: inline-flex; align-items: center; justify-content: center; gap: 5px;
+  cursor: pointer; border-radius: 2px; text-decoration: none;
+  transition: border-color .12s, background .12s, color .12s;
+}
+.button:hover, .btn:hover, .icon-button:hover { border-color: var(--accent); background: var(--accent-fill); color: #fff; }
+.button.active, .btn.active { border-color: var(--accent); background: var(--accent-fill); color: var(--accent-light); }
+.button.active:hover, .btn.active:hover { color: #fff; }
+.button.danger, .btn.erase { border-color: var(--danger); color: var(--danger); background: var(--surface); }
+.button.danger:hover, .btn.erase:hover { background: var(--danger); border-color: var(--danger); color: #fff; }
+.button.danger.active, .btn.erase.active { background: rgba(255,56,56,.15); border-color: var(--danger); color: var(--danger); }
+.button:disabled, .btn:disabled { opacity: .35; cursor: not-allowed; pointer-events: none; }
+.button-row { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+.button.full { width: 100%; min-height: 34px; }
+
+/* ── Mode buttons ── */
+.mode-bar { display: flex; gap: 4px; flex-wrap: wrap; }
+.mode, .mode-btn {
+  min-width: 80px; min-height: 30px; border: 1px solid var(--border);
+  border-radius: 2px; background: var(--surface); color: var(--sub);
+  font-family: var(--mono); font-size: 10px; font-weight: 800;
+  letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer;
+  display: inline-flex; align-items: center; justify-content: center;
+  transition: border-color .12s, background .12s, color .12s;
+}
+.mode:hover, .mode-btn:hover { border-color: var(--accent); color: #fff; }
+.mode.active, .mode-btn.active { border-color: var(--accent); background: var(--accent-fill); color: var(--accent-light); }
+
+/* ── Range fields ── */
+.range-field {
+  display: grid; grid-template-columns: minmax(0,1fr) 50px;
+  align-items: center; gap: 2px;
+  font-family: var(--mono); font-size: 10px; font-weight: 800;
+  letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted);
+}
+.range-field span { grid-column: 1 / -1; }
+.range-field small { grid-column: 1 / -1; font-size: 9px; color: #555; text-transform: none; letter-spacing: 0; margin-top: 1px; }
+.range-field input[type=range] { min-width: 0; width: 100%; height: 3px; accent-color: var(--accent); cursor: pointer; }
+.range-field output { justify-self: end; color: var(--sub); font-size: var(--lbl); font-variant-numeric: tabular-nums; text-transform: none; letter-spacing: 0; }
+
+/* ── Checkboxes ── */
+.check-row {
+  display: flex; align-items: center; gap: 7px;
+  min-height: 28px; padding: 5px 8px;
+  border: 1px solid var(--border); background: var(--surface);
+  font-family: var(--mono); font-size: var(--lbl); font-weight: 700;
+  color: var(--sub); letter-spacing: 0.04em; cursor: pointer; border-radius: 2px;
+}
+.check-row input[type=checkbox] { width: 12px; height: 12px; accent-color: var(--accent); cursor: pointer; flex-shrink: 0; }
+
+/* ── Toggle switch ── */
+.toggle-wrap { display: inline-flex; align-items: center; cursor: pointer; }
+.toggle-wrap input { display: none; }
+.toggle-track {
+  width: 32px; height: 18px; background: var(--surface-mid);
+  border: 1px solid var(--border); border-radius: 9px; position: relative;
+  transition: background .2s, border-color .2s;
+}
+.toggle-wrap input:checked + .toggle-track { background: var(--accent-fill); border-color: var(--accent); }
+.toggle-thumb {
+  position: absolute; top: 2px; left: 2px;
+  width: 12px; height: 12px; background: var(--muted); border-radius: 50%;
+  transition: left .2s, background .2s;
+}
+.toggle-wrap input:checked + .toggle-track .toggle-thumb { left: 16px; background: var(--accent-light); }
+
+/* ── Sub-headings inside accordions ── */
+.sub-heading {
+  font-family: var(--mono); font-size: 9px; font-weight: 800;
+  letter-spacing: 0.14em; text-transform: uppercase; color: #555;
+  padding: 5px 0 2px; border-top: 1px solid var(--border); margin-top: 2px;
+}
+.sub-heading:first-child { border-top: none; margin-top: 0; padding-top: 2px; }
+.major-heading {
+  font-family: var(--mono); font-size: var(--lbl); font-weight: 800;
+  letter-spacing: 0.14em; text-transform: uppercase; color: var(--text);
+  padding: 8px 0 4px; border-top: 1px solid var(--border); margin-top: 4px;
+}
+
+/* ── Readout / info panels ── */
+.readout {
+  font-family: var(--mono); font-size: 10px; color: var(--muted);
+  background: var(--bg); border: 1px solid var(--border);
+  padding: 6px 8px; line-height: 1.5;
+}
+.readout span { color: var(--accent-light); }
+.info-box {
+  font-family: var(--mono); font-size: 10px; color: var(--muted);
+  background: var(--bg); border: 1px solid var(--border);
+  padding: 6px 8px; line-height: 1.6;
+}
+
+/* ── Progress ── */
+.progress-bar-wrap { width: 100%; background: var(--bg); border: 1px solid var(--border); height: 4px; overflow: hidden; }
+.progress-bar { height: 100%; background: var(--accent); width: 0%; transition: width .08s; }
+.status-text { font-family: var(--mono); font-size: 10px; color: var(--muted); min-height: 14px; padding-top: 2px; }
+
+/* ── Upload zones ── */
+.upload-zone {
+  border: 1px dashed var(--border); background: var(--surface);
+  padding: 10px; text-align: center; min-height: 70px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px;
+}
+.upload-zone.loaded { border-style: solid; border-color: var(--accent); }
+.upload-zone .lbl { font-family: var(--mono); font-size: 10px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+.upload-zone .fname { font-family: var(--mono); font-size: 10px; color: var(--accent-light); word-break: break-all; max-width: 100%; }
+.upload-zone .thumb { width: 220px; height: 148px; object-fit: cover; border: 1px solid var(--border); display: block; margin: 0 auto; }
+
+/* ── Workspace canvas area ── */
+.ws-label { font-family: var(--mono); font-size: 10px; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); }
+#mask-wrap { display: none; }
+#mask-wrap > * + * { margin-top: 8px; }
+#canvas-container {
+  position: relative; display: inline-block;
+  border: 1px solid var(--border); overflow: hidden;
+  max-width: 100%; cursor: crosshair;
+}
+#mask-canvas { display: block; max-width: 100%; }
+#paint-canvas, #cursor-canvas, #fuse-canvas {
+  position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none;
+}
+.diff-stat { font-family: var(--mono); font-size: 10px; color: var(--muted); line-height: 1.5; }
+.diff-stat span { color: var(--accent-light); }
+/* #preview-wrap and #main-canvas defined in animate stage section above */
+#download-panel { display: none; border: 1px solid var(--border); background: var(--panel); padding: 12px; }
+#download-panel > * + * { margin-top: 8px; }
+
+/* ── Hold duration inline row ── */
+#hold-duration-wrap { padding: 5px 8px 3px; border: 1px solid var(--border); background: var(--bg); gap: 8px; align-items: center; }
+
+/* ── Vsep ── */
+.vsep { width: 1px; height: 20px; background: var(--border); flex-shrink: 0; }
+
+code { font-family: var(--mono); font-size: 10px; color: #555; }
+
+/* ── Animate tab workspace ── */
+#animate-stage {
+  position: relative; flex: 1; min-height: 0;
+  background: #08090b; overflow: hidden;
+  display: flex; align-items: center; justify-content: center;
+}
+#animate-bg {
+  display: block; max-width: 100%; max-height: 100%;
+  width: 100%; height: 100%; object-fit: contain;
+}
+#preview-wrap {
+  position: absolute; inset: 0;
+  display: none;
+  background: #08090b;
+}
+#main-canvas { display: block; width: 100%; height: 100%; object-fit: contain; }
+
+@media (max-width: 760px) {
+  main { grid-template-columns: 1fr; }
+  .tool-panel { height: auto; max-height: 52vh; border-right: 0; border-bottom: 1px solid var(--border); }
+}
+
+/* ── Tab bar ── */
+.tab-bar {
+  display: flex; gap: 0;
+  background: var(--topbar); border-bottom: 2px solid var(--border);
+  padding: 0 18px;
+}
+.tab {
+  min-height: 36px; padding: 0 20px;
+  background: transparent; border: none;
+  border-bottom: 2px solid transparent; margin-bottom: -2px;
+  font-family: var(--mono); font-size: var(--lbl); font-weight: 800;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--muted); cursor: pointer;
+  transition: color .12s, border-color .12s;
+}
+.tab:hover { color: var(--text); }
+.tab.active { color: var(--accent-light); border-bottom-color: var(--accent); }
+
+/* Tab panel layout */
+.tab-panel { min-height: 0; }
+
+/* ── Dissolve compass ── */
+.compass-wrap { display: flex; align-items: center; gap: 14px; padding: 6px 0; }
+#dissolve-compass { cursor: crosshair; flex-shrink: 0; overflow: visible; }
+#compass-handle { cursor: grab; }
+#compass-handle:active { cursor: grabbing; }
+.compass-readout { display: flex; flex-direction: column; gap: 3px; }
+.compass-readout output {
+  font-family: var(--mono); font-size: 22px; font-weight: 700;
+  color: var(--text); letter-spacing: -0.02em; line-height: 1;
+}
+.compass-readout span {
+  font-family: var(--mono); font-size: 9px; font-weight: 800;
+  color: #555; text-transform: uppercase; letter-spacing: 0.12em;
+}
+</style>
+</head>
+<body>
+
+<!-- ══ Topbar ══ -->
+<header class="topbar">
+  <div class="brand">
+    <svg class="brand-icon" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M22 3L7 20H17.5L14 33L29 16H18.5L22 3Z" stroke="#3b97ee" stroke-width="2.8" stroke-linejoin="round" stroke-linecap="round"/>
+    </svg>
+    <div>
+      <h1>Pixel <span>Dust</span></h1>
+      <div class="subtitle">Pixel-level image animation &middot; H.264 MP4 export</div>
+    </div>
+  </div>
+</header>
+<nav class="tab-bar">
+  <button class="tab active" data-tab="1">&#9654; Setup</button>
+  <button class="tab" data-tab="2">&#9654; Animate</button>
+</nav>
+<main>
+
+<!-- ══ Sidebar ══ -->
+<aside class="tool-panel">
+
+  <div class="tab-panel" data-tab="1">
+<!-- Images -->
+  <section class="accordion open">
+    <button class="accordion-heading" type="button">Images</button>
+    <div class="accordion-body">
+      <div class="upload-zone" id="zone-a">
+        <div class="lbl">Image A &mdash; Background</div>
+        <button class="button" id="btn-browse-a">Choose File</button>
+      </div>
+      <div class="upload-zone" id="zone-b">
+        <div class="lbl">Image B &mdash; With Object</div>
+        <button class="button" id="btn-browse-b">Choose File</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Diff & Selection -->
+  <section class="accordion open">
+    <button class="accordion-heading" type="button">Diff &amp; Selection</button>
+    <div class="accordion-body">
+      <label class="range-field">
+        <span>Diff Threshold</span>
+        <input type="range" min="1" max="80" value="15" id="threshold">
+        <output id="threshold-val">15</output>
+      </label>
+      <label class="range-field">
+        <span>Resolution</span>
+        <input type="range" min="1" max="5" value="1" step="1" id="resolution">
+        <output id="resolution-val">1 px</output>
+        <small>(single pixel)</small>
+      </label>
+
+      <div class="sub-heading">Paint Mask</div>
+      <div class="button-row">
+        <button class="button active" id="btn-add">+ Add</button>
+        <button class="button danger" id="btn-erase">&minus; Erase</button>
+        <div class="vsep"></div>
+        <button class="button" id="btn-reset-paint">Reset</button>
+      </div>
+      <label class="range-field">
+        <span>Brush Size</span>
+        <input type="range" min="1" max="200" value="100" id="brush-size">
+        <output id="brush-size-val">100 px</output>
+      </label>
+      <div class="readout" id="diff-stat">&mdash;</div>
+    </div>
+  </section>
+
+    </div>
+
+  <div class="tab-panel" data-tab="2" style="display:none">
+<!-- Animation -->
+  <section class="accordion open">
+    <button class="accordion-heading" type="button">Animation</button>
+    <div class="accordion-body">
+      <div class="mode-bar">
+        <button class="mode mode-btn active" id="mode-dissolve" data-mode="dissolve">Dissolve &rarr;</button>
+        <button class="mode mode-btn" id="mode-explode" data-mode="explode">Explode</button>
+      </div>
+
+      <!-- Dissolve Right -->
+      <div id="settings-dissolve" class="mode-settings">
+        <label class="range-field">
+          <span>Ease In (frames)</span>
+          <input type="range" min="0" max="50" value="0" step="1" id="dissolve-ease">
+          <output id="dissolve-ease-val">0 f</output>
+        </label>
+
+        <div class="major-heading">Fuse Wire</div>
+        <div style="display:flex;align-items:center;gap:8px;padding:3px 0">
+          <label class="toggle-wrap">
+            <input type="checkbox" id="dissolve-fuse-on">
+            <span class="toggle-track"><span class="toggle-thumb"></span></span>
+          </label>
+          <span style="font-family:var(--mono);font-size:10px;color:var(--muted)" id="dissolve-fuse-status">OFF &mdash; random offsets</span>
+        </div>
+        <div id="dissolve-fuse-hint" class="info-box" style="display:none">
+          Drag <span style="color:#f0a060">&#9679; S</span> and <span style="color:var(--accent)">&#9679; E</span> handles on the <strong style="color:var(--accent-light)">Diff Mask (Tab 1 &rarr; Setup)</strong>.<br>
+          Offset = dist(pixel&rarr;S) &times; (Max Offset &divide; dist S&rarr;E)
+        </div>
+        <label class="range-field">
+          <span>Max Offset (frames)</span>
+          <input type="range" min="0" max="200" value="0" step="1" id="dissolve-offset">
+          <output id="dissolve-offset-val">0 f</output>
+        </label>
+        <div id="dissolve-fuse-bright-wrap" style="display:none">
+          <label class="range-field" style="margin-top:4px">
+            <span>Brightness Delay (frames)</span>
+            <input type="range" min="0" max="50" value="0" step="1" id="dissolve-fuse-bright">
+            <output id="dissolve-fuse-bright-val">0 f</output>
+            <small style="font-size:11px;color:var(--muted)">White &rarr; +0 f &nbsp;&middot;&nbsp; Black &rarr; +max delay</small>
+          </label>
+        </div>
+
+        <div class="major-heading">Velocity</div>
+        <label class="range-field">
+          <span>Min Velocity (dark)</span>
+          <input type="range" min="0" max="2" value="0" step="0.01" id="vmin">
+          <output id="vmin-val">0.00</output>
+        </label>
+        <label class="range-field">
+          <span>Max Velocity (bright)</span>
+          <input type="range" min="0" max="2" value="1" step="0.01" id="vmax">
+          <output id="vmax-val">1.00</output>
+        </label>
+        <label class="range-field">
+          <span>Random &plusmn; Factor</span>
+          <input type="range" min="0" max="10" value="0" step="0.1" id="vrand">
+          <output id="vrand-val">0.0 %</output>
+        </label>
+
+        <div class="major-heading">Direction</div>
+        <div class="compass-wrap">
+          <svg id="dissolve-compass" viewBox="0 0 80 80" width="100" height="100">
+            <!-- Degree ring -->
+            <circle cx="40" cy="40" r="30" fill="rgba(26,26,32,0.9)" stroke="#343642" stroke-width="1.5"/>
+            <!-- Minor ticks (every 30°) -->
+            <g stroke="#4a4b5a" stroke-width="1">
+              <line x1="40" y1="10" x2="40" y2="14"/>
+              <line x1="55" y1="13.96" x2="53" y2="17.46"/>
+              <line x1="66.04" y1="25" x2="62.54" y2="27"/>
+              <line x1="70" y1="40" x2="66" y2="40"/>
+              <line x1="66.04" y1="55" x2="62.54" y2="53"/>
+              <line x1="55" y1="66.04" x2="53" y2="62.54"/>
+              <line x1="40" y1="70" x2="40" y2="66"/>
+              <line x1="25" y1="66.04" x2="27" y2="62.54"/>
+              <line x1="13.96" y1="55" x2="17.46" y2="53"/>
+              <line x1="10" y1="40" x2="14" y2="40"/>
+              <line x1="13.96" y1="25" x2="17.46" y2="27"/>
+              <line x1="25" y1="13.96" x2="27" y2="17.46"/>
+            </g>
+            <!-- Cardinal ticks (longer) -->
+            <g stroke="#8f96a8" stroke-width="1.5">
+              <line x1="40" y1="10" x2="40" y2="17"/>
+              <line x1="70" y1="40" x2="63" y2="40"/>
+              <line x1="40" y1="70" x2="40" y2="63"/>
+              <line x1="10" y1="40" x2="17" y2="40"/>
+            </g>
+            <!-- Cardinal labels -->
+            <text x="40" y="8" text-anchor="middle" fill="#8f96a8" font-size="6" font-family="monospace" font-weight="800">N</text>
+            <text x="77" y="43" text-anchor="middle" fill="#8f96a8" font-size="6" font-family="monospace" font-weight="800">E</text>
+            <text x="40" y="79" text-anchor="middle" fill="#8f96a8" font-size="6" font-family="monospace" font-weight="800">S</text>
+            <text x="3"  y="43" text-anchor="middle" fill="#8f96a8" font-size="6" font-family="monospace" font-weight="800">W</text>
+            <!-- Direction line -->
+            <line id="compass-line" x1="40" y1="40" x2="70" y2="40" stroke="#3b97ee" stroke-width="1.5" stroke-linecap="round" opacity="0.7"/>
+            <!-- Center dot -->
+            <circle cx="40" cy="40" r="2.5" fill="#3b97ee"/>
+            <!-- Draggable handle (starts at East = 90°) -->
+            <circle id="compass-handle" cx="70" cy="40" r="6" fill="#3b97ee" stroke="#163452" stroke-width="2"/>
+          </svg>
+          <div class="compass-readout">
+            <output id="dissolve-angle-val">90°</output>
+            <span>direction</span>
+          </div>
+        </div>
+        <label class="range-field" style="margin-top:6px">
+          <span>Turbulence</span>
+          <input type="range" min="0" max="1" value="0" step="0.01" id="dissolve-turbulence">
+          <output id="dissolve-turbulence-val">0.00</output>
+        </label>
+
+        <div class="major-heading">Flutter</div>
+        <label class="range-field">
+          <span>Amplitude</span>
+          <input type="range" min="0" max="1" value="0" step="0.01" id="dissolve-flutter">
+          <output id="dissolve-flutter-val">0.00</output>
+        </label>
+        <label class="range-field">
+          <span>Frequency</span>
+          <input type="range" min="0.5" max="5" value="2" step="0.1" id="dissolve-flutter-freq">
+          <output id="dissolve-flutter-freq-val">2.0</output>
+        </label>
+
+        <div class="major-heading">Wind</div>
+        <div class="compass-wrap">
+          <svg id="drift-compass" viewBox="0 0 80 80" width="100" height="100">
+            <circle cx="40" cy="40" r="28" fill="rgba(26,26,32,0.9)" stroke="#343642" stroke-width="1.5"/>
+            <g stroke="#4a4b5a" stroke-width="1">
+              <line x1="40" y1="12" x2="40" y2="15"/><line x1="52.97" y1="15.34" x2="51.22" y2="18.38"/>
+              <line x1="62.66" y1="27.03" x2="59.62" y2="28.78"/><line x1="68" y1="40" x2="65" y2="40"/>
+              <line x1="62.66" y1="52.97" x2="59.62" y2="51.22"/><line x1="52.97" y1="62.66" x2="51.22" y2="59.62"/>
+              <line x1="40" y1="68" x2="40" y2="65"/><line x1="27.03" y1="62.66" x2="28.78" y2="59.62"/>
+              <line x1="17.34" y1="52.97" x2="20.38" y2="51.22"/><line x1="12" y1="40" x2="15" y2="40"/>
+              <line x1="17.34" y1="27.03" x2="20.38" y2="28.78"/><line x1="27.03" y1="15.34" x2="28.78" y2="18.38"/>
+            </g>
+            <g stroke="#8f96a8" stroke-width="1.5">
+              <line x1="40" y1="12" x2="40" y2="18"/><line x1="68" y1="40" x2="62" y2="40"/>
+              <line x1="40" y1="68" x2="40" y2="62"/><line x1="12" y1="40" x2="18" y2="40"/>
+            </g>
+            <text x="40" y="10" text-anchor="middle" fill="#8f96a8" font-size="6" font-family="monospace" font-weight="800">N</text>
+            <text x="76" y="43" text-anchor="middle" fill="#8f96a8" font-size="6" font-family="monospace" font-weight="800">E</text>
+            <text x="40" y="78" text-anchor="middle" fill="#8f96a8" font-size="6" font-family="monospace" font-weight="800">S</text>
+            <text x="4"  y="43" text-anchor="middle" fill="#8f96a8" font-size="6" font-family="monospace" font-weight="800">W</text>
+            <line id="drift-line" x1="40" y1="40" x2="68" y2="40" stroke="#3b97ee" stroke-width="1.5" stroke-linecap="round" opacity="0.7"/>
+            <circle cx="40" cy="40" r="2.5" fill="#3b97ee"/>
+            <circle id="drift-handle" cx="68" cy="40" r="5.5" fill="#3b97ee" stroke="#163452" stroke-width="2"/>
+          </svg>
+          <div class="compass-readout">
+            <output id="drift-angle-val">90°</output>
+            <span>wind dir</span>
+          </div>
+        </div>
+        <label class="range-field">
+          <span>Strength</span>
+          <input type="range" min="0" max="1" value="0" step="0.01" id="drift-strength">
+          <output id="drift-strength-val">0.00</output>
+        </label>
+
+        <label class="range-field">
+          <span>Gravity</span>
+          <input type="range" min="0" max="2" value="0" step="0.01" id="dissolve-gravity">
+          <output id="dissolve-gravity-val">0.00</output>
+        </label>
+
+        <div class="sub-heading">Lifespan <span style="font-size:0.68rem;color:#444;font-weight:400;text-transform:none;letter-spacing:0">(particles fade out between Min and Max frames &middot; 0 = no fade)</span></div>
+        <label class="range-field">
+          <span>Min Lifespan (frames)</span>
+          <input type="range" min="0" max="250" value="0" step="1" id="dissolve-life-min">
+          <output id="dissolve-life-min-val">0 f</output>
+        </label>
+        <label class="range-field">
+          <span>Max Lifespan (frames)</span>
+          <input type="range" min="0" max="250" value="0" step="1" id="dissolve-life-max">
+          <output id="dissolve-life-max-val">0 f</output>
+        </label>
+
+      </div>
+
+      <!-- Explode -->
+      <div id="settings-explode" class="mode-settings" style="display:none">
+        <div class="major-heading">Velocity</div>
+        <label class="range-field">
+          <span>Min Velocity (dark)</span>
+          <input type="range" min="0" max="2" value="0" step="0.01" id="ex-vmin">
+          <output id="ex-vmin-val">0.00</output>
+        </label>
+        <label class="range-field">
+          <span>Max Velocity (bright)</span>
+          <input type="range" min="0" max="5" value="1" step="0.01" id="ex-vmax">
+          <output id="ex-vmax-val">1.00</output>
+        </label>
+
+        <div class="sub-heading">Direction Weights</div>
+        <label class="range-field">
+          <span>&#8593; Up</span>
+          <input type="range" min="0" max="1" value="0.5" step="0.01" id="ex-up">
+          <output id="ex-up-val">0.50</output>
+        </label>
+        <label class="range-field">
+          <span>&#8595; Down</span>
+          <input type="range" min="0" max="1" value="0.5" step="0.01" id="ex-down">
+          <output id="ex-down-val">0.50</output>
+        </label>
+        <label class="range-field">
+          <span>&#8592; Left</span>
+          <input type="range" min="0" max="1" value="0.5" step="0.01" id="ex-left">
+          <output id="ex-left-val">0.50</output>
+        </label>
+        <label class="range-field">
+          <span>&#8594; Right</span>
+          <input type="range" min="0" max="1" value="0.5" step="0.01" id="ex-right">
+          <output id="ex-right-val">0.50</output>
+        </label>
+
+        <div class="sub-heading">Physics</div>
+        <label class="range-field">
+          <span>Random &plusmn; Factor</span>
+          <input type="range" min="0" max="10" value="0" step="0.1" id="ex-vrand">
+          <output id="ex-vrand-val">0.0 %</output>
+        </label>
+        <label class="range-field">
+          <span>Gravity</span>
+          <input type="range" min="0" max="2" value="0.2" step="0.01" id="ex-gravity">
+          <output id="ex-gravity-val">0.20</output>
+        </label>
+        <label class="range-field">
+          <span>Weight (dark=heavy)</span>
+          <input type="range" min="-1" max="1" value="0" step="0.01" id="ex-weight">
+          <output id="ex-weight-val">0.00</output>
+        </label>
+        <label class="range-field">
+          <span>Dampening</span>
+          <input type="range" min="0" max="0.2" value="0" step="0.001" id="ex-dampen">
+          <output id="ex-dampen-val">0.000</output>
+        </label>
+
+        <div class="sub-heading">Lifespan</div>
+        <label class="range-field">
+          <span>Min Lifespan (frames)</span>
+          <input type="range" min="1" max="200" value="10" step="1" id="ex-life-min">
+          <output id="ex-life-min-val">10 f</output>
+        </label>
+        <label class="range-field">
+          <span>Max Lifespan (frames)</span>
+          <input type="range" min="1" max="200" value="60" step="1" id="ex-life-max">
+          <output id="ex-life-max-val">60 f</output>
+        </label>
+        <label class="check-row">
+          <input type="checkbox" id="ex-life-invert">
+          <span id="life-rule-label">Bright = short &nbsp;&middot;&nbsp; Dark = long</span>
+        </label>
+        <span id="life-invert-label" style="display:none"></span>
+
+        <div class="sub-heading">Start Offset</div>
+        <label class="range-field">
+          <span>Max Offset (frames)</span>
+          <input type="range" min="0" max="200" value="0" step="1" id="ex-offset">
+          <output id="ex-offset-val">0 f</output>
+        </label>
+
+        <div class="major-heading">Fuse Wire</div>
+        <div style="display:flex;align-items:center;gap:8px;padding:3px 0">
+          <label class="toggle-wrap" title="Fuse Wire on/off">
+            <input type="checkbox" id="ex-fuse-on">
+            <span class="toggle-track"><span class="toggle-thumb"></span></span>
+          </label>
+          <span style="font-family:var(--mono);font-size:10px;color:var(--muted)" id="fuse-status">OFF &mdash; random offsets</span>
+        </div>
+        <div id="fuse-hint" class="info-box" style="display:none">
+          Drag <span style="color:#f0a060">&#9679; S</span> and <span style="color:var(--accent)">&#9679; E</span> handles on the <strong style="color:var(--accent-light)">Diff Mask (Tab 1 &rarr; Setup)</strong>.<br>
+          Offset = dist(pixel&rarr;S) &times; (Max Offset &divide; dist S&rarr;E)
+        </div>
+        <div id="fuse-brightness-delay-wrap" style="display:none">
+          <label class="range-field" style="margin-top:4px">
+            <span>Brightness Delay (frames)</span>
+            <input type="range" min="0" max="50" value="0" step="1" id="ex-fuse-bright-delay">
+            <output id="ex-fuse-bright-delay-val">0 f</output>
+            <small style="font-size:11px;color:var(--muted)">White &rarr; +0 f &nbsp;&middot;&nbsp; Black &rarr; +max delay</small>
+          </label>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Output -->
+  <section class="accordion open">
+    <button class="accordion-heading" type="button">Output</button>
+    <div class="accordion-body">
+      <label class="range-field">
+        <span>Duration</span>
+        <input type="range" min="2" max="20" value="5" id="duration">
+        <output id="duration-val">5 s</output>
+      </label>
+
+      <label class="check-row">
+        <input type="checkbox" id="hold-frames">
+        <span>Hold first &amp; last frame</span>
+      </label>
+      <div id="hold-duration-wrap" style="display:none;flex-direction:row;align-items:center;gap:8px;padding:5px 8px;border:1px solid var(--border);background:var(--bg)">
+        <span style="font-family:var(--mono);font-size:10px;color:var(--muted);white-space:nowrap">Duration</span>
+        <input type="range" min="1" max="5" value="1" step="1" id="hold-duration" style="flex:1;height:3px;accent-color:var(--accent)">
+        <output id="hold-duration-val" style="font-family:var(--mono);font-size:10px;color:var(--sub);min-width:24px;white-space:nowrap">1 s</output>
+      </div>
+
+      <label class="check-row">
+        <input type="checkbox" id="render-reverse">
+        <span>Render in Reverse</span>
+      </label>
+
+      <button class="button active full" id="btn-render" disabled>&#9654; Render</button>
+
+      <div class="progress-bar-wrap">
+        <div class="progress-bar" id="progress-bar"></div>
+      </div>
+      <div class="status-text" id="status">Upload both images to begin.</div>
+      <div style="border-top:1px solid var(--border);margin-top:4px;padding-top:8px">
+        <a class="button active full" id="download-link" download="pixel-dust.mp4"
+           style="opacity:0.3;pointer-events:none;width:100%;min-height:34px">
+          &#8595; Download MP4
+        </a>
+        <div style="font-family:var(--mono);font-size:11px;color:var(--muted);margin-top:5px;line-height:1.5">
+          Available after render &middot; H.264 MP4 &middot; Chrome / Edge 94+
+        </div>
+      </div>
+    </div>
+  </section>
+
+  </div>
+
+</aside>
+
+<!-- ══ Workspace ══ -->
+<section class="workspace">
+
+  <div class="tab-panel ws-tab" data-tab="1" style="display:flex;flex-direction:column;gap:12px">
+    <div id="mask-wrap">
+    <div class="ws-label">Diff Mask &nbsp;&middot;&nbsp; Paint to refine selection</div>
+    <div id="canvas-container">
+      <canvas id="mask-canvas"></canvas>
+      <canvas id="paint-canvas"></canvas>
+      <canvas id="cursor-canvas"></canvas>
+      <canvas id="fuse-canvas"></canvas>
+    </div>
+  </div>
+
+    </div>
+
+  <div class="tab-panel ws-tab" data-tab="2" style="display:none;flex-direction:column;gap:0">
+    <div id="animate-stage">
+      <img id="animate-bg" alt="" style="display:none">
+      <div id="preview-wrap" style="display:none">
+        <canvas id="main-canvas"></canvas>
+      </div>
+    </div>
+    <div id="download-panel" style="display:none">
+      <div style="font-family:var(--mono);font-size:10px;color:var(--muted);padding:6px 0">
+        &#10003; Render complete &mdash; download ready in Output panel
+      </div>
+    </div>
+  </div>
+
+</section>
+
+</main>
+
+<input type="file" accept="image/*" id="file-a" style="display:none">
+<input type="file" accept="image/*" id="file-b" style="display:none">
+
+<script>
+const FPS = 25;
+let imgA = null, imgB = null;
+
+// paintMask: null | Uint8Array of size w*h
+// values: 0 = follow diff, 1 = force selected (painted), 2 = force deselected (erased)
+let paintMask = null;
+let diffSelected = null; // boolean array from auto-diff, same size
+let maskW = 0, maskH = 0;
+
+let brushMode = 'add'; // 'add' | 'erase'
+let brushSize = 100;
+let isPainting = false;
+
+// ── Utilities ──────────────────────────────────────────────────────────────
+function setStatus(msg) { document.getElementById('status').textContent = msg; }
+function setProgress(p)  { document.getElementById('progress-bar').style.width = p + '%'; }
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+function readFileAsDataURL(file) {
+  return new Promise((res, rej) => {
+    const r = new FileReader();
+    r.onload  = e => res(e.target.result);
+    r.onerror = () => rej(new Error('FileReader error'));
+    r.readAsDataURL(file);
+  });
+}
+function dataURLtoImg(dataURL) {
+  return new Promise((res, rej) => {
+    const img = new Image();
+    img.onload  = () => res(img);
+    img.onerror = () => rej(new Error('Image decode error'));
+    img.src = dataURL;
+  });
+}
+function getPixelData(img) {
+  const c = document.createElement('canvas');
+  c.width = img.width; c.height = img.height;
+  c.getContext('2d').drawImage(img, 0, 0);
+  return c.getContext('2d').getImageData(0, 0, c.width, c.height);
+}
+
+// ── File loading ───────────────────────────────────────────────────────────
+document.getElementById('btn-browse-a').addEventListener('click', () => document.getElementById('file-a').click());
+document.getElementById('btn-browse-b').addEventListener('click', () => document.getElementById('file-b').click());
+document.getElementById('file-a').addEventListener('change', e => { if (e.target.files[0]) loadImage('a', e.target.files[0]); });
+document.getElementById('file-b').addEventListener('change', e => { if (e.target.files[0]) loadImage('b', e.target.files[0]); });
+
+['a','b'].forEach(w => {
+  const z = document.getElementById('zone-' + w);
+  z.addEventListener('dragover',  e => { e.preventDefault(); z.style.borderColor = '#7cb87a'; });
+  z.addEventListener('dragleave', () => { z.style.borderColor = ''; });
+  z.addEventListener('drop', e => {
+    e.preventDefault(); z.style.borderColor = '';
+    const f = e.dataTransfer.files[0];
+    if (f && f.type.startsWith('image/')) loadImage(w, f);
+  });
+});
+
+async function loadImage(which, file) {
+  setStatus('Loading image ' + which.toUpperCase() + '...');
+  try {
+    const dataURL = await readFileAsDataURL(file);
+    const img     = await dataURLtoImg(dataURL);
+    if (which === 'a') imgA = img; else imgB = img;
+
+    const zone = document.getElementById('zone-' + which);
+    zone.innerHTML = ''; zone.classList.add('loaded');
+    const thumb = document.createElement('img');
+    thumb.src = dataURL; thumb.className = 'thumb'; zone.appendChild(thumb);
+    const fname = document.createElement('div');
+    fname.className = 'fname';
+    fname.textContent = file.name + ' (' + img.width + 'x' + img.height + ')';
+    zone.appendChild(fname);
+    const reBtn = document.createElement('button');
+    reBtn.className = 'btn';
+    reBtn.style.cssText = 'margin-top:0.4rem;padding:0.3rem 0.9rem;font-size:0.72rem';
+    reBtn.textContent = 'Change';
+    reBtn.addEventListener('click', () => document.getElementById('file-' + which).click());
+    zone.appendChild(reBtn);
+
+    if (imgA && imgB) {
+      document.getElementById('btn-render').disabled = false;
+      initMask();
+      setStatus('Both images loaded. Refine selection with the paintbrush, then Render.');
+    } else {
+      setStatus('Image ' + which.toUpperCase() + ' loaded. Now upload Image ' + (which==='a'?'B':'A') + '.');
+    }
+  } catch(err) { setStatus('Failed to load: ' + err.message); console.error(err); }
+}
+
+// ── Sliders ────────────────────────────────────────────────────────────────
+document.getElementById('threshold').addEventListener('input', function() {
+  document.getElementById('threshold-val').textContent = this.value;
+  if (imgA && imgB) initMask();
+});
+document.getElementById('resolution').addEventListener('input', function() {
+  const v = parseInt(this.value);
+  const label = v === 1 ? '(single pixel)' : v + 'x' + v + ' block';
+  document.getElementById('resolution-val').innerHTML = v + ' px <span style="font-size:0.68rem;color:#555">(' + label + ')</span>';
+  if (imgA && imgB) initMask();
+});
+document.getElementById('duration').addEventListener('input', function() {
+  document.getElementById('duration-val').textContent = this.value + ' s';
+});
+document.getElementById('vmin').addEventListener('input', function() {
+  document.getElementById('vmin-val').textContent = parseFloat(this.value).toFixed(2);
+});
+document.getElementById('vmax').addEventListener('input', function() {
+  document.getElementById('vmax-val').textContent = parseFloat(this.value).toFixed(2);
+});
+document.getElementById('vrand').addEventListener('input', function() {
+  document.getElementById('vrand-val').textContent = parseFloat(this.value).toFixed(1) + ' %';
+});
+
+// Ease In
+let dissolveEaseFrames = 0;
+document.getElementById('dissolve-ease').addEventListener('input', function() {
+  dissolveEaseFrames = parseInt(this.value);
+  document.getElementById('dissolve-ease-val').textContent = this.value + ' f';
+});
+
+// ── Dissolve Compass ───────────────────────────────────────────────────────
+let dissolveAngle = 90; // degrees, compass convention: 0=N(up), 90=E(right), 180=S(down)
+
+(function() {
+  const svg    = document.getElementById('dissolve-compass');
+  const handle = document.getElementById('compass-handle');
+  const line   = document.getElementById('compass-line');
+  const readout = document.getElementById('dissolve-angle-val');
+  const CX = 40, CY = 40, R = 30;
+  let dragging = false;
+
+  function updateCompass(deg) {
+    dissolveAngle = ((deg % 360) + 360) % 360;
+    const rad = dissolveAngle * Math.PI / 180;
+    const hx  = (CX + R * Math.sin(rad)).toFixed(2);
+    const hy  = (CY - R * Math.cos(rad)).toFixed(2);
+    handle.setAttribute('cx', hx);
+    handle.setAttribute('cy', hy);
+    line.setAttribute('x2', hx);
+    line.setAttribute('y2', hy);
+    readout.textContent = Math.round(dissolveAngle) + '\u00b0';
+  }
+
+  function angleFromEvent(e) {
+    const rect = svg.getBoundingClientRect();
+    const cx = e.touches ? e.touches[0].clientX : e.clientX;
+    const cy = e.touches ? e.touches[0].clientY : e.clientY;
+    const dx = (cx - rect.left) / rect.width  * 80 - CX;
+    const dy = (cy - rect.top)  / rect.height * 80 - CY;
+    // atan2(dy,dx) → SVG angle (0=right, π/2=down)
+    // Compass: 0=up(N), 90=right(E) → compassAngle = 90 - degrees(svgAngle) + 360
+    const svgDeg = Math.atan2(-dy, dx) * 180 / Math.PI;
+    return (90 - svgDeg + 360) % 360;
+  }
+
+  svg.addEventListener('mousedown',  e => { dragging = true;  updateCompass(angleFromEvent(e)); });
+  svg.addEventListener('touchstart', e => { e.preventDefault(); dragging = true; updateCompass(angleFromEvent(e)); }, {passive:false});
+  window.addEventListener('mousemove',  e => { if (dragging) updateCompass(angleFromEvent(e)); });
+  window.addEventListener('touchmove',  e => { if (dragging) { e.preventDefault(); updateCompass(angleFromEvent(e)); } }, {passive:false});
+  window.addEventListener('mouseup',  () => { dragging = false; });
+  window.addEventListener('touchend', () => { dragging = false; });
+})();
+
+// ── Turbulence ─────────────────────────────────────────────────────────────
+let dissolveTurbulence = 0;
+document.getElementById('dissolve-turbulence').addEventListener('input', function() {
+  dissolveTurbulence = parseFloat(this.value);
+  document.getElementById('dissolve-turbulence-val').textContent = parseFloat(this.value).toFixed(2);
+});
+
+// Flutter
+let dissolveFlutter = 0;
+let dissolveFlutterFreq = 2.0;
+document.getElementById('dissolve-flutter').addEventListener('input', function() {
+  dissolveFlutter = parseFloat(this.value);
+  document.getElementById('dissolve-flutter-val').textContent = parseFloat(this.value).toFixed(2);
+});
+document.getElementById('dissolve-flutter-freq').addEventListener('input', function() {
+  dissolveFlutterFreq = parseFloat(this.value);
+  document.getElementById('dissolve-flutter-freq-val').textContent = parseFloat(this.value).toFixed(1);
+});
+
+// Wind / Drift compass
+let driftAngle = 90;
+let driftStrength = 0;
+(function() {
+  const svg = document.getElementById('drift-compass');
+  const handle = document.getElementById('drift-handle');
+  const line   = document.getElementById('drift-line');
+  const readout = document.getElementById('drift-angle-val');
+  const CX = 40, CY = 40, R = 28;
+  let dragging = false;
+
+  function updateDrift(deg) {
+    driftAngle = ((deg % 360) + 360) % 360;
+    const rad = driftAngle * Math.PI / 180;
+    const hx = (CX + R * Math.sin(rad)).toFixed(2);
+    const hy = (CY - R * Math.cos(rad)).toFixed(2);
+    handle.setAttribute('cx', hx); handle.setAttribute('cy', hy);
+    line.setAttribute('x2', hx);   line.setAttribute('y2', hy);
+    readout.textContent = Math.round(driftAngle) + '°';
+  }
+  function driftAngleFromEvent(e) {
+    const rect = svg.getBoundingClientRect();
+    const cx = e.touches ? e.touches[0].clientX : e.clientX;
+    const cy = e.touches ? e.touches[0].clientY : e.clientY;
+    const dx = (cx - rect.left) / rect.width  * 80 - CX;
+    const dy = (cy - rect.top)  / rect.height * 80 - CY;
+    return (90 - Math.atan2(-dy, dx) * 180 / Math.PI + 360) % 360;
+  }
+  svg.addEventListener('mousedown',  e => { dragging = true;  updateDrift(driftAngleFromEvent(e)); });
+  svg.addEventListener('touchstart', e => { e.preventDefault(); dragging = true; updateDrift(driftAngleFromEvent(e)); }, {passive:false});
+  window.addEventListener('mousemove',  e => { if (dragging) updateDrift(driftAngleFromEvent(e)); });
+  window.addEventListener('touchmove',  e => { if (dragging) { e.preventDefault(); updateDrift(driftAngleFromEvent(e)); } }, {passive:false});
+  window.addEventListener('mouseup',  () => { dragging = false; });
+  window.addEventListener('touchend', () => { dragging = false; });
+})();
+document.getElementById('drift-strength').addEventListener('input', function() {
+  driftStrength = parseFloat(this.value);
+  document.getElementById('drift-strength-val').textContent = parseFloat(this.value).toFixed(2);
+});
+
+// Dissolve Gravity
+let dissolveGravity = 0;
+document.getElementById('dissolve-gravity').addEventListener('input', function() {
+  dissolveGravity = parseFloat(this.value);
+  document.getElementById('dissolve-gravity-val').textContent = parseFloat(this.value).toFixed(2);
+});
+
+// Dissolve Lifespan
+let dissolveLifeMin = 0;
+let dissolveLifeMax = 0;
+document.getElementById('dissolve-life-min').addEventListener('input', function() {
+  dissolveLifeMin = parseInt(this.value);
+  document.getElementById('dissolve-life-min-val').textContent = this.value + ' f';
+});
+document.getElementById('dissolve-life-max').addEventListener('input', function() {
+  dissolveLifeMax = parseInt(this.value);
+  document.getElementById('dissolve-life-max-val').textContent = this.value + ' f';
+});
+
+// Mode switching
+let animMode = 'dissolve';
+document.querySelectorAll('.mode-btn').forEach(btn => {
+  btn.addEventListener('click', function() {
+    animMode = this.dataset.mode;
+    document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+    this.classList.add('active');
+    document.querySelectorAll('.mode-settings').forEach(s => s.style.display = 'none');
+    document.getElementById('settings-' + animMode).style.display = 'block';
+  });
+});
+
+// Explode sliders
+['ex-vmin','ex-vmax','ex-up','ex-down','ex-left','ex-right','ex-gravity'].forEach(id => {
+  document.getElementById(id).addEventListener('input', function() {
+    document.getElementById(id + '-val').textContent = parseFloat(this.value).toFixed(2);
+  });
+});
+document.getElementById('ex-vrand').addEventListener('input', function() {
+  document.getElementById('ex-vrand-val').textContent = parseFloat(this.value).toFixed(1) + ' %';
+});
+document.getElementById('ex-weight').addEventListener('input', function() {
+  const v = parseFloat(this.value);
+  const label = v < -0.05 ? 'bright = heavy' : v > 0.05 ? 'dark = heavy' : 'neutral';
+  document.getElementById('ex-weight-val').innerHTML = v.toFixed(2) + ' <span style="font-size:0.68rem;color:#555">(' + label + ')</span>';
+});
+document.getElementById('ex-dampen').addEventListener('input', function() {
+  const v = parseFloat(this.value);
+  const label = v < 0.01 ? 'none' : v < 0.3 ? 'light' : v < 0.6 ? 'moderate' : v < 0.85 ? 'heavy' : 'strong';
+  document.getElementById('ex-dampen-val').innerHTML = v.toFixed(2) + ' <span style="font-size:0.68rem;color:#555">(' + label + ')</span>';
+});
+['ex-life-min','ex-life-max'].forEach(id => {
+  document.getElementById(id).addEventListener('input', function() {
+    document.getElementById(id + '-val').textContent = parseInt(this.value) + ' f';
+  });
+});
+document.getElementById('ex-offset').addEventListener('input', function() {
+  const v = parseInt(this.value);
+  const label = v === 0 ? '(no offset)' : v < 20 ? '(subtle)' : v < 50 ? '(moderate)' : '(wide spread)';
+  document.getElementById('ex-offset-val').innerHTML = v + ' f <span style="font-size:0.68rem;color:#555">' + label + '</span>';
+});
+
+// ── Fuse Wire ──────────────────────────────────────────────────────────────
+let fuseOn = false;
+// Handle positions stored as fractions (0-1) of mask dimensions
+let fuseStart = { fx: 0.2, fy: 0.5 };
+let fuseEnd   = { fx: 0.8, fy: 0.5 };
+let fuseDragging = null; // 'start' | 'end' | null
+const HANDLE_RADIUS = 10; // px in canvas display space
+
+// Shared helper — fuse canvas active when either mode's fuse is ON
+function fuseActive() {
+  return fuseOn || (typeof dissolveFuseOn !== 'undefined' && dissolveFuseOn);
+}
+function syncFuseCanvas() {
+  document.getElementById('fuse-canvas').style.pointerEvents = fuseActive() ? 'auto' : 'none';
+  drawFuseHandles();
+}
+
+document.getElementById('ex-fuse-on').addEventListener('change', function() {
+  fuseOn = this.checked;
+  document.getElementById('fuse-status').textContent = fuseOn
+    ? 'ON — offset calculated from Start → End' : 'OFF — offsets are random';
+  document.getElementById('fuse-hint').style.display = fuseOn ? 'block' : 'none';
+  document.getElementById('fuse-brightness-delay-wrap').style.display = fuseOn ? 'block' : 'none';
+  syncFuseCanvas();
+});
+
+// Dissolve Fuse Wire
+let dissolveFuseOn         = false;
+let dissolveMaxOffset      = 0;
+let dissolveFuseBrightDelay = 0;
+
+document.getElementById('dissolve-fuse-on').addEventListener('change', function() {
+  dissolveFuseOn = this.checked;
+  document.getElementById('dissolve-fuse-status').textContent = dissolveFuseOn
+    ? 'ON — offset from S→E distance' : 'OFF — random offsets';
+  document.getElementById('dissolve-fuse-hint').style.display        = dissolveFuseOn ? 'block' : 'none';
+  document.getElementById('dissolve-fuse-bright-wrap').style.display = dissolveFuseOn ? 'block' : 'none';
+  syncFuseCanvas();
+});
+document.getElementById('dissolve-offset').addEventListener('input', function() {
+  dissolveMaxOffset = parseInt(this.value);
+  document.getElementById('dissolve-offset-val').textContent = this.value + ' f';
+});
+document.getElementById('dissolve-fuse-bright').addEventListener('input', function() {
+  dissolveFuseBrightDelay = parseInt(this.value);
+  const v = parseInt(this.value);
+  document.getElementById('dissolve-fuse-bright-val').textContent = v + ' f';
+});
+
+function fuseCanvasCoords(e) {
+  const fc = document.getElementById('fuse-canvas');
+  const rect = fc.getBoundingClientRect();
+  const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+  const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+  return {
+    fx: Math.max(0, Math.min(1, (clientX - rect.left) / rect.width)),
+    fy: Math.max(0, Math.min(1, (clientY - rect.top)  / rect.height))
+  };
+}
+
+function hitHandle(fx, fy, handle) {
+  // Compare in display-fraction space with a tolerance
+  const tol = HANDLE_RADIUS / (document.getElementById('fuse-canvas').getBoundingClientRect().width || 400);
+  return Math.hypot(fx - handle.fx, fy - handle.fy) < tol * 2;
+}
+
+function drawFuseHandles() {
+  const fc = document.getElementById('fuse-canvas');
+  if (!fc.width) return;
+  const ctx = fc.getContext('2d');
+  ctx.clearRect(0, 0, fc.width, fc.height);
+  if (!fuseActive()) return;
+
+  const sx = fuseStart.fx * fc.width,  sy = fuseStart.fy * fc.height;
+  const ex = fuseEnd.fx   * fc.width,  ey = fuseEnd.fy   * fc.height;
+  const r  = HANDLE_RADIUS;
+
+  // Start handle — orange
+  ctx.beginPath(); ctx.arc(sx, sy, r, 0, Math.PI*2);
+  ctx.fillStyle = 'rgba(240,150,60,0.9)'; ctx.fill();
+  ctx.strokeStyle = '#fff'; ctx.lineWidth = 1.5; ctx.stroke();
+  ctx.fillStyle = '#fff'; ctx.font = 'bold 9px sans-serif';
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText('S', sx, sy);
+
+  // End handle — blue
+  ctx.beginPath(); ctx.arc(ex, ey, r, 0, Math.PI*2);
+  ctx.fillStyle = 'rgba(80,150,240,0.9)'; ctx.fill();
+  ctx.strokeStyle = '#fff'; ctx.lineWidth = 1.5; ctx.stroke();
+  ctx.fillStyle = '#fff';
+  ctx.fillText('E', ex, ey);
+}
+
+// Fuse canvas sync is handled directly inside initMask
+
+// Pointer events on fuse-canvas
+const fuseCanvas = document.getElementById('fuse-canvas');
+fuseCanvas.style.pointerEvents = 'none';
+
+fuseCanvas.addEventListener('mousedown', e => {
+  if (!fuseActive()) return;
+  const {fx, fy} = fuseCanvasCoords(e);
+  if (hitHandle(fx, fy, fuseStart))      fuseDragging = 'start';
+  else if (hitHandle(fx, fy, fuseEnd))   fuseDragging = 'end';
+});
+fuseCanvas.addEventListener('mousemove', e => {
+  if (!fuseActive() || !fuseDragging) return;
+  const {fx, fy} = fuseCanvasCoords(e);
+  if (fuseDragging === 'start') fuseStart = {fx, fy};
+  else                           fuseEnd   = {fx, fy};
+  drawFuseHandles();
+});
+fuseCanvas.addEventListener('mouseup',   () => { fuseDragging = null; });
+fuseCanvas.addEventListener('mouseleave',() => { fuseDragging = null; });
+fuseCanvas.addEventListener('touchstart', e => {
+  e.preventDefault(); if (!fuseActive()) return;
+  const {fx, fy} = fuseCanvasCoords(e);
+  if (hitHandle(fx, fy, fuseStart))      fuseDragging = 'start';
+  else if (hitHandle(fx, fy, fuseEnd))   fuseDragging = 'end';
+}, {passive: false});
+fuseCanvas.addEventListener('touchmove', e => {
+  e.preventDefault(); if (!fuseActive() || !fuseDragging) return;
+  const {fx, fy} = fuseCanvasCoords(e);
+  if (fuseDragging === 'start') fuseStart = {fx, fy};
+  else                           fuseEnd   = {fx, fy};
+  drawFuseHandles();
+}, {passive: false});
+fuseCanvas.addEventListener('touchend', () => { fuseDragging = null; });
+
+// Cursor style
+fuseCanvas.addEventListener('mousemove', e => {
+  if (!fuseActive()) return;
+  const {fx, fy} = fuseCanvasCoords(e);
+  fuseCanvas.style.cursor = (hitHandle(fx, fy, fuseStart) || hitHandle(fx, fy, fuseEnd))
+    ? 'grab' : 'default';
+});
+
+document.getElementById('ex-fuse-bright-delay').addEventListener('input', function() {
+  const v = parseInt(this.value);
+  const label = v === 0 ? '(off)' : v <= 10 ? '(subtle)' : v <= 30 ? '(moderate)' : '(strong)';
+  document.getElementById('ex-fuse-bright-delay-val').innerHTML =
+    v + ' f <span style="font-size:0.68rem;color:#555">' + label + '</span>';
+});
+document.getElementById('ex-life-invert').addEventListener('change', function() {
+  const inv = this.checked;
+  document.getElementById('life-rule-label').textContent = inv
+    ? 'Dark = short life \u00b7 Bright = long life'
+    : 'Bright = short life \u00b7 Dark = long life';
+  document.getElementById('life-invert-label').style.color = inv ? '#7cb87a' : '#444';
+});
+
+// ── Brush toolbar ──────────────────────────────────────────────────────────
+document.getElementById('btn-add').addEventListener('click', () => {
+  brushMode = 'add';
+  document.getElementById('btn-add').classList.add('active');
+  document.getElementById('btn-erase').classList.remove('active');
+});
+document.getElementById('btn-erase').addEventListener('click', () => {
+  brushMode = 'erase';
+  document.getElementById('btn-erase').classList.add('active');
+  document.getElementById('btn-add').classList.remove('active');
+});
+document.getElementById('brush-size').addEventListener('input', function() {
+  brushSize = parseInt(this.value);
+  document.getElementById('brush-size-val').textContent = brushSize + ' px';
+});
+document.getElementById('btn-reset-paint').addEventListener('click', () => {
+  if (!paintMask) return;
+  paintMask.fill(0);
+  redrawPaintCanvas();
+  updateDiffStat();
+});
+
+// ── Mask initialisation ────────────────────────────────────────────────────
+function initMask() {
+  const threshold  = parseInt(document.getElementById('threshold').value);
+  const res        = parseInt(document.getElementById('resolution').value);
+  const w = Math.min(imgA.width, imgB.width);
+  const h = Math.min(imgA.height, imgB.height);
+  const dA = getPixelData(imgA);
+  const dB = getPixelData(imgB);
+
+  maskW = w; maskH = h;
+  diffSelected = new Uint8Array(w * h);
+  if (!paintMask || paintMask.length !== w * h) paintMask = new Uint8Array(w * h);
+
+  // Process in blocks of res×res.
+  // For each block: average colour of dA and dB separately, compare averages.
+  // If block differs, all pixels in that block are selected.
+  for (let by = 0; by < h; by += res) {
+    for (let bx = 0; bx < w; bx += res) {
+      // Accumulate colour sums for this block
+      let sumAr=0,sumAg=0,sumAb=0, sumBr=0,sumBg=0,sumBb=0, count=0;
+      for (let dy = 0; dy < res && by+dy < h; dy++) {
+        for (let dx = 0; dx < res && bx+dx < w; dx++) {
+          const i = ((by+dy)*w + (bx+dx)) * 4;
+          sumAr += dA.data[i]; sumAg += dA.data[i+1]; sumAb += dA.data[i+2];
+          sumBr += dB.data[i]; sumBg += dB.data[i+1]; sumBb += dB.data[i+2];
+          count++;
+        }
+      }
+      const avgDiff = (Math.abs(sumBr-sumAr) + Math.abs(sumBg-sumAg) + Math.abs(sumBb-sumAb)) / (3*count);
+      const selected = avgDiff >= threshold ? 1 : 0;
+      // Apply selection to all pixels in the block
+      for (let dy = 0; dy < res && by+dy < h; dy++) {
+        for (let dx = 0; dx < res && bx+dx < w; dx++) {
+          diffSelected[(by+dy)*w + (bx+dx)] = selected;
+        }
+      }
+    }
+  }
+
+  // Draw base diff on mask-canvas
+  const mc = document.getElementById('mask-canvas');
+  mc.width = w; mc.height = h;
+  const mctx = mc.getContext('2d');
+  const imgData = mctx.createImageData(w, h);
+  for (let y = 0; y < h; y++) {
+    for (let x = 0; x < w; x++) {
+      const i = (y * w + x) * 4;
+      if (diffSelected[y * w + x]) {
+        imgData.data[i] = 90; imgData.data[i+1] = 210; imgData.data[i+2] = 120; imgData.data[i+3] = 200;
+      } else {
+        imgData.data[i] = dA.data[i]; imgData.data[i+1] = dA.data[i+1];
+        imgData.data[i+2] = dA.data[i+2]; imgData.data[i+3] = 80;
+      }
+    }
+  }
+  mctx.putImageData(imgData, 0, 0);
+
+  const pc = document.getElementById('paint-canvas');
+  pc.width = w; pc.height = h;
+  const cc = document.getElementById('cursor-canvas');
+  cc.width = w; cc.height = h;
+
+  redrawPaintCanvas();
+  updateDiffStat();
+  document.getElementById('mask-wrap').style.display = 'block';
+  // Sync fuse canvas dimensions and redraw handles
+  const _fc = document.getElementById('fuse-canvas');
+  if (_fc && maskW) { _fc.width = maskW; _fc.height = maskH; }
+  if (typeof drawFuseHandles === 'function') drawFuseHandles();
+}
+
+// ── Paint canvas rendering ─────────────────────────────────────────────────
+function redrawPaintCanvas() {
+  const pc = document.getElementById('paint-canvas');
+  const ctx = pc.getContext('2d');
+  ctx.clearRect(0, 0, maskW, maskH);
+
+  const imgData = ctx.createImageData(maskW, maskH);
+  for (let y = 0; y < maskH; y++) {
+    for (let x = 0; x < maskW; x++) {
+      const pi = y * maskW + x;
+      const i  = pi * 4;
+      if (paintMask[pi] === 1) {
+        // Painted-add: bright cyan tint
+        imgData.data[i] = 0; imgData.data[i+1] = 200; imgData.data[i+2] = 220; imgData.data[i+3] = 180;
+      } else if (paintMask[pi] === 2) {
+        // Painted-erase: red tint
+        imgData.data[i] = 220; imgData.data[i+1] = 60; imgData.data[i+2] = 60; imgData.data[i+3] = 180;
+      }
+    }
+  }
+  ctx.putImageData(imgData, 0, 0);
+}
+
+function updateDiffStat() {
+  let count = 0;
+  for (let i = 0; i < maskW * maskH; i++) {
+    const sel = paintMask[i] === 1 ? 1 : paintMask[i] === 2 ? 0 : diffSelected[i];
+    if (sel) count++;
+  }
+  const pct = ((count / (maskW * maskH)) * 100).toFixed(1);
+  document.getElementById('diff-stat').innerHTML =
+    '<span>' + count.toLocaleString() + '</span> pixels selected (' + pct + '% of frame) — green = auto diff · cyan = painted · red = erased';
+}
+
+// ── Canvas coordinate mapping ──────────────────────────────────────────────
+function canvasCoords(e) {
+  const container = document.getElementById('canvas-container');
+  const mc = document.getElementById('mask-canvas');
+  const rect = container.getBoundingClientRect();
+  const scaleX = maskW / rect.width;
+  const scaleY = maskH / rect.height;
+  const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+  const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+  return {
+    x: Math.round((clientX - rect.left) * scaleX),
+    y: Math.round((clientY - rect.top)  * scaleY)
+  };
+}
+
+// ── Paint stroke ───────────────────────────────────────────────────────────
+function paintAt(cx, cy) {
+  if (!paintMask) return;
+  const r = Math.round(brushSize / 2);
+  const val = brushMode === 'add' ? 1 : 2;
+  for (let dy = -r; dy <= r; dy++) {
+    for (let dx = -r; dx <= r; dx++) {
+      if (dx*dx + dy*dy > r*r) continue;
+      const px = cx + dx, py = cy + dy;
+      if (px < 0 || px >= maskW || py < 0 || py >= maskH) continue;
+      paintMask[py * maskW + px] = val;
+    }
+  }
+  redrawPaintCanvas();
+  updateDiffStat();
+}
+
+// ── Cursor ring ────────────────────────────────────────────────────────────
+function drawCursor(cx, cy) {
+  const cc = document.getElementById('cursor-canvas');
+  const ctx = cc.getContext('2d');
+  ctx.clearRect(0, 0, maskW, maskH);
+  const r = Math.round(brushSize / 2);
+  ctx.beginPath();
+  ctx.arc(cx, cy, r, 0, Math.PI * 2);
+  ctx.strokeStyle = brushMode === 'add' ? 'rgba(0,220,255,0.85)' : 'rgba(255,80,80,0.85)';
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+}
+
+// ── Pointer events on the container ───────────────────────────────────────
+const container = document.getElementById('canvas-container');
+
+container.addEventListener('mousedown', e => {
+  if (!paintMask) return;
+  isPainting = true;
+  const {x, y} = canvasCoords(e);
+  paintAt(x, y);
+  drawCursor(x, y);
+});
+container.addEventListener('mousemove', e => {
+  if (!paintMask) return;
+  const {x, y} = canvasCoords(e);
+  drawCursor(x, y);
+  if (isPainting) paintAt(x, y);
+});
+container.addEventListener('mouseup',   () => { isPainting = false; });
+container.addEventListener('mouseleave', () => {
+  isPainting = false;
+  if (paintMask) {
+    const cc = document.getElementById('cursor-canvas');
+    cc.getContext('2d').clearRect(0, 0, maskW, maskH);
+  }
+});
+// Touch support
+container.addEventListener('touchstart', e => {
+  e.preventDefault(); if (!paintMask) return;
+  isPainting = true;
+  const {x, y} = canvasCoords(e);
+  paintAt(x, y);
+}, {passive: false});
+container.addEventListener('touchmove', e => {
+  e.preventDefault(); if (!paintMask || !isPainting) return;
+  const {x, y} = canvasCoords(e);
+  paintAt(x, y);
+}, {passive: false});
+container.addEventListener('touchend', () => { isPainting = false; });
+
+// ── Build pixel array (merging diff + paint overrides) ─────────────────────
+// ── Spatial noise for turbulence ──────────────────────────────────────────
+function _nhash(x, y) {
+  let h = Math.imul(x, 1619) ^ Math.imul(y, 31337);
+  h = Math.imul(h ^ (h >>> 16), 0x45d9f3b);
+  h = Math.imul(h ^ (h >>> 16), 0x45d9f3b);
+  return ((h ^ (h >>> 16)) & 0x7fffffff) / 0x7fffffff; // 0..1
+}
+function smoothNoise(x, y, scale) {
+  const sx = x / scale, sy = y / scale;
+  const ix = Math.floor(sx), iy = Math.floor(sy);
+  const fx = sx - ix,       fy = sy - iy;
+  // Smoothstep
+  const ux = fx * fx * (3 - 2 * fx);
+  const uy = fy * fy * (3 - 2 * fy);
+  const a = _nhash(ix,   iy),   b = _nhash(ix+1, iy);
+  const c = _nhash(ix,   iy+1), d = _nhash(ix+1, iy+1);
+  return a*(1-ux)*(1-uy) + b*ux*(1-uy) + c*(1-ux)*uy + d*ux*uy; // 0..1
+}
+
+async function buildPixels(vmin, vmax, vrand, mode, ex) {
+  const w = maskW, h = maskH;
+  const dB = getPixelData(imgB);
+  const dA = getPixelData(imgA);
+  const pixels = [];
+
+  const res = parseInt(document.getElementById('resolution').value);
+
+  // Iterate in blocks; one particle per block
+  for (let by = 0; by < h; by += res) {
+    if (by % (50 * res) === 0) await new Promise(r => setTimeout(r, 0)); // yield
+    for (let bx = 0; bx < w; bx += res) {
+      // Check selection using top-left pixel of block
+      const pi = by * w + bx;
+      const sel = paintMask[pi] === 1 ? true
+                : paintMask[pi] === 2 ? false
+                : !!diffSelected[pi];
+      if (!sel) continue;
+
+      // Average colour of block from image B
+      let sumR=0,sumG=0,sumB=0,sumA=0, count=0;
+      for (let dy = 0; dy < res && by+dy < h; dy++) {
+        for (let dx = 0; dx < res && bx+dx < w; dx++) {
+          const i2 = ((by+dy)*w + (bx+dx)) * 4;
+          sumR += dB.data[i2]; sumG += dB.data[i2+1];
+          sumB += dB.data[i2+2]; sumA += dB.data[i2+3];
+          count++;
+        }
+      }
+      const x = bx, y = by;
+      const r = Math.round(sumR/count), g = Math.round(sumG/count);
+      const b = Math.round(sumB/count), a = Math.round(sumA/count);
+      const brightness = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+
+      if (mode === 'dissolve') {
+        const baseVx = vmin + brightness * (vmax - vmin);
+        const jitter = vrand > 0 ? baseVx * vrand * (Math.random() * 2 - 1) : 0;
+        const vx = Math.max(0, baseVx + jitter);
+        // Curl noise — divergence-free, creates swirling rather than fanning
+        const _nSc  = Math.max(w, h) / 6;
+        const _eps  = _nSc * 0.5;
+        const _gnx  = smoothNoise(x, y + _eps, _nSc) - smoothNoise(x, y - _eps, _nSc);
+        const _gny  = smoothNoise(x + _eps, y, _nSc) - smoothNoise(x - _eps, y, _nSc);
+        const _clen = Math.sqrt(_gnx * _gnx + _gny * _gny) || 1;
+        // Per-pixel phase for flutter (spatially varied)
+        const _phase = smoothNoise(x * 0.5, y * 0.5, _nSc) * 2 * Math.PI;
+        // Dissolve Fuse Wire: per-pixel start offset
+        let _dOff = 0;
+        const _dmaxOff = typeof dissolveMaxOffset !== 'undefined' ? dissolveMaxOffset : 0;
+        if (_dmaxOff > 0) {
+          if (typeof dissolveFuseOn !== 'undefined' && dissolveFuseOn) {
+            const _sx = fuseStart.fx * w, _sy = fuseStart.fy * h;
+            const _ex = fuseEnd.fx   * w, _ey = fuseEnd.fy   * h;
+            const _distSE = Math.hypot(_ex - _sx, _ey - _sy) || 1;
+            const _factor = _dmaxOff / _distSE;
+            _dOff = Math.round(Math.hypot(x - _sx, y - _sy) * _factor);
+          } else {
+            _dOff = Math.floor(Math.random() * (_dmaxOff + 1));
+          }
+          // Brightness delay: dark pixels wait longer
+          const _brightDelay = typeof dissolveFuseBrightDelay !== 'undefined' ? dissolveFuseBrightDelay : 0;
+          if ((typeof dissolveFuseOn !== 'undefined' && dissolveFuseOn) && _brightDelay > 0) {
+            _dOff += Math.round((1 - brightness) * _brightDelay);
+          }
+        }
+        // Dissolve lifespan: random between min and max (0 = no fade)
+        const _dLMin = typeof dissolveLifeMin !== 'undefined' ? dissolveLifeMin : 0;
+        const _dLMax = typeof dissolveLifeMax !== 'undefined' ? dissolveLifeMax : 0;
+        const _dLife = _dLMax > 0
+          ? Math.max(1, _dLMin + Math.floor(Math.random() * (_dLMax - _dLMin + 1)))
+          : 0;
+        pixels.push({ x, y, r, g, b, a, vx, vy: 0, res,
+          curlX: _gny / _clen, curlY: -_gnx / _clen, flutterPhase: _phase,
+          dOffset: _dOff, dissolveLife: _dLife,
+          mode: 'dissolve' });
+
+      } else if (mode === 'explode') {
+        // Speed: brightness-mapped, with weight modifying by darkness
+        // weight > 0: dark pixels slower (heavier); weight < 0: bright pixels slower
+        const weightFactor = 1 - ex.weight * (1 - brightness) + ex.weight * brightness;
+        // simplified: dark heavy (weight>0) means darker = lower speed multiplier
+        const massFactor = ex.weight >= 0
+          ? 1 - ex.weight * (1 - brightness)   // dark pixels get reduced speed
+          : 1 + ex.weight * brightness;          // bright pixels get reduced speed (weight<0)
+        const baseSpeed = ex.vmin + brightness * (ex.vmax - ex.vmin);
+        const jitter = ex.vrand > 0 ? baseSpeed * ex.vrand * (Math.random() * 2 - 1) : 0;
+        const speed = Math.max(0, baseSpeed + jitter) * Math.max(0.05, massFactor);
+
+        // Direction vector weighted by sliders
+        const hNet = (Math.random() * ex.right) - (Math.random() * ex.left);
+        const vNet = (Math.random() * ex.down)  - (Math.random() * ex.up);
+        const mag = Math.sqrt(hNet * hNet + vNet * vNet) || 1;
+
+        // Lifespan: brightness-driven base within [lifeMin, lifeMax],
+        // PLUS the pixel's fuse wire start offset (so pixel lives that much longer).
+        let startOffset;
+        if (ex.fuseOn && ex.offset > 0) {
+          // Fuse Wire: offset = distance(pixel → Start) × (maxOffset / distance(Start → End))
+          const sx = ex.fuseStart.fx * w, sy = ex.fuseStart.fy * h;
+          const endX = ex.fuseEnd.fx * w,  endY = ex.fuseEnd.fy * h;
+          const distSE = Math.hypot(endX - sx, endY - sy) || 1;
+          const factor = ex.offset / distSE;
+          const distPx = Math.hypot(x - sx, y - sy);
+          startOffset = Math.round(distPx * factor);
+        } else {
+          startOffset = ex.offset > 0 ? Math.floor(Math.random() * (ex.offset + 1)) : 0;
+        }
+
+        // Brightness delay (fuse wire only): dark pixels get extra delay.
+        // bright (1) → 0 extra frames, dark (0) → fuseBrightDelay frames
+        if (ex.fuseOn && ex.fuseBrightDelay > 0) {
+          const brightnessDelay = Math.round((1 - brightness) * ex.fuseBrightDelay);
+          startOffset += brightnessDelay;
+        }
+
+        const lifeFactor = ex.lifeInvert ? brightness : (1 - brightness);
+        const baseLife = ex.lifeMin + lifeFactor * (ex.lifeMax - ex.lifeMin);
+        const lifeJitter = baseLife * 0.05 * (Math.random() * 2 - 1);
+        const lifespan = Math.max(1, Math.round(baseLife + lifeJitter + startOffset));
+        pixels.push({
+          x, y, r, g, b, a,
+          vx: (hNet / mag) * speed,
+          vy: (vNet / mag) * speed,
+          gravity: ex.gravity,
+          dampen:  ex.dampen,
+          lifespan,
+          startOffset,
+          res,
+          mode: 'explode'
+        });
+      }
+    }
+  }
+  return { pixels, w, h, dA };
+}
+
+// ── Render one frame ───────────────────────────────────────────────────────
+function renderFrame(ctx, state, t, frameIndex, totalFrames) {
+  const { pixels, w, h, dA } = state;
+  const frame = ctx.createImageData(w, h);
+  for (let i = 0; i < dA.data.length; i++) frame.data[i] = dA.data[i];
+
+  for (const px of pixels) {
+    if (px.mode === 'dissolve') {
+      // Fuse Wire hold: pixel stays put until its trigger frame
+      const _dOff = px.dOffset || 0;
+      if (_dOff > 0 && frameIndex < _dOff) {
+        const _bsH = px.res || 1;
+        for (let _byH = 0; _byH < _bsH && px.y+_byH < h; _byH++) {
+          for (let _bxH = 0; _bxH < _bsH && px.x+_bxH < w; _bxH++) {
+            const _niH = ((px.y+_byH)*w + (px.x+_bxH)) * 4;
+            frame.data[_niH]=px.r; frame.data[_niH+1]=px.g;
+            frame.data[_niH+2]=px.b; frame.data[_niH+3]=px.a;
+          }
+        }
+        continue;
+      }
+      // Local progress: 0→1 over frames remaining after trigger
+      const _dRem = Math.max(1, totalFrames - _dOff);
+      const _dt   = _dOff > 0 ? (frameIndex - _dOff) / _dRem : t;
+      const _df   = _dOff > 0 ? frameIndex - _dOff : frameIndex;
+
+      // 1 — Primary direction (compass angle)
+      const _baseAng = typeof dissolveAngle !== 'undefined' ? dissolveAngle : 90;
+      const _rad  = _baseAng * Math.PI / 180;
+      const _dirX = Math.sin(_rad);
+      const _dirY = -Math.cos(_rad);
+
+      // Ease-in using local frame index
+      const _ef = typeof dissolveEaseFrames !== 'undefined' ? dissolveEaseFrames : 0;
+      let _easeT = 1;
+      if (_ef > 0 && _df < _ef) {
+        const _et = _df / _ef;
+        _easeT = _et * _et * (3 - 2 * _et);
+      }
+
+      const _base = px.vx * _dt * w * _easeT;
+
+      // 2 — Curl noise turbulence
+      const _turb = typeof dissolveTurbulence !== 'undefined' ? dissolveTurbulence : 0;
+      const _curl = _turb * _base;
+
+      let _nx = px.x + _base * _dirX + _curl * (px.curlX || 0);
+      let _ny = px.y + _base * _dirY + _curl * (px.curlY || 0);
+
+      // 3 — Flutter
+      const _flAmp = typeof dissolveFlutter !== 'undefined' ? dissolveFlutter : 0;
+      if (_flAmp > 0) {
+        const _flFreq = typeof dissolveFlutterFreq !== 'undefined' ? dissolveFlutterFreq : 2;
+        const _flOff  = _flAmp * 0.12 * w * _easeT * Math.sin(_dt * 2 * Math.PI * _flFreq + (px.flutterPhase || 0));
+        _nx += _flOff * (-_dirY);
+        _ny += _flOff * _dirX;
+      }
+
+      // 4 — Wind drift
+      const _wStr = typeof driftStrength !== 'undefined' ? driftStrength : 0;
+      if (_wStr > 0) {
+        const _wRad = (typeof driftAngle !== 'undefined' ? driftAngle : 90) * Math.PI / 180;
+        const _wAmt = _wStr * _dt * w * 0.4 * _easeT;
+        _nx += _wAmt * Math.sin(_wRad);
+        _ny += _wAmt * (-Math.cos(_wRad));
+      }
+
+      // 5 — Gravity
+      const _grav = typeof dissolveGravity !== 'undefined' ? dissolveGravity : 0;
+      if (_grav > 0) _ny += 0.5 * _grav * _dt * _dt * h * _easeT;
+
+      const nx = Math.round(_nx), ny = Math.round(_ny);
+
+      // Lifespan fade: blend dissolve pixel toward image A background
+      const _dLife = px.dissolveLife || 0;
+      let _fade = 1;
+      if (_dLife > 0) {
+        if (_df >= _dLife) continue; // fully faded — skip pixel
+        _fade = Math.max(0, 1 - _df / _dLife);
+      }
+
+      const bs = px.res || 1;
+      for (let _by = 0; _by < bs && ny+_by < h; _by++) {
+        for (let _bx = 0; _bx < bs && nx+_bx < w; _bx++) {
+          if (nx+_bx < 0 || ny+_by < 0) continue;
+          const ni = ((ny+_by) * w + (nx+_bx)) * 4;
+          if (_fade < 1) {
+            // Blend toward image A background
+            frame.data[ni]   = Math.round(dA.data[ni]   + (px.r - dA.data[ni])   * _fade);
+            frame.data[ni+1] = Math.round(dA.data[ni+1] + (px.g - dA.data[ni+1]) * _fade);
+            frame.data[ni+2] = Math.round(dA.data[ni+2] + (px.b - dA.data[ni+2]) * _fade);
+            frame.data[ni+3] = 255;
+          } else {
+            frame.data[ni]   = px.r; frame.data[ni+1] = px.g;
+            frame.data[ni+2] = px.b; frame.data[ni+3] = px.a;
+          }
+        }
+      }
+
+    } else if (px.mode === 'explode') {
+      // t drives displacement; gravity accumulates downward over time
+      // Per-pixel start offset: pixel stays put until its startOffset frame,
+      // then animates using a local t that runs from 0 at startOffset to 1 at totalFrames.
+      const offset = px.startOffset || 0;
+      if (frameIndex < offset) {
+        // Not yet started — draw block at original position
+        const bs0 = px.res || 1;
+        for (let dy = 0; dy < bs0 && px.y+dy < h; dy++) {
+          for (let dx = 0; dx < bs0 && px.x+dx < w; dx++) {
+            const ni0 = ((px.y+dy) * w + (px.x+dx)) * 4;
+            frame.data[ni0]   = px.r; frame.data[ni0+1] = px.g;
+            frame.data[ni0+2] = px.b; frame.data[ni0+3] = px.a;
+          }
+        }
+        continue;
+      }
+      const remaining = totalFrames - offset;
+      const elapsed = remaining > 0 ? (frameIndex - offset) / remaining : 1;
+      // Dampening: closed-form geometric series for decayed displacement
+      // pos = v * (1-(1-d)^frame) / d   when d > 0, else v * frame (linear)
+      const d = px.dampen || 0;
+      // Geometric velocity decay per frame.
+      // vx is total fractional displacement at d=0 (i.e. vx*w pixels over full animation).
+      // Per-frame velocity = vx / N, decayed by (1-d) each frame.
+      // Cumulative displacement at frame f = (vx/N) * w * (1-(1-d)^f) / d
+      // At d=0: simplifies to vx * t * w (linear, unchanged).
+      const N = totalFrames || 1;
+      const f = elapsed * N;
+      let dampedX, dampedY;
+      if (d < 0.001) {
+        dampedX = px.vx * elapsed * w;
+        dampedY = (px.vy || 0) * elapsed * h;
+      } else {
+        const decay = (1 - Math.pow(1 - d, f)) / d;
+        dampedX = (px.vx / N) * w * decay;
+        dampedY = ((px.vy || 0) / N) * h * decay;
+      }
+      const gravY = 0.5 * px.gravity * elapsed * elapsed * h;
+      const nxF = Math.round(px.x + dampedX);
+      const nyF = Math.round(px.y + dampedY + gravY);
+      const nx = nxF, ny = nyF;
+      if (nx < 0 || nx >= w || ny < 0 || ny >= h) continue;
+
+      // Lifespan fade: frameIndex is current frame number
+      let alpha = px.a;
+      if (px.lifespan > 0) {
+        if (frameIndex >= px.lifespan) continue; // fully faded
+        alpha = Math.round(px.a * Math.max(0, 1 - frameIndex / px.lifespan));
+      }
+      if (alpha <= 0) continue;
+
+      const bs = px.res || 1;
+      for (let dy = 0; dy < bs && ny+dy < h; dy++) {
+        for (let dx = 0; dx < bs && nx+dx < w; dx++) {
+          const ni = ((ny+dy) * w + (nx+dx)) * 4;
+          const bg_a = dA.data[ni+3] / 255;
+          const fg_a = alpha / 255;
+          const out_a = fg_a + bg_a * (1 - fg_a);
+          if (out_a > 0) {
+            frame.data[ni]   = Math.round((px.r * fg_a + dA.data[ni]   * bg_a * (1 - fg_a)) / out_a);
+            frame.data[ni+1] = Math.round((px.g * fg_a + dA.data[ni+1] * bg_a * (1 - fg_a)) / out_a);
+            frame.data[ni+2] = Math.round((px.b * fg_a + dA.data[ni+2] * bg_a * (1 - fg_a)) / out_a);
+            frame.data[ni+3] = Math.round(out_a * 255);
+          }
+        }
+      }
+    }
+  }
+  ctx.putImageData(frame, 0, 0);
+}
+
+// ── Main render + encode ───────────────────────────────────────────────────
+document.getElementById('btn-render').addEventListener('click', async () => {
+  if (!imgA || !imgB || !diffSelected) return;
+  try {
+  const durationSec = parseInt(document.getElementById('duration').value);
+  const vmin        = parseFloat(document.getElementById('vmin').value);
+  const vmax        = parseFloat(document.getElementById('vmax').value);
+  const vrand       = parseFloat(document.getElementById('vrand').value) / 100;
+  const exParams = {
+    vmin:    parseFloat(document.getElementById('ex-vmin').value),
+    vmax:    parseFloat(document.getElementById('ex-vmax').value),
+    up:      parseFloat(document.getElementById('ex-up').value),
+    down:    parseFloat(document.getElementById('ex-down').value),
+    left:    parseFloat(document.getElementById('ex-left').value),
+    right:   parseFloat(document.getElementById('ex-right').value),
+    vrand:   parseFloat(document.getElementById('ex-vrand').value) / 100,
+    gravity: parseFloat(document.getElementById('ex-gravity').value),
+    weight:  parseFloat(document.getElementById('ex-weight').value),
+    lifeMin:    parseInt(document.getElementById('ex-life-min').value),
+    lifeMax:    parseInt(document.getElementById('ex-life-max').value),
+    lifeInvert: document.getElementById('ex-life-invert').checked,
+    dampen:     parseFloat(document.getElementById('ex-dampen').value),
+    offset:     parseInt(document.getElementById('ex-offset').value),
+    fuseOn:          fuseOn,
+    fuseStart:       { ...fuseStart },
+    fuseEnd:         { ...fuseEnd },
+    fuseBrightDelay: parseInt(document.getElementById('ex-fuse-bright-delay').value),
+  };
+  const totalFrames = durationSec * FPS;
+
+  document.getElementById('btn-render').disabled = true;
+  document.getElementById('download-panel').style.display = 'none';
+  setProgress(0);
+  setStatus('Building pixel array...');
+  await sleep(30);
+
+  const state = await buildPixels(vmin, vmax, vrand, animMode, exParams);
+  const { w, h } = state;
+
+  const canvas = document.getElementById('main-canvas');
+  canvas.width = w; canvas.height = h;
+  const ctx = canvas.getContext('2d');
+  document.getElementById('preview-wrap').style.display = 'block';
+
+  const holdSec     = parseInt(document.getElementById('hold-duration').value);
+  const holdFrames  = document.getElementById('hold-frames').checked ? holdSec * FPS : 0;
+  const totalWithHold = holdFrames + totalFrames + holdFrames;
+
+  // ── WebCodecs H.264 MP4 export ──────────────────────────────────────────
+  // Scratch canvas for VideoFrame source
+  const scratch = document.createElement('canvas');
+  scratch.width = w; scratch.height = h;
+  const sCtx = scratch.getContext('2d');
+
+  // Encoded chunk accumulator
+  const encodedChunks = [];
+  let decoderConfig = null;
+
+  const encoder = new VideoEncoder({
+    output: (chunk, meta) => {
+      if (meta && meta.decoderConfig) decoderConfig = meta.decoderConfig;
+      const buf = new Uint8Array(chunk.byteLength);
+      chunk.copyTo(buf);
+      encodedChunks.push({ buf, type: chunk.type, ts: chunk.timestamp });
+    },
+    error: e => { throw new Error('VideoEncoder: ' + e.message); }
+  });
+
+  // Ensure dimensions are even (H.264 requirement)
+  const encW = w % 2 === 0 ? w : w - 1;
+  const encH = h % 2 === 0 ? h : h - 1;
+
+  encoder.configure({
+    codec: 'avc1.640033',
+    width: encW,
+    height: encH,
+    bitrate: 10_000_000,
+    framerate: FPS,
+    latencyMode: 'quality',
+  });
+
+  // Helper: render a state to scratch, encode as VideoFrame
+  const renderReverse = document.getElementById('render-reverse').checked;
+
+  async function encodeStateFrame(t, frameIdx, totalFr, isKey) {
+    const tActual = renderReverse ? 1 - t : t;
+    const fActual = renderReverse ? totalFr - frameIdx : frameIdx;
+    renderFrame(ctx, state, tActual, fActual, totalFr);
+    sCtx.drawImage(canvas, 0, 0, encW, encH);
+    const vf = new VideoFrame(scratch, {
+      timestamp: Math.round((encodedChunks.length / FPS) * 1_000_000),
+      duration:  Math.round(1_000_000 / FPS),
+    });
+    encoder.encode(vf, { keyFrame: isKey });
+    vf.close();
+    await encoder.flush();
+  }
+
+  setStatus('Encoding ' + totalWithHold + ' frames (H.264 MP4)...');
+
+  // Hold first frame
+  for (let f = 0; f < holdFrames; f++) {
+    await encodeStateFrame(0, 0, totalFrames, f === 0);
+    setProgress(Math.round((f / totalWithHold) * 100));
+    if (f % 4 === 0) await sleep(0);
+  }
+  // Animation frames
+  for (let f = 0; f <= totalFrames; f++) {
+    await encodeStateFrame(f / totalFrames, f, totalFrames, f === 0 && holdFrames === 0);
+    setProgress(Math.round(((holdFrames + f) / totalWithHold) * 100));
+    if (f % 4 === 0) await sleep(0);
+  }
+  // Hold last frame
+  for (let f = 0; f < holdFrames; f++) {
+    await encodeStateFrame(1, totalFrames, totalFrames, false);
+    setProgress(Math.round(((holdFrames + totalFrames + f) / totalWithHold) * 100));
+    if (f % 4 === 0) await sleep(0);
+  }
+
+  await encoder.flush();
+  encoder.close();
+
+  setStatus('Muxing MP4...');
+
+  // ── Pure-JS MP4 muxer ───────────────────────────────────────────────────
+  function u32(v) { const b=new Uint8Array(4); new DataView(b.buffer).setUint32(0,v); return b; }
+  function u16(v) { const b=new Uint8Array(2); new DataView(b.buffer).setUint16(0,v); return b; }
+  function i16(v) { const b=new Uint8Array(2); new DataView(b.buffer).setInt16(0,v);  return b; }
+  function concat(...arrays) {
+    const total = arrays.reduce((s,a)=>s+a.length,0);
+    const out = new Uint8Array(total); let off=0;
+    for (const a of arrays) { out.set(a,off); off+=a.length; }
+    return out;
+  }
+  function box(type, ...payloads) {
+    const typeBytes = new TextEncoder().encode(type);
+    const payload = concat(...payloads);
+    return concat(u32(8+payload.length), typeBytes, payload);
+  }
+  function fullbox(type, version, flags, ...payloads) {
+    return box(type, new Uint8Array([version,(flags>>16)&0xff,(flags>>8)&0xff,flags&0xff]), ...payloads);
+  }
+
+  // Extract SPS/PPS from decoderConfig
+  let spsNAL = null, ppsNAL = null;
+  if (decoderConfig && decoderConfig.description) {
+    const desc = decoderConfig.description instanceof ArrayBuffer
+      ? new Uint8Array(decoderConfig.description)
+      : new Uint8Array(decoderConfig.description.buffer
+          ? decoderConfig.description.buffer
+          : decoderConfig.description);
+    // AVCC format: configurationVersion(1) profileIndication(1) profileCompatibility(1)
+    //              levelIndication(1) 0xff(1) 0xe1(1) spsLen(2) sps... numPPS(1) ppsLen(2) pps...
+    if (desc.length > 8 && desc[0] === 1) {
+      let off = 5;
+      const numSPS = desc[off++] & 0x1f;
+      if (numSPS > 0) {
+        const spsLen = (desc[off]<<8)|desc[off+1]; off+=2;
+        spsNAL = desc.slice(off, off+spsLen); off+=spsLen;
+      }
+      const numPPS = desc[off++];
+      if (numPPS > 0) {
+        const ppsLen = (desc[off]<<8)|desc[off+1]; off+=2;
+        ppsNAL = desc.slice(off, off+ppsLen);
+      }
+    }
+  }
+  // Annex B fallback: scan encoded chunks for SPS(NAL 7) / PPS(NAL 8)
+  if (!spsNAL || !ppsNAL) {
+    for (const { buf } of encodedChunks) {
+      let i = 0;
+      while (i < buf.length - 4) {
+        if (buf[i]===0&&buf[i+1]===0&&buf[i+2]===0&&buf[i+3]===1) {
+          const nalType = buf[i+4] & 0x1f;
+          let end = buf.length;
+          for (let j=i+4; j<buf.length-4; j++) {
+            if (buf[j]===0&&buf[j+1]===0&&buf[j+2]===0&&buf[j+3]===1) { end=j; break; }
+          }
+          if (nalType===7 && !spsNAL) spsNAL = buf.slice(i+4, end);
+          if (nalType===8 && !ppsNAL) ppsNAL = buf.slice(i+4, end);
+          i = end;
+        } else i++;
+      }
+      if (spsNAL && ppsNAL) break;
+    }
+  }
+  // Hardcoded fallback SPS/PPS for avc1.640033 at common resolutions
+  if (!spsNAL) spsNAL = new Uint8Array([0x67,0x64,0x00,0x33,0xac,0xd9,0x40,0xa0,0xfd,0x00,0xda,0x10,0x00,0x00,0x03,0x00,0x10,0x00,0x00,0x03,0x03,0x20,0xf1,0x83,0x19,0x60]);
+  if (!ppsNAL) ppsNAL = new Uint8Array([0x68,0xeb,0xe3,0xcb,0x22,0xc0]);
+
+  // Build mdat payload (AVCC-length-prefixed NALUs)
+  // Convert each chunk from raw bytestream to AVCC (4-byte length prefix)
+  function toAVCC(buf) {
+    const out = []; let i = 0;
+    // Check if already AVCC (no start codes)
+    const hasStartCode = buf[0]===0&&buf[1]===0&&buf[2]===0&&buf[3]===1;
+    if (!hasStartCode) return buf; // already AVCC
+    while (i < buf.length) {
+      if (buf[i]===0&&buf[i+1]===0&&buf[i+2]===0&&buf[i+3]===1) {
+        let end = buf.length;
+        for (let j=i+4; j<buf.length-3; j++) {
+          if (buf[j]===0&&buf[j+1]===0&&buf[j+2]===0&&buf[j+3]===1) { end=j; break; }
+        }
+        const nal = buf.slice(i+4, end);
+        const len = u32(nal.length);
+        out.push(len, nal);
+        i = end;
+      } else i++;
+    }
+    return concat(...out);
+  }
+
+  const frameChunks = encodedChunks.map(c => toAVCC(c.buf));
+  const frameSizes  = frameChunks.map(c => c.length);
+  const frameTypes  = encodedChunks.map(c => c.type);
+  const totalVideoBytes = frameSizes.reduce((s,v)=>s+v,0);
+
+  const nFrames   = encodedChunks.length;
+  const timescale = FPS * 100; // high-res timescale
+  const frameDur  = 100;       // timescale / FPS = 100 ticks per frame
+  const totalDur  = nFrames * frameDur;
+  const profile   = spsNAL[1], compat = spsNAL[2], level = spsNAL[3];
+
+  // avcc box (part of avc1)
+  const avccPayload = concat(
+    new Uint8Array([1, profile, compat, level, 0xff, 0xe1]),
+    u16(spsNAL.length), spsNAL,
+    new Uint8Array([0x01]),
+    u16(ppsNAL.length), ppsNAL
+  );
+  const avccBox = box('avcC', avccPayload);
+
+  // avc1 sample entry
+  const avc1 = box('avc1',
+    new Uint8Array(6),          // reserved
+    u16(1),                     // data-ref index
+    new Uint8Array(16),         // pre-defined / reserved
+    u16(encW), u16(encH),
+    u32(0x00480000), u32(0x00480000), // horiz/vert res 72dpi
+    u32(0), u16(1),             // reserved, frame count
+    new Uint8Array(32),         // compressor name
+    u16(0x0018), i16(-1),       // depth, pre-defined
+    avccBox
+  );
+
+  // stsd
+  const stsd = fullbox('stsd', 0, 0, u32(1), avc1);
+
+  // stts (time-to-sample): all frames same duration
+  const stts = fullbox('stts', 0, 0, u32(1), u32(nFrames), u32(frameDur));
+
+  // stss (sync samples = keyframes)
+  const keyIndices = frameTypes.map((t,i)=>t==='key'?i+1:0).filter(i=>i>0);
+  const stssEntries = concat(...keyIndices.map(i=>u32(i)));
+  const stss = fullbox('stss', 0, 0, u32(keyIndices.length), stssEntries);
+
+  // stsz (sample sizes)
+  const stszEntries = concat(...frameSizes.map(s=>u32(s)));
+  const stsz = fullbox('stsz', 0, 0, u32(0), u32(nFrames), stszEntries);
+
+  // stsc (sample-to-chunk): 1 chunk with all samples
+  const stsc = fullbox('stsc', 0, 0, u32(1), u32(1), u32(nFrames), u32(1));
+
+  // stco placeholder (offset filled in second pass)
+  const stcoPayload = new Uint8Array(12); // version+flags(4) + count(4) + offset(4)
+  new DataView(stcoPayload.buffer).setUint32(4, 1); // entry count = 1
+  const stcoBox = concat(u32(8+stcoPayload.length), new TextEncoder().encode('stco'), stcoPayload);
+
+  const stbl = box('stbl', stsd, stts, stss, stsz, stsc, stcoBox);
+
+  const url2 = fullbox('url ', 0, 1); // self-contained
+  const dref = fullbox('dref', 0, 0, u32(1), url2);
+  const dinf = box('dinf', dref);
+
+  const smhd = fullbox('smhd', 0, 0); // not used, but needed for minf
+  const vmhd = fullbox('vmhd', 0, 1);
+  const minf = box('minf', vmhd, dinf, stbl);
+
+  const mdhd = fullbox('mdhd', 0, 0,
+    u32(0), u32(0),             // creation/mod time
+    u32(timescale),
+    u32(totalDur),
+    u16(0x55c4),                // language 'und'
+    u16(0)
+  );
+  const hdlr = fullbox('hdlr', 0, 0,
+    u32(0),
+    new TextEncoder().encode('vide'),
+    new Uint8Array(12),
+    new TextEncoder().encode('VideoHandler ')
+  );
+  const mdia = box('mdia', mdhd, hdlr, minf);
+
+  const tkhd = fullbox('tkhd', 0, 3,
+    u32(0), u32(0),             // creation/mod time
+    u32(1),                     // track id
+    u32(0),                     // reserved
+    u32(totalDur),
+    new Uint8Array(8),          // reserved
+    u16(0), u16(0),             // layer, alternate group
+    u16(0), u16(0),             // volume (0 = video), reserved
+    // 3x3 identity matrix
+    u32(0x00010000),u32(0),u32(0),
+    u32(0),u32(0x00010000),u32(0),
+    u32(0),u32(0),u32(0x40000000),
+    u32(encW<<16), u32(encH<<16)  // width/height (16.16 fixed)
+  );
+  const trak = box('trak', tkhd, mdia);
+
+  const mvhd = fullbox('mvhd', 0, 0,
+    u32(0), u32(0),
+    u32(timescale),
+    u32(totalDur),
+    u32(0x00010000),            // rate 1.0
+    u16(0x0100),                // volume 1.0
+    new Uint8Array(10),         // reserved
+    u32(0x00010000),u32(0),u32(0),
+    u32(0),u32(0x00010000),u32(0),
+    u32(0),u32(0),u32(0x40000000),
+    new Uint8Array(24),         // pre-defined
+    u32(2)                      // next track id
+  );
+  const moov = box('moov', mvhd, trak);
+
+  const ftyp = box('ftyp',
+    new TextEncoder().encode('isom'),
+    u32(0x200),
+    new TextEncoder().encode('isom'), new TextEncoder().encode('iso2'),
+    new TextEncoder().encode('avc1'), new TextEncoder().encode('mp41')
+  );
+
+  // Two-pass: calculate mdat offset and patch stco
+  const mdatHeader = concat(u32(8 + totalVideoBytes), new TextEncoder().encode('mdat'));
+  const mdatOffset = ftyp.length + moov.length;
+
+  // Find stco offset field within moov and patch it
+  const moovArr = new Uint8Array(moov);
+  const stcoTag = new TextEncoder().encode('stco');
+  for (let i = 0; i < moovArr.length - 4; i++) {
+    if (moovArr[i]===stcoTag[0]&&moovArr[i+1]===stcoTag[1]&&
+        moovArr[i+2]===stcoTag[2]&&moovArr[i+3]===stcoTag[3]) {
+      // stco box: size(4) type(4) version+flags(4) count(4) offset(4)
+      // offset field is at i+12 (after type)
+      const off = i + 12;
+      const dv = new DataView(moovArr.buffer);
+      dv.setUint32(off, mdatOffset + mdatHeader.length); // offset to first sample
+      break;
+    }
+  }
+
+  // Assemble final MP4
+  const mdatParts = [mdatHeader, ...frameChunks];
+  const finalParts = [ftyp, moovArr, ...mdatParts];
+  const totalBytes = finalParts.reduce((s,a)=>s+a.length,0);
+  const mp4 = new Uint8Array(totalBytes);
+  let writeOff = 0;
+  for (const part of finalParts) { mp4.set(part, writeOff); writeOff += part.length; }
+
+  const blob = new Blob([mp4], { type: 'video/mp4' });
+  const url  = URL.createObjectURL(blob);
+  const dlLink = document.getElementById('download-link');
+  dlLink.href = url;
+  dlLink.download = 'pixel-dust.mp4';
+  dlLink.textContent = '\u2b07 Download Video (.mp4)';
+  document.getElementById('download-panel').style.display = 'block';
+  setStatus('Done! ' + nFrames + ' frames · ' + (blob.size/1024).toFixed(0) + ' KB · H.264 MP4');
+  setProgress(100);
+  document.getElementById('btn-render').disabled = false;
+  } catch(err) {
+    setStatus('Error: ' + err.message);
+    console.error(err);
+    document.getElementById('btn-render').disabled = false;
+  }
+});
+
+// Hold duration slider + checkbox show/hide
+document.getElementById('hold-frames').addEventListener('change', function() {
+  document.getElementById('hold-duration-wrap').style.display = this.checked ? 'flex' : 'none';
+});
+document.getElementById('hold-duration').addEventListener('input', function() {
+  document.getElementById('hold-duration-val').textContent = this.value + ' s';
+});
+</script>
+
+<script>
+// Accordion toggle
+document.querySelectorAll('.accordion-heading').forEach(h => {
+  h.addEventListener('click', () => h.closest('.accordion').classList.toggle('open'));
+});
+</script>
+
+<script>
+// Tab switching
+document.querySelectorAll('.tab[data-tab]').forEach(tab => {
+  tab.addEventListener('click', function() {
+    const t = this.dataset.tab;
+    document.querySelectorAll('.tab[data-tab]').forEach(b => b.classList.toggle('active', b.dataset.tab === t));
+    document.querySelectorAll('.tab-panel[data-tab]').forEach(p => {
+      const show = p.dataset.tab === t;
+      p.style.display = show ? (p.classList.contains('ws-tab') ? 'flex' : 'block') : 'none';
+    });
+  });
+});
+</script>
+
+<script>
+// Show Image B in Animate tab workspace when loaded
+document.getElementById('file-b').addEventListener('change', function(e) {
+  if (!e.target.files[0]) return;
+  const reader = new FileReader();
+  reader.onload = function(ev) {
+    const bg = document.getElementById('animate-bg');
+    if (bg) { bg.src = ev.target.result; bg.style.display = 'block'; }
+  };
+  reader.readAsDataURL(e.target.files[0]);
+});
+
+// Activate download button in sidebar when render completes
+const _dlPanel = document.getElementById('download-panel');
+if (_dlPanel) {
+  new MutationObserver(() => {
+    if (_dlPanel.style.display === 'block') {
+      const dl = document.getElementById('download-link');
+      if (dl) { dl.style.opacity = '1'; dl.style.pointerEvents = 'auto'; }
+    }
+  }).observe(_dlPanel, { attributes: true, attributeFilter: ['style'] });
+}
+
+// Make animate-stage fill workspace height
+function resizeAnimateStage() {
+  const stage = document.getElementById('animate-stage');
+  const ws = document.querySelector('.workspace');
+  if (stage && ws) {
+    stage.style.height = ws.clientHeight + 'px';
+  }
+}
+window.addEventListener('resize', resizeAnimateStage);
+resizeAnimateStage();
+</script>
+</body>
+</html>

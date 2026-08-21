@@ -2037,7 +2037,23 @@
       "resourceLink": "",
       "gallery": [
         {
-          "img": "",
+          "img": "images/pixel_dust06.jpg",
+          "caption": ""
+        },
+        {
+          "img": "images/pixel_dust07.jpg",
+          "caption": ""
+        },
+        {
+          "img": "images/pixel_dust05.jpg",
+          "caption": ""
+        },
+        {
+          "img": "images/pixel_dust04.jpg",
+          "caption": ""
+        },
+        {
+          "img": "images/pixel_dust08.jpg",
           "caption": ""
         },
         {
@@ -2045,38 +2061,22 @@
           "caption": ""
         },
         {
-          "img": "",
+          "img": "images/pixel_dust01.jpg",
           "caption": ""
         },
         {
-          "img": "",
+          "img": "images/pixel_dust02.jpg",
           "caption": ""
         },
         {
-          "img": "",
-          "caption": ""
-        },
-        {
-          "img": "",
-          "caption": ""
-        },
-        {
-          "img": "",
-          "caption": ""
-        },
-        {
-          "img": "",
-          "caption": ""
-        },
-        {
-          "img": "",
+          "img": "images/pixel_dust03.jpg",
           "caption": ""
         }
       ],
       "carousel": false,
       "link": "",
       "tags": [],
-      "thumb": "",
+      "thumb": "images/pixel_dust05.jpg",
       "youtube": "",
       "videoCaption": "Behind the Scenes",
       "videoRuntime": "",
