@@ -2393,9 +2393,126 @@
         "Grid Spacing",
         "Random Spread"
       ]
+    },
+    {
+      "id": 34,
+      "name": "LIFE — A Tribute to Conway's Game of Life",
+      "tier": "1",
+      "categories": [
+        "Behaviour",
+        "Game",
+        "Simulation",
+        "Three.js"
+      ],
+      "date": "2026-08-22",
+      "desc": "An interactive 3D reimagining of Conway's Game of Life, 1,600 cells evolving in real time on a virtual board users can orbit, edit, and disturb.",
+      "fullDesc": "LIFE began with a simple question: What happens when one of computing's oldest thought experiments is given a body? Conway's Game of Life has lived almost entirely as a flat grid on a screen since 1970 — this project asks whether it still feels alive when rendered as physical, three-dimensional form: cast in shadow, lit from an angle, and orbited by a viewer rather than watched head-on.\n   \nThe Game of Life is a cellular automaton: a grid of cells, each either alive or dead, that evolves in discrete steps according to four rules based on how many of its eight neighbours are alive. No player moves a piece after the first generation is set — the entire history of the board unfolds from that single starting configuration, deterministically, forever. It is, in Conway's own description, a \"zero-player game.\" Despite, or because of, its simplicity, Life produces genuinely unpredictable behaviour: stable shapes, oscillators, and \"gliders\" that travel indefinitely across the grid, all emerging from four short rules.\n\nLife was devised by the British mathematician John Horton Conway, then at Cambridge, and given to the world in Martin Gardner's \"Mathematical Games\" column in Scientific American in October 1970. That single publication turned a private mathematical amusement, reportedly worked out by hand with counters on a checkered surface before it ever touched a computer, into one of the most widely replicated programs in computing history. The 1970 ruleset is the canonical one: nearly every Game of Life implementation since, including this one, uses precisely the birth and survival conditions Gardner printed. Within the same year, Bill Gosper's team found the glider gun, a pattern that emits an endless stream of gliders, winning Conway's fifty-dollar challenge to find a configuration that grows without bound, and proving, among other things, that Life is Turing complete: capable, in principle, of computing anything a general-purpose computer can. Conway later held the John von Neumann Professorship at Princeton, a fitting echo of von Neumann's own earlier, more theoretical work on self-reproducing automata.\n    \nThis project began as a generic Three.js scene — a camera, a grid, and a lighting rig — and was rebuilt into a dedicated simulation. A 40×40 board runs the standard rules on a toroidal, wrapping grid, rendered as an instanced field of cubes so hundreds of cells can animate in real time without a performance cost. Cells scale up and down as they are born and die, giving each generation a visible, almost organic pulse rather than a hard cut. The camera orbits, pans, and zooms freely; a control panel lets a viewer play or pause the simulation, step through generations one at a time, adjust its speed, randomize or clear the board, and click directly on the grid to seed or erase individual cells, turning a purely mathematical object into something tactile.\n     \nFuture development could extend the piece considerably: a library of named patterns, including gliders, pulsars, and Gosper's own glider gun, selectable from the panel; support for other cellular-automaton rule sets beyond Conway's original; recorded playback with generation-scrubbing; or shared boards where several visitors seed the same grid at once.\n     \nMore broadly, the project is a proof of concept for treating cellular automata as spatial, embodied material rather than flat animation. That approach is directly relevant to immersive and spatial media, where the same instanced-rendering and generation-stepping techniques could drive procedural architecture, VR and AR environments that grow and decay on their own rules, generative set design, or ambient background systems for larger interactive works: anywhere a scene needs to feel alive on its own terms, evolving whether or not anyone is watching.",
+      "resourceLabel": "",
+      "resourceLink": "",
+      "gallery": [
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        }
+      ],
+      "carousel": false,
+      "link": "",
+      "tags": [
+        "Cellular automaton",
+        "Conway's Game of Life",
+        "Three.js",
+        "WebGL",
+        "InstancedMesh",
+        "Real-time Rendering",
+        "Procedural Animation",
+        "Interactive simulation",
+        "JavaScript"
+      ],
+      "thumb": "",
+      "youtube": "",
+      "videoCaption": "",
+      "videoRuntime": "",
+      "specSheet": [
+        {
+          "label": "Engine",
+          "value": "Three.js — instanced WebGL rendering, orbit camera, directional + ambient lighting, PCF soft shadows, ACES Filmic tone mapping"
+        },
+        {
+          "label": "Data",
+          "value": "Conway's Game of Life rules (1970) — B3/S23 birth/survival conditions, Moore neighbourhood, toroidal (wrap-around) grid."
+        },
+        {
+          "label": "Controls",
+          "value": "Buttons — play/pause, step, randomize, clear · slider — simulation speed (1–20 gen/s) · click-to-toggle — raycast cell editing directly on the board · orbit camera — drag to orbit, scroll to zoom, right-drag to pan."
+        },
+        {
+          "label": "Instruments",
+          "value": "Live generation counter · live population (alive-cell) counter."
+        },
+        {
+          "label": "Deploy",
+          "value": "Single self-contained HTML file — Three.js and OrbitControls bundled inline via esbuild · zero external dependencies · no CDN calls · no build step · no server · works fully offline."
+        },
+        {
+          "label": "Access",
+          "value": "Browser-based — open in any modern desktop browser · no installation · no login required."
+        },
+        {
+          "label": "Built With",
+          "value": "Claude — iterative, prompt-led development in a single guided session (design pass, build, colour and grid revisions, content pass)."
+        }
+      ],
+      "tunableParams": [
+        "GRID SIZE",
+        "CELL SPACING",
+        "SIMULATION SPEED",
+        "RANDOM DENSITY",
+        "BIRTH THRESHOLD",
+        "SURVIVAL RANGE",
+        "TWEEN DURATION",
+        "CAMERA FOV",
+        "ORBIT DISTANCE",
+        "BOARD COLOR",
+        "CELL COLOR",
+        "AMBIENT INTENSITY",
+        "KEY LIGHT INTENSITY",
+        "SHADOW RESOLUTION"
+      ]
     }
   ],
-  "nextId": 33,
+  "nextId": 35,
   "sortMode": "tier",
   "site": {
     "eyebrow": "Browser-based creative exploration : Chris Shaw",
