@@ -2461,9 +2461,9 @@
         "JavaScript"
       ],
       "thumb": "images/life_06.jpg",
-      "youtube": "",
-      "videoCaption": "",
-      "videoRuntime": "",
+      "youtube": "https://youtu.be/SunLoW2Sg88",
+      "videoCaption": "Behind the Scenes",
+      "videoRuntime": "01:07",
       "specSheet": [
         {
           "label": "Engine",
