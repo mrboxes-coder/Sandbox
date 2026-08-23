@@ -2447,8 +2447,8 @@
           "caption": ""
         }
       ],
-      "carousel": false,
-      "link": "",
+      "carousel": true,
+      "link": "./life/life.html",
       "tags": [
         "Cellular automaton",
         "Conway's Game of Life",
