@@ -2396,7 +2396,7 @@
     },
     {
       "id": 34,
-      "name": "LIFE — A Tribute to Conway's Game of Life",
+      "name": "LIFE - A Tribute to Conway",
       "tier": "1",
       "categories": [
         "Behaviour",
@@ -2461,9 +2461,9 @@
         "JavaScript"
       ],
       "thumb": "images/life_06.jpg",
-      "youtube": "https://youtu.be/SunLoW2Sg88",
-      "videoCaption": "Behind the Scenes",
-      "videoRuntime": "01:07",
+      "youtube": "",
+      "videoCaption": "",
+      "videoRuntime": "",
       "specSheet": [
         {
           "label": "Engine",
