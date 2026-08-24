@@ -1756,14 +1756,31 @@ document.getElementById('btn-render').addEventListener('click', async () => {
   const encW = w % 2 === 0 ? w : w - 1;
   const encH = h % 2 === 0 ? h : h - 1;
 
-  encoder.configure({
-    codec: 'avc1.640033',
-    width: encW,
-    height: encH,
-    bitrate: 10_000_000,
-    framerate: FPS,
-    latencyMode: 'quality',
-  });
+  // Choose codec level based on resolution
+  // avc1.640028 = Level 4.0 (up to 1920×1080), avc1.640033 = Level 5.1 (up to 4K)
+  const _isHD = encW * encH > 1920 * 1080;
+  const _codec = _isHD ? 'avc1.640033' : 'avc1.640028';
+  const _bitrate = Math.min(10_000_000, encW * encH * 2); // scale bitrate with resolution
+
+  try {
+    encoder.configure({
+      codec: _codec,
+      width: encW,
+      height: encH,
+      bitrate: _bitrate,
+      framerate: FPS,
+      latencyMode: 'quality',
+    });
+  } catch(configErr) {
+    // Fallback to a simpler configuration
+    encoder.configure({
+      codec: 'avc1.42E01E', // Baseline profile, very compatible
+      width: encW,
+      height: encH,
+      bitrate: _bitrate,
+      framerate: FPS,
+    });
+  }
 
   // Helper: render a state to scratch, encode as VideoFrame
   const renderReverse = document.getElementById('render-reverse').checked;
@@ -1779,30 +1796,37 @@ document.getElementById('btn-render').addEventListener('click', async () => {
     });
     encoder.encode(vf, { keyFrame: isKey });
     vf.close();
-    await encoder.flush();
+    // No per-frame flush — flush once after all frames for stability
   }
 
   setStatus('Encoding ' + totalWithHold + ' frames (H.264 MP4)...');
+
+  // Helper: yield + drain encoder queue to prevent backpressure at high res
+  async function yieldToEncoder(f) {
+    if (f % 5 === 0) await sleep(0);
+  }
 
   // Hold first frame
   for (let f = 0; f < holdFrames; f++) {
     await encodeStateFrame(0, 0, totalFrames, f === 0);
     setProgress(Math.round((f / totalWithHold) * 100));
-    if (f % 4 === 0) await sleep(0);
+    await yieldToEncoder(f);
   }
   // Animation frames
   for (let f = 0; f <= totalFrames; f++) {
     await encodeStateFrame(f / totalFrames, f, totalFrames, f === 0 && holdFrames === 0);
     setProgress(Math.round(((holdFrames + f) / totalWithHold) * 100));
-    if (f % 4 === 0) await sleep(0);
+    await yieldToEncoder(f);
   }
   // Hold last frame
   for (let f = 0; f < holdFrames; f++) {
     await encodeStateFrame(1, totalFrames, totalFrames, false);
     setProgress(Math.round(((holdFrames + totalFrames + f) / totalWithHold) * 100));
-    if (f % 4 === 0) await sleep(0);
+    await yieldToEncoder(f);
   }
 
+  // Single flush after all frames encoded
+  setStatus('Flushing encoder...');
   await encoder.flush();
   encoder.close();
 
