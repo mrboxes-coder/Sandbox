@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>PLY Gaussian Splat Viewer</title>
+  <title>Gaussian Splat Viewer</title>
   <link rel="icon" type="image/png" href="gaussian-flythru-icon.png">
   <style>
     :root {
@@ -167,6 +167,19 @@
       position: absolute;
       inset: 0;
       background: radial-gradient(circle at 40% 35%, #20252c 0, #101317 48%, #090b0d 100%);
+    }
+
+    .playcanvas-sog-canvas,
+    .three-overlay-canvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .three-overlay-canvas {
+      pointer-events: none;
     }
 
     .drop-panel {
@@ -1469,11 +1482,11 @@
         <img class="brand-icon" src="gaussian-flythru-icon.png" alt="" aria-hidden="true">
         <h1>Gaussian <span>FlyThru</span></h1>
       </div>
-      <div class="subtitle" id="fileMeta">Choose a Luma-style Gaussian splat .ply file from this device.</div>
+      <div class="subtitle" id="fileMeta">Choose a Gaussian splat .ply or .sog file from this device.</div>
     </div>
     <div class="actions">
-      <input id="fileInput" type="file" accept=".ply,application/octet-stream">
-      <label class="button primary" for="fileInput">Choose PLY</label>
+      <input id="fileInput" type="file">
+      <label class="button primary" for="fileInput">Choose File</label>
       <button class="button" id="orientationButton" type="button" disabled>Flip Upright</button>
       <button class="button" id="clearButton" type="button" disabled>Clear</button>
     </div>
@@ -1491,7 +1504,7 @@
           </svg>
         </div>
         <div>
-          <h2 class="drop-heading">Drop a .ply file here</h2>
+          <h2 class="drop-heading">Drop a .ply or .sog file here</h2>
           <p class="drop-copy">The file stays on this computer and is opened directly in the browser. Large captures can take a moment to process.</p>
         </div>
         <label class="button primary" for="fileInput">Select File</label>
@@ -1662,7 +1675,7 @@
       </div>
       <dl>
         <dt>Orbit</dt>
-        <dd>Drag to inspect. Scroll to zoom.</dd>
+        <dd>Click to set a pivot point. Drag to rotate around it. Scroll to zoom.</dd>
         <dt>Walk</dt>
         <dd>Arrow keys or W/A/S/D move through the scene.</dd>
         <dt>Look</dt>
@@ -1715,7 +1728,7 @@
       </div>
       <p class="annotation-copy" id="annotationCopy"></p>
     </aside>
-    <div class="status" id="status">Waiting for a .ply file.</div>
+    <div class="status" id="status">Waiting for a .ply or .sog file.</div>
   </main>
 
   <script>
@@ -1874,6 +1887,8 @@
     let hotspotsVisible = true;
     let activeHotspotId = null;
     let hotspotPointerDown = null;
+    let orbitPointer = null;
+    let orbitDistance = 3;
     const annotationRaycaster = new THREE.Raycaster();
     const annotationPointer = new THREE.Vector2();
     let boundsOverlayScene = null;
@@ -1889,6 +1904,7 @@
     };
 
     const plyFormat = GaussianSplats3D.SceneFormat?.Ply ?? 2;
+    const playCanvasModuleUrl = "https://cdn.jsdelivr.net/npm/playcanvas@2.12.1/+esm";
 
     function setStatus(message, tone = "") {
       statusEl.textContent = message;
@@ -3155,7 +3171,7 @@
       updateHotspotMarkers();
 
       const savedCurrentView = viewer.camera ? captureCurrentView("Current Camera") : null;
-      await loadPly(currentFile, { resetBounds: false, preserveBookmarks: true });
+      await loadSplatFile(currentFile, { resetBounds: false, preserveBookmarks: true });
       if (savedCurrentView) applyView(savedCurrentView);
       updateBookmarkList();
       setStatus(`Baked ${axis.toUpperCase()} rotation to scene transform.`, "ready");
@@ -3211,6 +3227,167 @@
     function defaultWorkspaceName(file) {
       const stem = file?.name?.replace(/\.[^.]+$/, "") || "luma-workspace";
       return `${sanitizeFileStem(stem, "luma-workspace")}-workspace`;
+    }
+
+    function isSupportedSceneFile(file) {
+      return /\.(ply|sog)$/i.test(file?.name || "");
+    }
+
+    function resizeRendererToViewer(renderer, camera) {
+      const rect = viewerRoot.getBoundingClientRect();
+      const width = Math.max(1, Math.floor(rect.width));
+      const height = Math.max(1, Math.floor(rect.height));
+      if (renderer.domElement.width !== width || renderer.domElement.height !== height) {
+        renderer.setSize(width, height, false);
+      }
+      camera.aspect = width / height;
+      camera.updateProjectionMatrix();
+    }
+
+    async function createNativeSogViewer(fileUrl) {
+      const pc = await import(playCanvasModuleUrl);
+      const canvas = document.createElement("canvas");
+      canvas.className = "playcanvas-sog-canvas";
+      viewerRoot.append(canvas);
+
+      const overlayCanvas = document.createElement("canvas");
+      overlayCanvas.className = "three-overlay-canvas";
+      viewerRoot.append(overlayCanvas);
+
+      const overlayRenderer = new THREE.WebGLRenderer({
+        canvas: overlayCanvas,
+        alpha: true,
+        antialias: true,
+        preserveDrawingBuffer: true
+      });
+      overlayRenderer.setPixelRatio(1);
+      overlayRenderer.setClearColor(0x000000, 0);
+
+      const camera = new THREE.PerspectiveCamera(65, 1, 0.01, 1000);
+      camera.position.set(0, 0.75, 1.8);
+      camera.lookAt(0, 0, 0);
+      camera.up.set(0, 1, 0);
+      resizeRendererToViewer(overlayRenderer, camera);
+
+      const controls = {
+        enabled: true,
+        target: new THREE.Vector3(0, 0, 0),
+        update() {
+          syncNativeSogCamera();
+        }
+      };
+
+      const app = new pc.Application(canvas, {
+        graphicsDeviceOptions: {
+          antialias: false,
+          preserveDrawingBuffer: true
+        }
+      });
+      app.autoRender = false;
+      app.setCanvasFillMode(pc.FILLMODE_FILL_WINDOW);
+      app.setCanvasResolution(pc.RESOLUTION_AUTO);
+
+      const pcCamera = new pc.Entity("SOG Camera");
+      pcCamera.addComponent("camera", {
+        clearColor: new pc.Color(0.035, 0.043, 0.051, 1),
+        fov: camera.fov,
+        nearClip: camera.near,
+        farClip: camera.far
+      });
+      app.root.addChild(pcCamera);
+
+      const asset = new pc.Asset("Native SOG", "gsplat", {
+        url: fileUrl,
+        filename: currentFile?.name || "scene.sog",
+        size: currentFile?.size || null
+      });
+      app.assets.add(asset);
+
+      await new Promise((resolve, reject) => {
+        asset.once("load", resolve);
+        asset.once("error", reject);
+        app.assets.load(asset);
+      });
+
+      const splatEntity = new pc.Entity("SOG Splat");
+      const rotation = sceneRotationQuaternion();
+      splatEntity.setPosition(...scenePositionArray());
+      splatEntity.setRotation(rotation[0], rotation[1], rotation[2], rotation[3]);
+      splatEntity.addComponent("gsplat", { asset });
+      app.root.addChild(splatEntity);
+
+      function syncNativeSogCamera() {
+        const rect = viewerRoot.getBoundingClientRect();
+        const width = Math.max(1, Math.floor(rect.width));
+        const height = Math.max(1, Math.floor(rect.height));
+        if (canvas.width !== width || canvas.height !== height) {
+          app.resizeCanvas(width, height);
+        }
+        resizeRendererToViewer(overlayRenderer, camera);
+        pcCamera.setPosition(camera.position.x, camera.position.y, camera.position.z);
+        pcCamera.setRotation(camera.quaternion.x, camera.quaternion.y, camera.quaternion.z, camera.quaternion.w);
+        if (pcCamera.camera) {
+          pcCamera.camera.fov = camera.fov;
+          pcCamera.camera.nearClip = camera.near;
+          pcCamera.camera.farClip = camera.far;
+        }
+      }
+
+      function renderNativeSog() {
+        syncNativeSogCamera();
+        app.render();
+        overlayRenderer.clear();
+      }
+
+      let renderScheduled = false;
+
+      function scheduleNativeSogRender() {
+        if (renderScheduled) return;
+        renderScheduled = true;
+        requestAnimationFrame(() => {
+          renderScheduled = false;
+          viewerFacade.render();
+        });
+      }
+
+      const rendererBridge = {
+        domElement: canvas,
+        get autoClear() {
+          return overlayRenderer.autoClear;
+        },
+        set autoClear(value) {
+          overlayRenderer.autoClear = value;
+        },
+        render(scene, sceneCamera) {
+          overlayRenderer.render(scene, sceneCamera);
+        },
+        setSize(width, height, updateStyle) {
+          overlayRenderer.setSize(width, height, updateStyle);
+        }
+      };
+
+      const viewerFacade = {
+        kind: "sog",
+        camera,
+        controls,
+        renderer: rendererBridge,
+        render: renderNativeSog,
+        forceRenderNextFrame: scheduleNativeSogRender,
+        dispose: () => {
+          try {
+            app.destroy();
+          } catch (error) {
+            console.warn("Native SOG renderer disposal failed", error);
+          }
+          overlayRenderer.dispose();
+          canvas.remove();
+          overlayCanvas.remove();
+        }
+      };
+
+      app.start();
+      renderNativeSog();
+      return viewerFacade;
     }
 
     function serializeView(view) {
@@ -3369,7 +3546,7 @@
     async function importWorkspaceJsonFile(file) {
       if (!file) return;
       if (!viewer || !currentFile) {
-        setStatus("Load the matching .ply file before importing a workspace JSON.", "error");
+        setStatus("Load the matching splat file before importing a workspace JSON.", "error");
         return;
       }
 
@@ -3418,7 +3595,7 @@
       updateAxisGizmo();
 
       if (needsSceneReload) {
-        await loadPly(currentFile, { resetBounds: false });
+        await loadSplatFile(currentFile, { resetBounds: false });
       } else {
         setPointScale(pointScale);
       }
@@ -3780,6 +3957,92 @@
       pitch = euler.x;
     }
 
+    function pointerRayFromEvent(event) {
+      const rect = viewerRoot.getBoundingClientRect();
+      const x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+      const y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+      const origin = viewer.camera.position.clone();
+      const direction = new THREE.Vector3(x, y, 0.5).unproject(viewer.camera).sub(origin).normalize();
+      return { origin, direction };
+    }
+
+    function setOrbitTargetFromPointer(event) {
+      if (!viewer?.camera || !viewer?.controls) return;
+      const { origin, direction } = pointerRayFromEvent(event);
+      const currentDistance = viewer.camera.position.distanceTo(viewer.controls.target);
+      orbitDistance = Number.isFinite(currentDistance) && currentDistance > 0.05 ? currentDistance : orbitDistance;
+      viewer.controls.target.copy(origin).add(direction.multiplyScalar(orbitDistance));
+    }
+
+    function orientCameraTowardOrbitTarget() {
+      if (!viewer?.camera || !viewer?.controls) return;
+      viewer.camera.up.set(0, 1, 0);
+      viewer.camera.lookAt(viewer.controls.target);
+      syncLookAngles();
+      viewer.controls.update();
+      updateCameraReadout();
+      viewer.forceRenderNextFrame?.();
+    }
+
+    function beginOrbitPointer(event) {
+      if (!viewer?.camera || !viewer?.controls || navigationMode !== "orbit" || event.button !== 0 || isFormControlElement(event.target)) return;
+      event.preventDefault();
+      setOrbitTargetFromPointer(event);
+      const offset = viewer.camera.position.clone().sub(viewer.controls.target);
+      orbitDistance = Math.max(0.05, offset.length());
+      const spherical = new THREE.Spherical().setFromVector3(offset);
+      orbitPointer = {
+        id: event.pointerId,
+        x: event.clientX,
+        y: event.clientY,
+        spherical,
+        moved: false
+      };
+      viewerRoot.setPointerCapture?.(event.pointerId);
+      orientCameraTowardOrbitTarget();
+      setStatus("Orbit pivot set. Drag to rotate, scroll to zoom.", "ready");
+    }
+
+    function updateOrbitPointer(event) {
+      if (!orbitPointer || orbitPointer.id !== event.pointerId || !viewer?.camera || !viewer?.controls || navigationMode !== "orbit") return;
+      event.preventDefault();
+      const dx = event.clientX - orbitPointer.x;
+      const dy = event.clientY - orbitPointer.y;
+      if (Math.abs(dx) + Math.abs(dy) > 2) orbitPointer.moved = true;
+      orbitPointer.x = event.clientX;
+      orbitPointer.y = event.clientY;
+
+      orbitPointer.spherical.theta -= dx * 0.006;
+      orbitPointer.spherical.phi -= dy * 0.006;
+      orbitPointer.spherical.phi = THREE.MathUtils.clamp(orbitPointer.spherical.phi, 0.04, Math.PI - 0.04);
+      orbitPointer.spherical.radius = Math.max(0.05, orbitPointer.spherical.radius);
+
+      const offset = new THREE.Vector3().setFromSpherical(orbitPointer.spherical);
+      viewer.camera.position.copy(viewer.controls.target).add(offset);
+      enforceBoundsOnCamera();
+      orientCameraTowardOrbitTarget();
+    }
+
+    function endOrbitPointer(event) {
+      if (!orbitPointer || orbitPointer.id !== event.pointerId) return;
+      viewerRoot.releasePointerCapture?.(event.pointerId);
+      orbitPointer = null;
+    }
+
+    function zoomOrbit(event) {
+      if (!viewer?.camera || !viewer?.controls || navigationMode !== "orbit" || isFormControlElement(event.target)) return;
+      event.preventDefault();
+      const offset = viewer.camera.position.clone().sub(viewer.controls.target);
+      const distance = Math.max(0.05, offset.length());
+      const zoomScale = Math.exp(event.deltaY * 0.001);
+      const nextDistance = THREE.MathUtils.clamp(distance * zoomScale, 0.05, 1000);
+      offset.setLength(nextDistance);
+      viewer.camera.position.copy(viewer.controls.target).add(offset);
+      orbitDistance = nextDistance;
+      enforceBoundsOnCamera();
+      orientCameraTowardOrbitTarget();
+    }
+
     function setNavigationMode(mode) {
       navigationMode = ["orbit", "walk", "look", "fly"].includes(mode) ? mode : "orbit";
       orbitModeButton.classList.toggle("active", navigationMode === "orbit");
@@ -3789,7 +4052,7 @@
       setKeyboardNavigationEnabled(!!viewer && (navigationMode === "walk" || navigationMode === "look" || navigationMode === "fly"));
 
       if (viewer?.controls) {
-        viewer.controls.enabled = navigationMode === "orbit";
+        viewer.controls.enabled = false;
         viewer.controls.update();
         updateCameraReadout();
       }
@@ -4105,13 +4368,28 @@
       updateBookmarkList();
     }
 
-    async function loadPly(file, options = {}) {
+    async function loadSplatFile(file, options = {}) {
+      if (!file) return;
+      if (!isSupportedSceneFile(file)) {
+        setStatus("Please choose a file with a .ply or .sog extension.", "error");
+        return;
+      }
+
+      if (file.name.toLowerCase().endsWith(".sog")) {
+        await loadSog(file, options);
+        return;
+      }
+
+      await loadPly(file, options);
+    }
+
+    async function loadSog(file, options = {}) {
       if (!file) return;
       const resetBounds = options.resetBounds ?? true;
       const preserveBookmarks = options.preserveBookmarks ?? false;
 
-      if (!file.name.toLowerCase().endsWith(".ply")) {
-        setStatus("Please choose a file with a .ply extension.", "error");
+      if (!file.name.toLowerCase().endsWith(".sog")) {
+        setStatus("Please choose a file with a .sog extension.", "error");
         return;
       }
 
@@ -4128,11 +4406,75 @@
       clearButton.disabled = false;
       orientationButton.disabled = false;
       orientationButton.textContent = flipUpright ? "Use Original" : "Flip Upright";
-      fileMeta.textContent = `${file.name} - ${prettyBytes(file.size)}`;
+      fileMeta.textContent = `${file.name} - ${prettyBytes(file.size)} - native SOG`;
       if (!workspaceNameInput.value || workspaceNameInput.value === "luma-workspace") {
         workspaceNameInput.value = defaultWorkspaceName(file);
       }
-      setStatus(`Loading ${file.name}...`);
+      setStatus(`Loading native SOG: ${file.name}...`);
+
+      currentObjectUrl = URL.createObjectURL(file);
+
+      try {
+        viewer = await createNativeSogViewer(currentObjectUrl);
+        captureInitialView();
+        updateCameraReadout();
+        if (initialView && resetBounds) {
+          bounds.center.set(0, 0, 0);
+          writeBoundsToInputs();
+        }
+        ensureBoundsHelper();
+        updateBoundsHelper();
+        ensureAxisGizmoHelper();
+        updateAxisGizmo();
+        updateHotspotList();
+        setPointScale(pointScale);
+        setSceneControlsEnabled(true);
+        setNavigationMode(navigationMode);
+        setStatus(`Ready: ${file.name}`, "ready");
+      } catch (error) {
+        console.error(error);
+        disposeViewer();
+        dropPanel.classList.remove("hidden");
+        clearButton.disabled = true;
+        orientationButton.disabled = true;
+        setSceneControlsEnabled(false);
+        fileMeta.textContent = "Choose a Gaussian splat .ply or .sog file from this device.";
+        setStatus("This .sog file could not be loaded natively. Make sure it is a bundled PlayCanvas/SuperSplat SOG file.", "error");
+      }
+    }
+
+    async function loadPly(file, options = {}) {
+      if (!file) return;
+      const resetBounds = options.resetBounds ?? true;
+      const preserveBookmarks = options.preserveBookmarks ?? false;
+      const sourceFile = options.sourceFile || file;
+      const displayFile = options.displayFile || sourceFile;
+      const displayName = displayFile.name || file.name;
+      const displaySize = displayFile.size ?? file.size;
+
+      if (!file.name.toLowerCase().endsWith(".ply")) {
+        setStatus("Please choose a file with a .ply extension.", "error");
+        return;
+      }
+
+      disposeViewer();
+      if (!preserveBookmarks) {
+        bookmarks = [];
+        hotspots = [];
+        cameraDefaultView = null;
+        updateBookmarkList();
+        updateHotspotList();
+      }
+      currentFile = sourceFile;
+      dropPanel.classList.add("hidden");
+      clearButton.disabled = false;
+      orientationButton.disabled = false;
+      orientationButton.textContent = flipUpright ? "Use Original" : "Flip Upright";
+      fileMeta.textContent = `${displayName} - ${prettyBytes(displaySize)}`;
+      if (!workspaceNameInput.value || workspaceNameInput.value === "luma-workspace") {
+        workspaceNameInput.value = defaultWorkspaceName(sourceFile);
+      }
+      setStatus(`Loading ${displayName}...`);
 
       currentObjectUrl = URL.createObjectURL(file);
 
@@ -4158,7 +4500,7 @@
           position: scenePositionArray(),
           onProgress: (percent, label) => {
             const shown = label || `${Math.round(percent)}%`;
-            setStatus(`Loading ${file.name}: ${shown}`);
+            setStatus(`Loading ${displayName}: ${shown}`);
           }
         });
 
@@ -4177,7 +4519,7 @@
         setPointScale(pointScale);
         setSceneControlsEnabled(true);
         setNavigationMode(navigationMode);
-        setStatus(`Ready: ${file.name}`, "ready");
+        setStatus(`Ready: ${displayName}`, "ready");
       } catch (error) {
         console.error(error);
         disposeViewer();
@@ -4185,13 +4527,13 @@
         clearButton.disabled = true;
         orientationButton.disabled = true;
         setSceneControlsEnabled(false);
-        fileMeta.textContent = "Choose a Luma-style Gaussian splat .ply file from this device.";
-        setStatus("This .ply file could not be loaded. Make sure it is a Gaussian splat PLY export, not a mesh-only PLY.", "error");
+        fileMeta.textContent = "Choose a Gaussian splat .ply or .sog file from this device.";
+        setStatus("This file could not be loaded. Make sure it is a Gaussian splat PLY or bundled SOG export, not a mesh-only file.", "error");
       }
     }
 
     fileInput.addEventListener("change", () => {
-      loadPly(fileInput.files?.[0]);
+      loadSplatFile(fileInput.files?.[0]);
       fileInput.value = "";
     });
 
@@ -4215,15 +4557,15 @@
       writeAlignFrameToInputs();
       setNavigationMode("orbit");
       setSceneControlsEnabled(false);
-      fileMeta.textContent = "Choose a Luma-style Gaussian splat .ply file from this device.";
+      fileMeta.textContent = "Choose a Gaussian splat .ply or .sog file from this device.";
       workspaceNameInput.value = "luma-workspace";
-      setStatus("Waiting for a .ply file.");
+      setStatus("Waiting for a .ply or .sog file.");
     });
 
     orientationButton.addEventListener("click", () => {
       if (!currentFile) return;
       flipUpright = !flipUpright;
-      loadPly(currentFile);
+      loadSplatFile(currentFile);
     });
 
     orbitModeButton.addEventListener("click", () => {
@@ -4420,7 +4762,12 @@
       }
     }, true);
 
+    viewerRoot.addEventListener("pointerdown", beginOrbitPointer);
     viewerRoot.addEventListener("pointerdown", handleHotspotPointerDown);
+    viewerRoot.addEventListener("pointermove", updateOrbitPointer);
+    viewerRoot.addEventListener("pointerup", endOrbitPointer);
+    viewerRoot.addEventListener("pointercancel", endOrbitPointer);
+    viewerRoot.addEventListener("wheel", zoomOrbit, { passive: false });
     viewerRoot.addEventListener("click", handleHotspotClick);
 
     document.addEventListener("pointerlockchange", () => {
@@ -4466,7 +4813,7 @@
 
     dropPanel.addEventListener("drop", (event) => {
       const file = event.dataTransfer?.files?.[0];
-      loadPly(file);
+      loadSplatFile(file);
     });
   </script>
 </body>
