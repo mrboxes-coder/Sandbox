@@ -153,7 +153,7 @@
       ],
       "date": "2026-08-28",
       "desc": "Mirror Kaleidoscope reflects webcam or uploaded photos across a vertical axis, producing a triptych of original and mirrored halves. Users align, adjust colour/effects, and export PNGs, exploring how artificial symmetry reveals natural versus constructed facial appearance.",
-      "link": "./basic_vibes/mirror_kaleidoscope.html/",
+      "link": "./basic_vibes/mirror_kaleidoscope.html",
       "tags": [
         "WebCam",
         "Canvas API"
