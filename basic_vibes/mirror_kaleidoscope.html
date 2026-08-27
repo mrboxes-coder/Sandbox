@@ -1,0 +1,1457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mirror Kaleidoscope</title>
+<link rel="icon" type="image/png" href="data:image/png;base64,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">
+<style>
+/* ============================================================
+   SANDBOX PROJECT STYLE GUIDE — applied
+   Compact technical tool UI: dark palette, mono labels, accordions
+   ============================================================ */
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:            #101014;
+  --topbar:        #1d1d22;
+  --panel:         #1a1a20;
+  --surface:       #26272f;
+  --surface-mid:   #2c2d35;
+  --border:        #343642;
+
+  --text:          #f2f3f7;
+  --muted:         #a5abc0;
+  --sub:           #b4bad0;
+
+  --accent:        #3b97ee;
+  --accent-light:  #71baff;
+  --accent-fill:   #163452;
+
+  --danger:        #ff3838;
+
+  --mono: "IBM Plex Mono", "Cascadia Mono", Consolas, monospace;
+  --sans: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+
+  --label-size:    11px;
+  --list-text:     #8f96a8;
+  --list-text-size: 13px;
+
+  --panel-w:       270px;
+  --radius:        4px;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
+}
+
+body {
+  font-size: 13px;
+  line-height: 1.4;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ═══════════ TOPBAR / BRANDING ═══════════ */
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  min-height: 64px;
+  padding: 10px 18px;
+  border-bottom: 1px solid var(--border);
+  background: var(--topbar);
+  flex-shrink: 0;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.brand-icon {
+  width: 34px;
+  height: 34px;
+  object-fit: contain;
+  border-radius: 6px;
+  flex: 0 0 auto;
+}
+
+.brand h1 {
+  color: var(--text);
+  font-size: 22px;
+  font-weight: 760;
+  letter-spacing: 0;
+  white-space: nowrap;
+}
+
+.brand h1 span { color: var(--accent); }
+
+.brand .subtitle {
+  margin-top: 1px;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.3;
+}
+
+.top-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.chip {
+  min-height: 32px;
+  display: inline-flex;
+  align-items: center;
+  padding: 0 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--sub);
+  font-family: var(--mono);
+  font-size: var(--label-size);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.chip.active {
+  border-color: var(--accent);
+  background: var(--accent-fill);
+  color: var(--accent-light);
+}
+
+/* ═══════════ BUTTONS ═══════════ */
+.button {
+  min-height: 32px;
+  padding: 0 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: var(--label-size);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  white-space: nowrap;
+  transition: background 0.1s, border-color 0.1s, color 0.1s;
+}
+.button svg { flex-shrink: 0; }
+.button:hover {
+  border-color: var(--accent);
+  background: var(--accent-fill);
+  color: #fff;
+}
+.button.primary {
+  background: var(--accent-fill);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.button.primary:hover { color: #fff; }
+.button.danger {
+  border-color: var(--danger);
+  color: var(--danger);
+}
+.button.danger:hover {
+  background: var(--danger);
+  border-color: var(--danger);
+  color: #fff;
+}
+.button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+.button:disabled:hover {
+  background: var(--surface);
+  border-color: var(--border);
+  color: var(--muted);
+}
+.button.full-w { width: 100%; }
+
+/* ═══════════ MODE BAR (segmented selector) ═══════════ */
+.mode-bar { display: flex; gap: 4px; flex-wrap: wrap; }
+.mode {
+  flex: 1;
+  min-width: 0;
+  min-height: 32px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--sub);
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.mode:hover { border-color: var(--accent); color: #fff; }
+.mode.active {
+  border-color: var(--accent);
+  background: var(--accent-fill);
+  color: var(--accent-light);
+}
+.mode.active:hover { color: #fff; }
+
+/* ═══════════ LAYOUT ═══════════ */
+.main {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+.left-panel,
+.right-panel {
+  width: var(--panel-w);
+  flex-shrink: 0;
+  background: var(--panel);
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: var(--accent) var(--bg);
+}
+.left-panel  { border-right: 1px solid var(--border); }
+.right-panel { border-left:  1px solid var(--border); }
+
+.center {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.status-bar {
+  height: 26px;
+  flex-shrink: 0;
+  background: var(--topbar);
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 0 14px;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+}
+.status-bar b {
+  color: var(--text);
+  font-weight: 700;
+}
+
+/* ═══════════ ACCORDION MENUS ═══════════ */
+.accordion {
+  border-bottom: 1px solid var(--border);
+  padding: 10px;
+}
+
+.accordion-heading {
+  width: 100%;
+  min-height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border: none;
+  border-radius: 0;
+  background: var(--surface-mid);
+  color: var(--text);
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  padding: 0 10px;
+  cursor: pointer;
+}
+.accordion-heading:hover { color: #fff; }
+.accordion-heading::after {
+  content: "+";
+  color: var(--accent);
+  font-size: 14px;
+}
+.accordion.open .accordion-heading::after { content: "\2212"; }
+
+.accordion-body {
+  display: none;
+  gap: 10px;
+  padding-top: 10px;
+}
+.accordion.open .accordion-body { display: grid; }
+
+/* ═══════════ TYPOGRAPHY ═══════════ */
+.section-title,
+.control-label {
+  font-family: var(--mono);
+  font-size: var(--label-size);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.prose {
+  font-family: var(--sans);
+  font-size: 12px;
+  color: var(--sub);
+  line-height: 1.55;
+}
+
+/* ═══════════ SLIDERS ═══════════ */
+.range-field {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 42px;
+  align-items: center;
+  gap: 4px;
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.range-field .control-label { grid-column: 1 / -1; }
+.range-field input[type="range"] {
+  min-width: 0;
+  width: 100%;
+  height: 3px;
+  accent-color: var(--accent);
+}
+.range-field .range-value {
+  justify-self: end;
+  color: var(--sub);
+  font-size: var(--label-size);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ═══════════ CHECKBOXES ═══════════ */
+.check-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 30px;
+  padding: 6px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--text);
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.check-row input {
+  width: 14px;
+  height: 14px;
+  accent-color: var(--accent);
+}
+
+/* ═══════════ READOUTS ═══════════ */
+.readout {
+  display: grid;
+  gap: 6px;
+}
+.readout-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 8px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg);
+  font-family: var(--mono);
+  font-size: var(--label-size);
+}
+.readout-row .k { color: var(--muted); letter-spacing: 0.06em; text-transform: uppercase; }
+.readout-row .v { color: var(--text); font-weight: 700; }
+
+.hint-list { display: grid; gap: 6px; }
+.hint-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  padding: 6px 8px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg);
+}
+.hint-key {
+  flex-shrink: 0;
+  min-width: 48px;
+  text-align: center;
+  padding: 2px 6px;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  background: var(--surface);
+  color: var(--accent-light);
+  font-family: var(--mono);
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
+.hint-text {
+  font-family: var(--sans);
+  font-size: 11px;
+  color: var(--sub);
+}
+
+.divider {
+  height: 1px;
+  background: var(--border);
+  margin: 2px 0;
+}
+
+/* ═══════════ CANVAS / WORKSPACE AREA ═══════════ */
+.canvas-area {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  background:
+    linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px),
+    #121216;
+  background-size: 28px 28px;
+}
+
+/* ═══════════ EMPTY STATE ═══════════ */
+.empty-state {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  pointer-events: none;
+}
+.empty-state .empty-icon { opacity: 0.2; color: var(--muted); }
+.empty-state .empty-title {
+  font-size: 16px;
+  font-weight: 760;
+  color: var(--text);
+  letter-spacing: -0.01em;
+}
+.empty-state .empty-sub {
+  font-size: 12px;
+  color: var(--muted);
+  max-width: 260px;
+  text-align: center;
+}
+.empty-state .empty-actions {
+  display: flex;
+  gap: 8px;
+  pointer-events: all;
+  margin-top: 6px;
+}
+
+/* ═══════════ ICONS / UTILITIES ═══════════ */
+svg { display: block; flex-shrink: 0; }
+.hidden { display: none !important; }
+
+/* ============================================================
+   ONE-OFF LAYOUT VALUES — not covered by the style guide
+   ============================================================ */
+#mainCanvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  touch-action: none;
+  cursor: grab;
+}
+#mainCanvas.dragging { cursor: grabbing; }
+#mainCanvas.rotating { cursor: crosshair; }
+</style>
+</head>
+<body>
+
+  <header class="topbar">
+    <div class="brand">
+      <img class="brand-icon" src="data:image/png;base64,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" alt="">
+      <div>
+        <h1>Mirror <span>Kaleidoscope</span></h1>
+        <div class="subtitle">Reflect a face across its own axis</div>
+      </div>
+    </div>
+    <div class="top-actions">
+      <div class="chip" id="modePill">Idle</div>
+      <button class="button" id="resetTopBtn" disabled title="Reset pan / scale / rotation">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-9.36L1 10"/></svg>
+        Reset Alignment
+      </button>
+      <button class="button" id="switchBtn" disabled title="Choose a different input">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 3h5v5"/><path d="M4 20 21 3"/><path d="M21 16v5h-5"/><path d="M15 15l6 6"/><path d="M4 4l5 5"/></svg>
+        Switch Input
+      </button>
+      <button class="button danger" id="stopBtn" disabled title="Stop and clear">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="M6 6l12 12"/></svg>
+        Stop
+      </button>
+    </div>
+  </header>
+
+  <div class="main">
+
+    <aside class="left-panel">
+
+      <section class="accordion open">
+        <button class="accordion-heading" type="button">View</button>
+        <div class="accordion-body">
+          <p class="prose">Original, left-mirrored, and right-mirrored shown side by side — the direct comparison is the point.</p>
+        </div>
+      </section>
+
+      <section class="accordion open">
+        <button class="accordion-heading" type="button">Alignment</button>
+        <div class="accordion-body">
+          <div class="hint-list">
+            <div class="hint-row"><span class="hint-key">DRAG</span><span class="hint-text">Pan to centre the face on the axis</span></div>
+            <div class="hint-row"><span class="hint-key">SCROLL</span><span class="hint-text">Scale up / down</span></div>
+            <div class="hint-row"><span class="hint-key">HANDLE</span><span class="hint-text">Drag the top handle to trim tilt</span></div>
+          </div>
+          <div class="divider"></div>
+          <button class="button full-w" id="resetPanelBtn" disabled>Reset Alignment</button>
+        </div>
+      </section>
+
+      <section class="accordion">
+        <button class="accordion-heading" type="button">Color Adjustments</button>
+        <div class="accordion-body">
+          <label class="range-field">
+            <span class="control-label">Brightness</span>
+            <input type="range" min="-100" max="100" value="0" data-param="brightness">
+            <span class="range-value" data-readout="brightness">0</span>
+          </label>
+          <label class="range-field">
+            <span class="control-label">Contrast</span>
+            <input type="range" min="-100" max="100" value="0" data-param="contrast">
+            <span class="range-value" data-readout="contrast">0</span>
+          </label>
+          <label class="range-field">
+            <span class="control-label">Exposure</span>
+            <input type="range" min="-100" max="100" value="0" data-param="exposure">
+            <span class="range-value" data-readout="exposure">0</span>
+          </label>
+          <label class="range-field">
+            <span class="control-label">Hue</span>
+            <input type="range" min="-180" max="180" value="0" data-param="hue">
+            <span class="range-value" data-readout="hue">0°</span>
+          </label>
+          <label class="range-field">
+            <span class="control-label">Saturation</span>
+            <input type="range" min="-100" max="100" value="0" data-param="saturation">
+            <span class="range-value" data-readout="saturation">0</span>
+          </label>
+
+          <div class="divider"></div>
+          <span class="section-title">Color Balance</span>
+          <label class="range-field">
+            <span class="control-label">Red</span>
+            <input type="range" min="-100" max="100" value="0" data-param="red">
+            <span class="range-value" data-readout="red">0</span>
+          </label>
+          <label class="range-field">
+            <span class="control-label">Green</span>
+            <input type="range" min="-100" max="100" value="0" data-param="green">
+            <span class="range-value" data-readout="green">0</span>
+          </label>
+          <label class="range-field">
+            <span class="control-label">Blue</span>
+            <input type="range" min="-100" max="100" value="0" data-param="blue">
+            <span class="range-value" data-readout="blue">0</span>
+          </label>
+
+          <div class="divider"></div>
+          <button class="button full-w" id="resetAdjustBtn">Reset Adjustments</button>
+        </div>
+      </section>
+
+      <section class="accordion">
+        <button class="accordion-heading" type="button">Effects</button>
+        <div class="accordion-body">
+          <span class="section-title">Tone</span>
+          <div class="mode-bar" id="toneGrid">
+            <button class="mode active" data-tone="none">None</button>
+            <button class="mode" data-tone="grayscale">Grayscale</button>
+            <button class="mode" data-tone="sepia">Sepia</button>
+          </div>
+          <div class="divider"></div>
+          <label class="check-row">
+            <input type="checkbox" id="pixelateToggle">
+            <span>Pixelate</span>
+          </label>
+          <label class="range-field">
+            <span class="control-label">Pixel Size</span>
+            <input type="range" min="1" max="10" value="5" id="pixelateSize">
+            <span class="range-value" id="vPixelateSize">5px</span>
+          </label>
+        </div>
+      </section>
+
+      <section class="accordion open">
+        <button class="accordion-heading" type="button">Export</button>
+        <div class="accordion-body">
+          <button class="button primary full-w" id="saveBtn" disabled title="Save the current triptych as a PNG (Space)">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Save PNG
+          </button>
+          <p class="hint-text">Save current view as PNG — press <span class="hint-key" style="display:inline-block;min-width:auto;">Space</span></p>
+        </div>
+      </section>
+
+      <section class="accordion">
+        <button class="accordion-heading" type="button">System Settings</button>
+        <div class="accordion-body">
+          <button class="button full-w" id="exportPromptBtn">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="4" x2="12" y2="16"/><polyline points="6 11 12 17 18 11"/><line x1="5" y1="20" x2="19" y2="20"/></svg>
+            Export Prompt
+          </button>
+          <p class="hint-text">Downloads a reconstruction prompt describing this build.</p>
+        </div>
+      </section>
+
+    </aside>
+
+    <div class="center">
+      <div class="canvas-area" id="canvasWrap">
+        <canvas id="mainCanvas"></canvas>
+
+        <div class="empty-state" id="emptyState">
+          <svg class="empty-icon" width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="9"/>
+            <line x1="12" y1="3" x2="12" y2="21"/>
+          </svg>
+          <div class="empty-title">Reflect a face across its own axis</div>
+          <div class="empty-sub">Start your camera or upload a photo, then align it against the guide to reveal the mirrored version.</div>
+          <div class="empty-actions">
+            <button class="button primary" id="startCameraBtn">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
+              Start Camera
+            </button>
+            <button class="button" id="uploadImageBtn">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+              Upload Image
+            </button>
+          </div>
+        </div>
+        <input type="file" id="fileInput" accept="image/*" class="hidden">
+      </div>
+    </div>
+
+    <aside class="right-panel">
+
+      <section class="accordion open">
+        <button class="accordion-heading" type="button">About</button>
+        <div class="accordion-body">
+          <p class="prose">Imposing artificial symmetry on an asymmetric face reveals what we normally read as "natural" versus "constructed." No face tracking is used — you align yourself against a fixed guide, on purpose.</p>
+        </div>
+      </section>
+
+      <section class="accordion open">
+        <button class="accordion-heading" type="button">Status</button>
+        <div class="accordion-body">
+          <div class="readout">
+            <div class="readout-row"><span class="k">Input</span><span class="v" id="statInput">None</span></div>
+            <div class="readout-row"><span class="k">Scale</span><span class="v" id="statScale">100%</span></div>
+            <div class="readout-row"><span class="k">Rotation</span><span class="v" id="statRotation">0°</span></div>
+            <div class="readout-row"><span class="k">Tone</span><span class="v" id="statTone">None</span></div>
+            <div class="readout-row"><span class="k">Pixelate</span><span class="v" id="statPixelate">Off</span></div>
+          </div>
+        </div>
+      </section>
+
+    </aside>
+
+  </div>
+
+  <div class="status-bar">
+    <span>Status: <b id="statusText">Waiting</b></span>
+    <span>Axis: <b>Vertical, fixed centre</b></span>
+    <span>Tracking: <b>None (canvas only)</b></span>
+  </div>
+
+<script>
+(function(){
+  'use strict';
+
+  // ── Accordion behaviour (per style guide) ─────────────────
+  document.querySelectorAll('.accordion-heading').forEach(heading => {
+    heading.addEventListener('click', () => {
+      const accordion = heading.closest('.accordion');
+      if(accordion) accordion.classList.toggle('open');
+    });
+  });
+
+  // ── State ────────────────────────────────────────────────
+  const state = {
+    mode: 'idle',        // 'idle' | 'camera' | 'image'
+    transform: { x: 0, y: 0, scale: 1, rotation: 0 }, // x/y are fractions of pane size
+    adjust: {
+      brightness: 0, contrast: 0, exposure: 0, hue: 0, saturation: 0,
+      red: 0, green: 0, blue: 0,
+      tone: 'none',       // 'none' | 'grayscale' | 'sepia'
+      pixelate: false,
+      pixelateSize: 5     // literal block edge length in px, e.g. 2 = a 2×2 pixel block
+    }
+  };
+
+  let stream = null;
+  const videoEl = document.createElement('video');
+  videoEl.autoplay = true;
+  videoEl.playsInline = true;
+  videoEl.muted = true;
+  let imageEl = null;
+
+  // ── DOM refs ─────────────────────────────────────────────
+  const canvasWrap   = document.getElementById('canvasWrap');
+  const canvas       = document.getElementById('mainCanvas');
+  const ctx          = canvas.getContext('2d');
+  const emptyState   = document.getElementById('emptyState');
+  const fileInput    = document.getElementById('fileInput');
+
+  const startCameraBtn = document.getElementById('startCameraBtn');
+  const uploadImageBtn = document.getElementById('uploadImageBtn');
+  const saveBtn          = document.getElementById('saveBtn');
+  const switchBtn       = document.getElementById('switchBtn');
+  const stopBtn          = document.getElementById('stopBtn');
+  const resetTopBtn      = document.getElementById('resetTopBtn');
+  const resetPanelBtn    = document.getElementById('resetPanelBtn');
+  const modePill          = document.getElementById('modePill');
+  const statusText        = document.getElementById('statusText');
+
+  const statInput    = document.getElementById('statInput');
+  const statScale    = document.getElementById('statScale');
+  const statRotation = document.getElementById('statRotation');
+  const statTone      = document.getElementById('statTone');
+  const statPixelate  = document.getElementById('statPixelate');
+  const resetAdjustBtn = document.getElementById('resetAdjustBtn');
+  const toneGrid        = document.getElementById('toneGrid');
+  const pixelateToggle  = document.getElementById('pixelateToggle');
+  const pixelateSizeInp = document.getElementById('pixelateSize');
+  const vPixelateSize   = document.getElementById('vPixelateSize');
+
+  // ── Canvas sizing ────────────────────────────────────────
+  let dpr = Math.max(1, window.devicePixelRatio || 1);
+  function resizeCanvas(){
+    dpr = Math.max(1, window.devicePixelRatio || 1);
+    const w = canvasWrap.clientWidth;
+    const h = canvasWrap.clientHeight;
+    canvas.width  = Math.round(w * dpr);
+    canvas.height = Math.round(h * dpr);
+    canvas.style.width  = w + 'px';
+    canvas.style.height = h + 'px';
+  }
+  new ResizeObserver(resizeCanvas).observe(canvasWrap);
+  resizeCanvas();
+
+  // ── UI helpers ───────────────────────────────────────────
+  function setMode(mode){
+    state.mode = mode;
+    const active = mode !== 'idle';
+    saveBtn.disabled        = !active;
+    switchBtn.disabled     = !active;
+    stopBtn.disabled       = !active;
+    resetTopBtn.disabled   = !active;
+    resetPanelBtn.disabled = !active;
+    emptyState.style.display = active ? 'none' : 'flex';
+    modePill.textContent = mode === 'idle' ? 'Idle' : (mode === 'camera' ? 'Camera' : 'Image');
+    modePill.classList.toggle('active', active);
+    statusText.textContent = mode === 'idle' ? 'Waiting' : 'Aligning — drag to adjust';
+    statInput.textContent = mode === 'idle' ? 'None' : (mode === 'camera' ? 'Camera' : 'Image');
+  }
+
+  function resetTransform(){
+    state.transform.x = 0;
+    state.transform.y = 0;
+    state.transform.scale = 1;
+    state.transform.rotation = 0;
+    updateStatusReadouts();
+  }
+
+  function updateStatusReadouts(){
+    statScale.textContent = Math.round(state.transform.scale * 100) + '%';
+    statRotation.textContent = Math.round(state.transform.rotation * 180 / Math.PI) + '°';
+    statTone.textContent = state.adjust.tone.charAt(0).toUpperCase() + state.adjust.tone.slice(1);
+    statPixelate.textContent = state.adjust.pixelate ? 'On' : 'Off';
+  }
+
+  // ── Adjustment controls ──────────────────────────────────
+  const adjustSliders = Array.from(document.querySelectorAll('input[type=range][data-param]'));
+  adjustSliders.forEach(inp => {
+    inp.addEventListener('input', () => {
+      const p = inp.dataset.param;
+      state.adjust[p] = Number(inp.value);
+      const readout = document.querySelector(`span[data-readout="${p}"]`);
+      if(readout) readout.textContent = inp.value + (p === 'hue' ? '°' : '');
+    });
+  });
+
+  toneGrid.addEventListener('click', e => {
+    const btn = e.target.closest('.mode');
+    if(!btn) return;
+    state.adjust.tone = btn.dataset.tone;
+    document.querySelectorAll('#toneGrid .mode').forEach(b => b.classList.toggle('active', b === btn));
+    updateStatusReadouts();
+  });
+
+  pixelateToggle.addEventListener('change', () => {
+    state.adjust.pixelate = pixelateToggle.checked;
+    updateStatusReadouts();
+  });
+
+  pixelateSizeInp.addEventListener('input', () => {
+    state.adjust.pixelateSize = Number(pixelateSizeInp.value);
+    vPixelateSize.textContent = pixelateSizeInp.value + 'px';
+  });
+
+  function resetAdjustments(){
+    Object.assign(state.adjust, {
+      brightness: 0, contrast: 0, exposure: 0, hue: 0, saturation: 0,
+      red: 0, green: 0, blue: 0, tone: 'none', pixelate: false, pixelateSize: 5
+    });
+    adjustSliders.forEach(inp => {
+      inp.value = 0;
+      const p = inp.dataset.param;
+      const readout = document.querySelector(`span[data-readout="${p}"]`);
+      if(readout) readout.textContent = '0' + (p === 'hue' ? '°' : '');
+    });
+    document.querySelectorAll('#toneGrid .mode').forEach(b => b.classList.toggle('active', b.dataset.tone === 'none'));
+    pixelateToggle.checked = false;
+    pixelateSizeInp.value = 5;
+    vPixelateSize.textContent = '5px';
+    updateStatusReadouts();
+  }
+  resetAdjustBtn.addEventListener('click', resetAdjustments);
+
+  // ── Input: camera ───────────────────────────────────────
+  async function startCamera(){
+    try{
+      stream = await navigator.mediaDevices.getUserMedia({ video: { width: 1280, height: 960 }, audio: false });
+      videoEl.srcObject = stream;
+      await videoEl.play();
+      imageEl = null;
+      resetTransform();
+      setMode('camera');
+    }catch(err){
+      statusText.textContent = 'Camera unavailable: ' + err.message;
+    }
+  }
+
+  function stopCamera(){
+    if(stream){
+      stream.getTracks().forEach(t => t.stop());
+      stream = null;
+    }
+    videoEl.srcObject = null;
+  }
+
+  // ── Input: image ─────────────────────────────────────────
+  function loadImageFile(file){
+    if(!file) return;
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = () => {
+      stopCamera();
+      imageEl = img;
+      resetTransform();
+      setMode('image');
+      URL.revokeObjectURL(url);
+    };
+    img.src = url;
+  }
+
+  function stopAll(){
+    stopCamera();
+    imageEl = null;
+    setMode('idle');
+  }
+
+  startCameraBtn.addEventListener('click', startCamera);
+  uploadImageBtn.addEventListener('click', () => fileInput.click());
+  fileInput.addEventListener('change', () => loadImageFile(fileInput.files[0]));
+  switchBtn.addEventListener('click', () => {
+    stopAll();
+  });
+  stopBtn.addEventListener('click', stopAll);
+  resetTopBtn.addEventListener('click', resetTransform);
+  resetPanelBtn.addEventListener('click', resetTransform);
+
+  // ── Pane geometry ────────────────────────────────────────
+  // Always a triptych: original, left-mirrored, right-mirrored.
+  function getPanes(){
+    const w = canvasWrap.clientWidth;
+    const h = canvasWrap.clientHeight;
+    const third = w / 3;
+    return [
+      { x:0,        y:0, w:third, h, kind:'original', label:'Original' },
+      { x:third,    y:0, w:third, h, kind:'mirror', half:'left',  label:'Left mirror' },
+      { x:third*2,  y:0, w:third, h, kind:'mirror', half:'right', label:'Right mirror' }
+    ];
+  }
+
+  // ── Rendering ────────────────────────────────────────────
+  function currentSourceEl(){
+    if(state.mode === 'camera') return videoEl;
+    if(state.mode === 'image')  return imageEl;
+    return null;
+  }
+  function sourceDims(el){
+    if(!el) return null;
+    const w = el.videoWidth || el.naturalWidth || el.width || 0;
+    const h = el.videoHeight || el.naturalHeight || el.height || 0;
+    if(!w || !h) return null;
+    return { w, h };
+  }
+
+  // ── Image processing pipeline ─────────────────────────────
+  // Raw source → colour-adjusted / toned / pixelated canvas, fed into the mirror
+  // renderer in place of the raw video/image element. Capped resolution keeps the
+  // per-pixel passes fast enough for live video.
+  const PROCESS_MAX = 640;
+  const procCanvas = document.createElement('canvas');
+  const procCtx = procCanvas.getContext('2d', { willReadFrequently: true });
+  const smallCanvas = document.createElement('canvas');
+  const smallCtx = smallCanvas.getContext('2d');
+
+  function clamp8(v){ return v < 0 ? 0 : (v > 255 ? 255 : v); }
+
+  function buildFilterString(a){
+    const parts = [
+      `brightness(${(1 + a.brightness / 100).toFixed(3)})`,
+      `contrast(${(1 + a.contrast / 100).toFixed(3)})`,
+      `saturate(${(1 + a.saturation / 100).toFixed(3)})`
+    ];
+    if(a.hue !== 0) parts.push(`hue-rotate(${a.hue}deg)`);
+    if(a.tone === 'grayscale') parts.push('grayscale(1)');
+    if(a.tone === 'sepia') parts.push('sepia(1)');
+    return parts.join(' ');
+  }
+
+  function processSource(el, dims){
+    const a = state.adjust;
+    const scale = Math.min(1, PROCESS_MAX / Math.max(dims.w, dims.h));
+    const pw = Math.max(1, Math.round(dims.w * scale));
+    const ph = Math.max(1, Math.round(dims.h * scale));
+    if(procCanvas.width !== pw || procCanvas.height !== ph){
+      procCanvas.width = pw;
+      procCanvas.height = ph;
+    }
+
+    procCtx.save();
+    procCtx.filter = buildFilterString(a);
+    procCtx.clearRect(0, 0, pw, ph);
+    procCtx.drawImage(el, 0, 0, pw, ph);
+    procCtx.restore();
+
+    const needsPixelPass = a.exposure !== 0 || a.red !== 0 || a.green !== 0 || a.blue !== 0;
+    if(needsPixelPass){
+      const expGain = 1 + (a.exposure / 100) * 1.5;
+      const rOff = (a.red / 100) * 60;
+      const gOff = (a.green / 100) * 60;
+      const bOff = (a.blue / 100) * 60;
+      const imgData = procCtx.getImageData(0, 0, pw, ph);
+      const d = imgData.data;
+      for(let i = 0; i < d.length; i += 4){
+        d[i]     = clamp8(d[i]     * expGain + rOff);
+        d[i + 1] = clamp8(d[i + 1] * expGain + gOff);
+        d[i + 2] = clamp8(d[i + 2] * expGain + bOff);
+      }
+      procCtx.putImageData(imgData, 0, 0);
+    }
+
+    if(a.pixelate){
+      // pixelateSize is the literal edge length of each pixelated block, in
+      // pixels of the (capped-resolution) processing canvas — e.g. 2 = a 2×2 block.
+      const blockPx = Math.max(1, Math.round(a.pixelateSize));
+      const smallW = Math.max(1, Math.round(pw / blockPx));
+      const smallH = Math.max(1, Math.round(ph / blockPx));
+      smallCanvas.width = smallW;
+      smallCanvas.height = smallH;
+      smallCtx.imageSmoothingEnabled = true;
+      smallCtx.clearRect(0, 0, smallW, smallH);
+      smallCtx.drawImage(procCanvas, 0, 0, smallW, smallH);
+
+      procCtx.imageSmoothingEnabled = false;
+      procCtx.clearRect(0, 0, pw, ph);
+      procCtx.drawImage(smallCanvas, 0, 0, pw, ph);
+      procCtx.imageSmoothingEnabled = true;
+    }
+
+    return procCanvas;
+  }
+
+  // Applies the alignment transform (pan/scale/rotate, anchored to paneRect's own
+  // centre) and draws the source. Caller is responsible for clip + save/restore
+  // around this, since it may be called inside an already-flipped coordinate space.
+  function paintAligned(paneRect, el, dims){
+    const cx = paneRect.x + paneRect.w / 2 + state.transform.x * paneRect.w;
+    const cy = paneRect.y + paneRect.h / 2 + state.transform.y * paneRect.h;
+    const baseScale = Math.max(paneRect.w / dims.w, paneRect.h / dims.h) * state.transform.scale;
+
+    ctx.translate(cx, cy);
+    ctx.rotate(state.transform.rotation);
+    ctx.scale(baseScale, baseScale);
+    ctx.translate(-dims.w / 2, -dims.h / 2);
+    ctx.drawImage(el, 0, 0, dims.w, dims.h);
+  }
+
+  function clipToRect(rect){
+    ctx.beginPath();
+    ctx.rect(rect.x, rect.y, rect.w, rect.h);
+    ctx.clip();
+  }
+
+  function drawOriginalPane(paneRect, el, dims){
+    ctx.save();
+    clipToRect(paneRect);
+    paintAligned(paneRect, el, dims);
+    ctx.restore();
+  }
+
+  function drawMirrorPane(paneRect, half, el, dims){
+    const midX = paneRect.x + paneRect.w / 2;
+    const leftRect  = { x: paneRect.x, y: paneRect.y, w: paneRect.w / 2, h: paneRect.h };
+    const rightRect = { x: midX,       y: paneRect.y, w: paneRect.w / 2, h: paneRect.h };
+    const realRect    = half === 'left' ? leftRect  : rightRect;
+    const reflectRect = half === 'left' ? rightRect : leftRect;
+
+    // real half, drawn in place
+    ctx.save();
+    clipToRect(realRect);
+    paintAligned(paneRect, el, dims);
+    ctx.restore();
+
+    // reflected half — mirror the whole aligned frame across midX, clipped to the other side
+    ctx.save();
+    clipToRect(reflectRect);
+    ctx.translate(2 * midX, 0);
+    ctx.scale(-1, 1);
+    paintAligned(paneRect, el, dims);
+    ctx.restore();
+  }
+
+  function drawGuide(paneRect){
+    const cx = paneRect.x + paneRect.w / 2;
+    const cy = paneRect.y + paneRect.h / 2;
+    const rw = Math.min(paneRect.w * 0.34, paneRect.h * 0.32);
+    const rh = Math.min(paneRect.h * 0.42, paneRect.w * 0.42);
+
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(paneRect.x, paneRect.y, paneRect.w, paneRect.h);
+    ctx.clip();
+
+    ctx.strokeStyle = 'rgba(255,255,255,0.18)';
+    ctx.lineWidth = 1.5;
+    ctx.setLineDash([]);
+    ctx.beginPath();
+    ctx.ellipse(cx, cy, rw, rh, 0, 0, Math.PI * 2);
+    ctx.stroke();
+
+    ctx.strokeStyle = 'rgba(59,151,238,0.4)';
+    ctx.lineWidth = 1;
+    ctx.setLineDash([4, 5]);
+    ctx.beginPath();
+    ctx.moveTo(cx, paneRect.y);
+    ctx.lineTo(cx, paneRect.y + paneRect.h);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    ctx.restore();
+  }
+
+  function drawLabel(paneRect, text){
+    ctx.save();
+    ctx.font = '800 10px "IBM Plex Mono", "Cascadia Mono", Consolas, monospace';
+    const paddingX = 7, paddingY = 4;
+    const metrics = ctx.measureText(text.toUpperCase());
+    const boxW = metrics.width + paddingX * 2;
+    const boxH = 18;
+    const x = paneRect.x + 8;
+    const y = paneRect.y + 8;
+    ctx.fillStyle = 'rgba(0,0,0,0.65)';
+    roundRect(x, y, boxW, boxH, 3);
+    ctx.fill();
+    ctx.fillStyle = '#f2f3f7';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(text.toUpperCase(), x + paddingX, y + boxH / 2 + 1);
+    ctx.restore();
+  }
+
+  function roundRect(x, y, w, h, r){
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.arcTo(x + w, y,     x + w, y + h, r);
+    ctx.arcTo(x + w, y + h, x,     y + h, r);
+    ctx.arcTo(x,     y + h, x,     y,     r);
+    ctx.arcTo(x,     y,     x + w, y,     r);
+    ctx.closePath();
+  }
+
+  function drawDivider(x, h){
+    ctx.save();
+    ctx.strokeStyle = 'rgba(255,255,255,0.1)';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(x, 0);
+    ctx.lineTo(x, h);
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  // Rotate handle geometry, always attached to the first (reference) pane
+  function getHandlePos(paneRect){
+    const cx = paneRect.x + paneRect.w / 2;
+    const rh = Math.min(paneRect.h * 0.42, paneRect.w * 0.42);
+    const cy = paneRect.y + paneRect.h / 2;
+    const dist = rh + 34;
+    const angle = state.transform.rotation - Math.PI / 2;
+    return { x: cx + Math.cos(angle) * dist, y: cy + Math.sin(angle) * dist, anchorX: cx, anchorY: cy };
+  }
+
+  function drawHandle(paneRect){
+    const p = getHandlePos(paneRect);
+    ctx.save();
+    ctx.strokeStyle = 'rgba(255,255,255,0.25)';
+    ctx.lineWidth = 1;
+    ctx.setLineDash([2, 4]);
+    ctx.beginPath();
+    ctx.moveTo(p.anchorX, p.anchorY);
+    ctx.lineTo(p.x, p.y);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, 7, 0, Math.PI * 2);
+    ctx.fillStyle = '#3b97ee';
+    ctx.fill();
+    ctx.strokeStyle = '#fff';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  let lastReferencePane = null;
+
+  // showGuide=false renders a clean frame (no alignment guide / rotate handle) —
+  // used for PNG export so the saved image is just the artwork.
+  function renderFrame(showGuide){
+    const w = canvasWrap.clientWidth;
+    const h = canvasWrap.clientHeight;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, w, h);
+
+    if(state.mode !== 'idle'){
+      const rawEl = currentSourceEl();
+      const rawDims = sourceDims(rawEl);
+      if(rawDims){
+        const el = processSource(rawEl, rawDims);
+        const dims = { w: el.width, h: el.height };
+        const panes = getPanes();
+        panes.forEach((pane, i) => {
+          if(pane.kind === 'original'){
+            drawOriginalPane(pane, el, dims);
+          }else{
+            drawMirrorPane(pane, pane.half, el, dims);
+          }
+          if(showGuide) drawGuide(pane);
+          drawLabel(pane, pane.label);
+          if(i > 0) drawDivider(pane.x, h);
+        });
+        lastReferencePane = panes[0];
+        if(showGuide && lastReferencePane) drawHandle(lastReferencePane);
+      }
+    }
+  }
+
+  function draw(){
+    renderFrame(true);
+    requestAnimationFrame(draw);
+  }
+  requestAnimationFrame(draw);
+
+  // ── Save as PNG ──────────────────────────────────────────
+  function saveAsPNG(){
+    if(state.mode === 'idle') return;
+    renderFrame(false); // clean pass, no guide/handle, for the export
+    canvas.toBlob(blob => {
+      if(!blob) return;
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      const stamp = new Date().toISOString().replace(/[:.]/g, '-');
+      a.href = url;
+      a.download = `mirror-kaleidoscope-${stamp}.png`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+      renderFrame(true); // restore the on-screen guide before the next rAF tick
+    }, 'image/png');
+  }
+  saveBtn.addEventListener('click', saveAsPNG);
+
+  // ── Export reconstruction prompt ──────────────────────────
+  const exportPromptBtn = document.getElementById('exportPromptBtn');
+
+  function buildPromptText(){
+    return `# Mirror Kaleidoscope — Reconstruction Prompt
+
+Author: Chris Shaw
+Organisation: LASALLE College of the Arts | University of the Arts Singapore
+Date: 27 August 2026
+Built With: Claude (Anthropic)
+
+Create a single self-contained HTML file — a "Mirror Kaleidoscope": a webcam or uploaded-photo mirror that reflects one half of a face across its own vertical axis, so the viewer can compare their real face against two fully symmetric reconstructions (left-mirrored and right-mirrored) side by side. No face tracking, no ML models — canvas 2D pixel manipulation only. Please feel free to ask any questions or make suggestions.
+
+---
+
+## DRIVING CONCEPT
+
+Imposing artificial symmetry on an asymmetric face reveals what we normally read as "natural" versus "constructed." The person aligns themselves against a fixed guide (rather than relying on face detection) — that act of self-alignment is itself part of the piece.
+
+---
+
+## PAGE STRUCTURE
+
+- Fixed-height dark topbar: a small lightning-bolt logo image (34×34px, left), followed by the title "Mirror Kaleidoscope" — "Mirror" in off-white (#f2f3f7), "Kaleidoscope" in accent blue (#3b97ee) via a span — with a one-line subtitle underneath ("Reflect a face across its own axis"). Right-aligned in the topbar: a status chip (Idle / Camera / Image) and three buttons — Reset Alignment, Switch Input, Stop (danger-styled).
+- Three-column layout below the topbar: a fixed-width (270px) scrollable left control panel, a flexible centre canvas area, and a fixed-width (270px) scrollable right panel.
+- Bottom status bar (26px): current status text, "Axis: Vertical, fixed centre", "Tracking: None (canvas only)".
+
+---
+
+## DESIGN TOKENS
+
+--bg: #101014;
+--topbar: #1d1d22;
+--panel: #1a1a20;
+--surface: #26272f;
+--surface-mid: #2c2d35;
+--border: #343642;
+--text: #f2f3f7;
+--muted: #a5abc0;
+--sub: #b4bad0;
+--accent: #3b97ee;
+--accent-light: #71baff;
+--accent-fill: #163452;
+--danger: #ff3838;
+--mono: "IBM Plex Mono", "Cascadia Mono", Consolas, monospace;
+--sans: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+
+---
+
+## TYPOGRAPHY
+
+- Accordion headings, control labels, buttons, mode-bar segments: var(--mono), 10-11px, uppercase, letter-spacing 0.08-0.14em.
+- Body copy (About / View descriptions): var(--sans), 12px, colour var(--sub).
+- Range-slider value readouts: var(--mono), 11px, colour var(--sub), right-aligned, fixed-width column so the label and value never overlap.
+
+---
+
+## CANVAS / RENDERING
+
+- A single canvas element fills the centre area; there is no DOM subdivision into multiple canvas elements — the triptych, dividers, pane labels, alignment guide, and rotate handle are all drawn with the 2D context every animation frame.
+- Rendering is a continuous requestAnimationFrame loop (renderFrame(showGuide)) so live camera video stays current; a static uploaded image is redrawn every frame too, at negligible cost.
+- Canvas resolution is device-pixel-ratio aware (ctx.setTransform(dpr,0,0,dpr,0,0) each frame) and resized via a ResizeObserver on the canvas's wrapping element.
+
+### Triptych panes
+Always exactly three equal-width panes, left to right: Original, Left Mirror, Right Mirror. Each pane is a rect { x, y, w, h }. A thin 1px divider line is drawn between panes, and a small dark rounded label chip (mono, uppercase, off-white text) sits in the top-left corner of each pane.
+
+### Mirror reflection math
+For a mirror pane with source half "left" or "right":
+1. Compute midX = pane centre x.
+2. Clip to the "real" half (left half if source="left", else right half) and paint the aligned source normally.
+3. Clip to the opposite half, translate(2*midX, 0), scale(-1,1), then paint the SAME aligned source again — the flip-and-translate reflects the whole aligned frame across midX, so the visible reflected half is a mirror image of the real half.
+Both draws call the same paintAligned(paneRect, el, dims) function; the only difference is the clip region and whether a flip transform is applied first. This guarantees the two mirror panes ("Left Mirror" duplicates the left half of the face; "Right Mirror" duplicates the right half) are geometrically exact reflections, not separately-drawn approximations.
+
+### Alignment guide
+A pale ellipse (face-shape reference) plus a dashed accent-coloured vertical axis line, drawn per-pane, centred on that pane. This guide is purely a visual aid — position/scale/rotation are NOT derived from it; it never moves. It is omitted from PNG exports (see EXPORT below).
+
+---
+
+## ALIGNMENT TRANSFORM & INTERACTION
+
+- A single shared transform { x, y, scale, rotation } (x/y stored as FRACTIONS of pane width/height, so the same transform values apply correctly across panes of different sizes).
+- paintAligned(paneRect, el, dims) anchors the source at the pane's own centre (offset by x/y fractions), applies rotation, applies a base "cover" scale (Math.max(paneRect.w/dims.w, paneRect.h/dims.h)) multiplied by the user's scale, then draws the source centred.
+- Pointer interaction on the canvas: drag anywhere to pan (updates x/y as a fraction of the first/reference pane's width and height); mouse-wheel to scale (clamped 0.3-3, multiplicative per wheel tick); a small draggable circular handle above the guide (only on the first/reference pane) to set rotation via atan2 of the pointer relative to the pane centre — a hit-test radius of 14px around the handle's current position decides whether a pointerdown starts a rotate-drag instead of a pan-drag.
+- "Reset Alignment" (both a topbar button and a duplicate inside the Alignment accordion) resets the transform to { x:0, y:0, scale:1, rotation:0 }.
+
+---
+
+## IMAGE PROCESSING PIPELINE
+
+Two input sources — live webcam (getUserMedia, drawn from a hidden video element) or an uploaded image — are treated identically once loaded. Every frame, the raw source is processed into an offscreen canvas BEFORE being fed to the mirror renderer:
+
+1. Downscale to a capped processing resolution (longest side <= 640px) to keep per-pixel passes fast for live video.
+2. Draw once through the canvas's native ctx.filter string combining brightness(), contrast(), saturate(), hue-rotate() (only appended if non-zero), and — mutually exclusively — grayscale(1) or sepia(1) depending on the selected Tone.
+3. If Exposure or any Colour Balance channel (Red/Green/Blue) is non-zero, run ONE additional getImageData/putImageData pass: each channel value is multiplied by an exposure gain (1 + exposure/100 * 1.5) and offset by (channel/100 * 60), clamped to 0-255. This pass is skipped entirely when all four values are at their default (0) to avoid the cost on the common case.
+4. If Pixelate is on, draw the current processed canvas down to a small canvas sized (processedWidth / blockPx) x (processedHeight / blockPx) — where blockPx is the literal edge length in pixels of the processing canvas (the Pixel Size slider value, 1-10, e.g. 2 = a 2x2 block) — then draw that small canvas back up with imageSmoothingEnabled=false (nearest-neighbour) to produce hard pixel blocks.
+
+The resulting processed canvas — not the raw video/image — is what the triptych mirror renderer reads from.
+
+---
+
+## CONTROL PANEL — ACCORDION SECTIONS
+
+Left panel, top to bottom, DEFAULT OPEN/CLOSED states matter and are exactly:
+1. View — OPEN. Static description of the triptych concept.
+2. Alignment — OPEN. Three instruction rows (Drag / Scroll / Handle) plus a Reset Alignment button.
+3. Color Adjustments — CLOSED. Sliders: Brightness, Contrast, Exposure, Hue, Saturation (all -100..100 except Hue -180..180), then a "Color Balance" sub-heading with Red/Green/Blue sliders (-100..100), then Reset Adjustments.
+4. Effects — CLOSED. A Tone segmented control (None / Grayscale / Sepia — mutually exclusive), then a Pixelate checkbox, then a Pixel Size slider (1-10, literal px block size, default 5).
+5. Export — OPEN. The Save PNG button plus a one-line hint ("Save current view as PNG — press Space").
+6. System Settings — CLOSED. An Export Prompt button that downloads this reconstruction prompt as a .txt file.
+
+Right panel: About (OPEN, static concept description) and Status (OPEN — live readouts: Input, Scale %, Rotation °, Tone, Pixelate On/Off).
+
+Accordion mechanics: a clickable header (mono, uppercase, "+"/"-" indicator via ::after content swapped by an "open" class on the parent section) toggles a class on the section; the body uses display:none / display:grid rather than a max-height transition.
+
+---
+
+## UI COMPONENT SPECS
+
+### Sliders (range-field)
+A label wrapping: a full-width control-label span (row 1, spans both grid columns), then the range input and a right-aligned mono value readout span side by side (row 2). accent-color: var(--accent) on the input. Label and value never sit on the same line as each other's text, so long numbers never overlap the label.
+
+### Segmented / mode buttons
+A flex row of equal-width buttons (mono, uppercase, 10px); the selected one gets border-color/background/color swapped to the accent trio (border var(--accent), background var(--accent-fill), color var(--accent-light)).
+
+### Checkboxes
+A label.check-row wrapping a native checkbox (14x14px, accent-color var(--accent)) and a text span, inside a bordered dark row.
+
+### Buttons
+Mono, uppercase, 1px border, var(--surface) background by default; hover swaps to var(--accent-fill) background / accent border / white text. .primary keeps the accent-fill look at rest (used for Save PNG). .danger uses the red token (used for Stop).
+
+### Readouts
+Bordered dark rows (var(--bg) background, var(--border) border) with a muted uppercase label on the left and a bold value on the right — used for both the live Status panel and the alignment instruction hints.
+
+---
+
+## EXPORT
+
+- Save PNG (button, and the Space keyboard shortcut when no form control has focus and a source is active): renders one "clean" frame with the alignment guide and rotate handle hidden, captures it via canvas.toBlob('image/png'), triggers a download named mirror-kaleidoscope-<ISO timestamp>.png, then immediately re-renders the normal (guide-visible) frame so the on-screen view never visibly flashes.
+- Export Prompt (System Settings): downloads this document as mirror-kaleidoscope-reconstruction-prompt.txt.
+
+---
+
+## GENERAL NOTES
+
+- Single self-contained HTML file, no build step, no external JS libraries — pure Canvas 2D API, no Three.js/WebGL, no MediaPipe or any face-tracking model.
+- Favicon and topbar logo are both embedded inline as base64 data URIs so the file has zero external asset dependencies.
+- getUserMedia requires a secure context — serve over localhost or https, not a bare file:// open.
+- All state lives in one JS module-scope object; there is no external state library or framework.
+`;
+  }
+
+  function exportPrompt(){
+    const blob = new Blob([buildPromptText()], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'mirror-kaleidoscope-reconstruction-prompt.txt';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  }
+  exportPromptBtn.addEventListener('click', exportPrompt);
+
+  // Spacebar shortcut — skipped while a form control has focus, so it doesn't
+  // fight with toggling a checkbox, re-clicking a focused button, or scrubbing
+  // a slider with the keyboard, and doesn't fire while the app is idle.
+  document.addEventListener('keydown', e => {
+    if(e.code !== 'Space' || e.repeat) return;
+    const tag = document.activeElement && document.activeElement.tagName;
+    if(tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || tag === 'BUTTON') return;
+    if(state.mode === 'idle') return;
+    e.preventDefault();
+    saveAsPNG();
+  });
+
+  // ── Pointer interaction: pan / rotate ───────────────────
+  let dragMode = null; // 'pan' | 'rotate' | null
+  let dragStart = null;
+
+  function distance(ax, ay, bx, by){
+    return Math.hypot(ax - bx, ay - by);
+  }
+
+  canvas.addEventListener('pointerdown', e => {
+    if(state.mode === 'idle') return;
+    const rect = canvas.getBoundingClientRect();
+    const px = e.clientX - rect.left;
+    const py = e.clientY - rect.top;
+
+    if(lastReferencePane){
+      const hp = getHandlePos(lastReferencePane);
+      if(distance(px, py, hp.x, hp.y) < 14){
+        dragMode = 'rotate';
+        canvas.classList.add('rotating');
+        canvas.setPointerCapture(e.pointerId);
+        return;
+      }
+    }
+
+    dragMode = 'pan';
+    dragStart = { px, py, x: state.transform.x, y: state.transform.y, paneW: lastReferencePane ? lastReferencePane.w : canvasWrap.clientWidth, paneH: lastReferencePane ? lastReferencePane.h : canvasWrap.clientHeight };
+    canvas.classList.add('dragging');
+    canvas.setPointerCapture(e.pointerId);
+  });
+
+  canvas.addEventListener('pointermove', e => {
+    if(!dragMode) return;
+    const rect = canvas.getBoundingClientRect();
+    const px = e.clientX - rect.left;
+    const py = e.clientY - rect.top;
+
+    if(dragMode === 'rotate' && lastReferencePane){
+      const p = getHandlePos(lastReferencePane);
+      const angle = Math.atan2(py - p.anchorY, px - p.anchorX) + Math.PI / 2;
+      state.transform.rotation = angle;
+      updateStatusReadouts();
+    }else if(dragMode === 'pan' && dragStart){
+      state.transform.x = dragStart.x + (px - dragStart.px) / dragStart.paneW;
+      state.transform.y = dragStart.y + (py - dragStart.py) / dragStart.paneH;
+      updateStatusReadouts();
+    }
+  });
+
+  function endDrag(e){
+    dragMode = null;
+    dragStart = null;
+    canvas.classList.remove('dragging', 'rotating');
+    try{ canvas.releasePointerCapture(e.pointerId); }catch(err){}
+  }
+  canvas.addEventListener('pointerup', endDrag);
+  canvas.addEventListener('pointercancel', endDrag);
+
+  canvas.addEventListener('wheel', e => {
+    if(state.mode === 'idle') return;
+    e.preventDefault();
+    const delta = -e.deltaY * 0.0015;
+    state.transform.scale = Math.min(3, Math.max(0.3, state.transform.scale * (1 + delta)));
+    updateStatusReadouts();
+  }, { passive: false });
+
+  // ── Init ─────────────────────────────────────────────────
+  setMode('idle');
+  updateStatusReadouts();
+})();
+</script>
+</body>
+</html>

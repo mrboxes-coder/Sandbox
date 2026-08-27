@@ -148,17 +148,18 @@
       "name": "Mirror Kaleidoscope",
       "tier": "1",
       "categories": [
-        "Canvas"
+        "Canvas",
+        "Image Editor"
       ],
-      "date": "",
-      "desc": "Your webcam feed reflected and rotated into a real-time symmetrical kaleidoscope. Adjust segments and mirror modes live.",
-      "link": "./mirror-kaleidoscope/",
+      "date": "2026-08-28",
+      "desc": "Mirror Kaleidoscope reflects webcam or uploaded photos across a vertical axis, producing a triptych of original and mirrored halves. Users align, adjust colour/effects, and export PNGs, exploring how artificial symmetry reveals natural versus constructed facial appearance.",
+      "link": "./basic_vibes/mirror_kaleidoscope.html/",
       "tags": [
         "WebCam",
         "Canvas API"
       ],
       "thumb": "",
-      "fullDesc": "",
+      "fullDesc": "Tier 1 driving question: How does imposing artificial symmetry on an asymmetric human face reveal what we normally read as \"natural\" versus \"constructed\" in appearance?\n                   \nHuman faces are naturally asymmetric, yet we rarely notice this in everyday life — we perceive faces as coherent, \"natural\" wholes. Mirror Kaleidoscope makes that asymmetry visible by forcing perfect bilateral symmetry onto a live or still image, letting the viewer directly compare their unaltered face against two artificially \"corrected\" versions of themselves.\n               \nWhat it does: A single-page web tool takes a webcam feed or an uploaded photo and displays it as a triptych — the original in the centre, flanked by a left-mirrored and a right-mirrored reconstruction, each built entirely from one half of the face reflected across a user-positioned vertical axis. No AI face-tracking is used; the axis is placed manually, keeping the process transparent and deliberately \"constructed\" rather than algorithmically \"solved.\"\n                \nHow it works: Built as a single self-contained HTML file using only the Canvas 2D API. The source (video or image) is drawn twice per mirrored pane — once normally, once flipped via a translate/scale transform — clipped to opposite halves of the axis, producing an exact geometric reflection. Users pan, scale, and rotate the source against a fixed alignment guide; adjustment controls (brightness, contrast, exposure, hue, saturation, colour balance, grayscale/sepia toning, and pixelation) run through a capped-resolution processing pipeline before rendering, keeping live video responsive. Finished triptychs export as PNGs, and the project can also export its own build specification as a reconstruction prompt for reproducibility.\n             \nFuture development: Optional face-landmark tracking (e.g. MediaPipe) could offer an auto-aligned axis alongside the current manual mode, giving users a choice between deliberate and assisted symmetry. Additional axes (horizontal, diagonal, radial/kaleidoscopic multi-wedge reflections) would extend the perceptual experiment beyond bilateral symmetry. A \"difference map\" overlay highlighting where the mirrored halves diverge most from the original could make the asymmetry more quantifiable. Session recording or side-by-side time-lapse comparisons would let users track how perceived symmetry changes with expression, angle, or lighting.\n          \nApplications in immersive tech: The underlying technique — real-time symmetry manipulation as a perceptual and identity-questioning device — extends naturally into AR filters, mirror-based installations, and interactive gallery pieces exploring self-image and the uncanny. It's also a useful teaching tool for immersive/XR design programmes, demonstrating how simple canvas transforms can produce psychologically loaded effects without machine learning, and how manual, transparent interaction (versus black-box AI) shapes user trust in a tool that alters their own face.",
       "resourceLabel": "",
       "resourceLink": "",
       "gallery": [
@@ -185,10 +186,26 @@
         {
           "img": "",
           "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
         }
       ],
       "carousel": true,
-      "youtube": ""
+      "youtube": "",
+      "videoCaption": "",
+      "videoRuntime": "",
+      "tunableParams": [],
+      "specSheet": []
     },
     {
       "id": 8,
