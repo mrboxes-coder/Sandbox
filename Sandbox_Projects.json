@@ -42,10 +42,55 @@
         {
           "img": "",
           "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
         }
       ],
       "carousel": true,
-      "youtube": ""
+      "youtube": "",
+      "videoCaption": "",
+      "videoRuntime": "",
+      "tunableParams": [],
+      "specSheet": [
+        {
+          "label": "ENGINE",
+          "value": ""
+        },
+        {
+          "label": "DATA",
+          "value": ""
+        },
+        {
+          "label": "CONTROLS",
+          "value": ""
+        },
+        {
+          "label": "INSTRUMENTS",
+          "value": ""
+        },
+        {
+          "label": "DEPLOY",
+          "value": ""
+        },
+        {
+          "label": "ACCESS",
+          "value": ""
+        },
+        {
+          "label": "BUILT WITH",
+          "value": ""
+        }
+      ]
     },
     {
       "id": 25,
@@ -89,18 +134,63 @@
         {
           "img": "",
           "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
         }
       ],
       "carousel": true,
-      "youtube": ""
+      "youtube": "",
+      "videoCaption": "",
+      "videoRuntime": "",
+      "tunableParams": [],
+      "specSheet": [
+        {
+          "label": "ENGINE",
+          "value": ""
+        },
+        {
+          "label": "DATA",
+          "value": ""
+        },
+        {
+          "label": "CONTROLS",
+          "value": ""
+        },
+        {
+          "label": "INSTRUMENTS",
+          "value": ""
+        },
+        {
+          "label": "DEPLOY",
+          "value": ""
+        },
+        {
+          "label": "ACCESS",
+          "value": ""
+        },
+        {
+          "label": "BUILT WITH",
+          "value": ""
+        }
+      ]
     },
     {
       "id": 3,
       "name": "Presence Theremin",
       "tier": "1",
       "categories": [
-        "MediaPipe Hands",
-        "Audio"
+        "Audio",
+        "MediaPipe Hands"
       ],
       "date": "",
       "desc": "Hand position controls pitch and volume of a Web Audio synth. An invisible instrument you play with empty air.",
@@ -138,10 +228,55 @@
         {
           "img": "",
           "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
         }
       ],
       "carousel": true,
-      "youtube": ""
+      "youtube": "",
+      "videoCaption": "",
+      "videoRuntime": "",
+      "tunableParams": [],
+      "specSheet": [
+        {
+          "label": "ENGINE",
+          "value": ""
+        },
+        {
+          "label": "DATA",
+          "value": ""
+        },
+        {
+          "label": "CONTROLS",
+          "value": ""
+        },
+        {
+          "label": "INSTRUMENTS",
+          "value": ""
+        },
+        {
+          "label": "DEPLOY",
+          "value": ""
+        },
+        {
+          "label": "ACCESS",
+          "value": ""
+        },
+        {
+          "label": "BUILT WITH",
+          "value": ""
+        }
+      ]
     },
     {
       "id": 4,
@@ -204,8 +339,50 @@
       "youtube": "",
       "videoCaption": "",
       "videoRuntime": "",
-      "tunableParams": [],
-      "specSheet": []
+      "tunableParams": [
+        "Brightness",
+        "Contrast",
+        "Exposure",
+        "Hue",
+        "Saturation",
+        "Red Balance",
+        "Green Balance",
+        "Blue Balance",
+        "Tone Mode",
+        "Pixel Size",
+        "Axis Position",
+        "Scale"
+      ],
+      "specSheet": [
+        {
+          "label": "ENGINE",
+          "value": "Canvas 2D — clip/transform-based mirror rendering, requestAnimationFrame loop."
+        },
+        {
+          "label": "DATA",
+          "value": "Live webcam feed (getUserMedia) or user-uploaded photo — processed entirely client-side, nothing sent to a server."
+        },
+        {
+          "label": "CONTROLS",
+          "value": "Drag to pan · scroll wheel to scale · drag top handle to trim tilt · Space to save PNG."
+        },
+        {
+          "label": "INSTRUMENTS",
+          "value": "Input source, Scale %, Rotation °, Tone, Pixelate state."
+        },
+        {
+          "label": "DEPLOY",
+          "value": "Static single HTML file — no server, no build step, opens directly in browser."
+        },
+        {
+          "label": "ACCESS",
+          "value": "None — fully client-side, no login, no external network calls."
+        },
+        {
+          "label": "BUILT WITH",
+          "value": "Claude (Anthropic) — iterative, screenshot-led development (Playwright-verified)."
+        }
+      ]
     },
     {
       "id": 8,
