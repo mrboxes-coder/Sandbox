@@ -1,0 +1,1025 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tessera Mosaic</title>
+  <link rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAIAAAD8GO2jAAAE8ElEQVR4nK2WbYhUZRTH/+d57rN35s7OzL7MtIptRK6KBJlFLWRhBdkbZGZqRuGHkD4ECRqWSFBBYWmIhghBCEUYbrr6QelVLIStRNjCL5mokW80szs7Mzuv9z7n9GH2TZvdmaDz6XK59/zO+T/n5SFmRtMmAqVo/Fma+UU1790ylKJDg/nN/alLGb/Ga2hOk94DhtF09EzhjcND2RLHQ3rr4x2WWRP9DwDLMJoG/ypvPTLU5mlHUTTUwO+ENZaIBY6mKyPBhr4UA1qRz+huNwCAxpgGABEQoVjlDX2pVIE9QwGL0TQrrpuKf2aAAAwooi1Hhn67XPWMqgQCgWeoK6oBNNK/EYBZHEU7vs0cO1NwDd3Soe/sdvNljoepM6LRjEAzAAIWR6sDp/Mfn8zGw7pFY9vyhOtQxaIz4kRDSkSayaB+FVkWo9XA+dI7x4bjni5UeM+a5PyulvPpQBMSrYqIrBU1DWAquA6ABY5WF9L+xoNp16hsiV9/pO2hBd6ljF+sMoA5cYcAR014khvUEpGJVzcCWKAIuRK/2pcqVqUSyHN3R15aEmfBSImLVdEKMU9lS+xbdhTV3E/GDrCg3VOKqDZLrgOMf0qb+1PnUr4i9N7qvvlEp2/FaLqWs5VAOjzdd3q0f7BQT1goQtVKT9LsXJlo95TI9QBmOJre+2r4+9+LEVclW/WHK5NGoxoIQGVfMkUrgB+MDSGBQAAiCIjQ6hIAR9GJs8ULQ35HJMQsk4DatNl/Kr9vIB8Pa0B2r04kWnVg2dEkIg/OD298OH4la40mmUy5BiOB/PhHWSnKFO3Ti1rvmOMyi1Kg2ri2DEfTwPnS+s//dh01WuGP1iSWLYxU/Jp3ANAKNH1h7jo+8slADsDchPl0XVc0pJiFCM542dDFIX/ToSGjKWB596mOZQsjAFxTp1EsT1aJteIa9dnPud0nRmJhHTa089lENKQsjxWxU5s22ZLddDCdLVmvRYUMDV6u/vJnmmi8+ohqclQD3D7brOuNKQUCLItr1MlzpW3fZNo9XfZlz+rErZ0msKzHe8SxAqOof3D0p4vlm9tM1Uq+zPtP5YkIIiBgCkUR+gf5rm53cXeoGnCLoy6k/df60yGjcmX71pMd980N+1acKR3oKIIAi7vdBTeZki+eIRFEXV07NwCEWvjEIgGjGpDRBEArypV5Q1+65KNc5XW9sefviQVWnOtFHTtkIipUbK4smvDvPcgsWqsd32X6fy3Mjukv189KtmoBXvki9cO5MgFLbgvtXZusZXlDGTgTLiKuirgzTa/RCltGu6eiriKi97/OHD9bChs1p01/sKJTEVjqzFdnQl9moE70Y53EjGs5S5B4WIdb1IHT+X0DuWhIaYVdqxJtnp4om/oAzLA9BIooV7EjJbZCC7rMmSuVt48OR0OqWOW9a5M9yZbAip5m8DfeybWkhoucK7FnkCnYLYeHtKZc2W55tH3pPC+wPJ13NHOrqLVxKm+LvkRD+vjZslYo+/LCvdEXe2OBFT3dWmgyg1oOV3NBYEUA4yBf5qXzQlsf65hO9/8KAICrWSuAo1CoSE/SbH8moYjQxN5vBkAALmcD11G+RatLu1Yl2sKapXH4TQIAIFO0w4WgWOXtKxJzky3B9Av5Bmt8yDURXr4/Zq0sX9T6QE94hqKs83uT1/eJTdDMwU61fwCA3F2Lxd9ZFwAAAABJRU5ErkJggg==">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:           #101014;
+      --topbar:       #1d1d22;
+      --panel:        #1a1a20;
+      --surface:      #26272f;
+      --surface-mid:  #2c2d35;
+      --border:       #343642;
+      --text:         #f2f3f7;
+      --muted:        #a5abc0;
+      --sub:          #b4bad0;
+      --accent:       #3b97ee;
+      --accent-light: #71baff;
+      --accent-fill:  #163452;
+      --danger:       #ff3838;
+      --green:        #44cc44;
+      --mono: "IBM Plex Mono", "Cascadia Mono", Consolas, monospace;
+      --sans: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      --panel-w: 270px;
+    }
+
+    html, body { width: 100%; height: 100%; }
+
+    body {
+      font-family: var(--sans);
+      font-size: 13px; line-height: 1.4;
+      background: var(--bg); color: var(--text);
+      display: flex; flex-direction: column;
+      overflow: hidden; -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── TOPBAR ── */
+    .topbar {
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 18px; min-height: 64px; padding: 10px 18px; flex-shrink: 0;
+      background: var(--topbar); border-bottom: 1px solid var(--border);
+    }
+    .brand { display: flex; align-items: center; gap: 12px; min-width: 0; }
+    .brand-icon { width: 34px; height: 34px; object-fit: contain; flex-shrink: 0; border-radius: 4px; }
+    .brand h1 { font-size: 22px; font-weight: 760; color: var(--text); white-space: nowrap; letter-spacing: -0.01em; }
+    .brand h1 span { color: var(--accent); }
+    .brand-sub { font-size: 12px; color: var(--muted); margin-top: 1px; }
+    .top-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+
+    /* ── CHIP / STATUS ── */
+    .chip {
+      min-height: 30px; padding: 0 10px;
+      border: 1px solid var(--border); border-radius: 3px;
+      background: var(--surface); color: var(--muted);
+      font-family: var(--mono); font-size: 11px; font-weight: 700;
+      letter-spacing: 0.08em; text-transform: uppercase;
+      display: inline-flex; align-items: center; gap: 6px;
+    }
+    .chip.live { border-color: var(--accent); background: var(--accent-fill); color: var(--accent-light); }
+
+    /* ── BUTTONS ── */
+    .button {
+      min-height: 32px; padding: 0 12px;
+      border: 1px solid var(--border); border-radius: 3px;
+      background: var(--surface); color: var(--muted);
+      font-family: var(--mono); font-size: 11px; font-weight: 700;
+      letter-spacing: 0.08em; text-transform: uppercase;
+      cursor: pointer; display: inline-flex; align-items: center; gap: 6px;
+      white-space: nowrap; transition: background 0.1s, border-color 0.1s, color 0.1s;
+    }
+    .button:hover { border-color: var(--accent); background: var(--accent-fill); color: #fff; }
+    .button:disabled { opacity: 0.35; cursor: not-allowed; pointer-events: none; }
+    .button.primary { background: var(--accent-fill); border-color: var(--accent); color: var(--accent); }
+    .button.primary:hover { color: #fff; }
+    .button.danger { border-color: var(--danger); color: var(--danger); }
+    .button.danger:hover { background: var(--danger); color: #fff; }
+    .button.full { width: 100%; justify-content: center; }
+    .button svg { flex-shrink: 0; }
+
+    /* ── LAYOUT ── */
+    .main { display: flex; flex: 1; overflow: hidden; }
+
+    .left-panel, .right-panel {
+      width: var(--panel-w); flex-shrink: 0;
+      background: var(--panel);
+      display: flex; flex-direction: column;
+      overflow-y: auto; overflow-x: hidden;
+      scrollbar-width: thin; scrollbar-color: var(--accent) var(--bg);
+    }
+    .left-panel  { border-right: 1px solid var(--border); }
+    .right-panel { border-left:  1px solid var(--border); }
+
+    .center { flex: 1; overflow: hidden; display: flex; flex-direction: column; }
+
+    /* ── STATUS BAR ── */
+    .status-bar {
+      height: 26px; flex-shrink: 0;
+      background: var(--topbar); border-top: 1px solid var(--border);
+      display: flex; align-items: center; gap: 16px;
+      padding: 0 14px;
+      font-family: var(--mono); font-size: 10px;
+      letter-spacing: 0.04em; color: var(--muted);
+    }
+    .status-bar b { color: var(--text); font-weight: 700; }
+
+    /* ── ACCORDION ── */
+    .accordion { border-bottom: 1px solid var(--border); padding: 8px; flex-shrink: 0; }
+    .accordion:last-child { border-bottom: none; }
+
+    .accordion-heading {
+      width: 100%; min-height: 30px;
+      display: flex; align-items: center; justify-content: space-between;
+      border: none; border-radius: 0;
+      background: var(--surface-mid); color: var(--text);
+      font-family: var(--mono); font-size: 11px; font-weight: 800;
+      letter-spacing: 0.14em; text-transform: uppercase;
+      padding: 0 10px; cursor: pointer; transition: color 0.1s;
+    }
+    .accordion-heading:hover { color: #fff; }
+    .accordion-heading::after { content: "+"; color: var(--accent); font-size: 14px; font-weight: 400; }
+    .accordion.open .accordion-heading::after { content: "\2212"; }
+
+    .accordion-body { display: none; flex-direction: column; gap: 8px; padding-top: 8px; }
+    .accordion.open .accordion-body { display: flex; }
+
+    /* ── RANGE SLIDERS ── */
+    .range-field {
+      display: grid;
+      grid-template-columns: minmax(0,1fr) 40px;
+      align-items: center; gap: 4px;
+      font-family: var(--mono); font-size: 10px; font-weight: 800;
+      letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted);
+    }
+    .range-field .rf-label { grid-column: 1 / -1; }
+    .range-field input[type=range] {
+      min-width: 0; width: 100%; height: 3px; accent-color: var(--accent);
+    }
+    .range-field output {
+      justify-self: end; color: var(--sub);
+      font-size: 11px; font-variant-numeric: tabular-nums;
+    }
+
+    /* ── CHECKBOXES / TOGGLES ── */
+    .check-row {
+      display: flex; align-items: center; gap: 8px;
+      min-height: 30px; padding: 5px 8px;
+      border: 1px solid var(--border); border-radius: 3px;
+      background: var(--surface); color: var(--sub);
+      font-family: var(--mono); font-size: 11px; font-weight: 700;
+      cursor: pointer;
+    }
+    .check-row input { width: 14px; height: 14px; accent-color: var(--accent); flex-shrink: 0; }
+
+    /* ── MODE BUTTONS (2-col grid) ── */
+    .mode-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; }
+    .mode-btn {
+      min-height: 32px; border: 1px solid var(--border); border-radius: 3px;
+      background: var(--surface); color: var(--sub);
+      font-family: var(--mono); font-size: 10px; font-weight: 800;
+      letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer;
+      transition: background 0.1s, border-color 0.1s, color 0.1s;
+    }
+    .mode-btn:hover { border-color: var(--accent); color: #fff; }
+    .mode-btn.active { border-color: var(--accent); background: var(--accent-fill); color: var(--accent-light); }
+    .mode-btn.active:hover { color: #fff; }
+
+    /* ── READOUT ROWS ── */
+    .readout { display: flex; flex-direction: column; gap: 5px; }
+    .readout-row {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 5px 8px;
+      border: 1px solid var(--border); border-radius: 3px;
+      background: var(--bg);
+      font-family: var(--mono); font-size: 11px;
+    }
+    .readout-row .rk { color: var(--muted); letter-spacing: 0.06em; text-transform: uppercase; }
+    .readout-row .rv { color: var(--text); font-weight: 700; }
+
+    /* ── CANVAS ── */
+    .canvas-area {
+      flex: 1; position: relative; overflow: hidden;
+      background:
+        linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px),
+        #121216;
+      background-size: 28px 28px;
+    }
+    #mainCanvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+
+    /* ── EMPTY STATE ── */
+    .empty-state {
+      position: absolute; inset: 0;
+      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px;
+    }
+    .empty-state .empty-icon  { opacity: 0.15; }
+    .empty-state .empty-title { font-size: 18px; font-weight: 700; color: var(--muted); }
+    .empty-state .empty-sub   { font-size: 12px; color: var(--muted); opacity: 0.6; }
+    .empty-state .empty-actions { display: flex; gap: 8px; margin-top: 6px; }
+
+    /* ── LIVE DOT ── */
+    .live-dot {
+      display: inline-block; width: 7px; height: 7px;
+      border-radius: 50%; background: var(--muted); flex-shrink: 0;
+    }
+    .live-dot.active {
+      background: var(--green); box-shadow: 0 0 6px var(--green);
+      animation: pulse 2s ease-in-out infinite;
+    }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
+    /* ── VIDEO PREVIEW ── */
+    .video-wrap {
+      border: 1px solid var(--border); border-radius: 3px;
+      background: #000; position: relative; overflow: hidden;
+    }
+    .video-wrap video { width: 100%; display: block; }
+    .overlay-badge {
+      position: absolute; top: 6px; left: 6px;
+      font-family: var(--mono); font-size: 9px; font-weight: 700;
+      background: rgba(0,0,0,0.65); color: var(--muted);
+      padding: 2px 6px; border-radius: 2px;
+      text-transform: uppercase; letter-spacing: 0.08em;
+    }
+    .no-signal {
+      height: 72px; display: flex; align-items: center; justify-content: center;
+      color: var(--muted); font-family: var(--mono); font-size: 11px;
+      letter-spacing: 0.06em; text-transform: uppercase;
+    }
+
+    /* ── PALETTE GRID ── */
+    .pal-sw { height: 20px; border-radius: 2px; border: 1px solid rgba(0,0,0,0.25); }
+
+    /* ── THUMBNAILS ── */
+    #thumbRow { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px; }
+    .thumb {
+      width: 52px; height: 40px; border-radius: 3px; overflow: hidden;
+      border: 1px solid var(--border); cursor: pointer; flex-shrink: 0;
+    }
+    .thumb:hover { border-color: var(--accent); }
+    .thumb canvas { width: 100%; height: 100%; display: block; }
+
+    /* ── FLASH ── */
+    #flash {
+      position: absolute; inset: 0; background: #fff;
+      opacity: 0; pointer-events: none; z-index: 10; transition: opacity 0.4s;
+    }
+    #flash.go { opacity: 0.8; transition: opacity 0s; }
+
+    svg { display: block; flex-shrink: 0; }
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<header class="topbar">
+  <div class="brand">
+    <img class="brand-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAZAAAAGQCAIAAAAP3aGbAAAABmJLR0QA/wD/AP+gvaeTAAAbIklEQVR4nO3de3ScdZ3H8eeZmWSmSS+5kLY0CZS0Db1QqoLocnSPcug5QHV1VboVxBYPFFwXena1wLruurtnL4joajmrpdyKIJfiEVGrFXqABUXWRaCmhTZpUmiT0iTNtU0yk0xm9o/2tE+nSZpJZn7f3+X9+g/E+X2Pp3545vl8n2c8DwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAJDjSw8Ap4Ui0Wj5OdGSs0PRqenhwcHetkTngWRfl/Rc0BSBBQGx8nPL3//JkoUfL668wA9HMv7TeMf+3r2vdOzY2tv4qpdOiUwIPRFYUKpozuKq5etKF1/m+aEz/sMDbXsPPr/x8Bs/89JpBbNBfwQWFAlFotVX3Tbr0uv8UDir/+KRd/7Y9NTt8fZ9eRoMBsnujw4wMdHSyoU3/qjsguX+OC6sMv+7JXMqLv5svL1poK0xH7PBIAQW8i5WUbP4psemzKyZ8CeEIoVlS68Y7G3tb9mVw8FgHAIL+VUwrWLxzY9HS+dM8nN8P1S66LL+93bH25tyMhhMlPX1OTB+oYLY+dffFy2tzM3H+aH5n/9urOK83HwaDERgIW98v2blXcVVS3P4kaHConkrvz2ehhFW4ish8qVq+bpZl16X848tLDk7fnjfwKE9Of9k6I9/UyEvypetqLz8ljx9eNXlt3g+GzkuIrCQe8WVS2pWfit/mRKrqJle86E8fTh0RmAhxwqmz6xdsylUMCWvp5Qv+0RePx96IrCQS6GC2PlrNhXOmJ3vg2bUfiTfR0BDBBZyx/drrr4zt7XgaKJl1ZGiEgUHQSsEFnKm6vJby9/3SWXHxc5iIcs5BBZyo2zpFfmrBUcUKZqh8jjogMBCDhRXLZ236juKVw1CkajK46ADAguTVTB9Zu3qjaGCmOJzhxN9ik+EOAILk6KsFjxdsr9T/aGQRWBhEhTWgqdLdLaInAtBBBYmTnEtGDQcP5oc6BE5GoIILEyQ+lowKNF1QOpoCCKwMBHFlUvmrbpb8Alkvg+6icBC1tQ8LTi2RFez4OmQQmAhO6GCWO3qjSK1YFCiiyssFxFYyIbv11x959TqZdJzcIXlKAILWRCsBTMMElhOIrAwXrK1YAZuuruJwMK4iNeCQSxhOYvAwpnpUAsGsYTlLAILZ6BJLRjE90FnEVgYkza1YBAVobMILIxFn1owiCUsZxFYGJVWtWAQV1jOIrAwMq1qwQwsYTmLwMIIdKsFM3DT3VkEFjJpWAsGsYTlMgILp9KyFgxiCctlBBZOoWctGMT3QZcRWDhJ21owiIrQZQQWjtO5FgxiCctlBBY8T/taMIgrLJcRWNC9FszAEpbLCCznaV8LZuCmu8sILNfpXwsGsYTlOALLaUbUgkEsYTmOwHKXKbVgEN8HHUdgOcqgWjCIitBxBJaLzKoFg1jCchyB5R7TasEgrrAcR2A5x6xaMANLWI4jsNxiXC2YgZvujiOwHGJiLRjEEhYILFcYWgsGsYQFAssJ5taCQXwfBIHlAJNrwSAqQhBY9jO6FgxiCQsEluVMrwWDuMICgWUz02vBDCxhgcCylgW1YAZuuoPAspMdtWAQS1jwCCw72VILBrGEBY/AspI1tWAQ3wfhEVj2sakWDKIihEdgWcayWjCIJSx4BJZN7KsFg7jCgkdgWcO+WjADS1jwCCxL2FgLZuCmOzwCyw5W1oJBLGHhGALLeLbWgkEsYeEYAstsxVVL5636jmAtmB4eSqeG830KFSGOIbAMVjB9Zu3qjaGCmOAM+7f+p+/n/U9RopM77vA8AstcOtSC7730QPeelxVc33GFhWMILDNpUAv21L904FffipZWKTiLJSwcQ2AZSbwWHGjb2/DjdenUcLSsUsFxLGHhGALLPOK1YLK/u/6htcMDvZ7nRUtVBBZLWDiGwDKM+NOC6eFkwyNfiXe8e+wvFXwlZAkLJxBYJtHhacF3nvnn3sZXT/ylgsBiCQsnEFjG0KQWbHv18eDfUfCVkO+DOIHAMoQ2tWDw74Qi0YJpFfk+l4oQJxBYZtCnFgz+zcLSSpawoBKBZQCtasEglrCgGIGlO91qwSCWsKAYgaU1DWvBIJawoBiBpS89a8EglrCgGIGlKy1rwQwsYUExAktTetaCGVjCgmIElo60rQWDWMKCegSWdnSuBYNYwoJ6BJZeNK8Fg1jCgnoElkb0rwWDWMKCegSWNkyoBYNYwoJ6BJYujKgFg1jCgnoElhaMqAUzsIQF9QgseabUghlYwoJ6BJYwg2rBIJawIILAkmRWLRjEEhZEEFhyTKsFg1jCgggCS4xxtWAQS1gQQWDJMLEWDGIJCyIILAGG1oJBLGFBBIGlmqG1YAaWsCCCwFLK3FowA0tYEEFgKWRyLRjEEhakEFjqGF0LBrGEBSkEliKm14JBLGFBCoGlggW1YBBLWJBCYOWdHbVgEEtYkEJg5Zc1tWAQS1iQQmDlky21YAaWsCCFwMoja2rBDCxhQQqBlS821YJBLGFBEIGVF5bVgkEsYUEQgZV79tWCQSxhQRCBlWNW1oJBLGFBEIGVU5bWgkEsYUEQgZVLttaCQSxhQRCBlTO21oIZWMKCIAIrNyyuBTOwhAVBBFYO2F0LBrGEBVkE1mRZXwsGsYQFWQTW5DhQCwaxhAVZBNakuFALBrGEBVkE1sQ5UgsGsYQFWQTWBLlTCwaxhAVZBNZEuFMLZmAJC7IIrKw5VQtmYAkLsgisLDlWCwaxhAVxBFZ2XKsFg1jCgjgCKwsO1oJBLGFBHIE1Xm7WgkEsYUEcgTUuztaCQSxhQRyBdWYu14JBLGFBXER6AO35fs3Ku2Rrwe7dL4rUghkUBFY4NvVDdzXm+xSMSzo9dPTwYM+hvpZdR/a91v328zr8u0Tsjowpqpavq1x+q+AAA60Nu/77c8Pxo4IzHPOBb/y+YPpM6SkgIz081Lnz2ff+Z1Nf807BMcKCZ+uvfNmKuZ/6puCN9mRf19v3Xjt05LDUACeEItHqK9cL/k8BWX4oXDS7duYlq2JnnXv0nddTg/0iY3APa1TFVUtrVt4lWgsO1T/y14lOLR5VUbOEBd35/lkf+PTSv/vV9PmXipxPYI2sYPrM2tUbQwUxwRneeeZfjjT9QXCAIDVLWDBCwdTyhTdsrvjg1eqPJrBGECqInb9mk2wteOjlB8VrwaBo6RzpEaARPxSu+dx/lL//LxSfS2CdxvdrVt5VXLVUcITu3S/u33qn4ACni5ZxhYVT+aGaq++ces77VJ5JYGWquvzW8mUrBAcYaNu79/G/FXlacAx8JcTpQpHo/Gu+Fy4sUneispOMUL5shfDTgn1dex68QeppwTEQWBhRtKz67I+tVXYcgXUSteAY1DyXAxPN/uiXIsWlas4isI6jFhyDmjdhwVDhaHHFxZ9TcxaB5XnUgmfCEhbGVnHRZ9QcRGAdf4mobC3YU/+SbrVgEDewMLYps2sLS1QsvhBYGrxEtLWh4dFbdKsFg1jCwhlNm/sBBae4Hlha1IIP3ajDs81j4I47zmjKzAUKTnE6sIorl9Ss/JbwS0Qf/Rs9a8GgSJGiDgjmKph2loJT3A2swhmzaq+/T/Ylovue/kfZl4iOUzg2VXoE6C4cVfGHxNHAChXEFnzxh4XTZwnO8N5LD7T/YYvgAOOXSg5KjwDdpZJxBac4GVi8RDRLyf5u6RGgu2S/iveRuhhYPC2YrfjhfdIjQHfx9iYFpzgXWFrUglo+LTgG2bfiwgh9LbsUnOJWYFELTkxfy66hvk7pKaCvZF8XgZVj/LbgxKVTXXXbpIeAvjr+9CsvnVJwkCuBxdOCk9T66uNeOi09BbSUTrf97xNqjnIjsHhacNL6D77Vtes56Smgo85dz/YffEvNWU4EFk8L5sT+X9+VGlKxawODpIbiB379bWXH2R9YWtSC2j8tOB7x9n0q/2jCCAe23R1vV7f1YvkPqRZXLa1dc68fLpAaID08tOehG/oPvi01QG4dPbAjVl5ddPYi6UGghY4dWxXf6LA5sApnzFp006ORohLBGfb99BtdO58VHCDnut9+oWh27ZSZ86QHgbC+5rr6h29ODw+pPNTawAoVxBbe8PCUihrBGQ69/ODBFzYKDpAX6VRn3bZIcenU6gulR4GYwd7W3Zu+oP6ZLUsDy/fnrfrujNqPCI7QvfvFpqdut3MVIJ3u3v1ivK1xWs0lKn/iCZpIDcV3379GzbM4GewMrKrl62Zdep3gAAOtDXse/FJqKCE4Q74NtDa0/eFJz/eLZp8fikSlx4Eq6XTjE1/tafityOEWBlb5shVzP/VNwedvkn1db9977dCRw1IDKJNOJnobftf6+0fj7fs8P1QwtVz2Z4egQMv2e1pfeUTqdNt+CqW4auniLz8h+H+b9PDQ2/d9Uc9f68o734+WVhXOmM1vguWDHwqds+LrhTMkX+LWsWPr3sfWCd7oiEgdnA/8tqCwdDrRecC4R7tNce4n/0E2rfpadjU9dYfsbVl7FkdDBbHa1RtlnxZ876UHzH1aEDqruPizsz/6JcEBhnrb6jevTQ32C87g2RNYvl9z9Z2yLxHtqX/JoJeIwiDT5l489zP/JjhAKpmof/jmwZ5DgjMcY0lgyT8t2La34cfrTH9aEBqKllYtWP3DUKRQbIJ0umnL7UcP7BAbIMCGwCpbeoXw04L93fUPrTXrJaIwQjhaXHv9poLiMsEZmrdv6HjzF4IDBBkfWMWVS+atulv4JaKPfCXe8a7UALCWH5p/zfeKZp8vOEJn3baW7fcIDpDB7MDiJaKw2Lmf+PuSRZcJDtDXsqvxyfVaPa1hcGBRC8Ji1IIjMjawqAVhL2rB0ZgaWNSCsBW14BiMDCxqQdiKWnBs5gUWtSCsRS14JoYFFrUgLEYteEYmBRa1ICxGLTge5gQWtSDsRS04TsYEFrUgbEUtOH5mBBa1IGxFLZgVAwKLWhDWohbMku6BRS0Ii1ELZkvrwKIWhMWoBSdA48CiFoS9qAUnRt/AohaEragFJ0zTwKIWhK2oBSdDx8CiFoS1qAUnR7vAohaExagFJ0mvwKIWhMWoBSdPp8CiFoS9qAVzQqPAohaEragFc0WXwKIWhK2oBXNIi8CiFoS1qAVzSj6wqAVhMWrB3BIOLGpBWIxaMOcikof7fs3Ku2RrwcGe1r7mP5VdeJXgDLYaOtI+2HMo0dVszb/eszKt5pLzPvvvggOkhuJ7Nq81vRbMIHbbyPO8quXrKpffKjgAFEgO9BzZ91rXzt907vzNcPyo9DiKRMuqL7jl6UhxqdgE6fTex9Z17NgqNkB+iAVW+bIV86/5vuCNdig2HD/S+upjB1/YaH0VG45NXfKVn0yZtUBwhpbnNjQ/933BAfIkLHJqcdXS2jX3+uECkdMhIhSJTpt7ccUHrx7sPjjQ2iA9Tr74ofCC634wbe5FgjN07Nj6zjP/IjhA/ggEVuGMWYtuejRSVKL+aIgLFxaVXXhlwdTynvqXrby3de4nvn7WRX8pOEBfc139wzelh5OCM+SP6sAKFUxZeMPmKRU1is+FVqZWX1g0+/zOnc966ZT0LLlUccnK6ivXCw4w2Nu6e9MXkv09gjPkldrA8v15q74zo/YjSg+FlqbMnBctq+za9Zz0IDkzreaSBddu8EMyt1k8z0sNxXffvybe3iQ1gAJK/8ed/dHrz/7zG1SeCJ0Vnb1oeKDn6P43pQfJgWhZ9aIbHwlHi8UmSKcbn/hqT8NvxQZQQt3iaKzivOorvqbsOBih+sr1sYrzpKeYrHBs6vnX3ye5xOB5LdvvsW+J4XTqAuucq24PFcSUHQcjhApi51x5m/QUk+OH5n/+v2SXGDrrtjVv3yA4gDKKAqtozuLSxZerOQtmKV2yvGjOYukpJk7+acHmusYnvmpl5Xo6RYE168OfZ0cUI/P9mR9aJT3EBGnxtODDN6eG4oIzqKQksPxQ6dIrVBwEM5VfeJXny784JFu8RFQ9FX9KiiuXyL69DJqLFJcWVy6RniI70bLq2tUbhV8i+uR6C14imhUlgVV1gYJTYDSzAiscLa5dc69sLdi8fYMLtWAGFYEVO8v43hr5FjPn4Qc/FJ5/7QbZl4h27NhqzUtEs6IisHhsEGcUKZohPcJ4nbPijpKFHxMcoK9lV9NTdzhSC2ZQEVihSFTBKTCaKX9IKi5ZKVsLDva21m++0aaXiGZFRWANJ1x5bRsmLGnCS7Kmzb147qclX9uSSiYaHv7yYE+r4AyyVATW0JHDCk6B0YYHdH/BALWgDlQE1kCbtW9rQ64kulqkRxgLTwtqQkVgHdn3moJTYDStA4unBbWhIrAGew4NHKpXcBDMpXNg8bSgPhQ9D9H+x5+qOQhGSqcHdQ0snhbUiqrAeu0nw4k+NWfBOENH2lPJhPQUI+C3BXWjKLCSfV2HXn5QzVkwjp7fB6Nl1bXX/UDyt53S6aYtt/U114kNoB91j8gffOHeePs+ZcfBIInOA9IjZOJpQT2pC6zU0EDjk1/T88ofshLdel1h8bSgtpS+hOjo/jebnrrDsl92wuQlOpulRziF/NOCzXVNW26jFjxdRPF5HW/83PO8eX91t+CvIUE3Wt3DohbUmcBrHjve+Pnu+9cMHe1QfzT0pE9gUQtqTua9tL17X6n77lWHX/8ZF73QZwmLWlB/cr9SO9jftfPZ7t3Ph2PTp1ScxzdEZw0daT/44r3SU3jh2NRFax+NllYKztCy/Z7WVx4RHEB/wjEx1NvWWffr1lceGWhtSPZ1el7a90PhwiJ+YscdA4fq2/9vi+wMfii84LofTJt7keAMHTu2vvOM5LtrjKD6pvuIkgM9h19/+vDrT0sPgkwX/+ub4di0vB6hwxKWfC3o8EtEs2LebytBmUhRSb7TyvO8RJfwToMWteDmtc6+RDQrBBZGpeaGjmxFyG8LmoXAwqiipVUKThEMrGhp1YLVPxR+ieiW2x1/iWhWCCyMKlqmJrBkvhKGo8W112+S/Ynf5u0bOt78heAAxiGwMKrCkvx/JUynB7sO5v2U0/mh+dd8T/Zpwc66bTwtmC0CC6OKluU9sAaPtIk8Dy//EtGWXY1PrqcWzBaBhVEpuIclcgOLWtBcBBZGpaAlHFT+ngZqQaMRWBiZlUtY1IKmI7AwMvuWsKgFLUBgYWS2LWFRC1qBwMLILFvCoha0A4GFkdm0hEUtaA0CCyOzZgmLWtAmBBZGZscSFrWgZQgsjMyCJSxqQfsQWBiBDUtY1II2IrAwAguWsKgFrURgYQSmL2FRC9qKwMIIjF7Coha0GIGFEZi7hEUtaDcCCyMwdAmLWtB6BBZGYOQSFrWgAwgsjMDEJSxqQRcQWMhk4hIWtaAjCCxkMm4Ji1rQHQQWMpm1hEUt6BQCC5kMWsKiFnQNgYVMxixhUQu6h8BCJlOWsKgFHURgIZMRS1jUgm4isJBJ/yUsakFnEVg4hf5LWNSCLiOwcArNl7CoBR1HYOEUWi9hUQs6j8DCKXRewqIWBIGFU2i7hEUtCI/AQgY9l7CoBXEMgYVTaLiERS2IEwgsnEK3JSxqQQQRWDhJuyUsakGcisDCSbotYVELIgOBhZO0WsKiFsTpCCycpM8SFrUgRkRg4SRNlrCoBTEaAgsn6bCERS2IMRBYOEl+CYtaEGMisHCS+BIWtSDGRmDhOPElLGpBnBGBheNkl7CoBTEeBBaOE1zCohbEOBFYOE5qCYtaEONHYOE4mSUsakFkg8DCcSJLWNSCyAqBhePUL2FRCyJbBBaOU7yERS2ICSCw4HnKl7CoBTExBBY8T+0SFrUgJozAguepXMKiFsQkEFjwPIVLWNSCmAwCC56naglr+rw/oxbEZBBY8DwlS1jpdGrup/4p36eMITUU37N5LbWg0SLSA0ALCu5h+aGw54Xzfcqo0ummp+7oa64TGwC5wBUWPE9VSyiIWtAOBBYULWEJoha0BoEFyy+vqAVtQmBB0RKWCGpByxBYULSEpR5PC9qHwIKSJSz1eFrQRgQWVCxhqUctaCUCCxbew6IWtBWBBdtaQmpBixFYrrNsCYta0G4ElutsuryiFrQegeU6e25gUQs6gMBynTVLWNSCLiCwXGfHEha1oCMILNdZsIRFLegOAst1pt/DohZ0CoHlOqNbQmpB1xBYTjN7CYta0D0EltOMvryiFnQQgeU0c29gUQu6icBymqFLWNSCziKwnGbiEha1oMsILKcZt4RFLeg4Astpht3DohZ0HoHlNLNaQmpBEFjuMmsJi1oQHoHlMoMur6gFcQyB5S5TbmBRC+IEAstdRixhUQsiiMBylwFLWNSCOBWB5S79l7CoBZGBwHKX5vewqAVxOgLLXTq3hNSCGBGB5Sidl7CoBTEaAstR2l5eUQtiDASWozS9gUUtiDERWI7ScwmLWhBjI7AcpeESFrUgzojAcpRuS1jUghgPAstRWt3DohbEOBFYjtKnJaQWxPgRWC7SaAmLWhDZILBcpM/lFbUgskJguUiTG1jUgsgWgeUiHZawqAUxAQSWi8SXsKgFMTEElotkl7CoBTFhBJaLJO9hUQtiEggsFwm2hNSCmAwCyzmCS1jUgpgkAss50dI5Iuf2Ndc1PvFVakFMBoHlnEhxufpDh3rb6h++OTUUV380bEJgOSdcWKT4xNRQfM/mtdSCmDwCyzmp4UGl56XTTU/d0ddcp/RQWIrAck6yr1vlcS3b76EWRK4QWM6JtzcpO6uzblvz9g3KjoP1CCznJAd6Ep0HFBxELYicI7Bc1NPwu3wfQS2IfCCwXNSx45d5/XyeFkSeEFgu6m18NY93stLppifX87Qg8iEsPQBkJAd6ypZekY9Pbt6+ofWVR/PxyQBXWI7qePOXR999I/cfu2MrTwsifwgsV6VTjVvW5/YVen3NdU1bbqMWRP7wldBdyf7ugda95cuu8nx/8p+W6Gp5e9MXhgd6J/9RwGgILKfF25sGe1tLFn7c9yd1rT3Y/d7u+1cPdrXkajBgRASW6/pbdg0cqi9Z+LFQpHBin9DX8taeB9YkOvbndjDgdAQWvIG2xs6d24orl0RLsntVVjo13Pq7HzU+ti7Z35Wn2YCgHNy8gCV8/6z3f3rOZTdPmTn/zP9wOtX11vPNz32//+Bb+Z8MOI7Awqn80PR5Hy5ftmL6/Etj5edk/Ifp4WRfy87u3S90vPGLeMe7IgPCZQQWRhUpLo2WVRdOn+mHC1OJo4nu9xId+1PJhPRcAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACDh/wHU8KYKsvWEMgAAAABJRU5ErkJggg==" alt="">
+    <div>
+      <h1>Tessera <span>Mosaic</span></h1>
+      <div class="brand-sub">Live colour mosaic from your webcam</div>
+    </div>
+  </div>
+  <div class="top-actions">
+    <div class="chip" id="pill">Idle</div>
+    <button class="button primary" id="btnStart" onclick="startCamera()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8" fill="currentColor" stroke="none"/></svg>
+      Start Camera
+    </button>
+    <button class="button danger" id="btnStop" onclick="stopCamera()" disabled>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>
+      Stop
+    </button>
+  </div>
+</header>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- LEFT PANEL -->
+  <div class="left-panel">
+
+    <!-- Render Mode -->
+    <div class="accordion open">
+      <button class="accordion-heading" type="button">Render Mode</button>
+      <div class="accordion-body">
+        <div class="mode-grid">
+          <button class="mode-btn active" onclick="setMode('mosaic',this)">Mosaic</button>
+          <button class="mode-btn" onclick="setMode('halftone',this)">Halftone</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Image — always visible -->
+    <div class="accordion open">
+      <button class="accordion-heading" type="button">Image</button>
+      <div class="accordion-body">
+        <label class="check-row">
+          <input type="checkbox" checked onchange="cfg.mirrorX=this.checked">
+          <span>Mirror X</span>
+        </label>
+        <label class="check-row">
+          <input type="checkbox" onchange="cfg.invert=this.checked">
+          <span>Invert</span>
+        </label>
+      </div>
+    </div>
+
+    <!-- Grid (Mosaic only) -->
+    <div class="accordion open" id="secGrid">
+      <button class="accordion-heading" type="button">Grid</button>
+      <div class="accordion-body">
+        <div class="range-field">
+          <span class="rf-label">Columns</span>
+          <input type="range" min="4" max="100" value="40" oninput="cfg.cols=+this.value;this.nextElementSibling.value=this.value">
+          <output>40</output>
+        </div>
+        <div class="range-field">
+          <span class="rf-label">Rows</span>
+          <input type="range" min="4" max="70" value="30" oninput="cfg.rows=+this.value;this.nextElementSibling.value=this.value">
+          <output>30</output>
+        </div>
+        <div class="range-field">
+          <span class="rf-label">Gap</span>
+          <input type="range" min="0" max="10" value="1" oninput="cfg.gap=+this.value;this.nextElementSibling.value=this.value+'px'">
+          <output>1px</output>
+        </div>
+      </div>
+    </div>
+
+    <!-- Colour (Mosaic only) -->
+    <div class="accordion open" id="secColour">
+      <button class="accordion-heading" type="button">Colour</button>
+      <div class="accordion-body">
+        <div class="range-field">
+          <span class="rf-label">Saturation</span>
+          <input type="range" min="0" max="300" value="130" oninput="cfg.sat=+this.value;this.nextElementSibling.value=this.value+'%'">
+          <output>130%</output>
+        </div>
+        <div class="range-field">
+          <span class="rf-label">Brightness</span>
+          <input type="range" min="0" max="200" value="100" oninput="cfg.bri=+this.value;this.nextElementSibling.value=this.value+'%'">
+          <output>100%</output>
+        </div>
+        <div class="range-field">
+          <span class="rf-label">Contrast</span>
+          <input type="range" min="0" max="300" value="110" oninput="cfg.con=+this.value;this.nextElementSibling.value=this.value+'%'">
+          <output>110%</output>
+        </div>
+        <div class="range-field">
+          <span class="rf-label">Hue Shift</span>
+          <input type="range" min="0" max="360" value="0" oninput="cfg.hue=+this.value;this.nextElementSibling.value=this.value+'°'">
+          <output>0°</output>
+        </div>
+      </div>
+    </div>
+
+    <!-- Animation (Mosaic only) -->
+    <div class="accordion open" id="secAnimation">
+      <button class="accordion-heading" type="button">Animation</button>
+      <div class="accordion-body">
+        <div class="range-field">
+          <span class="rf-label">Smoothing</span>
+          <input type="range" min="1" max="30" value="15" oninput="cfg.lerp=+this.value/100;this.nextElementSibling.value=this.value+'%'">
+          <output>15%</output>
+        </div>
+      </div>
+    </div>
+
+    <!-- Halftone (Halftone only) -->
+    <div class="accordion open" id="secHalftone" style="display:none">
+      <button class="accordion-heading" type="button">Halftone</button>
+      <div class="accordion-body">
+        <div class="range-field">
+          <span class="rf-label">Dot Size</span>
+          <input type="range" min="4" max="40" value="14" oninput="cfg.htSize=+this.value;this.nextElementSibling.value=this.value+'px'">
+          <output>14px</output>
+        </div>
+        <div class="range-field">
+          <span class="rf-label">Contrast</span>
+          <input type="range" min="50" max="300" value="140" oninput="cfg.htContrast=+this.value;this.nextElementSibling.value=this.value+'%'">
+          <output>140%</output>
+        </div>
+        <div class="range-field">
+          <span class="rf-label">Brightness</span>
+          <input type="range" min="0" max="200" value="110" oninput="cfg.htBrightness=+this.value;this.nextElementSibling.value=this.value+'%'">
+          <output>110%</output>
+        </div>
+        <div class="range-field">
+          <span class="rf-label">Angle</span>
+          <input type="range" min="0" max="89" value="45" oninput="cfg.htAngle=+this.value*Math.PI/180;this.nextElementSibling.value=this.value+'°'">
+          <output>45°</output>
+        </div>
+        <div class="range-field">
+          <span class="rf-label">Min Dot</span>
+          <input type="range" min="0" max="40" value="0" oninput="cfg.htMin=+this.value/100;this.nextElementSibling.value=this.value+'%'">
+          <output>0%</output>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /left-panel -->
+
+  <!-- CENTER -->
+  <div class="center">
+    <div class="canvas-area">
+      <canvas id="mainCanvas"></canvas>
+      <div id="flash"></div>
+      <div class="empty-state" id="emptyState">
+        <svg class="empty-icon" width="56" height="56" viewBox="0 0 56 56" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <!-- top row: left -->
+          <rect x="2"  y="2"  width="16" height="16"/>
+          <!-- middle row: centre -->
+          <rect x="20" y="20" width="16" height="16"/>
+          <!-- bottom row: left and right -->
+          <rect x="2"  y="38" width="16" height="16"/>
+          <rect x="38" y="38" width="16" height="16"/>
+        </svg>
+        <div class="empty-title">Tessera Mosaic</div>
+        <div class="empty-sub">Live colour mosaic from your webcam</div>
+        <div class="empty-actions">
+          <button class="button primary" onclick="startCamera()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8" fill="currentColor" stroke="none"/></svg>
+            Start Camera
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT PANEL -->
+  <div class="right-panel">
+
+    <!-- Camera feed -->
+    <div class="accordion open">
+      <button class="accordion-heading" type="button">Camera Feed</button>
+      <div class="accordion-body">
+        <div class="video-wrap">
+          <div class="no-signal" id="noSignal">No Signal</div>
+          <video id="video" autoplay playsinline muted style="display:none"></video>
+          <div class="overlay-badge">Source</div>
+        </div>
+        <div style="font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:0.04em" id="avgColor">AVG COLOUR: —</div>
+      </div>
+    </div>
+
+    <!-- Live palette -->
+    <div class="accordion open">
+      <button class="accordion-heading" type="button">Live Palette</button>
+      <div class="accordion-body">
+        <div id="paletteGrid" style="display:grid;grid-template-columns:repeat(8,1fr);gap:3px;"></div>
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="accordion">
+      <button class="accordion-heading" type="button">Stats</button>
+      <div class="accordion-body">
+        <div class="readout">
+          <div class="readout-row"><span class="rk">FPS</span><span class="rv" id="sFps">—</span></div>
+          <div class="readout-row"><span class="rk">Cells</span><span class="rv" id="sCells">—</span></div>
+          <div class="readout-row"><span class="rk">Canvas</span><span class="rv" id="sRes">—</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Snapshots -->
+    <div class="accordion">
+      <button class="accordion-heading" type="button">Snapshots</button>
+      <div class="accordion-body">
+        <button class="button full" id="dlBtn" onclick="download()" disabled>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+          Download Snapshot
+        </button>
+        <button class="button full" id="capBtn" onclick="snap()" disabled>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Save Thumbnail
+        </button>
+        <div id="thumbRow"></div>
+      </div>
+    </div>
+
+    <!-- System Settings -->
+    <div class="accordion">
+      <button class="accordion-heading" type="button">System Settings</button>
+      <div class="accordion-body">
+        <button class="button full" onclick="exportPrompt()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Export Prompt
+        </button>
+        <div style="font-family:var(--sans);font-size:11px;color:var(--accent);line-height:1.5;">
+          Downloads a reconstruction prompt describing this build.
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /right-panel -->
+
+</div><!-- /main -->
+
+<div class="status-bar">
+  <span class="live-dot" id="liveDot"></span>
+  <span>Status: <b id="statusText">Waiting for camera</b></span>
+  <span>FPS: <b id="sbFps">—</b></span>
+  <span>Cells: <b id="sbCells">—</b></span>
+</div>
+
+<script>
+/* ── ACCORDION ── */
+document.querySelectorAll('.accordion-heading').forEach(h => {
+  h.addEventListener('click', () => h.closest('.accordion').classList.toggle('open'));
+});
+
+/* ── UTILITIES ── */
+function setStatus(msg) { document.getElementById('statusText').textContent = msg; }
+
+function rgbToHsv(r, g, b) {
+  r/=255; g/=255; b/=255;
+  const max=Math.max(r,g,b), min=Math.min(r,g,b), d=max-min;
+  let h=0;
+  if (d) {
+    if (max===r) h=((g-b)/d+6)%6;
+    else if (max===g) h=(b-r)/d+2;
+    else h=(r-g)/d+4;
+    h*=60;
+  }
+  return [h, max?d/max:0, max];
+}
+
+/* ── CONFIG ── */
+const cfg = {
+  cols: 40, rows: 30, gap: 1,
+  sat: 130, bri: 100, con: 110, hue: 0,
+  mirrorX: true, invert: false,
+  lerp: 0.15,
+  mode: 'mosaic',
+  htSize: 14, htContrast: 140, htBrightness: 110,
+  htAngle: Math.PI / 4, htMin: 0,
+};
+
+/* ── STATE ── */
+let running = false, stream = null, animId = null;
+let cellColors = [], tick = 0, lastTs = 0, fpsSmooth = 0;
+
+const canvas  = document.getElementById('mainCanvas');
+const ctx     = canvas.getContext('2d');
+const video   = document.getElementById('video');
+const empty   = document.getElementById('emptyState');
+const liveDot = document.getElementById('liveDot');
+const flash   = document.getElementById('flash');
+const off     = document.createElement('canvas');
+const offCtx  = off.getContext('2d');
+
+/* ── CAMERA ── */
+async function startCamera() {
+  setStatus('Requesting camera…');
+  try {
+    stream = await navigator.mediaDevices.getUserMedia({
+      video: { width: { ideal: 1280 }, height: { ideal: 720 }, facingMode: 'user' },
+      audio: false
+    });
+    video.srcObject = stream;
+    video.style.display = 'block';
+    document.getElementById('noSignal').style.display = 'none';
+    await video.play();
+
+    empty.style.display = 'none';
+    liveDot.classList.add('active');
+    document.getElementById('pill').textContent = 'Live';
+    document.getElementById('pill').classList.add('live');
+    document.getElementById('btnStart').disabled = true;
+    document.getElementById('btnStop').disabled  = false;
+    document.getElementById('capBtn').disabled   = false;
+    document.getElementById('dlBtn').disabled    = false;
+
+    setStatus('Running');
+    running = true;
+    requestAnimationFrame(loop);
+  } catch (err) {
+    setStatus('Camera error: ' + err.message);
+    alert('Could not access camera.\n\n' + err.message + '\n\nOpen via VS Code Live Server or any localhost server, then allow camera permission.');
+  }
+}
+
+function stopCamera() {
+  running = false;
+  if (animId) cancelAnimationFrame(animId);
+  if (stream) stream.getTracks().forEach(t => t.stop());
+  stream = null; cellColors = [];
+
+  video.style.display = 'none';
+  document.getElementById('noSignal').style.display = 'flex';
+  liveDot.classList.remove('active');
+  document.getElementById('pill').textContent = 'Idle';
+  document.getElementById('pill').classList.remove('live');
+  document.getElementById('btnStart').disabled = false;
+  document.getElementById('btnStop').disabled  = true;
+  document.getElementById('capBtn').disabled   = true;
+
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  empty.style.display = 'flex';
+  setStatus('Stopped');
+}
+
+/* ── MAIN LOOP ── */
+function loop(ts) {
+  if (!running) return;
+  animId = requestAnimationFrame(loop);
+  tick++;
+
+  const dt = ts - lastTs; lastTs = ts;
+  if (dt > 0) fpsSmooth += (1000 / dt - fpsSmooth) * 0.1;
+
+  const wrap = canvas.parentElement;
+  const W = wrap.clientWidth, H = wrap.clientHeight;
+  if (canvas.width !== W || canvas.height !== H) {
+    canvas.width = W; canvas.height = H; cellColors = [];
+  }
+  if (video.readyState < 2) return;
+
+  off.width = cfg.cols; off.height = cfg.rows;
+  offCtx.filter = [
+    'saturate(' + cfg.sat + '%)',
+    'brightness(' + cfg.bri + '%)',
+    'contrast(' + cfg.con + '%)',
+    'hue-rotate(' + cfg.hue + 'deg)',
+    cfg.invert ? 'invert(1)' : '',
+  ].join(' ');
+
+  if (cfg.mirrorX) { offCtx.save(); offCtx.translate(cfg.cols, 0); offCtx.scale(-1, 1); }
+  offCtx.drawImage(video, 0, 0, cfg.cols, cfg.rows);
+  if (cfg.mirrorX) offCtx.restore();
+
+  const px = offCtx.getImageData(0, 0, cfg.cols, cfg.rows).data;
+  const total = cfg.cols * cfg.rows;
+  const raw = new Array(total);
+  for (let i = 0; i < total; i++) raw[i] = [px[i*4], px[i*4+1], px[i*4+2]];
+
+  if (cellColors.length !== total) {
+    cellColors = raw.map(c => [c[0], c[1], c[2]]);
+  } else {
+    const t = cfg.lerp;
+    for (let i = 0; i < total; i++) {
+      cellColors[i][0] += (raw[i][0] - cellColors[i][0]) * t;
+      cellColors[i][1] += (raw[i][1] - cellColors[i][1]) * t;
+      cellColors[i][2] += (raw[i][2] - cellColors[i][2]) * t;
+    }
+  }
+
+  ctx.fillStyle = cfg.mode === 'halftone' ? (cfg.invert ? '#000' : '#fff') : '#121216';
+  ctx.fillRect(0, 0, W, H);
+
+  if (cfg.mode === 'mosaic') drawMosaic(W, H);
+  else drawHalftone(W, H);
+
+  if (tick % 20 === 0) updateStats(raw);
+}
+
+/* ── MOSAIC ── */
+function drawMosaic(W, H) {
+  const cw = W / cfg.cols, ch = H / cfg.rows, g = cfg.gap;
+  for (let row = 0; row < cfg.rows; row++) {
+    for (let col = 0; col < cfg.cols; col++) {
+      const c = cellColors[row * cfg.cols + col];
+      ctx.fillStyle = 'rgb(' + (c[0]|0) + ',' + (c[1]|0) + ',' + (c[2]|0) + ')';
+      const x = col*cw + g*0.5, y = row*ch + g*0.5, rw = cw-g, rh = ch-g;
+      if (g >= 3) { ctx.beginPath(); ctx.roundRect(x, y, rw, rh, 3); ctx.fill(); }
+      else ctx.fillRect(x, y, rw, rh);
+    }
+  }
+}
+
+/* ── HALFTONE ── */
+const htOff = document.createElement('canvas');
+const htOffCtx = htOff.getContext('2d');
+
+function drawHalftone(W, H) {
+  const sW = Math.min(320, W), sH = Math.min(240, H);
+  htOff.width = sW; htOff.height = sH;
+  htOffCtx.filter = [
+    'brightness(' + cfg.htBrightness + '%)',
+    'contrast(' + cfg.htContrast + '%)',
+    cfg.invert ? 'invert(1)' : '',
+  ].join(' ');
+  if (cfg.mirrorX) { htOffCtx.save(); htOffCtx.translate(sW, 0); htOffCtx.scale(-1, 1); }
+  htOffCtx.drawImage(video, 0, 0, sW, sH);
+  if (cfg.mirrorX) htOffCtx.restore();
+  const imgData = htOffCtx.getImageData(0, 0, sW, sH).data;
+
+  function sampleLum(sx, sy) {
+    const px = Math.max(0, Math.min(sW-1, Math.floor(sx/W*sW)));
+    const py = Math.max(0, Math.min(sH-1, Math.floor(sy/H*sH)));
+    const i = (py*sW+px)*4;
+    return (0.299*imgData[i] + 0.587*imgData[i+1] + 0.114*imgData[i+2]) / 255;
+  }
+
+  const spacing = cfg.htSize;
+  const cosA = Math.cos(cfg.htAngle), sinA = Math.sin(cfg.htAngle);
+  const diag = Math.ceil(Math.sqrt(W*W + H*H));
+  const steps = Math.ceil(diag / spacing) + 2;
+  const cx = W/2, cy = H/2;
+  ctx.fillStyle = cfg.invert ? '#fff' : '#000';
+
+  for (let i = -steps; i <= steps; i++) {
+    for (let j = -steps; j <= steps; j++) {
+      const gx = i*spacing, gy = j*spacing;
+      const sx = cx + gx*cosA - gy*sinA;
+      const sy = cy + gx*sinA + gy*cosA;
+      if (sx < -spacing || sx > W+spacing || sy < -spacing || sy > H+spacing) continue;
+      const lum = sampleLum(sx, sy);
+      const dotFrac = Math.max(cfg.htMin, 1-lum);
+      const r = (spacing/2) * dotFrac * 0.96;
+      if (r < 0.4) continue;
+      ctx.beginPath();
+      ctx.arc(sx, sy, r, 0, Math.PI*2);
+      ctx.fill();
+    }
+  }
+}
+
+/* ── MODE SELECTOR ── */
+function setMode(mode, btn) {
+  cfg.mode = mode; cellColors = [];
+  document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('secGrid').style.display      = mode === 'mosaic'   ? '' : 'none';
+  document.getElementById('secColour').style.display    = mode === 'mosaic'   ? '' : 'none';
+  document.getElementById('secAnimation').style.display = mode === 'mosaic'   ? '' : 'none';
+  document.getElementById('secHalftone').style.display  = mode === 'halftone' ? '' : 'none';
+}
+
+/* ── STATS + PALETTE ── */
+function updateStats(raw) {
+  document.getElementById('sFps').textContent  = fpsSmooth.toFixed(0);
+  document.getElementById('sbFps').textContent = fpsSmooth.toFixed(0);
+  const cells = (cfg.cols * cfg.rows).toLocaleString();
+  document.getElementById('sCells').textContent  = cells;
+  document.getElementById('sbCells').textContent = cells;
+  document.getElementById('sRes').textContent = canvas.width + '×' + canvas.height;
+
+  let sumR=0,sumG=0,sumB=0;
+  for (const c of raw) { sumR+=c[0]; sumG+=c[1]; sumB+=c[2]; }
+  const n=raw.length, r=sumR/n|0, g=sumG/n|0, b=sumB/n|0;
+  const avgEl = document.getElementById('avgColor');
+  avgEl.textContent = '';
+  const prefix = document.createTextNode('AVG: ');
+  const swatch = document.createElement('b');
+  swatch.style.color = 'rgb(' + r + ',' + g + ',' + b + ')';
+  swatch.textContent = '■';
+  const suffix = document.createTextNode(' rgb(' + r + ', ' + g + ', ' + b + ')');
+  avgEl.appendChild(prefix);
+  avgEl.appendChild(swatch);
+  avgEl.appendChild(suffix);
+
+  const HUES=8, BRIGHTS=4;
+  const buckets = Array.from({length:HUES*BRIGHTS}, () => ({r:0,g:0,b:0,n:0}));
+  for (const c of raw) {
+    const [h,,v] = rgbToHsv(c[0],c[1],c[2]);
+    const hi = Math.min(HUES-1,   Math.floor(h/360*HUES));
+    const bi = Math.min(BRIGHTS-1, Math.floor(v*BRIGHTS));
+    const idx = bi*HUES+hi;
+    buckets[idx].r+=c[0]; buckets[idx].g+=c[1]; buckets[idx].b+=c[2]; buckets[idx].n++;
+  }
+  const grid = document.getElementById('paletteGrid');
+  if (grid.children.length !== HUES*BRIGHTS) {
+    grid.innerHTML = '';
+    for (let i=0; i<HUES*BRIGHTS; i++) {
+      const sw = document.createElement('div'); sw.className='pal-sw'; grid.appendChild(sw);
+    }
+  }
+  const sw = grid.children;
+  for (let bi=0; bi<BRIGHTS; bi++) {
+    for (let hi=0; hi<HUES; hi++) {
+      const idx = bi*HUES+hi;
+      const di  = (BRIGHTS-1-bi)*HUES+hi;
+      const bk  = buckets[idx];
+      sw[di].style.background = bk.n > 0
+        ? 'rgb(' + (bk.r/bk.n|0) + ',' + (bk.g/bk.n|0) + ',' + (bk.b/bk.n|0) + ')'
+        : '#1a1a1a';
+    }
+  }
+}
+
+/* ── SNAPSHOTS ── */
+const MAX_THUMBS = 12;
+
+function snap() {
+  if (!running) return;
+  const row = document.getElementById('thumbRow');
+  if (row.children.length >= MAX_THUMBS) {
+    alert('Maximum of 12 thumbnails reached.\nRight-click an existing thumbnail to delete it before saving a new one.');
+    return;
+  }
+  flash.classList.add('go');
+  setTimeout(() => flash.classList.remove('go'), 80);
+  const fullDataUrl = canvas.toDataURL('image/png');
+  const timestamp = Date.now();
+  const thumb = document.createElement('canvas');
+  thumb.width = 104; thumb.height = 80;
+  thumb.getContext('2d').drawImage(canvas, 0, 0, 104, 80);
+  const wrap = document.createElement('div');
+  wrap.className = 'thumb';
+  wrap.title = 'Left-click to download full resolution · Right-click to delete';
+  wrap.appendChild(thumb);
+  wrap.addEventListener('click', () => {
+    const a = document.createElement('a');
+    a.href = fullDataUrl; a.download = 'tessera-mosaic-' + timestamp + '.png'; a.click();
+  });
+  wrap.addEventListener('contextmenu', e => { e.preventDefault(); wrap.remove(); });
+  row.prepend(wrap);
+}
+
+function download() {
+  const a = document.createElement('a');
+  a.href = canvas.toDataURL('image/png');
+  a.download = 'tessera-mosaic-' + Date.now() + '.png';
+  a.click();
+}
+
+/* ── EXPORT PROMPT ── */
+function exportPrompt() {
+  const text = `# Tessera Mosaic — Reconstruction Prompt
+
+Author: Chris Shaw
+Organisation: LASALLE College of the Arts | University of the Arts Singapore
+Date: September 2026
+Built With: Claude (Anthropic)
+
+Create a single self-contained HTML file — "Tessera Mosaic": a live webcam tool that samples pixel colours from the camera feed and renders them as a real-time generative art mosaic. No face tracking, no ML models — Canvas 2D pixel manipulation only. The file must have zero external dependencies; all CSS, JavaScript, and image assets are inlined.
+
+---
+
+## DRIVING CONCEPT
+
+The webcam feed is sampled at a low grid resolution and each cell is filled with the average colour of that region. The result is a pixellated, mosaic-like portrait of the live scene. Two render modes — Mosaic and Halftone — explore different visual treatments of the same colour data. The tool is intended for both creative exploration and as a teaching aid for understanding how images are constructed from discrete colour samples.
+
+---
+
+## DESIGN SYSTEM
+
+Follows the Sandbox Project Style Guide. All tokens, typography, and components must match exactly.
+
+### Colour Tokens
+\`\`\`css
+:root {
+  --bg:           #101014;
+  --topbar:       #1d1d22;
+  --panel:        #1a1a20;
+  --surface:      #26272f;
+  --surface-mid:  #2c2d35;
+  --border:       #343642;
+  --text:         #f2f3f7;
+  --muted:        #a5abc0;
+  --sub:          #b4bad0;
+  --accent:       #3b97ee;
+  --accent-light: #71baff;
+  --accent-fill:  #163452;
+  --danger:       #ff3838;
+  --green:        #44cc44;
+  --mono: "IBM Plex Mono", "Cascadia Mono", Consolas, monospace;
+  --sans: Inter, ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --panel-w: 270px;
+}
+\`\`\`
+
+### Typography
+- Accordion headings, control labels, buttons: var(--mono), 10-11px, uppercase, letter-spacing 0.08-0.14em
+- Body/description text: var(--sans), 11-12px, var(--sub) or var(--muted)
+- Range slider value readouts: var(--mono), right-aligned, tabular nums
+
+---
+
+## PAGE STRUCTURE
+
+- **Topbar** (min-height 64px, background var(--topbar)): Lightning bolt logo (34×34px, base64 embedded) at left, title "Tessera Mosaic" — "Tessera" in var(--text), "Mosaic" in var(--accent) via a span — with subtitle "Live colour mosaic from your webcam" underneath. Right-aligned: status chip (Idle/Live), Start Camera button (primary style), Stop button (danger style).
+- **Three-column layout**: fixed left panel (270px) + flexible centre canvas + fixed right panel (270px).
+- **Status bar** (26px, background var(--topbar)): live dot, Status, FPS, Cells.
+
+---
+
+## TOPBAR LOGO
+
+The lightning bolt logo is embedded as a base64 PNG data URI (black background version for the topbar). A resized 32×32 version of the white-background variant is embedded as the favicon.
+
+---
+
+## LEFT PANEL — ACCORDION SECTIONS
+
+All sections use the Sandbox accordion pattern: monospace uppercase heading with +/− indicator via CSS ::after, toggled by an "open" class on the parent. Body uses display:flex/flex-direction:column/gap:8px when open.
+
+1. **Render Mode** — OPEN. 2-column mode-btn grid: Mosaic | Halftone.
+2. **Image** — OPEN. Two check-rows: Mirror X (checked by default), Invert.
+3. **Grid** — OPEN, Mosaic only (hidden in Halftone). Range fields: Columns (4–100, default 40), Rows (4–70, default 30), Gap (0–10px, default 1).
+4. **Colour** — OPEN, Mosaic only. Range fields: Saturation (0–300%, default 130%), Brightness (0–200%, default 100%), Contrast (0–300%, default 110%), Hue Shift (0–360°, default 0°).
+5. **Animation** — OPEN, Mosaic only. Range field: Smoothing (1–30%, default 15%) — controls lerp speed; the interesting smearing range is 1–20%, so the slider is deliberately compressed to that range.
+6. **Halftone** — OPEN, Halftone only (hidden in Mosaic). Range fields: Dot Size (4–40px, default 14), Contrast (50–300%, default 140%), Brightness (0–200%, default 110%), Angle (0–89°, default 45°), Min Dot (0–40%, default 0%).
+
+When switching modes, Grid + Colour + Animation show/hide together for Mosaic; Halftone section shows/hides for Halftone. Image section always remains visible.
+
+---
+
+## RIGHT PANEL — ACCORDION SECTIONS
+
+1. **Camera Feed** — OPEN. Video preview with "No Signal" placeholder and "Source" overlay badge. Avg colour readout below (monospace, updates every 20 frames).
+2. **Live Palette** — OPEN. 8×4 grid of 32 colour swatches (8 hue bands × 4 brightness bands, bright rows at top). Updated every 20 frames from the raw sampled pixel data.
+3. **Stats** — OPEN. Readout rows: FPS, Cells, Canvas resolution.
+4. **Snapshots** — OPEN. Two full-width buttons: Download Snapshot (camera icon — immediately downloads current canvas as PNG); Save Thumbnail (download icon — stores full-res frame, adds 104×80 thumbnail proxy to history strip). Max 12 thumbnails; left-click thumbnail downloads full-res frame; right-click deletes thumbnail. Alert shown if user attempts a 13th.
+5. **System Settings** — CLOSED. Export Prompt button (download icon) — downloads this reconstruction prompt as tessera-mosaic-reconstruction-prompt.txt. Description text below button in var(--accent) colour.
+
+---
+
+## CANVAS / RENDERING
+
+The centre area has a subtle dot-grid background (linear-gradient pattern, rgba white at 2.5% on #121216). The canvas element sits absolutely over it filling the full area.
+
+### Mosaic mode
+- Webcam sampled every frame into an offscreen canvas at cfg.cols × cfg.rows resolution via offCtx.drawImage(video, 0, 0, cols, rows).
+- ctx.filter applied before sampling: saturate / brightness / contrast / hue-rotate / invert.
+- Mirror X applied via save/translate(cols,0)/scale(-1,1)/restore before drawImage.
+- Raw pixel array [r,g,b] per cell extracted via getImageData.
+- Each cell lerps toward its raw target each frame: cell[ch] += (raw[ch] - cell[ch]) * cfg.lerp. Smoothing slider maps 1–30 → 0.01–0.30 lerp factor.
+- Rendering: ctx.fillRect per cell (gap * 0.5 inset each side). If gap >= 3, ctx.roundRect with radius 3 is used instead. Background fill is #121216 each frame.
+
+### Halftone mode
+- Completely independent from the mosaic pipeline — reads directly from the video element into its own offscreen canvas (htOff) at min(320,W) × min(240,H).
+- htOffCtx.filter applies htBrightness, htContrast, and invert.
+- Mirror X applied to htOffCtx the same way as mosaic.
+- Dot grid is rotated by cfg.htAngle (default 45°). Grid is generated from canvas centre outward to cover the diagonal, then clipped to canvas bounds.
+- For each grid point: sample luminance at that screen position from htOff. dotFrac = max(htMin, 1 - lum). r = (spacing/2) * dotFrac * 0.96.
+- Background: white (#fff) in normal mode, black (#000) when inverted. Dot colour: black (#000) normal, white (#fff) inverted.
+- Canvas background fill in the loop also respects invert for halftone.
+
+### Stats update
+Every 20 frames: FPS (exponential smoothing), cell count, canvas resolution, avg colour (mean R/G/B across raw cells), 32-bucket palette (8 hue × 4 brightness, using rgbToHsv per cell, bright rows rendered at top of grid).
+
+---
+
+## COMPONENT SPECS
+
+### Range field (slider)
+\`\`\`html
+[div class="range-field"]
+  [span class="rf-label"]Label[/span]
+  [input type="range" min="0" max="100" value="50"
+    oninput="cfg.prop=+this.value; this.nextElementSibling.value=this.value+'unit'"]
+  [output]50unit[/output]
+[/div]
+\`\`\`
+Two-row grid: label spans full width (row 1), input + output side by side (row 2). Output is right-aligned, tabular nums, min-width 40px.
+
+### Check row
+\`\`\`html
+[label class="check-row"]
+  [input type="checkbox" onchange="cfg.prop=this.checked"]
+  [span]Label[/span]
+[/label]
+\`\`\`
+Bordered dark row, flex, gap 8px, accent-color var(--accent) on checkbox.
+
+### Mode buttons
+\`\`\`html
+[div class="mode-grid"]
+  [button class="mode-btn active" onclick="setMode('mosaic',this)"]Mosaic[/button]
+  [button class="mode-btn" onclick="setMode('halftone',this)"]Halftone[/button]
+[/div]
+\`\`\`
+2-col grid, monospace uppercase, accent styling on .active.
+
+### Readout rows
+\`\`\`html
+[div class="readout-row"]
+  [span class="rk"]Label[/span]
+  [span class="rv" id="elemId"]—[/span]
+[/div]
+\`\`\`
+Flex row, space-between, bordered, bg var(--bg), monospace.
+
+---
+
+## CAMERA
+
+- getUserMedia: { video: { width: {ideal:1280}, height: {ideal:720}, facingMode:'user' } }
+- On success: show video, hide no-signal placeholder, enable buttons, start rAF loop.
+- On stop: cancel rAF, stop tracks, clear canvas, show empty state.
+- Requires localhost or https — never file://.
+
+---
+
+## SNAPSHOTS
+
+- Max 12 thumbnails stored per session.
+- Each snap: stores canvas.toDataURL('image/png') as fullDataUrl in closure. Draws 104×80 thumbnail canvas as visual proxy.
+- Left-click thumbnail: triggers download of fullDataUrl (full canvas resolution).
+- Right-click thumbnail: removes element (contextmenu, preventDefault).
+- Download Snapshot: canvas.toDataURL immediately downloaded, no thumbnail created.
+- Filenames: tessera-mosaic-{timestamp}.png.
+
+---
+
+## GENERAL NOTES
+
+- Single self-contained HTML file — all CSS, JS, and image assets inlined. No external dependencies.
+- Zero build step required.
+- Webcam requires secure context (localhost or https).
+- Accordion open/close: querySelectorAll('.accordion-heading') → toggle 'open' class on closest('.accordion'). CSS ::after shows + when closed, − (U+2212) when open.
+- setMode() resets cellColors array to force clean lerp start on mode switch.
+`;
+
+  const blob = new Blob([text], { type: 'text/plain' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href     = url;
+  a.download = 'tessera-mosaic-reconstruction-prompt.txt';
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}
+</script>
+</body>
+</html>
