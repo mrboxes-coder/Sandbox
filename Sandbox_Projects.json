@@ -20,13 +20,29 @@
         "Mosaic",
         "Halftone"
       ],
-      "thumb": "",
+      "thumb": "images/tessera_01.jpg",
       "fullDesc": "A tessera is a single small tile, typically stone, glass, or ceramic, used in the ancient craft of mosaic making. Arranged in their thousands, individual tessera accumulate into a complete image, each contributing a fragment of colour to a larger whole. The word itself is a useful lens for this project, because it captures something important about how digital images work: every image, whether a photograph, a video frame, or a live camera feed, is ultimately a grid of discrete colour values - digital tessera - waiting to be read, processed, and reassembled.\n    \nThis project asks: What new visual experiences become possible when you break an image down into its raw data values and reassemble them differently?\n     \nWhat is Tessera Mosaic?\n       \nTessera Mosaic is a live browser-based tool that takes your webcam feed and treats it not as a video stream but as a continuous source of raw colour data. Every frame, that data is sampled, processed, and rebuilt on screen using two very different visual strategies — Mosaic and Halftone. The result in each case is something that the original camera image is not: a living, constantly shifting artwork generated entirely from the numbers that describe colour.\n     \nThe tool runs entirely in the browser with no installation. Every parameter is controlled through sliders, making the underlying data processes directly manipulable and their visual consequences immediately visible.\n     \nMosaic Mode\n     \nIn Mosaic mode the canvas is divided into a grid of rectangular cells. Each frame, the webcam image is drawn into a tiny offscreen canvas at the grid resolution — say 40 columns by 30 rows. Each cell reads the colour value of its corresponding region and fills its tile with that colour. What you see is a continuously updating field of coloured rectangles — a digital mosaic built entirely from averaged colour samples.\n     \nThe grid resolution slider is the central variable. At low resolution the image dissolves into large blocks of pure colour, highly abstract and painterly. At high resolution the tiles become fine enough that the original image re-emerges with near-photographic clarity. Between those two extremes lies a rich middle ground where recognisable form and pure colour coexist. Saturation, contrast, brightness, and hue shift controls push the colour data further from its source, creating palettes that bear little resemblance to the real scene. The smoothing control slows how quickly tiles respond to new data, giving the mosaic a fluid, almost liquid quality as colours drift across the grid.\n\nHalftone Mode\n     \nHalftone mode draws on a different tradition — industrial print. Before digital reproduction, photographs in newspapers were rendered as grids of ink dots: large dots in dark areas, small dots in bright areas, on a white background. The eye blends the variation in dot density into the illusion of continuous tone. It is the same principle that underlies all offset lithographic printing today.\n   \nIn Halftone mode the webcam's luminance data — the brightness value at each point — drives the radius of a dot on a rotated grid. Dark areas of the scene produce large dots that nearly touch; bright areas produce tiny dots or none at all. The dot grid is rotated 45 degrees by default, matching the classic newspaper screen angle. The result is a black and white halftone portrait generated live from the camera feed, updating in real time as the scene changes.\n\nScaffolding, Flow, and the Learner's Zone\n    \nTessera Mosaic sits at the entry point of the Immersive Lab Sandbox suite deliberately. The concept of flow — developed by psychologist Mihaly Csikszentmihalyi — describes the state of optimal engagement that occurs when a challenge is closely matched to a person's current skill level. Too simple and curiosity dies. Too complex and frustration takes over. The space between those two conditions is where genuine learning happens.\n    \nAt this stage students need no coding knowledge. Every process in the system — sampling, averaging, reassembling — is controlled through a slider, and the consequences are immediate and personal. But the question the tool poses is not a simple one. It connects to computer graphics, the history of print, colour theory, and visual perception. A student can begin exploring it within minutes of opening a browser, and still find new territory to investigate an hour later. That balance — intellectually substantial, technically accessible — is precisely the condition that keeps curiosity alive and learning moving forward.",
       "resourceLabel": "",
       "resourceLink": "",
       "gallery": [
         {
-          "img": "",
+          "img": "images/tessera_02.jpg",
+          "caption": ""
+        },
+        {
+          "img": "images/tessera_03.jpg",
+          "caption": ""
+        },
+        {
+          "img": "images/tessera_04.jpg",
+          "caption": ""
+        },
+        {
+          "img": "images/tessera_01.jpg",
+          "caption": ""
+        },
+        {
+          "img": "images/tessera_06.jpg",
           "caption": ""
         },
         {
@@ -34,23 +50,7 @@
           "caption": ""
         },
         {
-          "img": "",
-          "caption": ""
-        },
-        {
-          "img": "",
-          "caption": ""
-        },
-        {
-          "img": "",
-          "caption": ""
-        },
-        {
-          "img": "",
-          "caption": ""
-        },
-        {
-          "img": "",
+          "img": "images/tessera_09.jpg",
           "caption": ""
         },
         {
