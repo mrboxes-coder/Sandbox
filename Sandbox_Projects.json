@@ -66,35 +66,51 @@
       "youtube": "",
       "videoCaption": "",
       "videoRuntime": "",
-      "tunableParams": [],
+      "tunableParams": [
+        "Columns",
+        "Rows",
+        "Gap",
+        "Saturation",
+        "Brightness",
+        "Contrast",
+        "Hue Shift",
+        "Smoothing",
+        "Dot Size",
+        "Screen Angle",
+        "Halftone Contrast",
+        "Halftone Brightness",
+        "Minimum Dot Size",
+        "Dot Colour",
+        "Background Colour"
+      ],
       "specSheet": [
         {
           "label": "ENGINE",
-          "value": ""
+          "value": "Canvas 2D API - offscreen pixel sampling, real-time colour averaging, and grid-based tile rendering."
         },
         {
           "label": "DATA",
-          "value": ""
+          "value": "Live webcam pixel values sampled at grid resolution - RGB colour channels read per cell, averaged, and lerped frame-to-frame to produce continuous colour transitions."
         },
         {
           "label": "CONTROLS",
-          "value": ""
+          "value": "Sliders - columns, rows, gap, saturation, brightness, contrast, hue shift, smoothing, dot size, halftone contrast, halftone brightness, screen angle, minimum dot · Colour pickers - dot colour, background colour · Checkboxes - mirror X, invert · Mode selector - Mosaic, Halftone."
         },
         {
           "label": "INSTRUMENTS",
-          "value": ""
+          "value": "Live FPS counter · cell count readout · canvas resolution display · average colour readout · 32-swatch live palette (8 hue bands × 4 brightness bands)."
         },
         {
           "label": "DEPLOY",
-          "value": ""
+          "value": "Single self-contained HTML file · no build tools · no server required for Mosaic mode · localhost required for webcam access · all assets base64 embedded."
         },
         {
           "label": "ACCESS",
-          "value": ""
+          "value": "Browser-based · open in any modern desktop browser · no installation · no login required · webcam permission required at runtime."
         },
         {
           "label": "BUILT WITH",
-          "value": ""
+          "value": "Claude - iterative, prompt-led development across a structured single-session build."
         }
       ]
     },
