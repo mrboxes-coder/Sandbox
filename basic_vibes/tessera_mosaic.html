@@ -306,6 +306,8 @@
         <div class="mode-grid">
           <button class="mode-btn active" onclick="setMode('mosaic',this)">Mosaic</button>
           <button class="mode-btn" onclick="setMode('halftone',this)">Halftone</button>
+          <button class="mode-btn" onclick="setMode('corrupt',this)">Corrupt Video</button>
+          <button class="mode-btn" onclick="setMode('ascii',this)">ASCII Density</button>
         </div>
       </div>
     </div>
@@ -424,6 +426,104 @@
           <span class="rf-label" style="grid-column:1/-1">Background</span>
           <input type="color" value="#ffffff" oninput="cfg.htBgColor=this.value;document.getElementById('vBgColor').textContent=this.value">
           <span class="colour-pick-val" id="vBgColor">#ffffff</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Corrupt Video (Corrupt only) -->
+    <div class="accordion open" id="secCorrupt" style="display:none">
+      <button class="accordion-heading" type="button">Corrupt Video</button>
+      <div class="accordion-body">
+        <div class="range-field">
+          <span class="rf-label">Intensity</span>
+          <input type="range" min="0" max="100" value="5" oninput="cfg.cvIntensity=+this.value/100;this.nextElementSibling.value=this.value">
+          <output>5</output>
+        </div>
+        <div class="range-field">
+          <span class="rf-label">Bands</span>
+          <input type="range" min="2" max="128" value="40" oninput="cfg.cvBands=+this.value;this.nextElementSibling.value=this.value">
+          <output>40</output>
+        </div>
+        <div class="range-field">
+          <span class="rf-label">Scatter Bands</span>
+          <input type="range" min="0" max="100" value="75" oninput="cfg.cvScatter=+this.value/100;this.nextElementSibling.value=this.value">
+          <output>75</output>
+        </div>
+        <div class="range-field">
+          <span class="rf-label">Speed</span>
+          <input type="range" min="0" max="100" value="50" oninput="cfg.cvSpeed=+this.value/100;this.nextElementSibling.value=this.value">
+          <output>50</output>
+        </div>
+        <div class="range-field">
+          <span class="rf-label">Speed Jitter</span>
+          <input type="range" min="0" max="100" value="50" oninput="cfg.cvSpeedJitter=+this.value/100;this.nextElementSibling.value=this.value">
+          <output>50</output>
+        </div>
+        <div class="range-field">
+          <span class="rf-label">Asymmetry</span>
+          <input type="range" min="0" max="100" value="60" oninput="cfg.cvAsymmetry=+this.value/100;this.nextElementSibling.value=this.value">
+          <output>60</output>
+        </div>
+        <div class="range-field">
+          <span class="rf-label">Frame Rate</span>
+          <input type="range" min="1" max="60" value="25" oninput="cfg.cvFps=+this.value;this.nextElementSibling.value=this.value+'fps'">
+          <output>25fps</output>
+        </div>
+      </div>
+    </div>
+
+    <!-- ASCII Density (ASCII only) — BETA -->
+    <div class="accordion open" id="secAscii" style="display:none">
+      <button class="accordion-heading" type="button">ASCII Density</button>
+      <div class="accordion-body">
+        <div class="range-field">
+          <span class="rf-label">Columns</span>
+          <input type="range" min="2" max="40" value="16" oninput="cfg.ascCols=+this.value;this.nextElementSibling.value=this.value">
+          <output>16</output>
+        </div>
+        <div class="range-field">
+          <span class="rf-label">Rows</span>
+          <input type="range" min="2" max="30" value="12" oninput="cfg.ascRows=+this.value;this.nextElementSibling.value=this.value">
+          <output>12</output>
+        </div>
+        <div class="range-field">
+          <span class="rf-label">Threshold</span>
+          <input type="range" min="0" max="100" value="30" oninput="cfg.ascThreshold=+this.value/100;this.nextElementSibling.value=this.value">
+          <output>30</output>
+        </div>
+        <div class="range-field">
+          <span class="rf-label">Resolution</span>
+          <input type="range" min="1" max="8" value="5" oninput="cfg.ascDepth=+this.value;this.nextElementSibling.value=this.value">
+          <output>5</output>
+        </div>
+        <div class="range-field">
+          <span class="rf-label">Gap</span>
+          <input type="range" min="0" max="8" value="1" oninput="cfg.ascGap=+this.value;this.nextElementSibling.value=this.value+'px'">
+          <output>1px</output>
+        </div>
+        <div class="range-field">
+          <span class="rf-label">Gamma</span>
+          <input type="range" min="10" max="300" value="70" oninput="cfg.ascGamma=+this.value/100;this.nextElementSibling.value=(+this.value/100).toFixed(1)">
+          <output>0.7</output>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:4px;margin-top:4px">
+          <span style="font-family:var(--mono);font-size:10px;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted)">Cell Mode</span>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px">
+            <button class="mode-btn active" id="ascModeGrey"  onclick="setAscCellMode('grey',this)">Grey</button>
+            <button class="mode-btn"        id="ascModeDot"   onclick="setAscCellMode('dot',this)">Dots</button>
+            <button class="mode-btn"        id="ascModeChars" onclick="setAscCellMode('chars',this)">ASCII</button>
+          </div>
+        </div>
+        <div class="range-field" style="margin-top:4px">
+          <span class="rf-label">Char Size</span>
+          <input type="range" min="4" max="24" value="8" oninput="cfg.ascDotSize=+this.value;this.nextElementSibling.value=this.value+'px'">
+          <output>8px</output>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:4px;margin-top:4px" id="ascCharsField" style="display:none">
+          <span style="font-family:var(--mono);font-size:10px;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted)">Characters</span>
+          <input type="text" value="アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン"
+            style="background:var(--surface);border:1px solid var(--border);border-radius:3px;color:var(--text);padding:5px 8px;font-family:var(--mono);font-size:10px;width:100%"
+            oninput="cfg.ascChars=this.value||'アイウエオカキクケコ'">
         </div>
       </div>
     </div>
@@ -567,6 +667,24 @@ const cfg = {
   htAngle: Math.PI / 4, htMin: 0,
   htDotColor: '#000000',
   htBgColor:  '#ffffff',
+  // Corrupt Video
+  cvIntensity:  0.05,
+  cvBands:      40,
+  cvSpeed:      0.50,
+  cvSpeedJitter: 0.50,
+  cvAsymmetry:  0.60,
+  cvScatter:    0.75,
+  cvFps:        25,
+  // ASCII Density (BETA)
+  ascCols:      16,
+  ascRows:      12,
+  ascThreshold: 0.30,
+  ascDepth:     5,
+  ascGap:       1,
+  ascGamma:     0.70,
+  ascCellMode:  'grey',
+  ascDotSize:   8,
+  ascChars:     'アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン',
 };
 
 /* ── STATE ── */
@@ -649,44 +767,52 @@ function loop(ts) {
   }
   if (video.readyState < 2) return;
 
-  off.width = cfg.cols; off.height = cfg.rows;
-  offCtx.filter = [
-    'saturate(' + cfg.sat + '%)',
-    'brightness(' + cfg.bri + '%)',
-    'contrast(' + cfg.con + '%)',
-    'hue-rotate(' + cfg.hue + 'deg)',
-    cfg.invert ? 'invert(1)' : '',
-  ].join(' ');
+  // Mosaic pipeline — not needed for corrupt or ascii mode
+  if (cfg.mode !== 'corrupt' && cfg.mode !== 'ascii') {
+    off.width = cfg.cols; off.height = cfg.rows;
+    offCtx.filter = [
+      'saturate(' + cfg.sat + '%)',
+      'brightness(' + cfg.bri + '%)',
+      'contrast(' + cfg.con + '%)',
+      'hue-rotate(' + cfg.hue + 'deg)',
+      cfg.invert ? 'invert(1)' : '',
+    ].join(' ');
 
-  if (cfg.mirrorX) { offCtx.save(); offCtx.translate(cfg.cols, 0); offCtx.scale(-1, 1); }
-  offCtx.drawImage(video, 0, 0, cfg.cols, cfg.rows);
-  if (cfg.mirrorX) offCtx.restore();
+    if (cfg.mirrorX) { offCtx.save(); offCtx.translate(cfg.cols, 0); offCtx.scale(-1, 1); }
+    offCtx.drawImage(video, 0, 0, cfg.cols, cfg.rows);
+    if (cfg.mirrorX) offCtx.restore();
 
-  const px = offCtx.getImageData(0, 0, cfg.cols, cfg.rows).data;
-  const total = cfg.cols * cfg.rows;
-  const raw = new Array(total);
-  for (let i = 0; i < total; i++) raw[i] = [px[i*4], px[i*4+1], px[i*4+2]];
+    const px = offCtx.getImageData(0, 0, cfg.cols, cfg.rows).data;
+    const total = cfg.cols * cfg.rows;
+    const raw = new Array(total);
+    for (let i = 0; i < total; i++) raw[i] = [px[i*4], px[i*4+1], px[i*4+2]];
 
-  if (cellColors.length !== total) {
-    cellColors = raw.map(c => [c[0], c[1], c[2]]);
-  } else {
-    const t = cfg.lerp;
-    for (let i = 0; i < total; i++) {
-      cellColors[i][0] += (raw[i][0] - cellColors[i][0]) * t;
-      cellColors[i][1] += (raw[i][1] - cellColors[i][1]) * t;
-      cellColors[i][2] += (raw[i][2] - cellColors[i][2]) * t;
+    if (cellColors.length !== total) {
+      cellColors = raw.map(c => [c[0], c[1], c[2]]);
+    } else {
+      const t = cfg.lerp;
+      for (let i = 0; i < total; i++) {
+        cellColors[i][0] += (raw[i][0] - cellColors[i][0]) * t;
+        cellColors[i][1] += (raw[i][1] - cellColors[i][1]) * t;
+        cellColors[i][2] += (raw[i][2] - cellColors[i][2]) * t;
+      }
     }
+    if (tick % 20 === 0) updateStats(raw);
   }
 
-  ctx.fillStyle = cfg.mode === 'halftone'
-    ? (cfg.invert ? cfg.htDotColor : cfg.htBgColor)
-    : '#121216';
-  ctx.fillRect(0, 0, W, H);
+  if (cfg.mode !== 'corrupt') {
+    ctx.fillStyle = cfg.mode === 'halftone'
+      ? (cfg.invert ? cfg.htDotColor : cfg.htBgColor)
+      : cfg.mode === 'ascii'
+        ? cfg.ascBg
+        : '#121216';
+    ctx.fillRect(0, 0, W, H);
+  }
 
   if (cfg.mode === 'mosaic') drawMosaic(W, H);
-  else drawHalftone(W, H);
-
-  if (tick % 20 === 0) updateStats(raw);
+  else if (cfg.mode === 'halftone') drawHalftone(W, H);
+  else if (cfg.mode === 'corrupt') drawCorrupt(W, H, ts);
+  else if (cfg.mode === 'ascii') drawAscii(W, H);
 }
 
 /* ── MOSAIC ── */
@@ -751,18 +877,364 @@ function drawHalftone(W, H) {
   }
 }
 
-/* ── MODE SELECTOR ── */
+/* ── ASCII DENSITY (BETA) ── */
+const ascOff    = document.createElement('canvas');
+const ascOffCtx = ascOff.getContext('2d');
+
+function drawAscii(W, H) {
+  // Sample webcam at fixed intermediate resolution for consistent fast sampling
+  const sW = 640, sH = 480;
+  ascOff.width = sW; ascOff.height = sH;
+  ascOffCtx.save();
+  ascOffCtx.filter = cfg.invert ? 'invert(1)' : 'none';
+  if (cfg.mirrorX) { ascOffCtx.translate(sW, 0); ascOffCtx.scale(-1, 1); }
+  ascOffCtx.drawImage(video, 0, 0, sW, sH);
+  ascOffCtx.restore();
+  const img = ascOffCtx.getImageData(0, 0, sW, sH).data;
+
+  // Sample average luminance and variance over a normalised rectangle (0–1 coords)
+  function sampleCell(nx, ny, nw, nh) {
+    const x0 = Math.max(0, (nx * sW)        | 0);
+    const y0 = Math.max(0, (ny * sH)        | 0);
+    const x1 = Math.min(sW, ((nx+nw) * sW)  | 0);
+    const y1 = Math.min(sH, ((ny+nh) * sH)  | 0);
+    let sum = 0, sum2 = 0, count = 0;
+    for (let py = y0; py < y1; py++) {
+      for (let px = x0; px < x1; px++) {
+        const i = (py * sW + px) * 4;
+        const L = (0.299 * img[i] + 0.587 * img[i+1] + 0.114 * img[i+2]) / 255;
+        sum  += L;
+        sum2 += L * L;
+        count++;
+      }
+    }
+    if (count === 0) return { avg: 0, variance: 0 };
+    const avg      = sum / count;
+    const variance = Math.max(0, sum2 / count - avg * avg);
+    return { avg, variance };
+  }
+
+  // Pass 1 — collect all cell variances, use 75th percentile as reference max
+  // This prevents a single high-contrast edge (bright window, door frame) from
+  // setting an impossibly high bar that leaves all facial detail unsubdivided.
+  const cellW = W / cfg.ascCols;
+  const cellH = H / cfg.ascRows;
+  let lumMin = 1, lumMax = 0;
+  const allVariances = [];
+
+  for (let row = 0; row < cfg.ascRows; row++) {
+    for (let col = 0; col < cfg.ascCols; col++) {
+      const { avg, variance } = sampleCell(
+        col / cfg.ascCols, row / cfg.ascRows,
+        1  / cfg.ascCols, 1  / cfg.ascRows
+      );
+      if (avg < lumMin) lumMin = avg;
+      if (avg > lumMax) lumMax = avg;
+      allVariances.push(variance);
+    }
+  }
+
+  // Sort and take 75th percentile as reference max variance
+  allVariances.sort((a, b) => a - b);
+  const p75idx     = Math.floor(allVariances.length * 0.5);
+  const maxVariance = Math.max(0.0001, allVariances[p75idx]);
+  const lumRange    = Math.max(0.01, lumMax - lumMin);
+
+  function lumToGrey(rawL) {
+    const stretched = Math.max(0, Math.min(1, (rawL - lumMin) / lumRange));
+    const v = Math.pow(stretched, cfg.ascGamma) * 255 | 0;
+    return 'rgb(' + v + ',' + v + ',' + v + ')';
+  }
+
+  function drawCell(x, y, w, h, avg) {
+    if (cfg.ascCellMode === 'grey') {
+      // ── Greyscale fill ──────────────────────────────────────
+      const g = cfg.ascGap;
+      ctx.fillStyle = lumToGrey(avg);
+      ctx.fillRect(x + g, y + g, Math.max(1, w - g * 2), Math.max(1, h - g * 2));
+
+    } else {
+      // ── Shared density logic for Dots and ASCII ─────────────
+      const fs     = cfg.ascDotSize;
+      const cols   = Math.max(1, Math.floor(w / fs));
+      const rows   = Math.max(1, Math.floor(h / fs));
+      const total  = cols * rows;
+
+      const stretched = Math.max(0, Math.min(1, (avg - lumMin) / lumRange));
+      const density   = Math.pow(stretched, cfg.ascGamma);
+      const dotCount  = Math.round(density * total);
+      if (dotCount === 0) return;
+
+      // Deterministic position shuffle — stable, no flicker
+      const positions = [];
+      for (let r = 0; r < rows; r++)
+        for (let c = 0; c < cols; c++)
+          positions.push([c, r]);
+
+      const seed = ((x * 1000 + y) | 0) >>> 0;
+      for (let i = positions.length - 1; i > 0; i--) {
+        const j = ((seed * (i + 1) * 2654435761) >>> 0) % (i + 1);
+        [positions[i], positions[j]] = [positions[j], positions[i]];
+      }
+
+      ctx.font         = 'bold ' + fs + 'px monospace';
+      ctx.textAlign    = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillStyle    = '#ffffff';
+
+      const padX = (w - cols * fs) / 2;
+      const padY = (h - rows * fs) / 2;
+      const charSet = cfg.ascCellMode === 'dot'
+        ? '.'
+        : (cfg.ascChars || 'アイウエオカキクケコ');
+
+      for (let k = 0; k < dotCount; k++) {
+        const [c, r] = positions[k];
+        // Random character from set — seeded per position for stability
+        const charSeed = ((seed + k * 6364136223846793005) >>> 0) % charSet.length;
+        const ch = charSet[charSeed];
+        ctx.fillText(ch, x + padX + c * fs + fs / 2, y + padY + r * fs + fs / 2);
+      }
+    }
+  }
+
+  // Pass 2 — quadtree using scene-relative variance threshold
+  // Threshold slider 0→1 maps to 0→100% of max scene variance.
+  // A cell subdivides if its variance exceeds (1 - threshold) * maxVariance —
+  // so low threshold = very sensitive (almost everything subdivides),
+  // high threshold = only the highest-contrast cells subdivide.
+  function subdivide(nx, ny, nw, nh, depth) {
+    const { avg, variance } = sampleCell(nx, ny, nw, nh);
+
+    // Screen-space coords for drawing
+    const sx = nx * W, sy = ny * H, sw = nw * W, sh = nh * H;
+    drawCell(sx, sy, sw, sh, avg);
+
+    if (depth >= cfg.ascDepth) return;
+
+    // Scene-relative threshold — low threshold = only highest-variance cells subdivide
+    // high threshold = even low-variance cells subdivide
+    // cfg.ascThreshold 0→1 maps to: subdivide if variance > (1 - threshold) * maxVariance
+    const varThreshold = (1 - cfg.ascThreshold) * maxVariance * 0.5;
+    if (variance <= varThreshold) return;
+
+    // Subdivide into 4 children
+    const hw = nw / 2, hh = nh / 2;
+    subdivide(nx,      ny,      hw, hh, depth + 1);
+    subdivide(nx + hw, ny,      hw, hh, depth + 1);
+    subdivide(nx,      ny + hh, hw, hh, depth + 1);
+    subdivide(nx + hw, ny + hh, hw, hh, depth + 1);
+  }
+
+  ctx.fillStyle = '#000';
+  ctx.fillRect(0, 0, W, H);
+
+  for (let row = 0; row < cfg.ascRows; row++) {
+    for (let col = 0; col < cfg.ascCols; col++) {
+      subdivide(
+        col / cfg.ascCols, row / cfg.ascRows,
+        1   / cfg.ascCols, 1   / cfg.ascRows,
+        0
+      );
+    }
+  }
+
+  if (tick % 20 === 0) {
+    document.getElementById('sFps').textContent  = fpsSmooth.toFixed(0);
+    document.getElementById('sbFps').textContent = fpsSmooth.toFixed(0);
+    document.getElementById('sCells').textContent  = (cfg.ascCols * cfg.ascRows) + ' base';
+    document.getElementById('sbCells').textContent = cfg.ascCols * cfg.ascRows;
+    document.getElementById('sRes').textContent = W + '×' + H;
+  }
+}
+
+/* ── CORRUPT VIDEO ── */
+// Offscreen WebGL canvas + chromatic aberration shader
+// R, G, B channels each read from a horizontally-shifted UV position.
+// Shift amount is randomised per horizontal band and per frame.
+// Result is drawn back to the main Canvas 2D canvas via drawImage.
+
+let glCanvas = null, gl = null, glProg = null;
+let glTexLoc = null, glTimeLoc = null;
+let glIntLoc = null, glBandsLoc = null, glAsymLoc = null, glScatterLoc = null, glJitterLoc = null;
+let glTex = null, glBuf = null;
+let glTime = 0;
+let glFrameAccum = 0;  // accumulates time between draws for FPS throttling
+let glLastDraw = 0;    // timestamp of last corrupt frame draw
+const glSrc = document.createElement('canvas');
+const glSrcCtx = glSrc.getContext('2d');
+
+function initGL() {
+  glCanvas = document.createElement('canvas');
+  gl = glCanvas.getContext('webgl', { preserveDrawingBuffer: true });
+  if (!gl) return false;
+
+  const vs = [
+    'attribute vec2 aPos;',
+    'varying vec2 vUv;',
+    'void main(){',
+    '  vUv = aPos * 0.5 + 0.5;',
+    '  vUv.y = 1.0 - vUv.y;',
+    '  gl_Position = vec4(aPos, 0.0, 1.0);',
+    '}'
+  ].join('\n');
+
+  const fs = [
+    'precision mediump float;',
+    'uniform sampler2D uTex;',
+    'uniform float uTime;',
+    'uniform float uIntensity;',
+    'uniform float uBands;',
+    'uniform float uAsymmetry;',
+    'uniform float uScatter;',
+    'uniform float uSpeedJitter;',
+    'varying vec2 vUv;',
+    'float randR(vec2 co){ return fract(sin(dot(co, vec2(12.9898, 78.233))) * 43758.5453); }',
+    'float randG(vec2 co){ return fract(sin(dot(co, vec2(93.9898, 67.345))) * 24634.6345); }',
+    'float randB(vec2 co){ return fract(sin(dot(co, vec2(41.2314, 29.817))) * 71263.1234); }',
+    'float randS(vec2 co){ return fract(sin(dot(co, vec2(57.765, 13.543))) * 98765.4321); }',
+    'void main(){',
+    '  vec2 uv = vUv;',
+    '  float band = floor(uv.y * uBands);',
+    // Per-band time offset — each band gets its own speed multiplier based on jitter
+    // randS with a fixed seed (band only, no time) gives a stable per-band random value
+    '  float bandRate = 1.0 + (randS(vec2(band, 0.5)) * 2.0 - 1.0) * uSpeedJitter;',
+    '  float t = floor(uTime * bandRate);',
+    '  float bandSeed = randS(vec2(t, band));',
+    '  float fires = step(uScatter, bandSeed);',
+    // Base offset — all channels share this (the "same direction" component)
+    '  float base = (randR(vec2(t, band)) * 2.0 - 1.0) * uIntensity * fires;',
+    // Independent offsets per channel — blended in by asymmetry amount
+    '  float indR = (randR(vec2(t * 1.00, band + 0.1)) * 2.0 - 1.0) * uIntensity * fires;',
+    '  float indG = (randG(vec2(t * 1.31, band + 0.2)) * 2.0 - 1.0) * uIntensity * fires;',
+    '  float indB = (randB(vec2(t * 0.73, band + 0.3)) * 2.0 - 1.0) * uIntensity * fires;',
+    // Mix: at asymmetry=0 all channels use base (move together), at 1 each is fully independent
+    '  float offR = mix(base, indR, uAsymmetry);',
+    '  float offG = mix(base, indG, uAsymmetry);',
+    '  float offB = mix(base, indB, uAsymmetry);',
+    '  gl_FragColor.r = texture2D(uTex, vec2(uv.x + offR, uv.y)).r;',
+    '  gl_FragColor.g = texture2D(uTex, vec2(uv.x + offG, uv.y)).g;',
+    '  gl_FragColor.b = texture2D(uTex, vec2(uv.x + offB, uv.y)).b;',
+    '  gl_FragColor.a = 1.0;',
+    '}'
+  ].join('\n');
+
+  function compile(type, src) {
+    const s = gl.createShader(type);
+    gl.shaderSource(s, src);
+    gl.compileShader(s);
+    return s;
+  }
+
+  glProg = gl.createProgram();
+  gl.attachShader(glProg, compile(gl.VERTEX_SHADER, vs));
+  gl.attachShader(glProg, compile(gl.FRAGMENT_SHADER, fs));
+  gl.linkProgram(glProg);
+  gl.useProgram(glProg);
+
+  // Full-screen quad
+  glBuf = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, glBuf);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 1,-1, -1,1, 1,1]), gl.STATIC_DRAW);
+  const aPos = gl.getAttribLocation(glProg, 'aPos');
+  gl.enableVertexAttribArray(aPos);
+  gl.vertexAttribPointer(aPos, 2, gl.FLOAT, false, 0, 0);
+
+  glTexLoc    = gl.getUniformLocation(glProg, 'uTex');
+  glTimeLoc   = gl.getUniformLocation(glProg, 'uTime');
+  glIntLoc    = gl.getUniformLocation(glProg, 'uIntensity');
+  glBandsLoc  = gl.getUniformLocation(glProg, 'uBands');
+  glAsymLoc   = gl.getUniformLocation(glProg, 'uAsymmetry');
+  glScatterLoc = gl.getUniformLocation(glProg, 'uScatter');
+  glJitterLoc  = gl.getUniformLocation(glProg, 'uSpeedJitter');
+
+  glTex = gl.createTexture();
+  gl.bindTexture(gl.TEXTURE_2D, glTex);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+
+  return true;
+}
+
+function drawCorrupt(W, H, ts) {
+  if (!gl && !initGL()) return;
+
+  // Frame rate throttle — skip this draw if not enough time has elapsed
+  const interval = 1000 / cfg.cvFps;
+  if (ts - glLastDraw < interval) return;
+  glLastDraw = ts;
+
+  // Resize WebGL canvas if needed
+  if (glCanvas.width !== W || glCanvas.height !== H) {
+    glCanvas.width = W; glCanvas.height = H;
+    gl.viewport(0, 0, W, H);
+  }
+
+  // Upload video frame — apply mirrorX/invert via persistent intermediate canvas
+  if (glSrc.width !== W || glSrc.height !== H) { glSrc.width = W; glSrc.height = H; }
+  glSrcCtx.save();
+  glSrcCtx.filter = cfg.invert ? 'invert(1)' : 'none';
+  if (cfg.mirrorX) { glSrcCtx.translate(W, 0); glSrcCtx.scale(-1, 1); }
+  glSrcCtx.drawImage(video, 0, 0, W, H);
+  glSrcCtx.restore();
+
+  gl.bindTexture(gl.TEXTURE_2D, glTex);
+  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, glSrc);
+
+  // glTime increments by cvSpeed each frame. The shader uses floor(glTime) so the
+  // pattern only changes when glTime crosses an integer — at speed 0.1 that's every
+  // 10 frames (~6 times/sec at 60fps). At speed 0 it never changes.
+  glTime += cfg.cvSpeed * 1.6;
+
+  // Set uniforms
+  gl.useProgram(glProg);
+  gl.uniform1i(glTexLoc, 0);
+  gl.uniform1f(glTimeLoc,   glTime);
+  gl.uniform1f(glIntLoc,    cfg.cvIntensity * 0.2);
+  gl.uniform1f(glBandsLoc,  cfg.cvBands);
+  gl.uniform1f(glAsymLoc,   cfg.cvAsymmetry);
+  gl.uniform1f(glScatterLoc, cfg.cvScatter);
+  gl.uniform1f(glJitterLoc,  cfg.cvSpeedJitter);
+
+  gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+
+  // Blit WebGL canvas onto the main Canvas 2D canvas
+  ctx.drawImage(glCanvas, 0, 0, W, H);
+
+  // Update stats with a simple raw sample for FPS/res display
+  if (tick % 20 === 0) {
+    document.getElementById('sFps').textContent  = fpsSmooth.toFixed(0);
+    document.getElementById('sbFps').textContent = fpsSmooth.toFixed(0);
+    document.getElementById('sCells').textContent  = '—';
+    document.getElementById('sbCells').textContent = '—';
+    document.getElementById('sRes').textContent = W + '×' + H;
+  }
+}
 function setMode(mode, btn) {
   cfg.mode = mode; cellColors = [];
+  if (mode === 'corrupt') glTime = 0;
   document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
   document.getElementById('secGrid').style.display      = mode === 'mosaic'   ? '' : 'none';
   document.getElementById('secColour').style.display    = mode === 'mosaic'   ? '' : 'none';
   document.getElementById('secAnimation').style.display = mode === 'mosaic'   ? '' : 'none';
   document.getElementById('secHalftone').style.display  = mode === 'halftone' ? '' : 'none';
+  document.getElementById('secCorrupt').style.display   = mode === 'corrupt'  ? '' : 'none';
+  document.getElementById('secAscii').style.display     = mode === 'ascii'    ? '' : 'none';
 }
 
-/* ── STATS + PALETTE ── */
+/* ── ASCII CELL MODE SELECTOR ── */
+function setAscCellMode(mode, btn) {
+  cfg.ascCellMode = mode;
+  document.querySelectorAll('#ascModeGrey, #ascModeDot, #ascModeChars')
+    .forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  // Show character string field only in ASCII mode
+  document.getElementById('ascCharsField').style.display =
+    mode === 'chars' ? 'flex' : 'none';
+}
 function updateStats(raw) {
   document.getElementById('sFps').textContent  = fpsSmooth.toFixed(0);
   document.getElementById('sbFps').textContent = fpsSmooth.toFixed(0);
