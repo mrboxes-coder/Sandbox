@@ -1337,7 +1337,7 @@ Create a single self-contained HTML file — "Tessera Mosaic": a live webcam too
 
 ## DRIVING CONCEPT
 
-The webcam feed is sampled at a low grid resolution and each cell is filled with the average colour of that region. The result is a pixellated, mosaic-like portrait of the live scene. Two render modes — Mosaic and Halftone — explore different visual treatments of the same colour data. The tool is intended for both creative exploration and as a teaching aid for understanding how images are constructed from discrete colour samples.
+The webcam feed is sampled and processed every frame through four render modes — Mosaic, Halftone, Corrupt Video, and ASCII Density — each revealing how raw image data can be reassembled into a completely different visual experience. The tool is intended for both creative exploration and as a teaching aid for understanding how digital images are constructed, corrupted, and reinterpreted from discrete data values.
 
 ---
 
@@ -1393,14 +1393,16 @@ The lightning bolt logo is embedded as a base64 PNG data URI (black background v
 
 All sections use the Sandbox accordion pattern: monospace uppercase heading with +/− indicator via CSS ::after, toggled by an "open" class on the parent. Body uses display:flex/flex-direction:column/gap:8px when open.
 
-1. **Render Mode** — OPEN. 2-column mode-btn grid: Mosaic | Halftone.
-2. **Image** — OPEN. Two check-rows: Mirror X (checked by default), Invert.
-3. **Grid** — OPEN, Mosaic only (hidden in Halftone). Range fields: Columns (4–100, default 40), Rows (4–70, default 30), Gap (0–10px, default 1).
+1. **Render Mode** — OPEN. 2×2 mode-btn grid: Mosaic | Halftone | Corrupt Video | ASCII Density. All four buttons equal size.
+2. **Image** — OPEN. Always visible regardless of mode. Two check-rows: Mirror X (checked by default), Invert.
+3. **Grid** — OPEN, Mosaic only. Range fields: Columns (4–100, default 40), Rows (4–70, default 30), Gap (0–10px, default 1).
 4. **Colour** — OPEN, Mosaic only. Range fields: Saturation (0–300%, default 130%), Brightness (0–200%, default 100%), Contrast (0–300%, default 110%), Hue Shift (0–360°, default 0°).
-5. **Animation** — OPEN, Mosaic only. Range field: Smoothing (1–30%, default 15%) — controls lerp speed; the interesting smearing range is 1–20%, so the slider is deliberately compressed to that range.
-6. **Halftone** — OPEN, Halftone only (hidden in Mosaic). Range fields: Dot Size (4–40px, default 14), Contrast (50–300%, default 140%), Brightness (0–200%, default 110%), Angle (0–89°, default 45°), Min Dot (0–40%, default 0%).
+5. **Animation** — OPEN, Mosaic only. Range field: Smoothing (1–30%, default 15%).
+6. **Halftone** — OPEN, Halftone only. Range fields: Dot Size (4–40px, default 14), Contrast (50–300%, default 140%), Brightness (0–200%, default 110%), Angle (0–89°, default 45°), Min Dot (0–40%, default 0%). Colour pickers: Dot Colour (default #000000), Background (default #ffffff).
+7. **Corrupt Video** — OPEN, Corrupt Video only. Range fields: Intensity (0–100, default 5), Bands (2–128, default 40), Scatter Bands (0–100, default 75), Speed (0–100, default 50), Speed Jitter (0–100, default 50), Asymmetry (0–100, default 60), Frame Rate (1–60fps, default 25).
+8. **ASCII Density** — OPEN, ASCII Density only. Range fields: Columns (2–40, default 16), Rows (2–30, default 12), Threshold (0–100, default 30), Resolution (1–8, default 5), Gap (0–8px, default 1), Gamma (0.1–3.0, default 0.7), Char Size (4–24px, default 8). Cell Mode selector: Grey | Dots | ASCII (3-button grid). Editable character string field (shown only in ASCII cell mode, default: full katakana syllabary アイウエオ…ン).
 
-When switching modes, Grid + Colour + Animation show/hide together for Mosaic; Halftone section shows/hides for Halftone. Image section always remains visible.
+Mode visibility: Grid + Colour + Animation visible for Mosaic only. Halftone section for Halftone only. Corrupt Video section for Corrupt Video only. ASCII Density section for ASCII Density only. Image section always visible.
 
 ---
 
@@ -1408,8 +1410,8 @@ When switching modes, Grid + Colour + Animation show/hide together for Mosaic; H
 
 1. **Camera Feed** — OPEN. Video preview with "No Signal" placeholder and "Source" overlay badge. Avg colour readout below (monospace, updates every 20 frames).
 2. **Live Palette** — OPEN. 8×4 grid of 32 colour swatches (8 hue bands × 4 brightness bands, bright rows at top). Updated every 20 frames from the raw sampled pixel data.
-3. **Stats** — OPEN. Readout rows: FPS, Cells, Canvas resolution.
-4. **Snapshots** — OPEN. Two full-width buttons: Download Snapshot (camera icon — immediately downloads current canvas as PNG); Save Thumbnail (download icon — stores full-res frame, adds 104×80 thumbnail proxy to history strip). Max 12 thumbnails; left-click thumbnail downloads full-res frame; right-click deletes thumbnail. Alert shown if user attempts a 13th.
+3. **Stats** — CLOSED. Readout rows: FPS, Cells, Canvas resolution.
+4. **Snapshots** — CLOSED. Two full-width buttons: Download Snapshot (camera icon — immediately downloads current canvas as PNG); Save Thumbnail (download icon — stores full-res frame, adds 104×80 thumbnail proxy to history strip). Max 12 thumbnails; left-click thumbnail downloads full-res frame; right-click deletes thumbnail. Alert shown if user attempts a 13th.
 5. **System Settings** — CLOSED. Export Prompt button (download icon) — downloads this reconstruction prompt as tessera-mosaic-reconstruction-prompt.txt. Description text below button in var(--accent) colour.
 
 ---
@@ -1419,24 +1421,40 @@ When switching modes, Grid + Colour + Animation show/hide together for Mosaic; H
 The centre area has a subtle dot-grid background (linear-gradient pattern, rgba white at 2.5% on #121216). The canvas element sits absolutely over it filling the full area.
 
 ### Mosaic mode
-- Webcam sampled every frame into an offscreen canvas at cfg.cols × cfg.rows resolution via offCtx.drawImage(video, 0, 0, cols, rows).
+- Webcam sampled every frame into an offscreen canvas at cfg.cols × cfg.rows via offCtx.drawImage.
 - ctx.filter applied before sampling: saturate / brightness / contrast / hue-rotate / invert.
 - Mirror X applied via save/translate(cols,0)/scale(-1,1)/restore before drawImage.
 - Raw pixel array [r,g,b] per cell extracted via getImageData.
-- Each cell lerps toward its raw target each frame: cell[ch] += (raw[ch] - cell[ch]) * cfg.lerp. Smoothing slider maps 1–30 → 0.01–0.30 lerp factor.
-- Rendering: ctx.fillRect per cell (gap * 0.5 inset each side). If gap >= 3, ctx.roundRect with radius 3 is used instead. Background fill is #121216 each frame.
+- Each cell lerps toward its raw target: cell[ch] += (raw[ch] - cell[ch]) * cfg.lerp.
+- Rendering: ctx.fillRect per cell (gap * 0.5 inset). If gap >= 3, ctx.roundRect with radius 3. Background fill is #121216.
 
 ### Halftone mode
-- Completely independent from the mosaic pipeline — reads directly from the video element into its own offscreen canvas (htOff) at min(320,W) × min(240,H).
-- htOffCtx.filter applies htBrightness, htContrast, and invert.
-- Mirror X applied to htOffCtx the same way as mosaic.
-- Dot grid is rotated by cfg.htAngle (default 45°). Grid is generated from canvas centre outward to cover the diagonal, then clipped to canvas bounds.
-- For each grid point: sample luminance at that screen position from htOff. dotFrac = max(htMin, 1 - lum). r = (spacing/2) * dotFrac * 0.96.
-- Background: white (#fff) in normal mode, black (#000) when inverted. Dot colour: black (#000) normal, white (#fff) inverted.
-- Canvas background fill in the loop also respects invert for halftone.
+- Independent pipeline — reads video into own offscreen canvas (htOff) at min(320,W) × min(240,H).
+- htOffCtx.filter applies htBrightness, htContrast, invert. Mirror X applied same way.
+- Rotated dot grid (default 45°) generated from canvas centre outward.
+- Per dot: sample luminance, dotFrac = max(htMin, 1 - lum), r = (spacing/2) * dotFrac * 0.96.
+- Background and dot colour user-configurable via colour pickers. Both swap when Invert is on.
+
+### Corrupt Video mode
+- WebGL offscreen canvas (glCanvas) created lazily on first use. Persistent intermediate canvas (glSrc) used for mirrorX/invert pre-processing before texture upload.
+- GLSL fragment shader: four independent hash functions (randR, randG, randB, randS) with different seeds. Per-band time quantised via floor(uTime * bandRate) where bandRate is a stable per-band speed multiplier driven by uSpeedJitter.
+- uScatter: step function determines which bands fire. uAsymmetry: mix() between shared base offset and independent per-channel offsets for RGB separation.
+- glTime accumulates each frame by cfg.cvSpeed * 1.6. Frame rate throttled via timestamp comparison (glLastDraw).
+- WebGL result blitted to main Canvas 2D via ctx.drawImage(glCanvas).
+- Uniforms: uTex, uTime, uIntensity, uBands, uAsymmetry, uScatter, uSpeedJitter.
+
+### ASCII Density mode
+- Independent pipeline — reads video into ascOff at 640×480 with mirrorX and invert filter.
+- Pass 1: scan all base grid cells for luminance min/max (contrast stretch) and collect all variances. Use 50th percentile variance as reference maximum to prevent outlier edges dominating threshold.
+- Quadtree subdivision: each cell subdivides into 4 children if its variance exceeds (1 - cfg.ascThreshold) * medianVariance * 0.5. Recursion limited by cfg.ascDepth.
+- Three cell rendering modes:
+  - **Grey**: ctx.fillRect with contrast-stretched gamma-corrected luminance as grey fill.
+  - **Dots**: grid of '.' characters at density proportional to luminance. Deterministic shuffle per cell position for flicker-free stable placement.
+  - **ASCII**: same density logic as Dots but random katakana character selected per position from cfg.ascChars string, seeded deterministically.
+- Background always black (#000) in Dot and ASCII cell modes.
 
 ### Stats update
-Every 20 frames: FPS (exponential smoothing), cell count, canvas resolution, avg colour (mean R/G/B across raw cells), 32-bucket palette (8 hue × 4 brightness, using rgbToHsv per cell, bright rows rendered at top of grid).
+Every 20 frames: FPS (exponential smoothing), cell count, canvas resolution, avg colour (mean R/G/B), 32-bucket palette.
 
 ---
 
