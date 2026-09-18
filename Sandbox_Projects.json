@@ -2735,9 +2735,72 @@
         "KEY LIGHT INTENSITY",
         "SHADOW RESOLUTION"
       ]
+    },
+    {
+      "id": 35,
+      "name": "Robot Uprising - The Playground",
+      "tier": "5",
+      "categories": [
+        "Animation Tool",
+        "Behaviour",
+        "Simulation",
+        "Three.js"
+      ],
+      "date": "2026-09-19",
+      "desc": "An interactive browser-based 3D playground featuring a user-controlled robot ( mrBoxes )with fluid walking, turning, and weight-shifting animations. Freely explore a simple environment using keyboard controls (W/A/D) and orbit the camera (Mouse) to view the character from different angles.",
+      "fullDesc": "This project is a work in progress that brings an interactive 3D environment into a webpage, allowing visitors to control a robot character directly in their browser. It explores how responsive controls, expressive movement, and a freely orbiting camera can make a digital character feel physically present within a virtual space.\n                                                  \nThe current prototype features a blue armoured robot in a simple, open environment. Its animation focuses on conveying weight, balance, and momentum through walking, turning, and coming to rest. Particular attention is being given to coordinated arm and leg movement, foot placement, and smooth transitions between different actions.\n       \nUsing a keyboard, hold W to walk forward. Hold A to turn left or D to turn right. Combining W with A or D makes the robot walk while turning. Release the keys and the character completes its current step before settling into a resting pose, where it gently looks around the environment.\n      \nThe camera starts in front of the robot. Hold the left mouse button and drag horizontally to orbit around it: dragging left moves clockwise, and dragging right moves anticlockwise. The camera maintains a fixed distance and height, allowing the character’s movement to be viewed from different angles.\n         \nThe intention is to develop this prototype into a richer webpage experience, with a more detailed 3D environment and a character that users can explore and interact with through direct control. As development continues, the movement, transitions, environment, and overall experience will be refined through testing, observation, and ongoing user feedback.",
+      "resourceLabel": "",
+      "resourceLink": "",
+      "gallery": [
+        {
+          "img": "images/mrboxes_playground01.jpg",
+          "caption": ""
+        },
+        {
+          "img": "images/mrboxes_playground02.jpg",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        }
+      ],
+      "carousel": false,
+      "link": "./mrboxes/index.html",
+      "tags": [],
+      "thumb": "images/mrboxes_playground01.jpg",
+      "youtube": "",
+      "videoCaption": "",
+      "videoRuntime": "",
+      "specSheet": [],
+      "tunableParams": []
     }
   ],
-  "nextId": 35,
+  "nextId": 36,
   "sortMode": "tier",
   "site": {
     "eyebrow": "Browser-based creative exploration : Chris Shaw",
