@@ -28,6 +28,7 @@ export class ReviewLocomotion{
   this.time=0;this.speed=0;this.yaw=0;this.yawRate=0;this.step=null;this.serial=0;this.nextFoot=1;this.phase='Rest';this.requested=false;this.settle=null;
   this.direction=direction;this.nextFoot=direction===1?1:0;
   this.headingLook={angle:0,velocity:0};
+  this.previousPelvisTilt=0;
   this.walkGaze=null;
   const m=this.motion;Object.assign(m,{state:'idle',amount:0,cycle:0,idleTime:1,stopTime:2,springs:{},turnActive:false,walkHandover:null,reviewClosingStep:false,reviewSupportRelease:null});
   updateRobotMotion(m,0,0,0);this.actor.updateMatrixWorld(true);
@@ -96,6 +97,23 @@ export class ReviewLocomotion{
    }
    const previousPelvis=m.pelvis.position.clone();
    updateCharacterTurn(m,dt,active,u,this.speed*dt,step.serial);
+   {
+    // Hip hike follows the actual swing: positive Z raises the +X hip.
+    // Both tilt and added height return to zero before double support.
+    const rise=recovery<.66?ease(recovery/.66):1-ease((recovery-.66)/.34);
+    m.pelvis.rotation.z=(active===0?-1:1)*.075*rise;
+    // Give height its own rounded arc, rather than
+    // tying it to the slower foot lift. Low contact height remains unchanged.
+    const bounce=Math.sin(Math.PI*clamp((u-.12)/.84,0,1))**2;
+    // An interrupted closing step starts airborne: ease into its new bounce
+    // without adding the mid-cycle height in a single frame.
+    m.pelvis.position.y+=.030*bounce*(step.entry?ease(recovery/.30):1);
+    // Follow the preceding simulation frame, independent of playback speed.
+    // Partial counterrotation leaves a little of the pelvis motion in the torso.
+    m.chest.rotation.z=-.65*this.previousPelvisTilt;
+    this.previousPelvisTilt=m.pelvis.rotation.z;
+    m.head.quaternion.copy(m.pelvis.quaternion).multiply(m.chest.quaternion).invert();
+   }
    this.actor.updateMatrixWorld(true);
    const native=this.feet.map(f=>m.raw.worldToLocal(f.position.clone()));
    // Measured support positions drive the pelvis; a damped trajectory carries
@@ -119,6 +137,7 @@ export class ReviewLocomotion{
    this.phase=step.steering?(step.steering===1?'Left turn':'Right turn'):this.requested?'Walk · turn queued':'Walk';
    if(u===1){this.step=null;if(!input.forward)this.speed=0;}
   }else{
+   this.previousPelvisTilt=0;
    if(m.state==='walk'&&!this.settle){
     // Model group LegR is on the character's anatomical left (+X).
     // Advance this trailing foot, rather than retracting the leading foot.

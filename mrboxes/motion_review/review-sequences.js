@@ -2,7 +2,11 @@
 export function reviewSequence(id='approved',offset=0,direction=1){
  const side=direction===1?'Left':'Right';
  let stages,title,hint;
- if(id==='approved'){
+ if(id==='pelvis-walk'){
+  stages=[[0,'Rest',''],[60,'Straight walk','W'],[412,'Settle',''],[600,'End','']];
+  title='Straight walk · pelvis rise and tilt';
+  hint='Front: lifted-leg hip rises, supporting hip drops; chest counters one frame later. Side: pelvis rises with the step and lowers at contact. This motion also applies to the other studies and turns.';
+ }else if(id==='approved'){
   stages=[[0,'Rest',''],[60,'Walk','W'],[Math.round((3.25+offset)*60),side+' turn',direction===1?'WA':'WD'],[Math.round((5.45+offset)*60),'Walk','W'],[480,'Settle',''],[630,'End','']];
   title='Walk → '+side.toLowerCase()+' turn → walk';hint='Approved single-turn sequence.';
  }else if(id.startsWith('walk-stop-')){

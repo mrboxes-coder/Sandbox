@@ -236,7 +236,9 @@ export function poseCharacterFeet(m,feet,softKnees=false){
   }
   const correction=m.springs.kneeReserve??(m.springs.kneeReserve={x:0,v:0});
   const target=m.pelvis.position.y-desiredY;
-  for(let n=0;n<2;n++){correction.v+=((target-correction.x)*180-correction.v*27)/120;correction.x+=correction.v/120;}
+  // Follow an upward body bounce promptly enough to retain knee flexion;
+  // retain the gentler recovery as the pelvis lowers.
+  for(let n=0;n<2;n++){const rising=target>correction.x;correction.v+=((target-correction.x)*(rising?360:180)-correction.v*(rising?38:27))/120;correction.x+=correction.v/120;}
   m.pelvis.position.y-=correction.x;
  }
  for(let i=0;i<2;i++)solveLeg(m,i,feet[i]);
