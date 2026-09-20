@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Robot · transition review</title><link rel="stylesheet" href="./transition-review.css"></head>
+<body>
+<header><div class="eyebrow">ROBOT MOTION STUDY / 01</div><h1>Transition review</h1><p id="sequence-title">Walk → left turn → walk</p><a href="./character-playground.html">Open Movement playground ↗</a></header>
+<aside aria-label="Animation review controls">
+ <div class="tag">DEVELOPMENT STUDY</div><h2>Inspect the handover</h2>
+ <label for="study">Study</label><select id="study"><option value="approved">Approved left / right turn</option><option value="mixed">Mixed · halfway interruption</option><option value="mixed-early">Mixed · early interruption</option><option value="mixed-late">Mixed · late interruption</option><option value="turn-stop">Turn → settle · middle release</option><option value="turn-stop-early">Turn → settle · early release</option><option value="turn-stop-late">Turn → settle · late release</option><option value="walk-stop-first-lift">Walk → rest · first foot lifting</option><option value="walk-stop-first-land">Walk → rest · first foot descending</option><option value="walk-stop-second-lift">Walk → rest · opposite foot lifting</option><option value="walk-stop-second-land">Walk → rest · opposite foot descending</option><option value="reverse-turn">Left ↔ right · direct reversal</option><option value="settle-restart-early">Settle → walk · before half-step</option><option value="settle-restart-late">Settle → walk · during half-step</option></select><p id="sequence-note" class="hint">Approved single-turn sequence.</p>
+ <label for="direction">Turn direction</label><select id="direction"><option value="1">Left turn</option><option value="-1">Right turn</option></select>
+ <label for="sequence">Repeatable sequence</label><select id="sequence"><option value="0">Standard turn request</option><option value="-0.22">Earlier turn request</option><option value="0.8">Later turn request</option></select>
+ <div class="buttons"><button id="play" aria-label="Pause animation">Pause</button><button id="replay">Replay</button></div>
+ <div class="buttons"><button id="back" aria-label="Step back one frame">← Frame</button><button id="step" aria-label="Step forward one frame">Frame →</button></div>
+ <label for="speed">Playback speed</label><select id="speed"><option value="0.25">¼ speed</option><option value="0.5" selected>½ speed</option><option value="1">Normal speed</option></select>
+ <label class="check"><input id="loop" type="checkbox" checked> Loop sequence</label>
+ <label class="check"><input id="markers" type="checkbox" checked> Show contact & balance markers</label>
+ <label for="view">Camera</label><select id="view"><option value="0">Front</option><option value="1.5707963267948966">Side</option><option value="0.65">Three-quarter</option></select>
+ <p class="hint">Drag the scene to orbit. Space pauses.<br>← / → steps one frame (1/60 second).</p>
+ <div class="legend"><span class="dot green"></span> Ground contact <span class="dot amber"></span> Foot airborne<br><span class="dot blue"></span> Pelvis projection <span class="dot white"></span> Weighted support target</div>
+ <p class="hint">The support target is an animation guide, not a physical centre-of-mass calculation.</p>
+ <p id="error" role="alert"></p>
+</aside>
+<section class="readout" aria-label="Motion measurements"><div id="input-state">Keys: none</div><div id="phase">Loading robot…</div><div id="support">—</div><div id="balance">—</div></section>
+<footer><div class="timeline-head"><strong id="time">0.00 s / 10.50 s</strong><span id="frame-count">Frame 0</span></div><input id="timeline" aria-label="Animation timeline" type="range" min="0" max="630" value="0" step="1"><div class="stages"><span>Rest</span><span>Walk</span><span id="turn-stage">Left turn</span><span>Walk</span><span>Settle</span></div><p>Transition study · Approved motion is now available in Movement playground.</p></footer>
+<script type="module" src="./transition-review.js"></script></body></html>
+
+
+
