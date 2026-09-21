@@ -33,6 +33,8 @@ export class ReviewLocomotion{
   const m=this.motion;Object.assign(m,{state:'idle',amount:0,cycle:0,idleTime:1,stopTime:2,springs:{},turnActive:false,walkHandover:null,reviewClosingStep:false,reviewSupportRelease:null});
   updateRobotMotion(m,0,0,0);this.actor.updateMatrixWorld(true);
   this.feet=m.feet.map(f=>({position:m.raw.localToWorld(new THREE.Vector3(f.x,0,f.z-.018)),yaw:f.yaw}));
+  const restMidpoint=m.raw.worldToLocal(this.feet[0].position.clone().add(this.feet[1].position).multiplyScalar(.5));
+  this.restPelvisForwardOffset=m.pelvis.position.z-restMidpoint.z;
   this.contacts=[true,true];this.actualContacts=[true,true];this.weights=[.5,.5];this.clearances=[0,0];this.measure();
  }
  beginStep(input){
@@ -146,8 +148,14 @@ export class ReviewLocomotion{
     const start=this.feet[moving].position.clone();
     const distance=Math.max(0,this.feet[leading].position.clone().sub(start).dot(forward));
     this.settle={time:0,moving,start,startYaw:this.feet[moving].yaw,end:start.clone().addScaledVector(forward,distance),yaw:this.feet[leading].yaw};
+    const finalMidpoint=m.raw.worldToLocal(this.settle.end.clone().add(this.feet[leading].position).multiplyScalar(.5));
+    this.settle.pelvisStartZ=m.pelvis.position.z;
+    this.settle.pelvisEndZ=finalMidpoint.z+this.restPelvisForwardOffset;
+    const delta=this.settle.pelvisEndZ-this.settle.pelvisStartZ;
+    this.settle.pelvisVelocityZ=Math.sign(delta)*clamp((m.pelvisVelocity?.z??0)*Math.sign(delta),0,2*Math.abs(delta)/1.65);
     m.reviewClosingStep=true;m.reviewClosingFoot=moving;m.reviewSupportRelease=null;
    }
+   const previousPelvis=m.pelvis.position.clone();
    this.speed=0;this.yawRate=0;updateRobotMotion(m,dt,0,this.time);
    let lift=0,closingRoll={pitch:0,toe:0};
    this.contacts=[true,true];this.weights=[.5,.5];
@@ -162,8 +170,14 @@ export class ReviewLocomotion{
     this.weights[s.moving]=.5-support;this.weights[1-s.moving]=.5+support;
    }
    this.actor.updateMatrixWorld(true);
-   // Keep the original settle's pelvis/chest/head curves untouched.
+   // Forward momentum continues throughout settling. Only lateral weight
+   // transfer waits for touchdown; the forward path has no intermediate stop.
+   if(this.settle){
+    const s=this.settle,t=clamp(s.time/1.65,0,1);
+    m.pelvis.position.z=THREE.MathUtils.lerp(s.pelvisStartZ,s.pelvisEndZ,ease(t))+s.pelvisVelocityZ*1.65*tangent(t);
+   }
    poseCharacterFeet(m,this.feet.map((f,i)=>{const p=m.raw.worldToLocal(f.position.clone());const active=i===this.settle?.moving;return {x:p.x,z:p.z+.018,lift:active?lift:0,pitch:active?closingRoll.pitch:0,toe:active?closingRoll.toe:0,yaw:f.yaw-this.yaw};}));
+   m.pelvisVelocity=m.pelvis.position.clone().sub(previousPelvis).divideScalar(dt);
    this.phase=m.state==='idle'?'Rest':'Settling';
   }
   // Look into the requested path before the next foot boundary steers the
