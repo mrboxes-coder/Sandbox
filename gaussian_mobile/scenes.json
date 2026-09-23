@@ -1,0 +1,15 @@
+{
+  "scenes": [{
+    "title": "LASALLE College",
+    "description": "Explore the campus",
+    "url": "assets/LASALLE.sog",
+    "thumbnail": "assets/LASALLE_thumbnail.jpg",
+    "pose": { "position": [0, 1.5, 4], "yaw": 0, "pitch": 0 },
+    "rotation": [180, 0, 0],
+    "speed": {
+      "forward": 2, "reverse": 1, "altitude": 1,
+      "yaw": 45, "bank": 15, "response": 0.5
+    },
+    "bounds": { "min": [-20, 0, -20], "max": [20, 10, 20] }
+  }]
+}
