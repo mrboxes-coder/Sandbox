@@ -2805,8 +2805,8 @@
       "tier": "5",
       "categories": [],
       "date": "2026-09-23",
-      "desc": "",
-      "fullDesc": "",
+      "desc": "Mobile Gaussian Splat Viewer brings immersive 3D scenes to Samsung Galaxy phones and tablets. Explore in landscape with intuitive touch controls, smooth flight, responsive steering, and fullscreen viewing through a simple online scene library experience.",
+      "fullDesc": "Mobile Gaussian Splat Viewer is a browser application that transforms captured environments into interactive 3D experiences for Samsung Galaxy phones and tablets. It invites users to explore spatial scenes through flight, making immersive viewing accessible through familiar mobile devices.\n   \nUsers select a scene from a visual library, wait for it to load, and begin exploring in landscape orientation. Two touch controls manage altitude, direction and speed, while gentle banking adds a sense of movement. Fullscreen viewing reduces distractions, and pause, reset and scene selection controls support exploration at an individual pace.\n  \nThe application uses PlayCanvas to render Gaussian splats directly from compressed SOG files. These splats represent captured environments through many overlapping visual elements. Camera movement, acceleration and braking are calculated separately from visual banking, allowing users to navigate smoothly while maintaining control.\n  \nAt its educational heart is a question: How might you transform a familiar place into an immersive experience that helps someone see it differently?\n      \nThis question encourages students to connect technical experimentation with imaginative purpose. Rather than expecting immediate mastery, the project positions testing, questioning and revision as essential creative practices. Students can ask: What happens if I change the viewpoint? How does movement influence emotion? What could make this experience more accessible? Each experiment can build technical confidence and reveal new possibilities.\n       \nThe project develops immersion through spatial imagery, responsive navigation and personal discovery. Future development could investigate sound, accessibility, student-created scenes and alternative interaction methods, with mobile testing guiding improvements in performance, comfort and meaningful engagement.",
       "resourceLabel": "",
       "resourceLink": "",
       "gallery": [
@@ -2849,7 +2849,16 @@
       ],
       "carousel": false,
       "link": "./gaussian_mobile",
-      "tags": [],
+      "tags": [
+        "Gaussian Splatting",
+        "WebGL",
+        "PlayCanvas",
+        "3D Visualisation",
+        "Immersive Technology",
+        "Mobile Interaction",
+        "Spatial Computing",
+        "Creative Coding"
+      ],
       "thumb": "images/qrcode_gaussian_mobile.png",
       "youtube": "",
       "videoCaption": "",
