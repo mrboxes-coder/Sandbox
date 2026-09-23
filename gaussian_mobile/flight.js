@@ -1,4 +1,4 @@
-export const defaults={forward:2,reverse:1,altitude:1,yaw:45,bank:15,response:0.5};
+export const defaults={forward:2,reverse:1,altitude:1,yaw:45,bank:15,response:0.25,steeringResponse:0.1};
 // Compose heading, pitch, then bank around the camera's local viewing axis.
 // A negative local Z roll lowers the right side of a camera looking along -Z.
 export function cameraRotation({yaw,pitch,bank}){
@@ -12,9 +12,10 @@ export function initial(scene){return {position:[...(scene.pose?.position||[0,0.
 export function step(s,input,dt,scene){
   const c={...defaults,...scene.speed};dt=Math.min(dt,0.05);
   const a=1-Math.exp(-dt/(Math.max(.05,c.response)/3));
+  const steering=1-Math.exp(-dt/(Math.max(.05,c.steeringResponse)/3));
   s.speed+=(input.speed*(input.speed>=0?c.forward:c.reverse)-s.speed)*a;
   s.climb+=(input.altitude*c.altitude-s.climb)*a;
-  s.turn+=(input.yaw*c.yaw-s.turn)*a;
+  s.turn+=(input.yaw*c.yaw-s.turn)*steering;
   s.yaw=(s.yaw-s.turn*dt)%360;
   const angle=s.yaw*Math.PI/180;
   s.position[0]-=Math.sin(angle)*s.speed*dt;

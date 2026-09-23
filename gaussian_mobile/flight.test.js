@@ -5,6 +5,19 @@ test('release brakes to hover',()=>{const s=initial({});tick(s,{speed:1,yaw:1,al
 test('hover turn has no banking or translation',()=>{const s=initial({}),p=[...s.position];tick(s,{speed:0,yaw:1,altitude:0});assert.deepEqual(s.position,p);assert.equal(s.bank,0);assert.ok(s.yaw<0);});
 test('bounds clamp all axes',()=>{const scene={bounds:{min:[-1,0,-1],max:[1,1,1]}},s=initial(scene);tick(s,{speed:1,yaw:0,altitude:1},scene,600);assert.deepEqual(s.position,[0,1,-1]);});
 test('reverse travels opposite heading',()=>{const s=initial({});tick(s,{speed:-1,yaw:0,altitude:0});assert.ok(s.position[2]>1.8);});
+test('steering reaches 95% in 100ms and brakes independently of movement smoothing',()=>{
+  const scene={speed:{response:1}},s=initial(scene);
+  tick(s,{speed:1,yaw:1,altitude:0},scene,6);
+  assert.ok(s.turn>=45*.95);assert.ok(s.speed<2*.3);
+  tick(s,{speed:0,yaw:0,altitude:0},scene,6);
+  assert.ok(s.turn<45*.05);
+});
+test('default movement reaches 95% in 250ms and brakes in 250ms',()=>{
+  const s=initial({});tick(s,{speed:1,yaw:0,altitude:1},{},15);
+  assert.ok(s.speed>=2*.95);assert.ok(s.climb>=.95);
+  tick(s,{speed:0,yaw:0,altitude:0},{},15);
+  assert.ok(s.speed<2*.05);assert.ok(s.climb<.05);
+});
 test('right bank lowers camera right side at every heading; left bank raises it',()=>{
   for(const yaw of [0,45,90,135,180,225,270,315]){
     for(const direction of [-1,1]){
