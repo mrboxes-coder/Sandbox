@@ -1,5 +1,5 @@
 <!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"><style>html,body,canvas{margin:0;width:100%;height:100%;overflow:hidden;display:block;background:#0b111b}</style></head><body><canvas id="canvas"></canvas><script type="module">
-import {initial,step} from './flight.js';
+import {initial,step,cameraRotation} from './flight.js';
 const send=(type,extra={})=>parent.postMessage({type,...extra},location.origin);
 let app,asset,active=false,state,scene,camera,pc,input={speed:0,yaw:0,altitude:0};
 function stop(){active=false;input={speed:0,yaw:0,altitude:0};if(state){state.speed=state.climb=state.turn=state.bank=0;}}
@@ -17,7 +17,7 @@ if(m.type==='load'){
  asset=new pc.Asset('Scene','gsplat',{url:m.url,filename:'scene.sog'});app.assets.add(asset);
  await new Promise((resolve,reject)=>{asset.once('load',resolve);asset.once('error',reject);app.assets.load(asset);});
  const splat=new pc.Entity('SOG');splat.addComponent('gsplat',{asset});splat.setEulerAngles(...(scene.rotation||[180,0,0]));app.root.addChild(splat);
- const update=dt=>{if(active)step(state,input,dt,scene);camera.setPosition(...state.position);camera.setEulerAngles(state.pitch,state.yaw,state.bank);};update(0);app.on('update',update);
+ const update=dt=>{if(active)step(state,input,dt,scene);camera.setPosition(...state.position);camera.setRotation(...cameraRotation(state));};update(0);app.on('update',update);
  app.once('frameend',()=>send('ready'));app.start();
 }else if(m.type==='input'){input=m.input;}else if(m.type==='active'){stop();active=m.active;}else if(m.type==='reset'){stop();state=initial(scene);}else if(m.type==='dispose'){dispose();}
 }catch(error){send('error',{message:String(error.message||error)});}});

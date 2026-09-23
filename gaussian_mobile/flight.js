@@ -1,4 +1,13 @@
 export const defaults={forward:2,reverse:1,altitude:1,yaw:45,bank:15,response:0.5};
+// Compose heading, pitch, then bank around the camera's local viewing axis.
+// A negative local Z roll lowers the right side of a camera looking along -Z.
+export function cameraRotation({yaw,pitch,bank}){
+  const half=Math.PI/360;
+  const sy=Math.sin(yaw*half),cy=Math.cos(yaw*half);
+  const sx=Math.sin(pitch*half),cx=Math.cos(pitch*half);
+  const sz=Math.sin(bank*half),cz=Math.cos(bank*half);
+  return [cy*sx*cz+sy*cx*sz,sy*cx*cz-cy*sx*sz,cy*cx*sz-sy*sx*cz,cy*cx*cz+sy*sx*sz];
+}
 export function initial(scene){return {position:[...(scene.pose?.position||[0,0.75,1.8])],yaw:scene.pose?.yaw||0,pitch:scene.pose?.pitch||0,bank:0,speed:0,climb:0,turn:0};}
 export function step(s,input,dt,scene){
   const c={...defaults,...scene.speed};dt=Math.min(dt,0.05);
