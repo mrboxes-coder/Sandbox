@@ -7,7 +7,7 @@ function release(){generation++;controller?.abort();controller=null;clearInput()
 function library(){release();phase='library';$('viewer').hidden=true;$('library').hidden=false;$('file').value='';}
 function setPhase(value){phase=value;$('controls').hidden=value!=='flying';$('pause').hidden=!['flying','paused'].includes(value);$('reset').hidden=!['ready','flying','paused'].includes(value);$('panel').hidden=value==='flying';$('start').hidden=!['ready','paused'].includes(value);$('cancel').hidden=!['loading','preparing','error'].includes(value);$('progress').hidden=value!=='loading';$('pause').textContent=value==='paused'?'Resume':'Pause';$('start').textContent=value==='paused'?'Resume flight':'Start flight';}
 function pause(){if(phase!=='flying')return;clearInput();send('active',{active:false});setPhase('paused');$('status').textContent='Flight paused';$('detail').textContent='Tap Resume when you are ready.';}
-function start(){if(!['ready','paused'].includes(phase)||innerHeight>innerWidth||document.hidden)return;clearInput();send('active',{active:true});setPhase('flying');}
+function start(){if(!['ready','paused'].includes(phase)||innerHeight>innerWidth||document.hidden)return;void enterFullscreen();clearInput();send('active',{active:true});setPhase('flying');}
 async function load(selected,file){
  release();const token=generation;scene=selected;$('library').hidden=true;$('viewer').hidden=false;$('sceneTitle').textContent=scene.title;setPhase('loading');$('status').textContent='Downloading scene';$('detail').textContent='Connecting…';$('progress').removeAttribute('value');controller=new AbortController();
  try{
@@ -35,3 +35,22 @@ addEventListener('blur',pause);document.addEventListener('visibilitychange',()=>
 $('file').onchange=e=>{const file=e.target.files[0];if(file&&/\.sog$/i.test(file.name))load({title:file.name},file);};
 function validate(s){if(typeof s.title!=='string'||typeof s.url!=='string'||!s.url.split('?')[0].toLowerCase().endsWith('.sog'))throw Error('Each scene needs a title and a .sog URL.');const vector=v=>Array.isArray(v)&&v.length===3&&v.every(Number.isFinite);if(s.pose&&((s.pose.position&&!vector(s.pose.position))||['yaw','pitch'].some(k=>s.pose[k]!==undefined&&!Number.isFinite(s.pose[k]))))throw Error('Invalid camera pose.');if(s.rotation&&!vector(s.rotation))throw Error('Invalid scene rotation.');if(s.speed&&Object.values(s.speed).some(v=>!Number.isFinite(v)||v<0))throw Error('Invalid speed settings.');if(s.bounds&&(!vector(s.bounds.min)||!vector(s.bounds.max)||s.bounds.min.some((v,i)=>v>s.bounds.max[i])))throw Error('Invalid scene bounds.');return s;}
 try{const response=await fetch('scenes.json');if(!response.ok)throw Error('Cannot read scenes.json');const data=await response.json();for(const item of data.scenes){const s=validate(item),button=document.createElement('button');button.className='card';const img=document.createElement('img');img.alt='';img.src=s.thumbnail||'placeholder.svg';img.onerror=()=>{img.onerror=null;img.src='placeholder.svg';};const body=document.createElement('div'),title=document.createElement('strong'),caption=document.createElement('small');title.textContent=s.title;caption.textContent=s.description||'Explore scene →';body.append(title,caption);button.append(img,body);button.onclick=()=>load(s);$('cards').append(button);}$('libraryStatus').textContent=data.scenes.length?'Select a scene to begin.':'No hosted scenes configured yet. Open a local SOG to test, or add scenes to scenes.json.';}catch(error){$('libraryStatus').textContent=error.message;}
+
+async function enterFullscreen(){
+  if(document.fullscreenElement)return;
+  if(!document.documentElement.requestFullscreen){
+    $('fullscreenStatus').textContent='Fullscreen is unavailable in this browser. Open the viewer in Chrome or Samsung Internet.';
+    return;
+  }
+  try{
+    await document.documentElement.requestFullscreen({navigationUI:'hide'});
+    $('fullscreenStatus').textContent='';
+  }catch{
+    $('fullscreenStatus').textContent='Fullscreen was not allowed. Tap Enter fullscreen to try again in your mobile browser.';
+  }
+}
+$('fullscreen').onclick=enterFullscreen;
+document.addEventListener('fullscreenchange',()=>{
+  $('fullscreen').hidden=!!document.fullscreenElement;
+  if(!document.fullscreenElement)pause();
+});
