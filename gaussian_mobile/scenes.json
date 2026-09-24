@@ -13,8 +13,8 @@
     "bounds": { "min": [-20, 0, -20], "max": [20, 10, 20] }
   },
   {
-    "title": "Frankenstein Street",
-    "description": "Explore the Frankenstein Street",
+    "title": "Blair Road - Everton Road",
+    "description": "2,350,000 Gaussians 32.0 MB",
     "url": "assets/Frankenstein.sog",
     "thumbnail": "assets/Frankenstein_thumbnail.jpg",
     "pose": { "position": [-0.447, 0.3966, 0.8715], "yaw": -58.1254, "pitch": 0 },
@@ -26,8 +26,8 @@
     "bounds": { "min": [-20, 0, -20], "max": [20, 10, 20] }
   },
   {
-    "title": "Frankenstein Street - Decimation 1.0",
-    "description": "Explore the Frankenstein Street",
+    "title": "Blair Road - Everton Road - Decimation 1.0",
+    "description": "1,200,000 Gaussians 16.8 MB",
     "url": "assets/Frank_Decimated01.sog",
     "thumbnail": "assets/Frankenstein_thumbnail.jpg",
     "pose": { "position": [-0.447, 0.3966, 0.8715], "yaw": -58.1254, "pitch": 0 },
@@ -39,11 +39,11 @@
     "bounds": { "min": [-20, 0, -20], "max": [20, 10, 20] }
   },
   {
-    "title": "Frankenstein Street - Decimation 2.0",
-    "description": "Explore the Frankenstein Street",
+    "title": "Blair Road - Everton Road - Decimation 2.0",
+    "description": "822,000 Gaussians 12.5 MB",
     "url": "assets/Frank_Decimated02.sog",
     "thumbnail": "assets/Frankenstein_thumbnail.jpg",
-    "pose": { "position": [-0.447, 0.3966, 0.8715], "yaw": -58.1254, "pitch": 0 },
+    "pose": { "position": [ -0.4756, 0.2357, 1.2007 ], "yaw": -124.6324, "pitch": 0 },
     "rotation": [180, 0, 0],
     "speed": {
       "forward": 0.5, "reverse": 0.2, "altitude": 0.1,
@@ -52,10 +52,6 @@
     "bounds": { "min": [-20, 0, -20], "max": [20, 10, 20] }
   }]
 }
-
-
-
-
 
 
 
