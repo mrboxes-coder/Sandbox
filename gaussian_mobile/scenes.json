@@ -17,7 +17,7 @@
     "description": "Explore the Frankenstein Street",
     "url": "assets/Frankenstein.sog",
     "thumbnail": "assets/Frankenstein_thumbnail.jpg",
-    "pose": { "position": [0, 0.5, 4], "yaw": 0, "pitch": 0 },
+    "pose": { "position": [-0.447, 0.3966, 0.8715], "yaw": -58.1254, "pitch": 0 },
     "rotation": [180, 0, 0],
     "speed": {
       "forward": 0.5, "reverse": 0.2, "altitude": 0.1,
@@ -26,3 +26,13 @@
     "bounds": { "min": [-20, 0, -20], "max": [20, 10, 20] }
   }]
 }
+
+
+
+
+
+
+
+
+
+
