@@ -2796,7 +2796,36 @@
       "youtube": "",
       "videoCaption": "",
       "videoRuntime": "",
-      "specSheet": [],
+      "specSheet": [
+        {
+          "label": "Engine",
+          "value": ""
+        },
+        {
+          "label": "Data",
+          "value": ""
+        },
+        {
+          "label": "Controls",
+          "value": ""
+        },
+        {
+          "label": "Instruments",
+          "value": ""
+        },
+        {
+          "label": "Deploy",
+          "value": ""
+        },
+        {
+          "label": "Access",
+          "value": ""
+        },
+        {
+          "label": "Built With",
+          "value": ""
+        }
+      ],
       "tunableParams": []
     },
     {
@@ -2863,7 +2892,36 @@
       "youtube": "",
       "videoCaption": "",
       "videoRuntime": "",
-      "specSheet": [],
+      "specSheet": [
+        {
+          "label": "Engine",
+          "value": ""
+        },
+        {
+          "label": "Data",
+          "value": ""
+        },
+        {
+          "label": "Controls",
+          "value": ""
+        },
+        {
+          "label": "Instruments",
+          "value": ""
+        },
+        {
+          "label": "Deploy",
+          "value": ""
+        },
+        {
+          "label": "Access",
+          "value": ""
+        },
+        {
+          "label": "Built With",
+          "value": ""
+        }
+      ],
       "tunableParams": []
     }
   ],
