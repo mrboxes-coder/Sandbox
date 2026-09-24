@@ -3,9 +3,9 @@ let frame,url,controller,generation=0,phase='library',scene,input={speed:0,yaw:0
 const pads=[];
 function send(type,extra={}){frame?.contentWindow?.postMessage({type,...extra},location.origin);}
 function clearInput(){input={speed:0,yaw:0,altitude:0};pads.forEach(p=>p.reset());send('input',{input});}
-function release(){generation++;controller?.abort();controller=null;clearInput();send('dispose');frame?.remove();frame=null;if(url)URL.revokeObjectURL(url);url=null;}
+function release(){if($('poseDialog').open)$('poseDialog').close();generation++;controller?.abort();controller=null;clearInput();send('dispose');frame?.remove();frame=null;if(url)URL.revokeObjectURL(url);url=null;}
 function library(){release();phase='library';$('viewer').hidden=true;$('library').hidden=false;$('file').value='';}
-function setPhase(value){phase=value;$('controls').hidden=value!=='flying';$('pause').hidden=!['flying','paused'].includes(value);$('reset').hidden=!['ready','flying','paused'].includes(value);$('panel').hidden=value==='flying';$('start').hidden=!['ready','paused'].includes(value);$('cancel').hidden=!['loading','preparing','error'].includes(value);$('progress').hidden=value!=='loading';$('pause').textContent=value==='paused'?'Resume':'Pause';$('start').textContent=value==='paused'?'Resume flight':'Start flight';}
+function setPhase(value){phase=value;$('pose').hidden=!['ready','flying','paused'].includes(value);$('controls').hidden=value!=='flying';$('pause').hidden=!['flying','paused'].includes(value);$('reset').hidden=!['ready','flying','paused'].includes(value);$('panel').hidden=value==='flying';$('start').hidden=!['ready','paused'].includes(value);$('cancel').hidden=!['loading','preparing','error'].includes(value);$('progress').hidden=value!=='loading';$('pause').textContent=value==='paused'?'Resume':'Pause';$('start').textContent=value==='paused'?'Resume flight':'Start flight';}
 function pause(){if(phase!=='flying')return;clearInput();send('active',{active:false});setPhase('paused');$('status').textContent='Flight paused';$('detail').textContent='Tap Resume when you are ready.';}
 function start(){if(!['ready','paused'].includes(phase)||innerHeight>innerWidth||document.hidden)return;void enterFullscreen();clearInput();send('active',{active:true});setPhase('flying');}
 async function load(selected,file){
@@ -22,7 +22,7 @@ async function load(selected,file){
  }catch(error){if(token!==generation)return;fail(error.message);}
 }
 function fail(message){release();setPhase('error');$('status').textContent='Unable to open scene';$('detail').textContent=message+' Check the connection and use a bundled .sog file.';}
-addEventListener('message',e=>{if(e.origin!==location.origin||e.source!==frame?.contentWindow)return;if(e.data.type==='boot')send('load',{scene,url});if(e.data.type==='ready'){if(url)URL.revokeObjectURL(url);url=null;setPhase('ready');$('status').textContent='Ready to explore';$('detail').textContent='Left thumb: altitude. Right thumb: turn and move. Release to hover.';}if(e.data.type==='error')fail(e.data.message);});
+addEventListener('message',e=>{if(e.origin!==location.origin||e.source!==frame?.contentWindow)return;if(e.data.type==='pose'&&$('poseDialog').open){$('poseValue').value=JSON.stringify({pose:e.data.pose},null,2);$('copyPose').disabled=false;$('poseStatus').textContent='Captured current pose. Copy the pose object into your scene entry.';}if(e.data.type==='boot')send('load',{scene,url});if(e.data.type==='ready'){if(url)URL.revokeObjectURL(url);url=null;setPhase('ready');$('status').textContent='Ready to explore';$('detail').textContent='Left thumb: altitude. Right thumb: turn and move. Release to hover.';}if(e.data.type==='error')fail(e.data.message);});
 function bindPad(id,altitude){const el=$(id),knob=el.querySelector('i');let pointer=null;function reset(){if(pointer!==null&&el.hasPointerCapture(pointer))el.releasePointerCapture(pointer);pointer=null;knob.style.transform='translate(-50%,-50%)';}pads.push({reset});
  function move(e){if(e.pointerId!==pointer)return;const r=el.getBoundingClientRect(),radius=r.width*.32;let x=(e.clientX-r.left-r.width/2)/radius,y=(e.clientY-r.top-r.height/2)/radius;const length=Math.max(1,Math.hypot(x,y));x/=length;y/=length;const dead=v=>Math.abs(v)<.08?0:Math.sign(v)*(Math.abs(v)-.08)/.92;if(altitude){input.altitude=-dead(y);x=0;}else{input.yaw=dead(x);input.speed=-dead(y);}knob.style.transform=`translate(calc(-50% + ${x*radius}px),calc(-50% + ${y*radius}px))`;send('input',{input});}
  el.addEventListener('pointerdown',e=>{if(phase!=='flying'||pointer!==null)return;e.preventDefault();pointer=e.pointerId;el.setPointerCapture(pointer);move(e);});el.addEventListener('pointermove',move);
@@ -54,3 +54,13 @@ document.addEventListener('fullscreenchange',()=>{
   $('fullscreen').hidden=!!document.fullscreenElement;
   if(!document.fullscreenElement)pause();
 });
+
+$('pose').onclick=()=>{
+ pause();clearInput();$('poseValue').value='';$('copyPose').disabled=true;
+ $('poseStatus').textContent='Reading camera pose...';$('poseDialog').showModal();send('getPose');
+};
+$('closePose').onclick=()=>$('poseDialog').close();
+$('copyPose').onclick=async()=>{
+ try{await navigator.clipboard.writeText($('poseValue').value);$('poseStatus').textContent='Pose copied.';}
+ catch{$('poseValue').focus();$('poseValue').select();$('poseStatus').textContent='Copy the highlighted text using your device Copy command.';}
+};

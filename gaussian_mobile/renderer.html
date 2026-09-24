@@ -19,7 +19,7 @@ if(m.type==='load'){
  const splat=new pc.Entity('SOG');splat.addComponent('gsplat',{asset});splat.setEulerAngles(...(scene.rotation||[180,0,0]));app.root.addChild(splat);
  const update=dt=>{if(active)step(state,input,dt,scene);camera.setPosition(...state.position);camera.setRotation(...cameraRotation(state));};update(0);app.on('update',update);
  app.once('frameend',()=>send('ready'));app.start();
-}else if(m.type==='input'){input=m.input;}else if(m.type==='active'){stop();active=m.active;}else if(m.type==='reset'){stop();state=initial(scene);}else if(m.type==='dispose'){dispose();}
+}else if(m.type==='getPose'&&state){const round=n=>Number(n.toFixed(4));send('pose',{pose:{position:state.position.map(round),yaw:round(state.yaw),pitch:round(state.pitch)}});}else if(m.type==='input'){input=m.input;}else if(m.type==='active'){stop();active=m.active;}else if(m.type==='reset'){stop();state=initial(scene);}else if(m.type==='dispose'){dispose();}
 }catch(error){send('error',{message:String(error.message||error)});}});
 addEventListener('resize',()=>app?.resizeCanvas());send('boot');
 </script></body></html>
