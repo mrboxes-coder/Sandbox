@@ -63,6 +63,19 @@
       "yaw": 45, "bank": 15, "response": 0.25, "steeringResponse": 0.1
     },
     "bounds": { "min": [-20, 0, -20], "max": [20, 10, 20] }
+  },
+  {
+    "title": "Bukit Pasoh : Duxton",
+    "description": "1,642,000 Gaussians 24.0 MB",
+    "url": "assets/Bukit_Pasoh.sog",
+    "thumbnail": "assets/Bukit_Pasoh_thumbnail.jpg",
+    "pose": { "position": [ -0.0683, 0.0881, -1.4842 ], "yaw": -170.4558, "pitch": 0 },
+    "rotation": [180, 0, 0],
+    "speed": {
+      "forward": 0.25, "reverse": 0.1, "altitude": 0.1,
+      "yaw": 45, "bank": 15, "response": 0.25, "steeringResponse": 0.1
+    },
+    "bounds": { "min": [-20, 0, -20], "max": [20, 10, 20] }
   }]
 }
 
