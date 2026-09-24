@@ -16,7 +16,7 @@
     "title": "Frankenstein Street",
     "description": "Explore the Frankenstein Street",
     "url": "assets/Frankenstein.sog",
-    "thumbnail": "assets/LASALLE_thumbnail.jpg",
+    "thumbnail": "assets/Frankenstein_thumbnail.jpg",
     "pose": { "position": [0, 0.5, 4], "yaw": 0, "pitch": 0 },
     "rotation": [180, 0, 0],
     "speed": {
