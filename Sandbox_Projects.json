@@ -2923,9 +2923,113 @@
         }
       ],
       "tunableParams": []
+    },
+    {
+      "id": 37,
+      "name": "Equity Desk",
+      "tier": "4",
+      "categories": [
+        "API",
+        "Cloudflare",
+        "Google"
+      ],
+      "date": "2026-09-27",
+      "desc": "Equity Desk is a stock research website that uses Gemini AI and web search to analyse companies, valuations, market news and trading scenarios. It presents reports with sources, charts, disclaimers and estimated costs, with downloadable PDFs for further independent review.",
+      "fullDesc": "Equity Desk was conceived as a practical learning project to understand APIs, API keys and website deployment. It explores how existing services are accessed, how credentials are created and protected, and how an application connects these components. A further aim is to use free financial information wherever practical.\n      \nThe result is a password-protected stock research website. Users enter a company and exchange ticker, then choose Gemini alone or Gemini with web search. A structured prompt requests analysis of valuation, financial performance, market developments, risks and potential entry and exit scenarios. Reports include source references, evidence identifiers, disclaimers and downloadable PDFs.\n     \nDeveloped collaboratively using ChatGPT Codex, the project uses HTML, CSS and JavaScript for its interface. A Cloudflare Worker handles authentication, request limits and communication with Google’s Gemini API. The Gemini API key is created through Google AI Studio and stored securely in Cloudflare, rather than exposed in the webpage.\n        \nTradingView provides free embedded historical charts, while locally generated charts illustrate proposed trading scenarios. Financial websites and company disclosures provide potential research sources, subject to availability and access restrictions. Gemini processing can incur charges; free information does not make the application entirely free.\n               \nLimitations include AI inaccuracies, inaccessible sources, delayed data and uncertain forecasts. Evidence checks are not independently audited, costs are estimates, and embedded chart verification remains outstanding.\n          \nFuture development could introduce saved reports, individual accounts, portfolio comparisons, verified financial feeds, stronger citation checks, configurable spending controls and a broader valuation framework, while preserving the project’s educational focus and affordable operation.",
+      "resourceLabel": "",
+      "resourceLink": "",
+      "gallery": [
+        {
+          "img": "images/equity_desk01.jpg",
+          "caption": ""
+        },
+        {
+          "img": "images/equity_desk02.jpg",
+          "caption": ""
+        },
+        {
+          "img": "images/equity_desk06.jpg",
+          "caption": ""
+        },
+        {
+          "img": "images/equity_desk04.jpg",
+          "caption": ""
+        },
+        {
+          "img": "images/equity_desk05.jpg",
+          "caption": ""
+        },
+        {
+          "img": "images/equity_desk03.jpg",
+          "caption": ""
+        },
+        {
+          "img": "images/equity_desk07.jpg",
+          "caption": ""
+        },
+        {
+          "img": "images/equity_desk08.jpg",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        }
+      ],
+      "carousel": true,
+      "link": "https://equity-research-desk.immersive-sandbox.workers.dev/",
+      "tags": [
+        "Generative AI",
+        "Gemini API",
+        "API Integration",
+        "API Key Security",
+        "Cloudflare Workers",
+        "JavaScript",
+        "HTML",
+        "CSS",
+        "Google Search Grounding",
+        "TradingView",
+        "PDF Generation",
+        "Financial Technology"
+      ],
+      "thumb": "images/equity_desk01.jpg",
+      "youtube": "",
+      "videoCaption": "",
+      "videoRuntime": "",
+      "specSheet": [
+        {
+          "label": "Engine",
+          "value": ""
+        },
+        {
+          "label": "Data",
+          "value": ""
+        },
+        {
+          "label": "Controls",
+          "value": ""
+        },
+        {
+          "label": "Instruments",
+          "value": ""
+        },
+        {
+          "label": "Deploy",
+          "value": ""
+        },
+        {
+          "label": "Access",
+          "value": ""
+        },
+        {
+          "label": "Built With",
+          "value": ""
+        }
+      ],
+      "tunableParams": []
     }
   ],
-  "nextId": 37,
+  "nextId": 38,
   "sortMode": "tier",
   "site": {
     "eyebrow": "Browser-based creative exploration : Chris Shaw",
