@@ -1,4 +1,6 @@
-import {settings} from './mobile-settings.js';
+// Touch input and continuous direction/speed control.
+import {settings} from './settings.js';
+
 const TAU=Math.PI*2,rad=Math.PI/180;
 export const wrap=a=>((a+Math.PI)%TAU+TAU)%TAU-Math.PI;
 const clamp=(x,a=0,b=1)=>Math.min(b,Math.max(a,x));
@@ -37,4 +39,16 @@ export class MobileController {
   this.lastError=error;
   return {analog:true,active:true,forward:true,left:this.rate>.001,right:this.rate<-.001,speed:request*alignmentFactor(error,cfg),yawRate:this.rate,requestedSpeed:request,error};
  }
+}
+
+// Independent pointer-captured thumb sticks.
+export class ThumbStick {
+ constructor(element){
+  this.element=element;this.knob=element.querySelector('.knob');this.x=0;this.y=0;this.pointer=null;
+  element.addEventListener('pointerdown',e=>{if(this.pointer!==null||e.button!==0)return;e.preventDefault();this.pointer=e.pointerId;element.setPointerCapture(e.pointerId);this.update(e);});
+  element.addEventListener('pointermove',e=>{if(e.pointerId===this.pointer){e.preventDefault();this.update(e);}});
+  for(const event of ['pointerup','pointercancel','lostpointercapture'])element.addEventListener(event,e=>{if(e.pointerId===this.pointer)this.clear();});
+ }
+ update(e){const r=this.element.getBoundingClientRect(),radius=r.width*.32;let x=(e.clientX-r.left-r.width/2)/radius,y=(r.top+r.height/2-e.clientY)/radius;const length=Math.hypot(x,y);if(length>1){x/=length;y/=length;}this.x=x;this.y=y;this.knob.style.transform=`translate(${x*radius}px,${-y*radius}px)`;}
+ clear(){const pointer=this.pointer;this.pointer=null;this.x=this.y=0;this.knob.style.transform='';if(pointer!==null&&this.element.hasPointerCapture(pointer))this.element.releasePointerCapture(pointer);}
 }

@@ -8,3 +8,4 @@ for(const button of document.querySelectorAll('[data-scene]'))button.addEventLis
  frame.hidden=false;frame.src='./'+button.dataset.scene;
  frame.addEventListener('load',()=>frame.focus(),{once:true});
 });
+

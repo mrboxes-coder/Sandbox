@@ -1,10 +1,9 @@
-import * as THREE from './three.module.js';
-import {loadReference} from './reference-loader.js';
-import {ReviewLocomotion,FIXED_DT} from './review-locomotion.js?v=armour-2';
+import * as THREE from '../vendor/three.module.js';
+import {loadReference} from './robot.js';
+import {ReviewLocomotion,FIXED_DT} from './animation.js';
+import {MobileController,ThumbStick} from './controls.js';
+import {settings} from './settings.js';
 
-import {MobileController} from './mobile-controller.js';
-import {ThumbStick} from './thumb-stick.js';
-import {settings} from './mobile-settings.js';
 const controller=new MobileController();
 const movement=new ThumbStick(document.getElementById('move-stick')),viewStick=new ThumbStick(document.getElementById('camera-stick'));
 const $=id=>document.getElementById(id),keys={forward:false,left:false,right:false};
@@ -60,5 +59,3 @@ function frame(now){requestAnimationFrame(frame);const dt=Math.min((now-last)/10
  const target=actor.position.clone().add(new THREE.Vector3(0,1.35,0));camera.position.copy(target).add(new THREE.Vector3(Math.sin(orbit)*7.088*Math.cos(elevation),7.088*Math.sin(elevation),Math.cos(orbit)*7.088*Math.cos(elevation)));camera.lookAt(target);renderer.render(scene,camera);
 }requestAnimationFrame(frame);
 window.addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)});
-
-

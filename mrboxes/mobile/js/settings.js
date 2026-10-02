@@ -11,3 +11,4 @@ export function sanitize(values){const result={...DEFAULTS};for(const [name,[,mi
 export function loadSettings(){try{return sanitize(JSON.parse(localStorage.getItem(key)));}catch{return {...DEFAULTS};}}
 export const settings=loadSettings();
 export function saveSettings(values){Object.assign(settings,sanitize(values));try{localStorage.setItem(key,JSON.stringify(settings));return true;}catch{return false;}}
+

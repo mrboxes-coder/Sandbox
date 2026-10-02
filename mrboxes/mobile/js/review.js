@@ -1,9 +1,87 @@
-import * as THREE from './three.module.js';
-import {loadReference} from './reference-loader.js';
-import {ReviewLocomotion,FIXED_DT,DURATION,sequenceInput} from './review-locomotion.js?v=armour-2';
-import {reviewSequence} from './review-sequences.js';
-import {mobileStudy} from './mobile-studies.js';
-import {mountTuning} from './tuning-panel.js';
+import * as THREE from '../vendor/three.module.js';
+import {loadReference} from './robot.js';
+import {ReviewLocomotion,FIXED_DT} from './animation.js';
+import {MobileController} from './controls.js';
+import {FIELDS,settings,saveSettings,DEFAULTS} from './settings.js';
+
+// Repeatable keyboard and mobile studies.
+// All events use simulation frames, independent of playback speed.
+export function reviewSequence(id='approved',offset=0,direction=1){
+ const side=direction===1?'Left':'Right';
+ let stages,title,hint;
+ if(id==='pelvis-walk'){
+  stages=[[0,'Rest',''],[60,'Straight walk','W'],[412,'Settle',''],[600,'End','']];
+  title='Straight walk · pelvis rise and tilt';
+  hint='Front: lifted-leg hip rises, supporting hip drops; chest counters one frame later. Side: pelvis rises with the step and lowers at contact. This motion also applies to the other studies and turns.';
+ }else if(id==='approved'){
+  stages=[[0,'Rest',''],[60,'Walk','W'],[Math.round((3.25+offset)*60),side+' turn',direction===1?'WA':'WD'],[Math.round((5.45+offset)*60),'Walk','W'],[480,'Settle',''],[630,'End','']];
+  title='Walk → '+side.toLowerCase()+' turn → walk';hint='Approved single-turn sequence.';
+ }else if(id.startsWith('walk-stop-')){
+  const release={'walk-stop-first-lift':80,'walk-stop-first-land':96,'walk-stop-second-lift':124,'walk-stop-second-land':140}[id];
+  stages=[[0,'Rest',''],[60,'Walk','W'],[release,'Release / settle',''],[release+210,'End','']];
+  title='Walk → rest · '+(id.includes('first')?'first':'opposite')+' foot '+(id.endsWith('lift')?'lifting':'descending');
+  hint='Release W at frame '+release+'. Compare the support leg, landing and final weight transfer. Direction mirrors the starting foot.';
+ }else if(id.startsWith('turn-stop')){
+  const release={'turn-stop-early':286,'turn-stop-late':318}[id]??302;
+  stages=[[0,'Rest',''],[60,'Walk','W'],[195,side+' turn',direction===1?'WA':'WD'],[release,'Release all',''],[510,'End','']];
+  title='Walk → '+side.toLowerCase()+' turn → settle';hint='All keys released at frame '+release+'. The current foot finishes landing. Compare early, middle and late releases.';
+ }else if(id==='reverse-turn'){
+  const opposite=direction===1?'Right':'Left';
+  stages=[[0,'Rest',''],[60,'Walk','W'],[195,side+' turn',direction===1?'WA':'WD'],[302,opposite+' requested',direction===1?'WD':'WA'],[434,'Walk','W'],[540,'Settle',''],[750,'End','']];
+  title=side+' → '+opposite.toLowerCase()+' · direct steering reversal';
+  hint='At frame 302, steering reverses while W stays held. Inspect the head lead, body rotation and the next foot placement. Direction swaps the order.';
+ }else if(id.startsWith('settle-restart')){
+  const restart=id==='settle-restart-early'?333:360;
+  stages=[[0,'Rest',''],[60,'Walk','W'],[302,'Release / settle',''],[restart,'Resume W','W'],[510,'Settle',''],[720,'End','']];
+  title='Walk → interrupted settle → walk → rest';
+  hint='Release W at frame 302; resume at frame '+restart+(id.endsWith('early')?' before the closing half-step lifts.':' during the closing half-step.')+' Inspect continuity as walking resumes.';
+ }else{
+  const release={mixed:786,'mixed-early':774,'mixed-late':802}[id]??786;
+  stages=[[0,'Rest',''],[60,'Walk','W'],[195,'Left','WA'],[327,'Walk','W'],[420,'Right','WD'],[552,'Walk','W'],[710,'Partial left','WA'],[release,'Walk','W'],[960,'Settle',''],[1140,'End','']];
+  title='Walk → left → walk → right → walk → partial left → walk → settle';
+  hint='A released at frame '+release+' ('+(id==='mixed-early'?'just after lift-off':id==='mixed-late'?'just before landing':'mid-step')+'); W stays held. All keys released at frame 960.';
+ }
+ const frames=stages.at(-1)[0];
+ return {frames,title,hint,stages,direction:id.startsWith('mixed')?1:direction,input(frame){
+  let stage=stages[0];for(const candidate of stages){if(candidate[0]>frame)break;stage=candidate;}
+  return {forward:stage[2].includes('W'),left:stage[2].includes('A'),right:stage[2].includes('D')};
+ }};
+}
+
+export function mobileStudy(id='mobile-reversal',direction=1){
+ const controller=new MobileController();
+ const release=id==='mobile-release';
+ const circle=id==='mobile-circle';
+ const stages=release?[[0,'Rest'],[60,'Walk'],[180,'Reverse'],[230,'Release'],[380,'Forward again'],[480,'Settle'],[660,'End']]:[[0,'Rest'],[60,'Walk'],[180,circle?'360° sweep':'Reverse'],[540,'Release'],[750,'End']];
+ return {mobile:true,direction,frames:stages.at(-1)[0],stages,title:circle?'Mobile · continuous 360° sweep':release?'Mobile · release mid-pivot and restart':'Mobile · walk → 180° pivot → walk',hint:'Uses the same analogue controller and animation settings as the Playground. Change turn direction to mirror the sweep. The release study stops yaw immediately, lands the current foot, and settles.',reset(){controller.reset();},input(frame,yaw=0){
+  let x=0,y=0;
+  if(frame>=60&&frame<180)y=1;
+  if(circle&&frame>=180&&frame<540){const angle=(frame-180)/360*Math.PI*2;x=-direction*Math.sin(angle);y=Math.cos(angle);}
+  else if(!circle&&frame>=180&&frame<(release?230:540)){x=direction*-.00001;y=-1;if(frame===180)controller.sweep=direction;}
+  if(release&&frame>=380&&frame<480)y=1;
+  return controller.sample(x,y,yaw,1/60);
+ }};
+}
+
+// Settings editor.
+export function mountTuning(onChange){
+ const box=document.getElementById('tuning-fields'),message=document.getElementById('tuning-status');
+ for(const [name,[title,min,max,step]] of Object.entries(FIELDS)){
+  const label=document.createElement('label');label.textContent=title;
+  const input=document.createElement('input');Object.assign(input,{type:'number',min,max,step,value:settings[name],name});label.append(input);box.append(label);
+ }
+ const fill=()=>{for(const input of box.querySelectorAll('input'))input.value=settings[input.name];};
+ document.getElementById('apply-tuning').onclick=()=>{
+  const values={};for(const input of box.querySelectorAll('input')){if(!input.reportValidity())return;values[input.name]=Number(input.value);}
+  const saved=saveSettings(values);fill();onChange();message.textContent=saved?'Saved on this browser. Mobile study restarted; Playground uses these settings on opening.':'Applied for this page. Browser storage is unavailable; export to keep settings.';
+ };
+ document.getElementById('reset-tuning').onclick=()=>{saveSettings(DEFAULTS);fill();onChange();message.textContent='Default settings restored.';};
+ document.getElementById('export-tuning').onclick=()=>{const url=URL.createObjectURL(new Blob([JSON.stringify(settings,null,2)],{type:'application/json'}));const a=document.createElement('a');a.href=url;a.download='mrboxes-mobile-settings.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);};
+ document.getElementById('import-tuning').onchange=async e=>{try{const file=e.target.files[0];if(!file)return;const data=JSON.parse(await file.text());if(!data||typeof data!=='object'||!Object.keys(FIELDS).some(k=>Number.isFinite(data[k])))throw Error('No recognised settings');saveSettings(data);fill();onChange();message.textContent='Settings imported.';}catch{message.textContent='Could not import: choose a mrBoxes settings JSON file.';}e.target.value='';};
+}
+
+// Browser page. Keep study functions usable by Node tests without a DOM.
+if(typeof document !== 'undefined'){
 const $=id=>document.getElementById(id);
 const renderer=new THREE.WebGLRenderer({antialias:true});renderer.setSize(innerWidth,innerHeight);renderer.setPixelRatio(Math.min(devicePixelRatio,1.6));renderer.setClearColor(0x172630);renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.15;renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;renderer.domElement.tabIndex=0;renderer.domElement.setAttribute('aria-label','Robot transition review scene. Drag to orbit.');document.body.appendChild(renderer.domElement);
 const scene=new THREE.Scene();scene.fog=new THREE.Fog(0x172630,24,65);
@@ -68,3 +146,4 @@ window.addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camer
 
 mountTuning(()=>configureStudy());
 $('review-toggle').onclick=()=>{const open=document.body.classList.toggle('controls-open');$('review-toggle').setAttribute('aria-expanded',String(open));};
+}
