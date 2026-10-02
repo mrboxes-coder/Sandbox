@@ -1,5 +1,5 @@
 import * as THREE from './three.module.js';
-import {prepareRobotMotion,updateRobotMotion,updateCharacterTurn,poseCharacterFeet} from './review-motion.js';
+import {prepareRobotMotion,updateRobotMotion,updateCharacterTurn,poseCharacterFeet} from './review-motion.js?v=armour-2';
 
 import {settings} from './mobile-settings.js';
 

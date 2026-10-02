@@ -1,6 +1,6 @@
 import * as THREE from './three.module.js';
 import {loadReference} from './reference-loader.js';
-import {ReviewLocomotion,FIXED_DT} from './review-locomotion.js';
+import {ReviewLocomotion,FIXED_DT} from './review-locomotion.js?v=armour-2';
 
 import {MobileController} from './mobile-controller.js';
 import {ThumbStick} from './thumb-stick.js';
@@ -33,7 +33,7 @@ renderer.domElement.addEventListener('pointermove',e=>{if(!drag||drag.id!==e.poi
 renderer.domElement.addEventListener('pointerup',()=>{drag=null});renderer.domElement.addEventListener('pointercancel',()=>{drag=null});
 function reset(){clearKeys();rig.reset();orbit=0;elevation=Math.atan2(2,6.8);accumulator=0;renderer.domElement.focus()}
 $('reset').onclick=()=>{if(actor)reset()};
-try{const {root}=await loadReference('./game-robot.glb');actor=new THREE.Group();scene.add(actor);root.scale.setScalar(2.6/3.15);actor.add(root);rig=new ReviewLocomotion(actor,root);actor.traverse(o=>{if(o.isMesh){o.castShadow=true;o.receiveShadow=true}});reset()}catch(e){$('error').textContent='The robot could not load. Refresh to try again.';throw e}
+try{const {root}=await loadReference('./game-robot.glb');actor=new THREE.Group();scene.add(actor);root.scale.setScalar(2.6/3.15);actor.add(root);rig=new ReviewLocomotion(actor,root);renderer.domElement.dataset.armourAttachment=root.getObjectByName('ThighArmourR')?.parent?.name||'missing';actor.traverse(o=>{if(o.isMesh){o.castShadow=true;o.receiveShadow=true}});reset()}catch(e){$('error').textContent='The robot could not load. Refresh to try again.';throw e}
 function frame(now){requestAnimationFrame(frame);const dt=Math.min((now-last)/1000,.1);last=now;
  accumulator+=dt;
  while(accumulator>=FIXED_DT){

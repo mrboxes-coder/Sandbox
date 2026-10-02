@@ -1,4 +1,5 @@
 import * as THREE from './three.module.js';
+import {attachThighArmour} from './thigh-armour.js?v=armour-2';
 
 const TAU=Math.PI*2, clamp=THREE.MathUtils.clamp;
 const smooth=t=>{t=clamp(t,0,1);return t*t*(3-2*t)};
@@ -25,6 +26,7 @@ export function prepareRobotMotion(body,type='patrol'){
   for(const id of parts){const p=body.getObjectByName('tripo_part_'+id);if(!p)throw Error('Missing robot part '+id);g.attach(p)}return g;
  }
  const hips=['L','R'].map(s=>body.getObjectByName('Leg'+s)),shoulders=['L','R'].map(s=>body.getObjectByName('Arm'+s));
+ attachThighArmour(body,hips[1]);
  const knees=[joint('KneeL',hips[0],[0,-.23,0],[3,7,9,13,17,29,36,50,51]),joint('KneeR',hips[1],[0,-.23,0],[5,8,11,19,21,23,32])];
  const ankles=[joint('AnkleL',knees[0],[0,-.253,-.018],[13,17,29,36,50,51]),joint('AnkleR',knees[1],[0,-.253,-.018],[8,21,23,32])];
  const toes=[joint('ToeL',ankles[0],[0,-.061,.043],[29,36]),joint('ToeR',ankles[1],[0,-.061,.043],[21,32])];

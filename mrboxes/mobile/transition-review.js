@@ -1,6 +1,6 @@
 import * as THREE from './three.module.js';
 import {loadReference} from './reference-loader.js';
-import {ReviewLocomotion,FIXED_DT,DURATION,sequenceInput} from './review-locomotion.js';
+import {ReviewLocomotion,FIXED_DT,DURATION,sequenceInput} from './review-locomotion.js?v=armour-2';
 import {reviewSequence} from './review-sequences.js';
 import {mobileStudy} from './mobile-studies.js';
 import {mountTuning} from './tuning-panel.js';
