@@ -8,7 +8,7 @@ import {settings} from './mobile-settings.js';
 const controller=new MobileController();
 const movement=new ThumbStick(document.getElementById('move-stick')),viewStick=new ThumbStick(document.getElementById('camera-stick'));
 const $=id=>document.getElementById(id),keys={forward:false,left:false,right:false};
-const renderer=new THREE.WebGLRenderer({antialias:true});renderer.setSize(innerWidth,innerHeight);renderer.setPixelRatio(Math.min(devicePixelRatio,1.6));renderer.setClearColor(0x172630);renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.15;renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;renderer.domElement.tabIndex=0;renderer.domElement.setAttribute('aria-label','Robot movement area. W walks; A and D turn. Drag to orbit.');document.body.appendChild(renderer.domElement);
+const renderer=new THREE.WebGLRenderer({antialias:true});renderer.setSize(innerWidth,innerHeight);renderer.setPixelRatio(Math.min(devicePixelRatio,1.6));renderer.setClearColor(0x172630);renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.15;renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;renderer.domElement.tabIndex=0;renderer.domElement.setAttribute('aria-label','Robot movement area. Use the camera and movement thumb controls.');document.body.appendChild(renderer.domElement);
 const scene=new THREE.Scene();scene.fog=new THREE.Fog(0x172630,27,65);
 const camera=new THREE.PerspectiveCamera(43,innerWidth/innerHeight,.05,100);
 scene.add(new THREE.HemisphereLight(0xc9e4ff,0x53565c,2.2));
@@ -32,7 +32,6 @@ renderer.domElement.addEventListener('pointerdown',e=>{if(e.button!==0)return;dr
 renderer.domElement.addEventListener('pointermove',e=>{if(!drag||drag.id!==e.pointerId)return;orbit+=(e.clientX-drag.x)*.006;elevation=THREE.MathUtils.clamp(elevation+(e.clientY-drag.y)*.003,settings.minPitch*Math.PI/180,settings.maxPitch*Math.PI/180);drag.x=e.clientX;drag.y=e.clientY});
 renderer.domElement.addEventListener('pointerup',()=>{drag=null});renderer.domElement.addEventListener('pointercancel',()=>{drag=null});
 function reset(){clearKeys();rig.reset();orbit=0;elevation=Math.atan2(2,6.8);accumulator=0;renderer.domElement.focus()}
-$('fullscreen').onclick=async()=>{try{if(document.fullscreenElement)await document.exitFullscreen();else await document.documentElement.requestFullscreen();}catch{$('error').textContent='Fullscreen is unavailable in this browser; use landscape for more space.'}};
 $('reset').onclick=()=>{if(actor)reset()};
 try{const {root}=await loadReference('./game-robot.glb');actor=new THREE.Group();scene.add(actor);root.scale.setScalar(2.6/3.15);actor.add(root);rig=new ReviewLocomotion(actor,root);actor.traverse(o=>{if(o.isMesh){o.castShadow=true;o.receiveShadow=true}});reset()}catch(e){$('error').textContent='The robot could not load. Refresh to try again.';throw e}
 function frame(now){requestAnimationFrame(frame);const dt=Math.min((now-last)/1000,.1);last=now;
@@ -53,7 +52,7 @@ function frame(now){requestAnimationFrame(frame);const dt=Math.min((now-last)/10
   }
   rig.advance(FIXED_DT,input);
   const rad=Math.PI/180;
-  if(Math.hypot(viewStick.x,viewStick.y)>.10){orbit-=viewStick.x*settings.cameraOrbit*rad*FIXED_DT;elevation=THREE.MathUtils.clamp(elevation+viewStick.y*settings.cameraPitch*rad*FIXED_DT,settings.minPitch*rad,settings.maxPitch*rad);}
+  if(Math.hypot(viewStick.x,viewStick.y)>.10){orbit+=viewStick.x*settings.cameraOrbit*rad*FIXED_DT;elevation=THREE.MathUtils.clamp(elevation+viewStick.y*settings.cameraPitch*rad*FIXED_DT,settings.minPitch*rad,settings.maxPitch*rad);}
   accumulator-=FIXED_DT;
  }
  if(!rig)return;
