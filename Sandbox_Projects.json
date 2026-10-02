@@ -3032,10 +3032,17 @@
       "id": 38,
       "name": "Robot Mobile",
       "tier": "5",
-      "categories": [],
+      "categories": [
+        "Animation Tool",
+        "Behaviour",
+        "Flock/Schools/Herds",
+        "Game",
+        "Simulation",
+        "Three.js"
+      ],
       "date": "2026-10-02",
-      "desc": "",
-      "fullDesc": "",
+      "desc": "mrBoxes goes Mobile is an interactive 3D robot playground featuring mobile thumb controls for camera movement and walking, alongside detailed animation review tools for inspecting, refining, and tuning turns, transitions, balance, and natural resting poses.",
+      "fullDesc": "mrBoxes goes Mobile is an interactive 3D robot playground designed for exploration on a mobile phone. It combines a controllable character, a shared environment, and dedicated motion review tools in a browser experience. The project explores how convincing character movement can emerge from procedural animation, careful observation, and continuous refinement.\nTwo thumb controllers make the playground accessible on a touchscreen. The left controller operates the camera, allowing users to orbit left and right and adjust the viewing elevation within defined limits. The right controller determines the robot’s walking direction and speed: moving further from the centre requests faster movement, while releasing the control brings the character towards a settled rest.\nTurning is deliberately gradual. Rather than instantly rotating to face a new direction, the robot takes time to align its body with the requested heading. Walking speed responds to both thumb displacement and directional alignment, allowing controlled pivots before forward movement builds. This slower approach gives changes of direction a more considered character and helps avoid abrupt sliding or snapping, particularly during reversals.\nThe Motion Review page provides a focused space to inspect and refine this behaviour. Repeatable studies expose walking, turning, stopping, restarting, and transitions between movement states. Playback can be slowed, paused, or stepped frame by frame, while camera views and contact markers help reveal problems with foot placement and balance. Adjustable settings allow movement behaviour to be tuned and shared with the Playground. User feedback then guides further code changes, effectively “teaching” the project through human observation and iteration rather than automatic machine learning.\nDeveloped through collaboration between the creator and an AI coding assistant, the project uses JavaScript to generate movement and Three.js to render the scene. It requires neither animation authoring software nor a game engine. Repeated visual feedback shaped the animation, corrected armour attachment, and refined the interface. Packaged as a website, it can be deployed online and opened directly in a phone browser without installing an app. This foundation could support interactive storytelling, virtual exhibitions, exploratory environments, and immersive experiences where responsive characters invite participation and make digital spaces feel more engaging and alive.",
       "resourceLabel": "",
       "resourceLink": "",
       "gallery": [
@@ -3078,13 +3085,71 @@
       ],
       "carousel": false,
       "link": "./mrboxes/mobile/index.html",
-      "tags": [],
+      "tags": [
+        "Procedural Animation",
+        "Mobile Interaction",
+        "3D Robotics",
+        "Three.js",
+        "Thumb Controls",
+        "Character Locomotion",
+        "Camera Navigation",
+        "Motion Review",
+        "Iterative Development",
+        "Immersive Experiences"
+      ],
       "thumb": "",
       "youtube": "",
       "videoCaption": "",
       "videoRuntime": "",
-      "specSheet": [],
-      "tunableParams": []
+      "specSheet": [
+        {
+          "label": "Engine",
+          "value": "Three.js renders the 3D environment using WebGL. Custom JavaScript generates walking, gradual turns, and settled rest poses without animation authoring software or a game engine."
+        },
+        {
+          "label": "Data",
+          "value": "GLB robot model, procedural motion sequences, and adjustable movement settings. Thumb input drives camera movement, character direction, and speed. Motion settings can be exported and imported as JSON."
+        },
+        {
+          "label": "Controls",
+          "value": "Left thumb controls camera orbit and limited elevation. Right thumb controls walking direction and speed, with gradual alignment for smoother turns. Release to stop and settle."
+        },
+        {
+          "label": "Instruments",
+          "value": "Motion Review provides repeatable studies, slow playback, pause, frame stepping, and timeline scrubbing. Contact markers, balance guides, and motion readouts support inspection, feedback, and refinement."
+        },
+        {
+          "label": "Deploy",
+          "value": "Static website containing HTML, CSS, JavaScript, and the robot model. Upload the supplied website package to GitHub Pages or another static host, retaining its folder structure."
+        },
+        {
+          "label": "Access",
+          "value": "Runs directly in a compatible mobile or desktop browser with WebGL support. No app installation or login required. Designed for landscape mobile use with touchscreen controls."
+        },
+        {
+          "label": "Built With",
+          "value": "Developed collaboratively with OpenAI Codex using JavaScript, Three.js, HTML, and CSS. Iterative visual feedback guided procedural animation, character corrections, controller behaviour, and interface design."
+        }
+      ],
+      "tunableParams": [
+        "Stick dead zone",
+        "maximum walking speed",
+        "turn speed",
+        "acceleration response",
+        "braking response",
+        "alignment curve power",
+        "pivot suppression start angle",
+        "full pivot angle",
+        "stick magnitude power",
+        "turn response",
+        "step duration",
+        "foot lift",
+        "pelvis bounce",
+        "camera orbit speed",
+        "camera elevation speed",
+        "minimum camera elevation",
+        "maximum camera elevation"
+      ]
     }
   ],
   "nextId": 39,
