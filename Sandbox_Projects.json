@@ -3027,9 +3027,67 @@
         }
       ],
       "tunableParams": []
+    },
+    {
+      "id": 38,
+      "name": "Robot Mobile",
+      "tier": "5",
+      "categories": [],
+      "date": "2026-10-02",
+      "desc": "",
+      "fullDesc": "",
+      "resourceLabel": "",
+      "resourceLink": "",
+      "gallery": [
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        },
+        {
+          "img": "",
+          "caption": ""
+        }
+      ],
+      "carousel": false,
+      "link": "./mrboxes/mobile/index.html",
+      "tags": [],
+      "thumb": "",
+      "youtube": "",
+      "videoCaption": "",
+      "videoRuntime": "",
+      "specSheet": [],
+      "tunableParams": []
     }
   ],
-  "nextId": 38,
+  "nextId": 39,
   "sortMode": "tier",
   "site": {
     "eyebrow": "Browser-based creative exploration : Chris Shaw",

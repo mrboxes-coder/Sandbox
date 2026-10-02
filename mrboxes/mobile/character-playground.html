@@ -1,0 +1,8 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><meta name="theme-color" content="#172630"><title>mrBoxes goes Mobile · Movement Playground</title><link rel="stylesheet" href="./mobile.css"></head>
+<body><header><small>mrBoxes goes Mobile</small><h1>Movement Playground</h1><p id="status">Loading robot…</p><p id="error" role="alert"></p></header>
+<nav><a href="./transition-review.html">Motion Review ↗</a><button id="reset">Reset</button><button id="fullscreen">Fullscreen</button></nav>
+<div class="instructions">Left thumb: orbit / elevation · Right thumb: travel direction / speed<br><span>Forward starts from the robot’s facing direction each time you release the stick.</span></div>
+<div class="stick-wrap camera"><span>CAMERA</span><div id="camera-stick" class="stick" aria-label="Camera thumb control: left/right orbit, up/down elevation"><i class="cross horizontal"></i><i class="cross vertical"></i><div class="knob"></div></div><small>Orbit · Elevation</small></div>
+<div class="stick-wrap movement"><span>MOVE</span><div id="move-stick" class="stick" aria-label="Movement thumb control: continuous direction and speed"><i class="cross horizontal"></i><i class="cross vertical"></i><div class="knob"></div></div><small>Direction · Speed</small></div>
+<p class="desktop-help">Desktop: W walk · A / D turn · Drag to orbit</p>
+<script type="module" src="./character-playground.js"></script></body></html>
