@@ -3083,7 +3083,7 @@
           "caption": ""
         }
       ],
-      "carousel": false,
+      "carousel": true,
       "link": "./mrboxes/mobile/index.html",
       "tags": [
         "Procedural Animation",
@@ -3097,7 +3097,7 @@
         "Iterative Development",
         "Immersive Experiences"
       ],
-      "thumb": "",
+      "thumb": "images/mrBoxes_mobile00.jpg",
       "youtube": "",
       "videoCaption": "",
       "videoRuntime": "",
