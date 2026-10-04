@@ -30,9 +30,9 @@ function updateFootsteps(){
   if(!contact)airborneSpeed[i]=Math.max(airborneSpeed[i],rig.speed);
   if(contact&&!previousContacts[i]){
    const speed=airborneSpeed[i],now=performance.now();
-   if(haptics&&!document.hidden&&speed>.12&&now-lastPulse>155){
-    // Shortening pulses suggest a fading impact: 60ms, 25ms gap, 30ms, 25ms gap, 15ms.
-    if(!pulse([60,25,30,25,15])){haptics=false;hapticButton.setAttribute('aria-pressed','false');hapticButton.textContent='Vibration blocked';}lastPulse=now;
+   if(haptics&&!document.hidden&&speed>.12&&now-lastPulse>205){
+    // Shortening pulses suggest a fading impact: 60ms, 50ms gap, 30ms, 50ms gap, 15ms.
+    if(!pulse([60,50,30,50,15])){haptics=false;hapticButton.setAttribute('aria-pressed','false');hapticButton.textContent='Vibration blocked';}lastPulse=now;
    }
    airborneSpeed[i]=0;
   }
