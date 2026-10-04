@@ -14,8 +14,16 @@ let haptics=false,previousContacts=[true,true],airborneSpeed=[0,0],lastPulse=-In
 function stopHaptics(){if(hapticAvailable)navigator.vibrate(0);previousContacts=[true,true];airborneSpeed=[0,0];}
 if(hapticAvailable){
  hapticButton.disabled=false;hapticButton.textContent='Vibration: Off';hapticButton.title='Optional vibration on foot contact';
- hapticButton.onclick=()=>{haptics=!haptics;hapticButton.setAttribute('aria-pressed',String(haptics));hapticButton.textContent='Vibration: '+(haptics?'On':'Off');if(!haptics)stopHaptics();};
+ hapticButton.onclick=()=>{
+  if(haptics){haptics=false;stopHaptics();hapticButton.setAttribute('aria-pressed','false');hapticButton.textContent='Vibration: Off';return;}
+  // A distinct test pulse from the user's tap checks the browser separately from walking.
+  haptics=pulse(100);
+  hapticButton.setAttribute('aria-pressed',String(haptics));
+  hapticButton.textContent=haptics?'Vibration: On':'Vibration blocked';
+  hapticButton.title=haptics?'A test pulse was requested. Tap to turn off.':'The browser rejected vibration. Tap to retry.';
+ };
 }
+function pulse(duration){try{return navigator.vibrate(duration)===true;}catch{return false;}}
 function updateFootsteps(){
  for(let i=0;i<2;i++){
   const contact=rig.contacts[i];
@@ -24,7 +32,7 @@ function updateFootsteps(){
    const speed=airborneSpeed[i],now=performance.now();
    if(haptics&&!document.hidden&&speed>.12&&now-lastPulse>120){
     const strength=Math.min(1,Math.max(0,(speed-.12)/.78));
-    navigator.vibrate(Math.round(6+strength*18));lastPulse=now;
+    if(!pulse(Math.round(20+strength*30))){haptics=false;hapticButton.setAttribute('aria-pressed','false');hapticButton.textContent='Vibration blocked';}lastPulse=now;
    }
    airborneSpeed[i]=0;
   }
