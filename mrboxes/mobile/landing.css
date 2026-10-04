@@ -30,3 +30,10 @@ h1{color:var(--text);font-weight:760;letter-spacing:0}h1 span{color:var(--accent
 @media(orientation:landscape){.topbar{padding:7px 12px}h1{font-size:26px}.intro{font-size:12px}.controllers article{border-radius:3px}.actions button{font-size:11px}.diagram svg{max-height:calc(100dvh - 175px)}}
 @media(orientation:landscape) and (max-height:350px){.topbar{padding:5px 10px}.brand-icon{width:30px;height:30px}h1{font-size:23px}.intro{font-size:11px}.orbit-labels{font-size:9px}.actions button{font-size:10px;letter-spacing:.04em}}
 @media(orientation:portrait) and (max-width:620px){.topbar{padding:12px}.brand-icon{width:30px;height:30px}h1{font-size:clamp(21px,6vw,30px)}.intro{font-size:12px}}
+
+/* Match Playground geometry, with blue replacing its dark grey accents. */
+.diagram .ring{fill:rgb(211 211 211 / 5%);stroke:#3b97ee;stroke-width:1.5}
+.diagram .axis{fill:none;stroke:#3b97ee;stroke-width:1.5;stroke-dasharray:3 5;stroke-linecap:butt}
+.diagram .arrows{fill:none;stroke:#3b97ee;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.diagram .knob{fill:rgb(59 151 238 / 100%);stroke:#d3d3d3;stroke-width:1.5}
+.diagram text.center{fill:#f2f3f7;font-size:17px;font-weight:400;letter-spacing:0}

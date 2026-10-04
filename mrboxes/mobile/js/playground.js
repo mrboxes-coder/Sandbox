@@ -7,6 +7,39 @@ import {settings} from './settings.js';
 const controller=new MobileController();
 const movement=new ThumbStick(document.getElementById('move-stick')),viewStick=new ThumbStick(document.getElementById('camera-stick'));
 const $=id=>document.getElementById(id),keys={forward:false,left:false,right:false};
+// Browser haptics are opt-in; duration approximates impact, not motor strength.
+const hapticButton=$('footsteps');
+const hapticAvailable=typeof navigator.vibrate==='function';
+let haptics=false,previousContacts=[true,true],airborneSpeed=[0,0],lastPulse=-Infinity;
+function stopHaptics(){if(hapticAvailable)navigator.vibrate(0);previousContacts=[true,true];airborneSpeed=[0,0];}
+if(hapticAvailable){
+ hapticButton.disabled=false;hapticButton.textContent='Vibration: Off';hapticButton.title='Optional vibration on foot contact';
+ hapticButton.onclick=()=>{
+  if(haptics){haptics=false;stopHaptics();hapticButton.setAttribute('aria-pressed','false');hapticButton.textContent='Vibration: Off';return;}
+  // A distinct test pulse from the user's tap checks the browser separately from walking.
+  haptics=pulse(100);
+  hapticButton.setAttribute('aria-pressed',String(haptics));
+  hapticButton.textContent=haptics?'Vibration: On':'Vibration blocked';
+  hapticButton.title=haptics?'A test pulse was requested. Tap to turn off.':'The browser rejected vibration. Tap to retry.';
+ };
+}
+function pulse(duration){try{return navigator.vibrate(duration)===true;}catch{return false;}}
+function updateFootsteps(){
+ for(let i=0;i<2;i++){
+  const contact=rig.contacts[i];
+  if(!contact)airborneSpeed[i]=Math.max(airborneSpeed[i],rig.speed);
+  if(contact&&!previousContacts[i]){
+   const speed=airborneSpeed[i],now=performance.now();
+   if(haptics&&!document.hidden&&speed>.12&&now-lastPulse>205){
+    // Shortening pulses suggest a fading impact: 60ms, 50ms gap, 30ms, 50ms gap, 15ms.
+    if(!pulse([60,50,30,50,15])){haptics=false;hapticButton.setAttribute('aria-pressed','false');hapticButton.textContent='Vibration blocked';}lastPulse=now;
+   }
+   airborneSpeed[i]=0;
+  }
+  previousContacts[i]=contact;
+ }
+}
+window.addEventListener('pagehide',stopHaptics);
 const renderer=new THREE.WebGLRenderer({antialias:true});renderer.setSize(innerWidth,innerHeight);renderer.setPixelRatio(Math.min(devicePixelRatio,1.6));renderer.setClearColor(0x172630);renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.15;renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;renderer.domElement.tabIndex=0;renderer.domElement.setAttribute('aria-label','Robot movement area. Use the camera and movement thumb controls.');document.body.appendChild(renderer.domElement);
 const scene=new THREE.Scene();scene.fog=new THREE.Fog(0x172630,27,65);
 const camera=new THREE.PerspectiveCamera(43,innerWidth/innerHeight,.05,100);
@@ -23,7 +56,7 @@ for(const [name,x,z,color] of [['NORTH',0,19,0x8db5c6],['EAST',19,0,0xc2a373],['
  box(1.6,.5,.6,x,.25,z,color);const c=document.createElement('canvas');c.width=512;c.height=128;const ctx=c.getContext('2d');ctx.fillStyle='#101d28';ctx.fillRect(0,0,512,128);ctx.fillStyle='#d4edf3';ctx.font='500 45px system-ui';ctx.textAlign='center';ctx.fillText(name,256,80);const sign=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(c)}));sign.position.set(x,1.4,z);sign.scale.set(2.4,.6,1);scene.add(sign);
 }
 let orbit=0,elevation=Math.atan2(2,6.8),drag=null,rig,actor,accumulator=0,last=performance.now();
-function clearKeys(){keys.forward=keys.left=keys.right=false;movement.clear();viewStick.clear();controller.reset();drag=null;}
+function clearKeys(){stopHaptics();keys.forward=keys.left=keys.right=false;movement.clear();viewStick.clear();controller.reset();drag=null;}
 window.addEventListener('keydown',e=>{if(/INPUT|SELECT|BUTTON|TEXTAREA/.test(e.target.tagName))return;const key={KeyW:'forward',KeyA:'left',KeyD:'right'}[e.code];if(key){keys[key]=true;e.preventDefault()}});
 window.addEventListener('keyup',e=>{const key={KeyW:'forward',KeyA:'left',KeyD:'right'}[e.code];if(key){keys[key]=false;e.preventDefault()}});
 window.addEventListener('blur',clearKeys);document.addEventListener('visibilitychange',()=>{if(document.hidden)clearKeys()});
@@ -50,6 +83,7 @@ function frame(now){requestAnimationFrame(frame);const dt=Math.min((now-last)/10
    if(Math.abs(actor.position.x+Math.sin(nextYaw)*distance)>18||Math.abs(actor.position.z+Math.cos(nextYaw)*distance)>18){input.speed=0;input.blocked=true;}
   }
   rig.advance(FIXED_DT,input);
+  updateFootsteps();
   const rad=Math.PI/180;
   if(Math.hypot(viewStick.x,viewStick.y)>.10){orbit+=viewStick.x*settings.cameraOrbit*rad*FIXED_DT;elevation=THREE.MathUtils.clamp(elevation+viewStick.y*settings.cameraPitch*rad*FIXED_DT,settings.minPitch*rad,settings.maxPitch*rad);}
   accumulator-=FIXED_DT;

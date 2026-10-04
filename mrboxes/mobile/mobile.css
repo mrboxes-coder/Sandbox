@@ -10,7 +10,44 @@ nav{position:absolute;right:max(16px,env(safe-area-inset-right));top:max(12px,en
 /* Reference controller artwork: full dotted axes, external arrows and radius guide. */
 .stick{background:#101014;border:1.5px solid #343642;margin:10px 9px;overflow:visible}
 .stick-arrows{overflow:visible}.stick-arrows path{stroke:#3b97ee;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-.stick-arrows .axis{fill:none;stroke:#626c84;stroke-width:1;stroke-dasharray:3 5;stroke-linecap:butt}
+.stick-arrows .axis{fill:none;stroke:#8290a8;stroke-width:1;stroke-dasharray:3 5;stroke-linecap:butt}
 .knob{width:34%;height:34%;left:33%;top:33%;border:1.5px solid #3b97ee;background:#163452;font-weight:400;font-size:17px}
 .stick-wrap .top-caption,.stick-wrap .bottom-caption{letter-spacing:.10em;color:#a5abc0;font-size:10px}
 @media(max-height:500px){.stick{width:108px;height:108px;margin:7px 9px}.stick-wrap{gap:3px}.stick-wrap .top-caption,.stick-wrap .bottom-caption{font-size:8px}.knob{font-size:14px}}
+
+/* Compact layout is selected automatically or by the development preview. */
+html[data-layout="compact"] header{left:max(12px,env(safe-area-inset-left));top:max(6px,env(safe-area-inset-top));gap:6px}
+html[data-layout="compact"] h1{font-size:16px}
+html[data-layout="compact"] .brand-icon{width:24px;height:24px}
+html[data-layout="compact"] #status{font-size:9px;margin-top:3px}
+html[data-layout="compact"] nav{right:max(12px,env(safe-area-inset-right));top:max(6px,env(safe-area-inset-top));gap:4px}
+html[data-layout="compact"] nav a,html[data-layout="compact"] button{font-size:9px;padding:0 8px;min-height:44px}
+html[data-layout="compact"] .stick{width:clamp(80px,25dvh,96px);height:clamp(80px,25dvh,96px);margin:7px 9px}
+html[data-layout="compact"] .stick-wrap{bottom:max(10px,env(safe-area-inset-bottom));gap:3px}
+html[data-layout="compact"] .camera{left:max(16px,env(safe-area-inset-left))}
+html[data-layout="compact"] .movement{right:max(16px,env(safe-area-inset-right))}
+html[data-layout="compact"] .stick-wrap>span{font-size:9px}
+html[data-layout="compact"] .top-caption,html[data-layout="compact"] .bottom-caption{display:none}
+html[data-layout="compact"] .orbit-caption{font-size:8px}
+html[data-layout="compact"] .knob{font-size:14px}
+
+/* Let the environment remain visible through both thumb controllers. */
+.stick{background:rgb(211 211 211 / 5%)}
+.knob{background:rgb(68 70 79 / 50%)}
+nav a,nav button,html[data-layout="compact"] nav a,html[data-layout="compact"] nav button{min-height:33px}
+
+/* Reference blue directional arrows and thumb outlines in both layouts. */
+.stick-arrows path:not(.axis){stroke:#3b97ee}
+.knob{border-color:#d3d3d3}
+
+/* Dark grey arrows and dotted guides on both controllers. */
+.stick-arrows path:not(.axis),.stick-arrows .axis{stroke:#44464f}
+
+.stick-arrows .axis{stroke-width:1.5}
+
+.camera.stick-wrap>span{color:#fff}
+.movement.stick-wrap>span{color:#fff}
+
+#footsteps[aria-pressed="true"]{background:var(--accent-fill);border-color:var(--accent);color:var(--accent-light)}
+#footsteps:disabled{opacity:.55;cursor:default}
+@media(max-width:700px){nav{flex-wrap:wrap;max-width:55%}#footsteps{order:4}}
