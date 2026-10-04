@@ -10,14 +10,14 @@ const $=id=>document.getElementById(id),keys={forward:false,left:false,right:fal
 // Browser haptics are opt-in; duration approximates impact, not motor strength.
 const hapticButton=$('footsteps');
 const hapticAvailable=typeof navigator.vibrate==='function';
-let haptics=false,previousContacts=[true,true],airborneSpeed=[0,0],lastPulse=-Infinity,footstepPulses=0;
+let haptics=false,previousContacts=[true,true],airborneSpeed=[0,0],lastPulse=-Infinity;
 function stopHaptics(){if(hapticAvailable)navigator.vibrate(0);previousContacts=[true,true];airborneSpeed=[0,0];}
 if(hapticAvailable){
  hapticButton.disabled=false;hapticButton.textContent='Vibration: Off';hapticButton.title='Optional vibration on foot contact';
  hapticButton.onclick=()=>{
   if(haptics){haptics=false;stopHaptics();hapticButton.setAttribute('aria-pressed','false');hapticButton.textContent='Vibration: Off';return;}
   // A distinct test pulse from the user's tap checks the browser separately from walking.
-  footstepPulses=0;haptics=pulse(100);
+  haptics=pulse(100);
   hapticButton.setAttribute('aria-pressed',String(haptics));
   hapticButton.textContent=haptics?'Vibration: On':'Vibration blocked';
   hapticButton.title=haptics?'A test pulse was requested. Tap to turn off.':'The browser rejected vibration. Tap to retry.';
@@ -30,9 +30,9 @@ function updateFootsteps(){
   if(!contact)airborneSpeed[i]=Math.max(airborneSpeed[i],rig.speed);
   if(contact&&!previousContacts[i]){
    const speed=airborneSpeed[i],now=performance.now();
-   if(haptics&&!document.hidden&&speed>.12&&now-lastPulse>120){
-    // Diagnostic: match the known perceptible enable pulse until phone testing is complete.
-    if(!pulse(100)){haptics=false;hapticButton.setAttribute('aria-pressed','false');hapticButton.textContent='Vibration blocked';}else{footstepPulses++;}lastPulse=now;
+   if(haptics&&!document.hidden&&speed>.12&&now-lastPulse>155){
+    // Shortening pulses suggest a fading impact: 60ms, 25ms gap, 30ms, 25ms gap, 15ms.
+    if(!pulse([60,25,30,25,15])){haptics=false;hapticButton.setAttribute('aria-pressed','false');hapticButton.textContent='Vibration blocked';}lastPulse=now;
    }
    airborneSpeed[i]=0;
   }
@@ -89,7 +89,7 @@ function frame(now){requestAnimationFrame(frame);const dt=Math.min((now-last)/10
   accumulator-=FIXED_DT;
  }
  if(!rig)return;
- $('status').textContent=rig.phase+' · '+rig.speed.toFixed(2)+' units/s'+(haptics?' · Footstep pulses: '+footstepPulses:'');
+ $('status').textContent=rig.phase+' · '+rig.speed.toFixed(2)+' units/s';
  const target=actor.position.clone().add(new THREE.Vector3(0,1.35,0));camera.position.copy(target).add(new THREE.Vector3(Math.sin(orbit)*7.088*Math.cos(elevation),7.088*Math.sin(elevation),Math.cos(orbit)*7.088*Math.cos(elevation)));camera.lookAt(target);renderer.render(scene,camera);
 }requestAnimationFrame(frame);
 window.addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)});
