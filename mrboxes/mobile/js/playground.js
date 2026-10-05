@@ -56,6 +56,24 @@ for(const [name,x,z,color] of [['NORTH',0,19,0x8db5c6],['EAST',19,0,0xc2a373],['
  box(1.6,.5,.6,x,.25,z,color);const c=document.createElement('canvas');c.width=512;c.height=128;const ctx=c.getContext('2d');ctx.fillStyle='#101d28';ctx.fillRect(0,0,512,128);ctx.fillStyle='#d4edf3';ctx.font='500 45px system-ui';ctx.textAlign='center';ctx.fillText(name,256,80);const sign=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(c)}));sign.position.set(x,1.4,z);sign.scale.set(2.4,.6,1);scene.add(sign);
 }
 let orbit=0,elevation=Math.atan2(2,6.8),drag=null,rig,actor,accumulator=0,last=performance.now();
+const settingsMenu=$('settings-menu');
+let cameraMode='remote';
+$('camera-mode').value=cameraMode;
+$('camera-mode').onchange=()=>{
+ cameraMode=$('camera-mode').value==='flight'?'flight':'remote';
+ viewStick.clear();
+ $('camera-mode-description').innerHTML=cameraMode==='flight'
+  ?'Left (Orbit to the Right) / Right (Orbit to the Left)<br>Up (camera lowers) / Down (camera raises).<br>Release: hold the camera angle.'
+  :'Left (Orbit to the Left) / Right (Orbit to the Right)<br>Up (camera raises) / Down (camera lowers).<br>Release: hold the camera angle.';
+ $('camera-stick').setAttribute('aria-label',cameraMode==='flight'
+  ?'Flight Sim camera control: left orbits right, right orbits left, up lowers, down raises'
+  :'Remote Control camera: left orbits left, right orbits right, up raises, down lowers');
+};
+
+$('settings-open').onclick=()=>{clearKeys();settingsMenu.showModal();};
+$('settings-close').onclick=()=>settingsMenu.close();
+settingsMenu.addEventListener('click',e=>{if(e.target===settingsMenu){const b=settingsMenu.getBoundingClientRect();if(e.clientX<b.left||e.clientX>b.right||e.clientY<b.top||e.clientY>b.bottom)settingsMenu.close();}});
+settingsMenu.addEventListener('close',()=>$('settings-open').focus());
 function clearKeys(){stopHaptics();keys.forward=keys.left=keys.right=false;movement.clear();viewStick.clear();controller.reset();drag=null;}
 window.addEventListener('keydown',e=>{if(/INPUT|SELECT|BUTTON|TEXTAREA/.test(e.target.tagName))return;const key={KeyW:'forward',KeyA:'left',KeyD:'right'}[e.code];if(key){keys[key]=true;e.preventDefault()}});
 window.addEventListener('keyup',e=>{const key={KeyW:'forward',KeyA:'left',KeyD:'right'}[e.code];if(key){keys[key]=false;e.preventDefault()}});
@@ -85,7 +103,7 @@ function frame(now){requestAnimationFrame(frame);const dt=Math.min((now-last)/10
   rig.advance(FIXED_DT,input);
   updateFootsteps();
   const rad=Math.PI/180;
-  if(Math.hypot(viewStick.x,viewStick.y)>.10){orbit+=viewStick.x*settings.cameraOrbit*rad*FIXED_DT;elevation=THREE.MathUtils.clamp(elevation+viewStick.y*settings.cameraPitch*rad*FIXED_DT,settings.minPitch*rad,settings.maxPitch*rad);}
+  if(Math.hypot(viewStick.x,viewStick.y)>.10){orbit+=(cameraMode==='flight'?-1:1)*viewStick.x*settings.cameraOrbit*rad*FIXED_DT;elevation=THREE.MathUtils.clamp(elevation+(cameraMode==='flight'?-1:1)*viewStick.y*settings.cameraPitch*rad*FIXED_DT,settings.minPitch*rad,settings.maxPitch*rad);}
   accumulator-=FIXED_DT;
  }
  if(!rig)return;
