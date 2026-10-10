@@ -3,9 +3,14 @@ const $ = id => document.getElementById(id);
 let pc, app, rig, camera, world, asset, ready = false, busy = false, yaw = 0, armed = true;
 let previousA = false, previousB = false, needsCenter = false, seconds = 0, frames = 0;
 const status = text => $('status').textContent = text;
-const config = {practice: {position:[0,0,3], yaw:0},lasalle:{position:[0,0,4],yaw:0,url:'assets/LASALLE.sog'}};
-let current = config.practice, sceneScale = 1, floor = 0;
-function buttons(){ $('load').disabled=busy||!!app?.xr.active; $('reset').disabled=!ready||busy; $('enter').disabled=!ready||busy||!app?.xr.isAvailable(pc.XRTYPE_VR); }
+const config = {
+  practice: {title:'Practice room', position:[0,0,3], yaw:0},
+  bukit: {title:'Bukit Pasoh', url:'assets/Bukit_Pasoh.sog', position:[0,0,4], yaw:0},
+  everett: {title:'Everett', url:'assets/Everett.sog', position:[0,0,4], yaw:0},
+  lasalle: {title:'LASALLE College', url:'assets/LASALLE.sog', position:[0,0,4], yaw:0}
+};
+let current = config.practice, sceneScale = 1, floor = 0, activeLod = false;
+function buttons(){ $('lod').disabled=busy||!!app?.xr.active; $('scene').disabled=busy||!!app?.xr.active; $('load').disabled=busy||!!app?.xr.active; $('reset').disabled=!ready||busy; $('enter').disabled=!ready||busy||!app?.xr.isAvailable(pc.XRTYPE_VR); }
 function reset(){
   yaw=current.yaw;rig.setEulerAngles(0,yaw,0);
   rig.setPosition(current.position[0]*sceneScale,floor*sceneScale,current.position[2]*sceneScale);
@@ -22,21 +27,24 @@ async function load(){
     world?.destroy();if(asset){asset.unload();app.assets.remove(asset);asset=null;}
     world=new pc.Entity('Environment');app.root.addChild(world);
     current=config[$('scene').value];sceneScale=current.url?scale:1;floor=current.url?height:0;
+    activeLod=!!current.url && $('lod').checked;
+    app.scene.gsplat.splatBudget=activeLod?400000:0;
     if(current.url){
-      status('Downloading and preparing LASALLE… This can take a while on Quest.');
-      asset=new pc.Asset('LASALLE','gsplat',{url:current.url,filename:'LASALLE.sog'});app.assets.add(asset);
+      status('Downloading and preparing '+current.title+'... This can take a while on Quest.');
+      const url=activeLod?current.url.replace('assets/','assets/lod/').replace('.sog','/lod-meta.json'):current.url;
+      asset=new pc.Asset(current.title,'gsplat',{url,filename:activeLod?'lod-meta.json':'scene.sog'});app.assets.add(asset);
       await new Promise((resolve,reject)=>{asset.once('load',resolve);asset.once('error',err=>reject(Error(String(err))));app.assets.load(asset);});
-      const splat=new pc.Entity('Splat');splat.addComponent('gsplat',{asset});splat.setEulerAngles(180,0,0);splat.setLocalScale(sceneScale,sceneScale,sceneScale);world.addChild(splat);
+      const splat=new pc.Entity('Splat');splat.addComponent('gsplat',{asset,unified:true});splat.setEulerAngles(180,0,0);splat.setLocalScale(sceneScale,sceneScale,sceneScale);world.addChild(splat);
     }else{
       box('Floor',[0,-.05,0],[12,.1,12],[.08,.13,.2]);
       for(let i=-6;i<=6;i++){box('Grid',[i,.005,0],[.015,.01,12],[.17,.28,.4]);box('Grid',[0,.005,i],[12,.01,.015],[.17,.28,.4]);}
       box('Blue landmark',[-2,.75,-2],[.6,1.5,.6],[.1,.4,.9]);box('Orange landmark',[2,.5,-3],[1,1,1],[.9,.35,.1]);
     }
-    ready=true;reset();status('Ready. Put on your headset and select Enter VR.');
-  }catch(error){status('Could not load: '+error.message);}finally{busy=false;buttons();}
+    ready=true;reset();status('Ready'+(current.url?(activeLod?' - LOD enabled (detail streams as you move)':' - full detail'):'')+'. Select Enter VR when the scene is visible.');
+  }catch(error){status('Could not load '+current.title+': '+error.message+' Check that the SOG file exists in the assets folder.');}finally{busy=false;buttons();}
 }
 function update(dt){
-  seconds+=dt;frames++;if(seconds>=1){$('stats').textContent=`${Math.round(frames/seconds)} FPS · ${app.xr.active?'VR':'browser preview'} · ${current.url?'LASALLE':'practice room'}`;seconds=frames=0;}
+  seconds+=dt;frames++;if(seconds>=1){$('stats').textContent=`${Math.round(frames/seconds)} FPS - ${app.xr.active?'VR':'browser preview'} - ${current.title} - ${activeLod?'LOD on':'LOD off'}`;seconds=frames=0;}
   if(!app.xr.active||!ready)return;
   if(app.xr.session.visibilityState!=='visible'){needsCenter=true;return;}
   let lx=0,ly=0,rx=0,ry=0,a=false,b=false;
@@ -51,17 +59,18 @@ function update(dt){
   rig.translate(delta.x,delta.y,delta.z);
 }
 async function boot(){try{
-  pc=await import('https://cdn.jsdelivr.net/npm/playcanvas@2.12.1/+esm');
+  pc=await import('https://cdn.jsdelivr.net/npm/playcanvas@2.23.2/+esm');
   app=new pc.Application($('view'),{graphicsDeviceOptions:{antialias:false,alpha:false}});app.graphicsDevice.maxPixelRatio=1;
   app.setCanvasFillMode(pc.FILLMODE_FILL_WINDOW);app.setCanvasResolution(pc.RESOLUTION_AUTO);
   rig=new pc.Entity('Player rig');app.root.addChild(rig);camera=new pc.Entity('Head');camera.addComponent('camera',{clearColor:new pc.Color(.025,.045,.075),nearClip:.05,farClip:1000});rig.addChild(camera);
   app.xr.on('available',buttons);app.xr.on('error',error=>{status('VR error: '+error.message);buttons();});
   app.xr.on('start',()=>{document.body.classList.add('xr');reset();buttons();});
   app.xr.on('end',()=>{document.body.classList.remove('xr');reset();buttons();status('VR ended. You can change environments or enter again.');});
+  $('lod').onchange=()=>{$('lodNote').textContent=$('lod').checked?'On: streams full and reduced-detail regions. Press Load environment to apply.':'Off: loads the original full-detail SOG. Press Load environment to apply.';};
   $('load').onclick=load;$('reset').onclick=reset;
   $('enter').onclick=()=>{app.xr.start(camera.camera,pc.XRTYPE_VR,pc.XRSPACE_LOCALFLOOR,{callback:error=>{if(error)status('Could not enter VR: '+error.message);}});};
   addEventListener('resize',()=>app.resizeCanvas());app.on('update',update);app.start();
   $('support').textContent=!isSecureContext?'VR needs HTTPS. Upload this folder to your HTTPS website.':!navigator.xr?'This browser has no WebXR. Open this page in the Quest browser.':'WebXR detected. Enter VR becomes available when immersive VR is supported.';
   await load();
-}catch(error){status('Startup failed: '+error.message+' — check your internet connection and reload.');}}
+}catch(error){status('Startup failed: '+error.message+' - check your internet connection and reload.');}}
 boot();
