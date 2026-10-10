@@ -3,14 +3,9 @@ const $ = id => document.getElementById(id);
 let pc, app, rig, camera, world, asset, ready = false, busy = false, yaw = 0, armed = true;
 let previousA = false, previousB = false, needsCenter = false, seconds = 0, frames = 0;
 const status = text => $('status').textContent = text;
-const config = {
-  practice: {title:'Practice room', position:[0,0,3], yaw:0},
-  bukit: {title:'Bukit Pasoh', url:'assets/Bukit_Pasoh.sog', position:[0,0,4], yaw:0},
-  everett: {title:'Everett', url:'assets/Everett.sog', position:[0,0,4], yaw:0},
-  lasalle: {title:'LASALLE College', url:'assets/LASALLE.sog', position:[0,0,4], yaw:0}
-};
+import {config} from './scenes.mjs';
 let current = config.practice, sceneScale = 1, floor = 0, activeLod = false;
-function buttons(){ $('lod').disabled=busy||!!app?.xr.active; $('scene').disabled=busy||!!app?.xr.active; $('load').disabled=busy||!!app?.xr.active; $('reset').disabled=!ready||busy; $('enter').disabled=!ready||busy||!app?.xr.isAvailable(pc.XRTYPE_VR); }
+function buttons(){ $('engine').disabled=busy||!!app?.xr.active; $('lod').disabled=busy||!!app?.xr.active; $('scene').disabled=busy||!!app?.xr.active; $('load').disabled=busy||!!app?.xr.active; $('reset').disabled=!ready||busy; $('enter').disabled=!ready||busy||!app?.xr.isAvailable(pc.XRTYPE_VR); }
 function reset(){
   yaw=current.yaw;rig.setEulerAngles(0,yaw,0);
   rig.setPosition(current.position[0]*sceneScale,floor*sceneScale,current.position[2]*sceneScale);
@@ -44,7 +39,7 @@ async function load(){
   }catch(error){status('Could not load '+current.title+': '+error.message+' Check that the SOG file exists in the assets folder.');}finally{busy=false;buttons();}
 }
 function update(dt){
-  seconds+=dt;frames++;if(seconds>=1){$('stats').textContent=`${Math.round(frames/seconds)} FPS - ${app.xr.active?'VR':'browser preview'} - ${current.title} - ${activeLod?'LOD on':'LOD off'}`;seconds=frames=0;}
+  seconds+=dt;frames++;if(seconds>=1){$('stats').textContent=`PlayCanvas | ${Math.round(frames/seconds)} FPS - ${app.xr.active?'VR':'browser preview'} - ${current.title} - ${activeLod?'LOD on':'LOD off'}`;seconds=frames=0;}
   if(!app.xr.active||!ready)return;
   if(app.xr.session.visibilityState!=='visible'){needsCenter=true;return;}
   let lx=0,ly=0,rx=0,ry=0,a=false,b=false;
@@ -66,7 +61,7 @@ async function boot(){try{
   app.xr.on('available',buttons);app.xr.on('error',error=>{status('VR error: '+error.message);buttons();});
   app.xr.on('start',()=>{document.body.classList.add('xr');reset();buttons();});
   app.xr.on('end',()=>{document.body.classList.remove('xr');reset();buttons();status('VR ended. You can change environments or enter again.');});
-  $('lod').onchange=()=>{$('lodNote').textContent=$('lod').checked?'On: streams full and reduced-detail regions. Press Load environment to apply.':'Off: loads the original full-detail SOG. Press Load environment to apply.';};
+
   $('load').onclick=load;$('reset').onclick=reset;
   $('enter').onclick=()=>{app.xr.start(camera.camera,pc.XRTYPE_VR,pc.XRSPACE_LOCALFLOOR,{callback:error=>{if(error)status('Could not enter VR: '+error.message);}});};
   addEventListener('resize',()=>app.resizeCanvas());app.on('update',update);app.start();
