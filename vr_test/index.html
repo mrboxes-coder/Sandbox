@@ -1,0 +1,11 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>VR Gaussian Splat · Quest</title><link rel="stylesheet" href="style.css"></head>
+<body><canvas id="view"></canvas><main id="panel"><span class="eyebrow">QUEST 2 · FIRST PROTOTYPE</span><h1>Step inside your scene.</h1><p>Explore Gaussian splats with your headset and Touch controllers.</p>
+<label>Environment<select id="scene"><option value="practice">Practice room · no download</option><option value="lasalle">LASALLE College · Gaussian splat</option></select></label>
+<label>Movement speed<select id="speed"><option value="0.5">Gentle · 0.5 m/s</option><option value="1">Normal · 1 m/s</option><option value="2">Fast · 2 m/s</option></select></label>
+<label>Scene scale · metres per source unit<input id="scale" type="number" value="1" min="0.01" max="100" step="0.1"></label>
+<label>Starting floor height · source units<input id="floor" type="number" value="0" step="0.1"></label>
+<div class="actions"><button id="load" disabled>Load environment</button><button id="enter" disabled>Enter VR</button><button id="reset" disabled>Reset view</button></div>
+<p id="status" role="status">Starting renderer…</p><p id="support"></p>
+<div class="instructions"><strong>Touch controller guide</strong><p>Left stick: move in the direction you face.<br>Right stick left/right: turn 30°.<br>Right stick up/down: fly up/down.<br>A: reset position · B: leave VR.</p><p>Release the sticks to stop. No wall collision or teleportation in this first prototype. Use the headset’s boundary and begin in a clear space.</p></div>
+<small id="stats">Performance will appear after loading.</small></main><script type="module" src="app.js"></script></body></html>
