@@ -3154,11 +3154,15 @@
     {
       "id": 39,
       "name": "VR",
-      "tier": "",
-      "categories": [],
-      "date": "",
-      "desc": "",
-      "fullDesc": "",
+      "tier": "4",
+      "categories": [
+        "Canvas",
+        "Gaussian Splat",
+        "Three.js"
+      ],
+      "date": "2026-10-10",
+      "desc": "This project explores options for viewing Gaussian splat environments in VR. It compares and contrasts PlayCanvas and SparkJS rendering, controller navigation, movement settings, and level-of-detail options across several captured locations using a browser-based viewer designed for Meta Quest headsets.",
+      "fullDesc": "This project is an experimental browser-based viewer for exploring Gaussian splat environments in virtual reality. Its purpose is to compare different ways of displaying captured places, rather than to present a single finished rendering approach. The current prototype supports three SOG scenes and a practice environment, with PlayCanvas and SparkJS available as selectable rendering engines. A Meta Quest headset and hand controllers are the intended way to experience and navigate the scenes.\n        \nThe viewer loads a chosen environment and lets the user move through it using the controllers. Settings include movement speed, scene scale, floor height, and an optional level-of-detail mode. LOD adjusts how scene detail is handled as the viewer moves, which can affect clarity and performance. The controls are shared across the two engines so users can compare their rendering behavior in similar conditions. The prototype is designed to run as a web project, making it possible to try through a compatible browser or host the files online.\n       \nThe project began with the idea of bringing Gaussian splats to a Quest 2 experience. It grew into a practical comparison tool: first establishing a basic VR viewer, then adding SOG environments, movement controls, LOD, and a choice of render engines. This progression makes it easier to investigate how engine, scene, and settings influence the experience.\n       \nPotential uses include virtual site visits, architectural and heritage interpretation, location-based storytelling, education, and previewing captured spaces for immersive productions. Gaussian splats can convey the appearance of real locations in a navigable form, offering creators another way to share captured environments.\n       \nFuture development could add more scenes, clearer comparison controls, performance and image-quality measurements, and guided points of interest. The viewer could also grow to support desktop and mobile previews, annotations, audio, multiple viewpoints, and curated journeys through a location. Testing on the actual headset will help identify comfort, controller, loading, and performance improvements. The project’s longer-term value is as a flexible testbed for comparing tools and design choices for immersive media.",
       "resourceLabel": "",
       "resourceLink": "",
       "gallery": [
@@ -3199,9 +3203,20 @@
           "caption": ""
         }
       ],
-      "carousel": false,
+      "carousel": true,
       "link": "./vr_test",
-      "tags": [],
+      "tags": [
+        "Gaussian splatting",
+        "virtual reality",
+        "Meta Quest",
+        "immersive media",
+        "PlayCanvas",
+        "SparkJS",
+        "SOG files",
+        "level of detail",
+        "VR navigation",
+        "rendering comparison"
+      ],
       "thumb": "",
       "youtube": "",
       "videoCaption": "",
