@@ -3217,48 +3217,12 @@
         "VR navigation",
         "rendering comparison"
       ],
-      "thumb": "",
+      "thumb": "images/vr_01.jpg",
       "youtube": "",
       "videoCaption": "",
       "videoRuntime": "",
-      "specSheet": [
-        {
-          "label": "Engine",
-          "value": "PlayCanvas and SparkJS are selectable Gaussian splat renderers. PlayCanvas loads SOG scenes directly; SparkJS uses Three.js and supports its own LOD mode. The viewer lets you compare both engines with the same environments and navigation settings."
-        },
-        {
-          "label": "Data",
-          "value": "Three captured environments stored as SOG files, plus a practice environment. Pre-generated LOD assets support the PlayCanvas option; SparkJS handles LOD at runtime."
-        },
-        {
-          "label": "Control",
-          "value": "Meta Quest hand-controller navigation is the target: left stick moves, right stick turns and adjusts height, A resets, and B exits VR. The viewer also provides settings for movement speed, scene scale, floor height, and LOD."
-        },
-        {
-          "label": "Instruments",
-          "value": "Environment and engine selectors, an LOD checkbox, and adjustable movement and scene settings. These let you explore and compare the available configurations; dedicated performance and image-quality measurement tools are not yet included."
-        },
-        {
-          "label": "Deploy",
-          "value": "A static web project packaged as a ZIP, with the HTML, JavaScript, styles, and scene assets. It can be hosted on GitHub Pages or another static host. VR access requires a compatible browser and secure hosting."
-        },
-        {
-          "label": "Access",
-          "value": "Designed for browser use on a Meta Quest headset, with desktop preview for setup and comparison. The prototype has not yet been fully validated on the Quest 2 hardware."
-        },
-        {
-          "label": "Built With",
-          "value": "JavaScript, HTML, CSS, PlayCanvas, SparkJS, and Three.js. Developed iteratively with OpenAI Codex, adding SOG scenes, engine selection, LOD options, and controller navigation."
-        }
-      ],
-      "tunableParams": [
-        "Render Engine",
-        "Environment",
-        "LOD = Level of Detail",
-        "Movement Speed",
-        "Scene Scale",
-        "Floor Height"
-      ]
+      "specSheet": [],
+      "tunableParams": []
     }
   ],
   "nextId": 40,
